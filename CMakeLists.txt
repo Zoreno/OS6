@@ -13,7 +13,7 @@ enable_language(ASM_NASM)
 
 set(CFLAGS "-ffreestanding -std=c11 -Wall -Wextra -ffreestanding -fno-builtin \
 -nostdlib -nostdinc -finline-functions -fno-stack-protector -fomit-frame-pointer \
--Werror=implicit-function-declaration -mno-sse")
+-Werror=implicit-function-declaration -mno-sse -fno-exceptions -g")
 set(CMAKE_C_FLAGS "${CFLAGS}")
 set(CMAKE_C_LINK_EXECUTABLE "ld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/kernel/linker.ld")

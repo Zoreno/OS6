@@ -1,2 +1,3 @@
 build/*
-kernel.bin
+*.bin
+.vscode/**

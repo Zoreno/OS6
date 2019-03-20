@@ -53,6 +53,9 @@ header_end:
 ;;=============================================================================
 
 STACK_SIZE equ 0x4000
+VIDEO_MEM equ 0xb8000
+
+TEXT_COLOR equ 0x0f
 
 global start
 
@@ -77,13 +80,86 @@ start:
 
     lgdt [gdt64.pointer]    ; Load the 64 bit GDT
 
+    mov ebx, message
+    call print_string_pm32
+
+    hlt
+
     pop ebx
     pop eax
 
     jmp gdt64.code:long_mode_start  ; Jump to 64 bit land!
 
-    mov dword [0xb8000], 0x2f4b2f4f ; Print OK on the screen.
+    mov dword [VIDEO_MEM], 0x2f4b2f4f ; Print OK on the screen.
     hlt
+
+;;=============================================================================
+;; Text printing utilities
+;;=============================================================================
+
+TERM_W equ 80
+TERM_H equ 25
+
+message: db 'This is a very very long string that should span more than one line in the terminal', 0
+xpos: dd 0
+ypos: dd 0
+
+;;
+;; Prints a string in 32 bit mode
+;; Assumes that ebx contains a pointer to a string in memory
+;;
+print_string_pm32:
+    pusha                   ; Save all registers
+
+.print_string_pm_loop32: 
+
+    mov edx, dword [ypos]   ; Store the y position
+    mov eax, TERM_W         ; Multiply with the width of the terminal
+    mul edx        
+    mov edx, eax            ; Result is stored in eax, so move it to edx again
+    add edx, dword [xpos]   ; Add the x position
+    shl edx, 1              ; Each entry is of size 2 bytes, so multiply with 2
+                            ; to get the correct offset.
+    add edx, VIDEO_MEM      ; Store the pointer to the video memory
+   
+    mov al, [ebx]           ; Get the current character from the string
+    mov ah, TEXT_COLOR      ; Set the text coloring
+
+    cmp al, 0               ; If the current character is null, we are done
+    je .print_string_pm_done32
+
+    cmp al, '\n'
+    je .newline32
+
+    mov [edx], ax           ; Store the character in video memory
+    inc ebx                 ; Increase the current character counter
+    
+    mov eax, dword [xpos]   ; Get the current x position
+    inc eax                 ; Increase it by one
+    mov dword [xpos], eax   ; Store it back
+
+    cmp eax, TERM_W         ; Check if it is below the width of the terminal
+
+    jb .newline_done32      ; If it is, jump past the newline block
+
+.newline32:
+    mov dword [xpos], 0     ; Reset the x position  
+
+    mov eax, dword [ypos]   ; Get the y position 
+    inc eax                 ; Increase it by one
+    mov dword [ypos], eax   ; Store it back
+
+.newline_done32:
+
+    jmp .print_string_pm_loop32
+
+.print_string_pm_done32:
+    popa                    ; Restore all registers
+    ret                     ; Return
+
+;;=============================================================================
+;; Kernel booting routines
+;;=============================================================================
 
 ;;
 ;; Prints an error message followd by the error code given in al
@@ -176,17 +252,24 @@ check_long_mode:
     mov al, "2"         ; Set the error code to 2
     jmp error           ; Jump to the error block.
 
+;;=============================================================================
+;; Paging setup
+;;=============================================================================
+
 ;;
 ;; Setup identity mapping with huge pages
 ;; 
 setup_page_tables:
+    xor ebx, ebx
     mov eax, p3_table   ; Map the P4 table entry to the P3 table
     or eax, 0b11        ; Present and writable flags
     mov [p4_table], eax ; Store the result in memory
+    mov [p4_table + 4], ebx
 
     mov eax, p2_table   ; Map the P3 table entry to the P2 table
     or eax, 0b11        ; Present and writable flags
     mov [p3_table], eax ; Store the result in memory
+    mov [p3_table + 4], ebx
 
     mov ecx, 0          ; Counter
 
@@ -196,6 +279,9 @@ setup_page_tables:
     mul ecx             ; Multiply with index to get offset into memory
     or eax, 0b10000011  ; Present + writable + huge pages
     mov [p2_table + ecx * 8], eax ; Store the entry
+    xor eax, eax
+    mov [p2_table + ecx * 8 + 4], eax ; Null out the rest of the descriptor
+
 
     inc ecx             ; Increase the current index
     cmp ecx, 512        ; Check if the index is 512
@@ -249,9 +335,9 @@ long_mode_start:
     mov fs, ax
     mov gs, ax
 
-    call kernel_main
+    ;call kernel_main
 
-    mov rax, 0x2f592f412f4b2f4f ; Print OKAY to screen
+    mov rax, 0x4f592f412f4b2f4f ; Print OKAY to screen
     mov qword [0xb8000], rax
     hlt
 
