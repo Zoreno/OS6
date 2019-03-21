@@ -19,7 +19,7 @@ set(CMAKE_C_LINK_EXECUTABLE "ld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/kernel/linker.ld")
 set(CMAKE_ASM_NASM_OBJECT_FORMAT elf64)
 set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> \
-    -f ${CMAKE_ASM_NASM_OBJECT_FORMAT} -o <OBJECT> <SOURCE>")
+    -f ${CMAKE_ASM_NASM_OBJECT_FORMAT} -g -F dwarf -o <OBJECT> <SOURCE>")
 
 add_executable(kernel.bin kernel/boot.asm kernel/kernel_main.c)
 
@@ -39,6 +39,12 @@ add_custom_command(OUTPUT ${ISO_IMAGE}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
 add_custom_target(run
-    COMMAND qemu-system-x86_64 ${ISO_IMAGE}
+    COMMAND qemu-system-x86_64 -vga std ${ISO_IMAGE}
+    DEPENDS ${ISO_IMAGE}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+
+add_custom_target(debug
+    COMMAND qemu-system-x86_64 -s -S ${ISO_IMAGE} &
+    COMMAND ddd --gdb -command=${CMAKE_SOURCE_DIR}/gdbdebug 2> /dev/null
     DEPENDS ${ISO_IMAGE}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
