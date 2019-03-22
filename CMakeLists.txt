@@ -13,7 +13,7 @@ enable_language(ASM_NASM)
 
 set(CFLAGS "-ffreestanding -std=c11 -Wall -Wextra -ffreestanding -fno-builtin \
 -nostdlib -nostdinc -finline-functions -fno-stack-protector -fomit-frame-pointer \
--Werror=implicit-function-declaration -mno-sse -fno-exceptions -g")
+-Werror=implicit-function-declaration -mno-sse -fno-exceptions -g -nodefaultlibs")
 set(CMAKE_C_FLAGS "${CFLAGS}")
 set(CMAKE_C_LINK_EXECUTABLE "ld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/kernel/linker.ld")
@@ -21,7 +21,14 @@ set(CMAKE_ASM_NASM_OBJECT_FORMAT elf64)
 set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> \
     -f ${CMAKE_ASM_NASM_OBJECT_FORMAT} -g -F dwarf -o <OBJECT> <SOURCE>")
 
-add_executable(kernel.bin kernel/boot.asm kernel/kernel_main.c)
+add_executable(kernel.bin "")
+
+target_sources(kernel.bin PUBLIC kernel/src/boot/boot.asm)
+target_sources(kernel.bin PUBLIC kernel/src/kernel_main.c)
+target_sources(kernel.bin PUBLIC kernel/src/debug/debug_terminal.c)
+
+
+target_include_directories(kernel.bin SYSTEM PUBLIC kernel/include)
 
 set_target_properties(kernel.bin PROPERTIES LINKER_LANGUAGE C)
 set_target_properties(kernel.bin PROPERTIES LINK_FLAGS "-n -T ${LINKER_SCRIPT}")

@@ -111,7 +111,7 @@ start:
     hlt
 
 ;;=============================================================================
-;; Text printing utilities
+;; Text printing utilities (32 bit mode)
 ;;=============================================================================
 
 TERM_W equ 80
@@ -548,6 +548,8 @@ long_mode_start:
     mov fs, ax
     mov gs, ax
 
+    call clear_screen64
+
     ;call kernel_main
 
     mov rax, 0x4f592f412f4b2f4f ; Print OKAY to screen
@@ -555,12 +557,33 @@ long_mode_start:
     hlt
 
 ;;=============================================================================
+;; Text printing utilities (64 bit mode)
+;;=============================================================================
+
+clear_screen64:
+    push rdi
+    push rax
+    push rcx
+    mov rdi, VIDEO_MEM  ; Set the address
+    mov rax, (TEXT_COLOR << 8) | \
+    (TEXT_COLOR << 24) | \
+    (TEXT_COLOR << 40) | \
+    (TEXT_COLOR << 56)   
+    mov rcx, TERM_H * TERM_W / 4    ; Number of qwords in the terminal buffer
+    rep stosq               ; Repeat the store operation
+
+    pop rcx
+    pop rax
+    pop rdi
+    ret                     ; Return
+
+;;=============================================================================
 ;; Initialized memory area 
 ;;=============================================================================
 
 section .data
 
-message: db 'Preparing to switch to 64 bit mode...', 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 'Hej', 0x12, 'Hello',  0
+message: db 'Preparing to switch to 64 bit mode...', 0x12, 0
 xpos: dd 0
 ypos: dd 0
 mb_message: db 'Checking for multiboot... ', 0
