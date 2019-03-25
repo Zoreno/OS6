@@ -1,3 +1,7 @@
+#==============================================================================
+# Cmake file for compiling the OS6 operating system
+#==============================================================================
+
 cmake_minimum_required(VERSION 3.5)
 
 set(CMAKE_ASM_SOURCE_FILE_EXTENSIONS "asm")
@@ -10,6 +14,9 @@ set(CAN_USE_ASSEMBLER TRUE)
 
 enable_language(ASM_NASM)
 
+#==============================================================================
+# Flags and compiler configuration
+#==============================================================================
 
 set(CFLAGS "-ffreestanding -std=c11 -Wall -Wextra -ffreestanding -fno-builtin \
 -nostdlib -nostdinc -finline-functions -fno-stack-protector -fomit-frame-pointer \
@@ -21,18 +28,71 @@ set(CMAKE_ASM_NASM_OBJECT_FORMAT elf64)
 set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> \
     -f ${CMAKE_ASM_NASM_OBJECT_FORMAT} -g -F dwarf -o <OBJECT> <SOURCE>")
 
-add_executable(kernel.bin "")
+#==============================================================================
+# Path macros
+#==============================================================================
 
-target_sources(kernel.bin PUBLIC kernel/src/boot/boot.asm)
-target_sources(kernel.bin PUBLIC kernel/src/kernel_main.c)
-target_sources(kernel.bin PUBLIC kernel/src/debug/debug_terminal.c)
+set(KERNEL_INCLUDE ${CMAKE_SOURCE_DIR}/kernel/include)
+set(KERNEL_SRC ${CMAKE_SOURCE_DIR}/kernel/src)
 
 
-target_include_directories(kernel.bin SYSTEM PUBLIC kernel/include)
+set(LIBK_INCLUDE ${CMAKE_SOURCE_DIR}/libk/include)
+set(LIBK_SRC ${CMAKE_SOURCE_DIR}/libk/src)
 
-set_target_properties(kernel.bin PROPERTIES LINKER_LANGUAGE C)
-set_target_properties(kernel.bin PROPERTIES LINK_FLAGS "-n -T ${LINKER_SCRIPT}")
-set_target_properties(kernel.bin PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
+set(KERNEL_EXEC kernel.bin)
+set(LIBK k)
+
+#==============================================================================
+# LIBK target
+#==============================================================================
+
+add_library(${LIBK} "")
+
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memset.c)
+
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isalnum.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isalpha.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/iscntrl.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isgraph.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isdigit.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/islower.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isprint.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/ispunct.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isspace.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isupper.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isxdigit.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/tolower.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/toupper.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isascii.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/toascii.c)
+
+target_include_directories(${LIBK} SYSTEM PRIVATE ${LIBK_INCLUDE})
+
+set_target_properties(${LIBK} PROPERTIES SKIP_BUILD_RPATH 1)
+
+#==============================================================================
+# Kernel target
+#==============================================================================
+
+add_executable(${KERNEL_EXEC} "")
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/boot/boot.asm)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/debug/debug_terminal.c)
+
+target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${KERNEL_INCLUDE})
+target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${LIBK_INCLUDE})
+
+target_link_libraries(${KERNEL_EXEC} PRIVATE ${LIBK})
+
+set_target_properties(${KERNEL_EXEC} PROPERTIES LINKER_LANGUAGE C)
+set_target_properties(${KERNEL_EXEC} PROPERTIES LINK_FLAGS "-n -T ${LINKER_SCRIPT}")
+set_target_properties(${KERNEL_EXEC} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
+
+#==============================================================================
+# Build ISO
+#==============================================================================
+
 
 set(ISO_NAME os.iso)
 set(ISO_IMAGE ${CMAKE_BINARY_DIR}/${ISO_NAME})
@@ -45,6 +105,10 @@ add_custom_command(OUTPUT ${ISO_IMAGE}
     COMMENT "Creating ISO image"
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
+#==============================================================================
+# Custom targets for running QEMU
+#==============================================================================
+
 add_custom_target(run
     COMMAND qemu-system-x86_64 -vga std ${ISO_IMAGE}
     DEPENDS ${ISO_IMAGE}
@@ -55,3 +119,7 @@ add_custom_target(debug
     COMMAND ddd --gdb -command=${CMAKE_SOURCE_DIR}/gdbdebug 2> /dev/null
     DEPENDS ${ISO_IMAGE}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+
+#==============================================================================
+# End of file
+#==============================================================================

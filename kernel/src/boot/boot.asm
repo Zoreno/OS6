@@ -550,7 +550,7 @@ long_mode_start:
 
     call clear_screen64
 
-    ;call kernel_main
+    call kernel_main
 
     mov rax, 0x4f592f412f4b2f4f ; Print OKAY to screen
     mov qword [0xb8000], rax
