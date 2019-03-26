@@ -1,6 +1,7 @@
 #include <debug/debug_terminal.h>
 
 #include <string.h>
+#include <stddef.h>
 
 #include <ctype.h>
 

@@ -30,13 +30,16 @@ typedef struct
 int atoi(const char *str);
 long int atol(const char *str);
 long long int atoll(const char *str);
+
 long int strtol(const char *str, char **endptr, int base);
 long long int strtoll(const char *str, char **endptr, int base);
 unsigned long int strtoul(const char *str, char **endptr, int base);
 unsigned long long int strtoull(const char *str, char **endptr, int base);
+
 void itoa(int i, int base, char *buf);
 void ltoa(long int i, int base, char *buf);
 void lltoa(long long int i, int base, char *buf);
+
 void uitoa(unsigned int i, int base, char *buf);
 void ultoa(unsigned long int i, int base, char *buf);
 void ulltoa(unsigned long long int i, int base, char *buf);

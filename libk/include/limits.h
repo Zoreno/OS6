@@ -24,4 +24,8 @@
 #define LONG_MAX 2147483647
 #define ULONG_MAX 4294967295
 
+#define LLONG_MIN -0x8000000000000000
+#define LLONG_MAX 0x7fffffffffffffff
+#define ULLONG_MAX 0xffffffffffffffff
+
 #endif

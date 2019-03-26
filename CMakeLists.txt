@@ -35,7 +35,6 @@ set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> \
 set(KERNEL_INCLUDE ${CMAKE_SOURCE_DIR}/kernel/include)
 set(KERNEL_SRC ${CMAKE_SOURCE_DIR}/kernel/src)
 
-
 set(LIBK_INCLUDE ${CMAKE_SOURCE_DIR}/libk/include)
 set(LIBK_SRC ${CMAKE_SOURCE_DIR}/libk/src)
 
@@ -43,13 +42,39 @@ set(KERNEL_EXEC kernel.bin)
 set(LIBK k)
 
 #==============================================================================
-# LIBK target
+# LIBK kernel C standard library target
 #==============================================================================
 
 add_library(${LIBK} "")
 
+# string.h header
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memset.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memchr.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memcmp.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memcpy.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memmove.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memsetw.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memsetl.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memsetll.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memccpy.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memmem.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/mempcpy.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memrchr.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memfrob.c)
 
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strcat.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strncat.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strchr.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strcmp.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strncmp.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strcpy.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strncpy.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strcspn.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strlen.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strnlen.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strpbrk.c)
+
+# ctype.h header
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isalnum.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isalpha.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/iscntrl.c)
@@ -65,6 +90,27 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/tolower.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/toupper.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isascii.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/toascii.c)
+
+# stdlib.h header
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/abs.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/bsearch.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/div.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/random.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/itoa.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/ltoa.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/lltoa.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/uitoa.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/ultoa.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/ulltoa.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/strtol.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/strtoul.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/strtoll.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/strtoull.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/atoi.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/atol.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/atoll.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/qsort.c)
+
 
 target_include_directories(${LIBK} SYSTEM PRIVATE ${LIBK_INCLUDE})
 

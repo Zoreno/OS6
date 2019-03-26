@@ -12,11 +12,12 @@ void *memset(void *str, unsigned char c, size_t n);
 void *memsetw(void *str, unsigned short c, size_t n);
 void *memsetl(void *str, unsigned int c, size_t n);
 void *memsetll(void *str, unsigned long long c, size_t n);
-void *memccpy(void *dest, const void *src, int c, int n);
-void *memmem(const void *haystack_start, size_t haystack_end,
-             const void *needle_start, size_t needle_end);
+void *memccpy(void *dest, const void *src, int c, size_t n);
+void *memmem(const void *haystack_start, size_t haystack_len,
+             const void *needle_start, size_t needle_len);
 void *mempcpy(void *dest, const void *src, size_t len);
-void *memrchr(const void *s, int c_in, size_t n);
+void *memrchr(const void *s, int c, size_t n);
+void *memfrob(void *s, size_t n);
 
 char *strcat(char *str1, const char *str2);
 char *strncat(char *str1, const char *str2, size_t n);
@@ -46,8 +47,6 @@ char *strchrnul(const char *str, int c_in);
 int bcmp(const void *s1, const void *s2, size_t n);
 int bcopy(const void *src, void *dest, size_t len);
 int bzero(const void *s, size_t len);
-
-void *memfrob(void *s, size_t n);
 
 int ffs(int i);
 int ffsl(long int i);

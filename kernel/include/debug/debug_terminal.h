@@ -1,12 +1,10 @@
 #ifndef DEBUG_TERMINAL_H
 #define DEBUG_TERMINAL_H
 
+#include <stdint.h>
+
 #define DEBUG_TERMINAL_WIDTH 80U
 #define DEBUG_TERMINAL_HEIGHT 25U
-
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-typedef unsigned int uint32_t;
 
 typedef enum VGA_COLOR
 {
