@@ -29,7 +29,7 @@ MULTIBOOT_CHECKSUM equ -(MULTIBOOT_MAGIC + MULTIBOOT_FLAGS)
 ; identify this image as a kernel compatible with the
 ; multiboot specification
 section .multiboot_header
-
+align 8
 header_start:
 
 %if mb_ver == 1
@@ -540,8 +540,7 @@ extern kernel_main
 ;;
 long_mode_start:
 
-    push rax
-    push rbx
+    mov r15, rbx
 
     mov ax, 0           ; Load 0 into all segement registers as they are
     mov ss, ax          ; ignored in 64 bit mode
@@ -553,7 +552,6 @@ long_mode_start:
     call clear_screen64
 
     mov rdi, rbx
-    mov rsi, rax
 
     call kernel_main
 

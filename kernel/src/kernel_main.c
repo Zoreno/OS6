@@ -20,9 +20,14 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     printf("rbx: %l, rax: %l\n", rbx, rax);
 
+    rbx += 8;
+
     struct multiboot_tag *start_tag = (struct multiboot_tag *)rbx;
 
-    printf("Total size: %i\n", start_tag->size);
+    // https://www.gnu.org/software/grub/manual/multiboot2/html_node/kernel_002ec.html
+
+    printf("Type: %i\n", start_tag->type);
+    printf("Size: %i\n", start_tag->size);
 
     for (;;)
         ;
