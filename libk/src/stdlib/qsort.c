@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdio.h>
 
 typedef int (*COMPARE)(const void *, const void *);
 
@@ -30,9 +31,10 @@ static void swap(void *mem1, void *mem2, size_t size)
 static size_t partition(void *arr, size_t low, size_t high, size_t item_size,
                         COMPARE compare)
 {
-    int i = low - 1;
 
     uint8_t *arr_b = arr;
+
+    int i = low - 1;
 
     for (size_t j = low; j < high; ++j)
     {
@@ -41,9 +43,10 @@ static size_t partition(void *arr, size_t low, size_t high, size_t item_size,
             ++i;
             swap(arr_b + i * item_size, arr_b + j * item_size, item_size);
         }
-
-        swap(arr_b + (i + 1) * item_size, arr_b + high * item_size, item_size);
     }
+
+    swap(arr_b + (i + 1) * item_size, arr_b + high * item_size, item_size);
+
     return i + 1;
 }
 

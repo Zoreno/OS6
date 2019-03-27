@@ -105,6 +105,8 @@ start:
     pop ebx
     pop eax
 
+before_jump:
+
     jmp gdt64.code:long_mode_start  ; Jump to 64 bit land!
 
     mov dword [VIDEO_MEM], 0x2f4b2f4f ; Print OK on the screen.
@@ -538,8 +540,8 @@ extern kernel_main
 ;;
 long_mode_start:
 
-    push rbx
     push rax
+    push rbx
 
     mov ax, 0           ; Load 0 into all segement registers as they are
     mov ss, ax          ; ignored in 64 bit mode
@@ -549,6 +551,9 @@ long_mode_start:
     mov gs, ax
 
     call clear_screen64
+
+    mov rdi, rbx
+    mov rsi, rax
 
     call kernel_main
 

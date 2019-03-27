@@ -1,7 +1,15 @@
+set architecture i386:x86-64:intel
+
 target remote localhost:1234
 
 symbol-file kernel.bin
 
-break start
+break long_mode_start
 
 continue
+
+disconnect
+
+set architecture i386:x86-64
+
+target remote localhost:1234

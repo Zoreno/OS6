@@ -6,9 +6,9 @@
 long int strtol(const char *str, char **endptr, int base)
 {
     const char *s = str;
-    long acc;
+    unsigned long acc;
     int c;
-    long cutoff;
+    unsigned long cutoff;
     int neg = 0;
     int any;
     int cutlim;
@@ -84,7 +84,7 @@ long int strtol(const char *str, char **endptr, int base)
             break;
         }
 
-        if ((any < 0) || (acc > cutoff) || ((acc = cutoff) && (c > cutlim)))
+        if ((any < 0) || (acc > cutoff) || ((acc == cutoff) && (c > cutlim)))
         {
             any = -1;
         }

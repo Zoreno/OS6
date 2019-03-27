@@ -11,7 +11,7 @@ void ulltoa(unsigned long long int i, int base, char *buf)
     int opos = 0;
     int top = 0;
 
-    char tbuf[64] = {0};
+    char tbuf[65] = {0};
 
     if ((!i) || (base > 16))
     {
@@ -29,7 +29,7 @@ void ulltoa(unsigned long long int i, int base, char *buf)
 
     top = pos--;
 
-    for (opos = 0; opos < top; pos--, opos--)
+    for (opos = 0; opos < top; pos--, opos++)
     {
         buf[opos] = tbuf[pos];
     }

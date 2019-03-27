@@ -29,7 +29,7 @@ void uitoa(unsigned int i, int base, char *buf)
 
     top = pos--;
 
-    for (opos = 0; opos < top; pos--, opos--)
+    for (opos = 0; opos < top; pos--, opos++)
     {
         buf[opos] = tbuf[pos];
     }

@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 typedef char (*read_function)(void);
-typedef void (*write_function)(void);
+typedef void (*write_function)(char);
 
 typedef struct
 {

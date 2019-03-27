@@ -111,6 +111,17 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/atol.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/atoll.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/qsort.c)
 
+# stdio.h header
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/fputc.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/fputs.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/fprintf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/set_stdout.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/printf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/putchar.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/puts.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/sprintf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/vsprintf.c)
+
 
 target_include_directories(${LIBK} SYSTEM PRIVATE ${LIBK_INCLUDE})
 
@@ -123,8 +134,12 @@ set_target_properties(${LIBK} PROPERTIES SKIP_BUILD_RPATH 1)
 add_executable(${KERNEL_EXEC} "")
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/boot/boot.asm)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
+
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/debug/debug_terminal.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/test/unit_tests.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
 
 target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${KERNEL_INCLUDE})
 target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${LIBK_INCLUDE})
@@ -162,7 +177,7 @@ add_custom_target(run
 
 add_custom_target(debug
     COMMAND qemu-system-x86_64 -s -S ${ISO_IMAGE} &
-    COMMAND ddd --gdb -command=${CMAKE_SOURCE_DIR}/gdbdebug 2> /dev/null
+    COMMAND sudo ddd --debugger gdb-multiarch -command=${CMAKE_SOURCE_DIR}/gdbdebug 2> /dev/null
     DEPENDS ${ISO_IMAGE}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 

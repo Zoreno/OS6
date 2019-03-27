@@ -1,36 +1,28 @@
 #include <debug/debug_terminal.h>
 
-#include <string.h>
-#include <stddef.h>
+#include <boot/multiboot2.h>
 
-#include <ctype.h>
+#include <string.h>
+#include <stdio.h>
+
+extern void run_unit_tests();
 
 int kernel_main(unsigned long long rbx, unsigned long long rax)
 {
-    (void)rbx;
-    (void)rax;
-
     debug_terminal_initialize();
 
-    debug_terminal_print("Welcome to the OS6 operating system. The kernel is now running in 64 bit mode.");
+    printf("================================================================================");
+    printf("|| Welcome to the OS6 operating system.                                       ||");
+    printf("|| The kernel is now running in 64 bit mode.                                  ||");
+    printf("================================================================================");
 
-    isalnum('c');
-    isalpha('c');
-    iscntrl('c');
-    isgraph('c');
-    isdigit('c');
-    islower('c');
-    isprint('c');
-    ispunct('c');
-    isspace('c');
-    isupper('c');
-    isxdigit('c');
+    run_unit_tests();
 
-    tolower('c');
-    toupper('c');
+    printf("rbx: %l, rax: %l\n", rbx, rax);
 
-    isascii('c');
-    toascii('c');
+    struct multiboot_tag *start_tag = (struct multiboot_tag *)rbx;
+
+    printf("Total size: %i\n", start_tag->size);
 
     for (;;)
         ;

@@ -3,7 +3,15 @@
 
 #include <va_list.h>
 
-#define STACK_ITEM long long int
+#if 1
+
+#define va_arg(ap, l) __builtin_va_arg(ap, l)
+#define va_end(ap) __builtin_va_end(ap)
+#define va_start(ap, last_arg) __builtin_va_start((ap), (last_arg))
+
+#else
+
+#define STACKITEM int
 
 #define VA_SIZE(TYPE) \
     ((sizeof(TYPE) + sizeof(STACKITEM) - 1) & ~(sizeof(STACKITEM) - 1))
@@ -24,5 +32,7 @@
  */
 #define va_arg(AP, TYPE) \
     (AP += VA_SIZE(TYPE), *((TYPE *)(AP - VA_SIZE(TYPE))))
+
+#endif
 
 #endif

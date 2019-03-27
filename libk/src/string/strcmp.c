@@ -4,7 +4,7 @@ int strcmp(const char *str1, const char *str2)
 {
     int res = 0;
 
-    while (!(res = *(unsigned char *)str1 - *(unsigned char *)str2) && str2)
+    while (!(res = *(unsigned char *)str1 - *(unsigned char *)str2) && *str2)
     {
         ++str1;
         ++str2;

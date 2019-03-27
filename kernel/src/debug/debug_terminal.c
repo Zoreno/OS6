@@ -1,5 +1,8 @@
 #include <debug/debug_terminal.h>
 
+#include <stdio.h>
+#include <string.h>
+
 typedef struct
 {
     uint8_t character;
@@ -19,6 +22,8 @@ static vga_color_t _default_back_color = VGA_COLOR_WHITE;
 
 static vga_color_t _text_color;
 static vga_color_t _back_color;
+
+static FILE file;
 
 uint32_t offset(uint32_t x, uint32_t y)
 {
@@ -50,6 +55,13 @@ void debug_terminal_initialize()
     _back_color = _default_back_color;
 
     debug_terminal_clear();
+
+    strcpy(file.name, "debug_terminal");
+
+    file.read = NULL;
+    file.write = debug_terminal_putch;
+
+    set_stdout(&file);
 }
 
 void debug_terminal_restore_default()
@@ -95,7 +107,6 @@ void debug_terminal_putch(char c)
     {
         _cursor_x = 0;
         ++_cursor_y;
-        return;
     }
 
     scroll();
