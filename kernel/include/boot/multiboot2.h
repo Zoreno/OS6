@@ -206,6 +206,12 @@ struct multiboot_tag
     multiboot_uint32_t size;
 };
 
+struct multiboot_start_tag
+{
+    multiboot_uint32_t total_size;
+    multiboot_uint32_t reserved;
+};
+
 struct multiboot_tag_string
 {
     multiboot_uint32_t type;

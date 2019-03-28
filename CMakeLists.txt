@@ -139,6 +139,10 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/debug/debug_terminal.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/test/unit_tests.c)
 
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/arch.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/cpu.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/gdt.c)
+
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
 
 target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${KERNEL_INCLUDE})
@@ -171,7 +175,7 @@ add_custom_command(OUTPUT ${ISO_IMAGE}
 #==============================================================================
 
 add_custom_target(run
-    COMMAND qemu-system-x86_64 -vga std ${ISO_IMAGE}
+    COMMAND qemu-system-x86_64 ${ISO_IMAGE}
     DEPENDS ${ISO_IMAGE}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 

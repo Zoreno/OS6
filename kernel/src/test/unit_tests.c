@@ -8,52 +8,52 @@
 static int num_tests = 0;
 static int num_cleared = 0;
 
-#define TEST_INT(expr, expected)                        \
-    {                                                   \
-        int eval = (expr);                              \
-        if (eval == (expected))                         \
-        {                                               \
-            ++num_cleared;                              \
-        }                                               \
-        else                                            \
-        {                                               \
-            printf("ERROR: [%s] got: %i expected %i\n", \
-                   #expr, eval, expected);              \
-        }                                               \
-                                                        \
-        ++num_tests;                                    \
+#define TEST_INT(expr, expected)                               \
+    {                                                          \
+        int eval = (expr);                                     \
+        if (eval == (expected))                                \
+        {                                                      \
+            ++num_cleared;                                     \
+        }                                                      \
+        else                                                   \
+        {                                                      \
+            printf("ERROR: %s:%i:[%s] got: %i expected %i\n",  \
+                   __FILE__, __LINE__, #expr, eval, expected); \
+        }                                                      \
+                                                               \
+        ++num_tests;                                           \
     }
 
-#define TEST_CHAR(expr, expected)                       \
-    {                                                   \
-        char eval = (expr);                             \
-        if (eval == (expected))                         \
-        {                                               \
-            ++num_cleared;                              \
-        }                                               \
-        else                                            \
-        {                                               \
-            printf("ERROR: [%s] got: %c expected %c\n", \
-                   #expr, eval, expected);              \
-        }                                               \
-                                                        \
-        ++num_tests;                                    \
+#define TEST_CHAR(expr, expected)                              \
+    {                                                          \
+        char eval = (expr);                                    \
+        if (eval == (expected))                                \
+        {                                                      \
+            ++num_cleared;                                     \
+        }                                                      \
+        else                                                   \
+        {                                                      \
+            printf("ERROR: %s:%i:[%s] got: %c expected %c\n",  \
+                   __FILE__, __LINE__, #expr, eval, expected); \
+        }                                                      \
+                                                               \
+        ++num_tests;                                           \
     }
 
-#define TEST_STRING(expr, expected)                             \
-    {                                                           \
-        char *eval = (expr);                                    \
-        if (strcmp(eval, expected) == 0)                        \
-        {                                                       \
-            ++num_cleared;                                      \
-        }                                                       \
-        else                                                    \
-        {                                                       \
-            printf("ERROR: [%s] got: \"%s\" expected \"%s\"\n", \
-                   #expr, eval, expected);                      \
-        }                                                       \
-                                                                \
-        ++num_tests;                                            \
+#define TEST_STRING(expr, expected)                                   \
+    {                                                                 \
+        char *eval = (expr);                                          \
+        if (strcmp(eval, expected) == 0)                              \
+        {                                                             \
+            ++num_cleared;                                            \
+        }                                                             \
+        else                                                          \
+        {                                                             \
+            printf("ERROR: %s:%i:[%s] got: \"%s\" expected \"%s\"\n", \
+                   __FILE__, __LINE__, #expr, eval, expected);        \
+        }                                                             \
+                                                                      \
+        ++num_tests;                                                  \
     }
 
 #define TEST_INT_ARRAY(expr, expected, count)            \
