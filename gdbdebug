@@ -4,7 +4,7 @@ target remote localhost:1234
 
 symbol-file kernel.bin
 
-break long_mode_start
+break default_irq_handler
 
 continue
 

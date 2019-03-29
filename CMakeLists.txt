@@ -142,6 +142,11 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/test/unit_tests.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/arch.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/cpu.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/gdt.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/idt.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/gdt_flush.asm)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/idt_flush.asm)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/default_irq_handler.asm)
+
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
 
@@ -181,7 +186,7 @@ add_custom_target(run
 
 add_custom_target(debug
     COMMAND qemu-system-x86_64 -s -S ${ISO_IMAGE} &
-    COMMAND sudo ddd --debugger gdb-multiarch -command=${CMAKE_SOURCE_DIR}/gdbdebug 2> /dev/null
+    COMMAND sudo ddd --gdb -command=${CMAKE_SOURCE_DIR}/gdbdebug 2> /dev/null
     DEPENDS ${ISO_IMAGE}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 

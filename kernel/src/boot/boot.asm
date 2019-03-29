@@ -615,6 +615,8 @@ gdt64:
 section .bss
 align 0x1000
 
+global stack_top
+
 p4_table:
     resb 0x1000
 p3_table:

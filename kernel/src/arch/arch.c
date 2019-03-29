@@ -1,4 +1,5 @@
 #include <arch/arch.h>
+#include <stdio.h>
 
 #ifdef ARCH_X86_64
 #include <arch/x86-64/cpu.h>
@@ -7,6 +8,8 @@
 void arch_initialize()
 {
 #ifdef ARCH_X86_64
+    printf("[ARCH] x64-64 initializing\n");
+
     arch_x86_64_initialize_cpu();
 #endif
 }

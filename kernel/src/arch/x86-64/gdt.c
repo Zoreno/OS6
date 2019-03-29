@@ -1,6 +1,7 @@
 #include <arch/x86-64/gdt.h>
 
 #include <string.h>
+#include <stdio.h>
 
 extern void arch_x86_64_gdt_flush(uint64_t gdt_ptr);
 
@@ -39,6 +40,8 @@ arch_x86_64_gdt_descriptor *arch_x86_64_get_descriptor(int i)
 
 void arch_x86_64_initialize_gdt()
 {
+    printf("[ARCH] Initializing GDT...\n");
+
     _gdtr.limit = (uint16_t)(sizeof(arch_x86_64_gdt_descriptor) * ARCH_X86_64_GDT_MAX_DESCRIPTORS - 1);
     _gdtr.base = (uint64_t)_gdt;
 
@@ -52,4 +55,6 @@ void arch_x86_64_initialize_gdt()
                                    ARCH_X86_64_GDT_GRAN_4K | ARCH_X86_64_GDT_GRAN_LIMITHI);
 
     arch_x86_64_gdt_flush((uint64_t)&_gdtr);
+
+    printf("[ARCH] GDT Done!\n");
 }
