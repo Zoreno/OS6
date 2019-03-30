@@ -4,7 +4,7 @@ target remote localhost:1234
 
 symbol-file kernel.bin
 
-break default_irq_handler
+break arch_x86_64_isr_1
 
 continue
 

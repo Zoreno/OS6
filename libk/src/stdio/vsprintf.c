@@ -412,11 +412,11 @@ int vsprintf(char *str, const char *format, va_list arg)
             case 'i':
             {
 
-                int c = va_arg(arg, int);
+                long long int c = va_arg(arg, long long int);
 
-                char s[32] = {0};
+                char s[65] = {0};
 
-                itoa(c, 10, s);
+                lltoa(c, 10, s);
 
                 int width_delta = width - strlen(s);
 
@@ -453,11 +453,11 @@ int vsprintf(char *str, const char *format, va_list arg)
             //============================================================
             case 'o':
             {
-                int c = va_arg(arg, int);
+                long long int c = va_arg(arg, long long int);
 
-                char s[32] = {0};
+                char s[65] = {0};
 
-                itoa(c, 8, s);
+                lltoa(c, 8, s);
 
                 int width_delta = width - strlen(s);
 
@@ -501,7 +501,9 @@ int vsprintf(char *str, const char *format, va_list arg)
             {
                 const char *c = va_arg(arg, const char *);
 
-                char s[32] = {0};
+                // TODO: We should be able to handle longer strings
+                // TODO: Do we need to copy the string at all?
+                char s[65] = {0};
 
                 strcpy(s, (const char *)c);
 
@@ -526,9 +528,9 @@ int vsprintf(char *str, const char *format, va_list arg)
             //============================================================
             case 'u':
             {
-                unsigned int c = va_arg(arg, unsigned int);
+                unsigned long long int c = va_arg(arg, unsigned long long int);
 
-                char s[32] = {0};
+                char s[65] = {0};
 
                 uitoa(c, 10, s);
 
@@ -555,11 +557,11 @@ int vsprintf(char *str, const char *format, va_list arg)
             case 'x':
             case 'X': // TODO: 'X' prints capital letters
             {
-                unsigned int c = va_arg(arg, unsigned int);
+                unsigned long long int c = va_arg(arg, unsigned long long int);
 
                 char s[32] = {0};
 
-                uitoa(c, 16, s);
+                ulltoa(c, 16, s);
 
                 int width_delta = width - strlen(s);
 
@@ -587,7 +589,7 @@ int vsprintf(char *str, const char *format, va_list arg)
             //============================================================
             case 'c':
             {
-                int c = va_arg(arg, int);
+                long long int c = va_arg(arg, long long int);
 
                 int width_delta = width - 1;
 
@@ -633,11 +635,11 @@ int vsprintf(char *str, const char *format, va_list arg)
             case 'b':
             case 'B': // TODO: 'B' prints capital letters
             {
-                unsigned int c = va_arg(arg, unsigned int);
+                unsigned long long int c = va_arg(arg, unsigned long long int);
 
-                char s[64] = {0};
+                char s[65] = {0};
 
-                uitoa(c, 2, s);
+                ulltoa(c, 2, s);
 
                 int width_delta = width - strlen(s);
 

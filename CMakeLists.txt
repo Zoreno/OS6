@@ -146,6 +146,8 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/idt.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/gdt_flush.asm)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/idt_flush.asm)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/default_irq_handler.asm)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/pic.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/pit.c)
 
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)

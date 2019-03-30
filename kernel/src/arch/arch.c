@@ -3,6 +3,9 @@
 
 #ifdef ARCH_X86_64
 #include <arch/x86-64/cpu.h>
+#include <arch/x86-64/pic.h>
+#include <arch/x86-64/idt.h>
+#include <arch/x86-64/pit.h>
 #endif
 
 void arch_initialize()
@@ -11,6 +14,24 @@ void arch_initialize()
     printf("[ARCH] x64-64 initializing\n");
 
     arch_x86_64_initialize_cpu();
+
+    printf("[ARCH] Initializing PIC\n");
+
+    arch_x86_64_initialize_pic(0x20, 0x28);
+
+    printf("[ARCH] PIC Done!\n");
+
+    printf("[ARCH] Initializing PIT\n");
+
+    arch_x86_64_initialize_pit();
+    arch_x86_64_pit_start_counter(100, ARCH_X86_64_PIT_OCW_COUNTER_0, ARCH_X86_64_PIT_OCW_MODE_SQUAREWAVEGEN);
+
+    printf("[ARCH] PIT Done!\n");
+
+    printf("[ARCH] x64-64 Done! \n");
+
+    sti();
+
 #endif
 }
 
@@ -91,4 +112,31 @@ void interrupt_done(uint32_t intno)
     {
         return;
     }
+
+    if (intno > 8)
+    {
+        arch_x86_64_pic_send_command(PIC_OCW2_MASK_EOI, 1);
+    }
+
+    arch_x86_64_pic_send_command(PIC_OCW2_MASK_EOI, 0);
+}
+
+void set_interrupt_handler(int intno, INT_HANDLER int_handler, int flags)
+{
+    arch_x86_64_install_ir(intno, ARCH_X86_64_IDT_DESC_PRESENT | ARCH_X86_64_IDT_DESC_BIT32, 0x08, int_handler);
+}
+
+void set_irq_handler(int irq, IRQ_HANDLER irq_handler)
+{
+    arch_x86_64_install_irq(irq, irq_handler);
+}
+
+uint32_t get_tick_count()
+{
+    return arch_x86_64_pit_get_tick_count();
+}
+
+void set_on_tick_handler(on_tick_handler_func on_tick_handler)
+{
+    arch_x86_64_set_on_tick_handler(on_tick_handler);
 }

@@ -10,10 +10,6 @@ void arch_x86_64_initialize_cpu()
     //arch_x86_64_initialize_gdt();
     arch_x86_64_initialize_idt(0x08);
     printf("[ARCH] CPU Done!\n");
-
-    sti();
-
-    __asm__ volatile("int %0" ::"N"(2));
 }
 
 void arch_x86_64_shutdown_cpu()
