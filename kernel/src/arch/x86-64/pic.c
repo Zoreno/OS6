@@ -78,7 +78,6 @@ void arch_x86_64_pic_send_command(uint8_t command, uint8_t pic_num)
 void arch_x86_64_pic_set_mask_interrupt(uint8_t irq)
 {
     uint16_t port;
-    uint8_t value;
 
     if (irq < 8)
     {
@@ -100,7 +99,6 @@ void arch_x86_64_pic_set_mask_interrupt(uint8_t irq)
 void arch_x86_64_pic_clear_mask_interrupt(uint8_t irq)
 {
     uint16_t port;
-    uint8_t value;
 
     if (irq < 8)
     {

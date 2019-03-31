@@ -21,9 +21,11 @@ void arch_x86_64_set_on_tick_handler(on_tick_handler_func on_tick_handler)
 
 void arch_x86_64_pit_irq(system_stack_t *regs)
 {
+    (void)regs;
+
     ++_pit_ticks;
 
-    printf("[PIC] PIT tick: %8i\n", _pit_ticks);
+    //printf("[PIC] PIT tick: %8i\n", _pit_ticks);
 
     if (_on_tick_handler)
     {

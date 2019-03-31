@@ -3,6 +3,7 @@ ENTRY(start)
 SECTIONS
 {
     . = 1M;
+    __kernel_start = .;
 
     .boot :
     {
@@ -27,4 +28,6 @@ SECTIONS
         *(.bss)
         _ebss = .;
     }
+
+    __kernel_end = .;
 }

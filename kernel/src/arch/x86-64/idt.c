@@ -122,8 +122,6 @@ static IRQ_HANDLER _irq_handlers[16] = {0};
 
 void arch_x86_64_default_irq_handler(system_stack_t *regs)
 {
-    int is_irq = 0;
-
     if (regs->int_no >= 32 && regs->int_no < 48)
     {
         int irq = regs->int_no - 32;
@@ -240,8 +238,6 @@ void arch_x86_64_initialize_idt(uint16_t code_sel)
 
     _idtr.limit = (sizeof(arch_x86_64_idt_descriptor)) * ARCH_X86_64_IDT_MAX_INTERRUPTS - 1;
     _idtr.base = (uint64_t)&_idt[0];
-
-    int num_ints = ARCH_X86_64_IDT_MAX_INTERRUPTS;
 
     // Install all hardware exception handlers
 

@@ -123,6 +123,9 @@ void interrupt_done(uint32_t intno)
 
 void set_interrupt_handler(int intno, INT_HANDLER int_handler, int flags)
 {
+    // TODO: Define and parse arch-agnostic interrupt flags
+    (void)flags;
+
     arch_x86_64_install_ir(intno, ARCH_X86_64_IDT_DESC_PRESENT | ARCH_X86_64_IDT_DESC_BIT32, 0x08, int_handler);
 }
 

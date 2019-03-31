@@ -4,6 +4,10 @@
 
 #include <arch/arch.h>
 
+#include <mm/phys_mem.h>
+#include <mm/memory_info.h>
+#include <mm/virt_mem.h>
+
 #include <string.h>
 #include <stdio.h>
 
@@ -11,8 +15,13 @@ extern void run_unit_tests();
 
 // https://www.gnu.org/software/grub/manual/multiboot2/html_node/kernel_002ec.html
 
-void initialize(unsigned char *mb_ptr)
+extern void *__kernel_start;
+extern void *__kernel_end;
+
+// TODO: Move to separate file
+void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
 {
+
     struct multiboot_start_tag *start_tag = (struct multiboot_start_tag *)mb_ptr;
 
     uint32_t mb_size = start_tag->total_size;
@@ -35,6 +44,7 @@ void initialize(unsigned char *mb_ptr)
             printf("[Command line] \"%s\"\n", cmdline->string);
         }
         break;
+
         case MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME:
         {
             struct multiboot_tag_string *boot_loader = (struct multiboot_tag_string *)tag;
@@ -64,18 +74,22 @@ void initialize(unsigned char *mb_ptr)
 
             printf("[mmap] entry_size: %i, count: %i\n", mmap->entry_size, count);
 
+            int j = 0;
+
             for (int i = 0; i < count; ++i)
             {
                 struct multiboot_mmap_entry mmap_entry = mmap->entries[i];
 
-                uint32_t addr_upper = mmap_entry.addr >> 32;
-                uint32_t addr_lower = mmap_entry.addr & 0xFFFFFFFF;
+                printf("[mmap_entry] addr: %#016x len: %#016x type: %i\n",
+                       mmap_entry.addr, mmap_entry.len, mmap_entry.type);
 
-                uint32_t len_upper = mmap_entry.len >> 32;
-                uint32_t len_lower = mmap_entry.len & 0xFFFFFFFF;
+                if (mmap_entry.type == MULTIBOOT_MEMORY_AVAILABLE)
+                {
+                    mem_info->regions[j].addr = mmap_entry.addr;
+                    mem_info->regions[j].len = mmap_entry.len;
 
-                printf("[mmap_entry] addr: %#08x%08x len: %#08x%08x type: %i\n",
-                       addr_upper, addr_lower, len_upper, len_lower, mmap_entry.type);
+                    ++j;
+                }
             }
         }
         break;
@@ -105,6 +119,26 @@ void initialize(unsigned char *mb_ptr)
 
         mb_ptr += (tag->size + 7) & ~7;
     }
+
+    uint64_t largest_mem = 0;
+
+    for (int i = 0; i < MEM_INFO_MAX_REGIONS; ++i)
+    {
+        mem_region_t region = mem_info->regions[i];
+
+        uint64_t region_end = region.addr + region.len;
+
+        if (region_end > largest_mem)
+        {
+            largest_mem = region_end;
+        }
+    }
+
+    mem_info->memory_size = largest_mem;
+
+    mem_info->kernel_load_addr = (uint64_t)&__kernel_start;
+    mem_info->kernel_end = (uint64_t)&__kernel_end;
+    mem_info->kernel_size = mem_info->kernel_end - mem_info->kernel_load_addr;
 }
 
 int kernel_main(unsigned long long rbx, unsigned long long rax)
@@ -122,8 +156,133 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     arch_initialize();
 
-    initialize((unsigned char *)rbx);
+    memory_info_t mem_info;
+
+    memset(&mem_info, 0, sizeof(mem_info));
+
+    parse_multiboot((unsigned char *)rbx, &mem_info);
+
+    printf("[MEMINFO] Memory size: %i\n", mem_info.memory_size);
+
+    phys_mem_init(&mem_info);
+
+    virt_mem_initialize();
 
     for (;;)
-        ;
+        __asm__ volatile("hlt");
 }
+
+/*
+
+Buddy Allocation
+
+Order 4 upper limit
+
+2^0 = 1
+2^1 = 2
+2^2 = 4
+2^3 = 8
+2^4 = 16
+2^5 = 32
+2^6 = 64
+2^7 = 128
+2^8 = 256
+2^9 = 512
+
+const int highest_order = 9;
+
+typedef struct
+{
+    uint64_t start;
+    uint64_t bitmap[2 * highest_order / 64]; // 988777766666666
+} block_t;
+
+typedef struct
+{
+
+} page_frame_allocator_t;
+
+int is_set(uint64_t *bitmap, int bit)
+{
+    ...
+}
+
+int set(uint64_t *bitmap, int bit);
+int clear(uint64_t *bitmap, int bit);
+
+int _find_page(uint64_t *bitmap, int i, int order, int curr_order)
+{
+    if(is_set(bitmap, i))
+    {
+        return -1;
+    }
+
+    if(curr_order == order)
+    {
+        return i;
+    }
+
+    int res;
+
+    if((res = _find_page(bitmap, 2 * i + 1, order, curr_order - 1)) != -1)
+    {
+        return res;
+    }
+
+    return _find_page(bitmap, 2 * i  + 2, order, curr_order - 1);
+}
+
+void *_alloc_page(block_t *block, size_t size)
+{
+    int order = _get_order(size);
+
+    int page = _find_page(block->bitmap, 0, order, highest_order);
+
+    if(page != -1)
+    {
+        void *addr = _get_address(block, i);
+
+        return addr;
+    }
+
+    return NULL;
+}
+
+Request A for 1 block (Order 0)
+
+Memory before:
+4
+Step 1: Split smallest until we have a order 0
+3-3
+2-2-3
+1-1-2-3
+0-0-1-2-3
+Step 2: Allocate order 0 block
+0(A)-0-1-2-3
+
+Request B for 1 block
+
+0(A)-0(B)-1-2-3
+
+Request C for 2 blocks (order 1)
+
+0(A)-0(B)-1(C)-2-3
+
+Free A
+
+0-0(B)-1(C)-2-3
+
+Free B
+
+0-0-1(C)-2-3
+1-1(C)-2-3
+
+Free C
+
+1-1-2-3
+2-2-3
+3-3
+4
+
+
+*/
