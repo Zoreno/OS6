@@ -18,28 +18,24 @@ enum PTE_FLAGS
     PTE_ACCESS = 0x20,
     PTE_DIRTY = 0x40,
     PTE_PAT = 0x80, // Page attribute table
-    PTE_CPU_GLOBAL = 0x100,
-    PTE_LV4_GLOBAL = 0x200,
     PTE_FRAME = 0x7FFFFFFFFFFFF000
 };
 
-typedef uint64_t pt_entry;
+typedef uint64_t pt_entry_t;
 
-void pt_entry_add_attrib(pt_entry *e, uint64_t attrib);
-void pt_entry_del_attrib(pt_entry *e, uint64_t attrib);
-void pt_entry_set_frame(pt_entry *e, phys_addr addr);
+void pt_entry_add_attrib(pt_entry_t *e, uint64_t attrib);
+void pt_entry_del_attrib(pt_entry_t *e, uint64_t attrib);
+void pt_entry_set_frame(pt_entry_t *e, phys_addr addr);
 
-int pt_entry_is_present(pt_entry e);
-int pt_entry_is_writable(pt_entry e);
-int pt_entry_is_user(pt_entry e);
-int pt_entry_is_writethrough(pt_entry e);
-int pt_entry_is_cacheable(pt_entry e);
-int pt_entry_is_accessed(pt_entry e);
-int pt_entry_is_dirty(pt_entry e);
-int pt_entry_is_PAT(pt_entry e);
-int pt_entry_is_CPU_global(pt_entry e);
-int pt_entry_is_LV4_global(pt_entry e);
-phys_addr pt_entry_pfn(pt_entry e);
+int pt_entry_is_present(pt_entry_t e);
+int pt_entry_is_writable(pt_entry_t e);
+int pt_entry_is_user(pt_entry_t e);
+int pt_entry_is_writethrough(pt_entry_t e);
+int pt_entry_is_cacheable(pt_entry_t e);
+int pt_entry_is_accessed(pt_entry_t e);
+int pt_entry_is_dirty(pt_entry_t e);
+int pt_entry_is_PAT(pt_entry_t e);
+phys_addr pt_entry_pfn(pt_entry_t e);
 
 //==============================================================================
 // Page Directory Entry
@@ -60,23 +56,19 @@ enum PDE_FLAGS
     PDE_FRAME = 0x7FFFFFFFFFFFF000
 };
 
-typedef uint64_t pd_entry;
+typedef uint64_t pd_entry_t;
 
-void pd_entry_add_attrib(pd_entry *e, uint64_t attrib);
-void pd_entry_del_attrib(pd_entry *e, uint64_t attrib);
-void pd_entry_set_frame(pd_entry *e, phys_addr addr);
+void pd_entry_add_attrib(pd_entry_t *e, uint64_t attrib);
+void pd_entry_del_attrib(pd_entry_t *e, uint64_t attrib);
+void pd_entry_set_frame(pd_entry_t *e, phys_addr addr);
 
-int pd_entry_is_present(pd_entry e);
-int pd_entry_is_writable(pd_entry e);
-int pd_entry_is_user(pd_entry e);
-int pd_entry_is_pwt(pd_entry e);
-int pd_entry_is_pcd(pd_entry e);
-int pd_entry_is_accessed(pd_entry e);
-int pd_entry_is_dirty(pd_entry e);
-int pd_entry_is_4MB(pd_entry e);
-int pd_entry_is_CPU_global(pd_entry e);
-int pd_entry_is_LV4_global(pd_entry e);
-phys_addr pd_entry_pfn(pd_entry e);
+int pd_entry_is_present(pd_entry_t e);
+int pd_entry_is_writable(pd_entry_t e);
+int pd_entry_is_user(pd_entry_t e);
+int pd_entry_is_pwt(pd_entry_t e);
+int pd_entry_is_pcd(pd_entry_t e);
+int pd_entry_is_accessed(pd_entry_t e);
+phys_addr pd_entry_pfn(pd_entry_t e);
 
 //==============================================================================
 // Page Directory Pointer Entry
@@ -90,30 +82,22 @@ enum PDPE_FLAGS
     PDPE_PWT = 8,
     PDPE_PCD = 0x10,
     PDPE_ACCESSED = 0x20,
-    PDPE_DIRTY = 0x40,
-    PDPE_4MB = 0x80,
-    PDPE_CPU_GLOBAL = 0x100,
-    PDPE_LV4_GLOBAL = 0x200,
     PDPE_FRAME = 0x7FFFFFFFFFFFF000
 };
 
-typedef uint64_t pdp_entry;
+typedef uint64_t pdp_entry_t;
 
-void pdp_entry_add_attrib(pdp_entry *e, uint64_t attrib);
-void pdp_entry_del_attrib(pdp_entry *e, uint64_t attrib);
-void pdp_entry_set_frame(pdp_entry *e, phys_addr addr);
+void pdp_entry_add_attrib(pdp_entry_t *e, uint64_t attrib);
+void pdp_entry_del_attrib(pdp_entry_t *e, uint64_t attrib);
+void pdp_entry_set_frame(pdp_entry_t *e, phys_addr addr);
 
-int pdp_entry_is_present(pdp_entry e);
-int pdp_entry_is_writable(pdp_entry e);
-int pdp_entry_is_user(pdp_entry e);
-int pdp_entry_is_pwt(pdp_entry e);
-int pdp_entry_is_pcd(pdp_entry e);
-int pdp_entry_is_accessed(pdp_entry e);
-int pdp_entry_is_dirty(pdp_entry e);
-int pdp_entry_is_4MB(pdp_entry e);
-int pdp_entry_is_CPU_global(pdp_entry e);
-int pdp_entry_is_LV4_global(pdp_entry e);
-phys_addr pdp_entry_pfn(pdp_entry e);
+int pdp_entry_is_present(pdp_entry_t e);
+int pdp_entry_is_writable(pdp_entry_t e);
+int pdp_entry_is_user(pdp_entry_t e);
+int pdp_entry_is_pwt(pdp_entry_t e);
+int pdp_entry_is_pcd(pdp_entry_t e);
+int pdp_entry_is_accessed(pdp_entry_t e);
+phys_addr pdp_entry_pfn(pdp_entry_t e);
 
 //==============================================================================
 // Page Directory Pointer Entry
@@ -127,30 +111,22 @@ enum PML4E_FLAGS
     PML4E_PWT = 8,
     PML4E_PCD = 0x10,
     PML4E_ACCESSED = 0x20,
-    PML4E_DIRTY = 0x40,
-    PML4E_4MB = 0x80,
-    PML4E_CPU_GLOBAL = 0x100,
-    PML4E_LV4_GLOBAL = 0x200,
     PML4E_FRAME = 0x7FFFFFFFFFFFF000
 };
 
-typedef uint64_t pml4_entry;
+typedef uint64_t pml4_entry_t;
 
-void pml4_entry_add_attrib(pml4_entry *e, uint64_t attrib);
-void pml4_entry_del_attrib(pml4_entry *e, uint64_t attrib);
-void pml4_entry_set_frame(pml4_entry *e, phys_addr addr);
+void pml4_entry_add_attrib(pml4_entry_t *e, uint64_t attrib);
+void pml4_entry_del_attrib(pml4_entry_t *e, uint64_t attrib);
+void pml4_entry_set_frame(pml4_entry_t *e, phys_addr addr);
 
-int pml4_entry_is_present(pml4_entry e);
-int pml4_entry_is_writable(pml4_entry e);
-int pml4_entry_is_user(pml4_entry e);
-int pml4_entry_is_pwt(pml4_entry e);
-int pml4_entry_is_pcd(pml4_entry e);
-int pml4_entry_is_accessed(pml4_entry e);
-int pml4_entry_is_dirty(pml4_entry e);
-int pml4_entry_is_4MB(pml4_entry e);
-int pml4_entry_is_CPU_global(pml4_entry e);
-int pml4_entry_is_LV4_global(pml4_entry e);
-phys_addr pml4_entry_pfn(pml4_entry e);
+int pml4_entry_is_present(pml4_entry_t e);
+int pml4_entry_is_writable(pml4_entry_t e);
+int pml4_entry_is_user(pml4_entry_t e);
+int pml4_entry_is_pwt(pml4_entry_t e);
+int pml4_entry_is_pcd(pml4_entry_t e);
+int pml4_entry_is_accessed(pml4_entry_t e);
+phys_addr pml4_entry_pfn(pml4_entry_t e);
 
 //==============================================================================
 // Virtual Memory Manager
@@ -170,29 +146,49 @@ typedef uint64_t virt_addr;
 
 typedef struct
 {
-    pt_entry entries[PT_ENTRIES];
+    pt_entry_t entries[PT_ENTRIES];
 } ptable_t;
 
 typedef struct
 {
-    pd_entry entries[PD_ENTRIES];
+    pd_entry_t entries[PD_ENTRIES];
 } pdirectory_t;
 
 typedef struct
 {
-    pdp_entry entries[PDP_ENTRIES];
+    pdp_entry_t entries[PDP_ENTRIES];
 } pdp_t;
 
 typedef struct
 {
-    pml4_entry entries[PML4_ENTRIES];
+    pml4_entry_t entries[PML4_ENTRIES];
 } pml4_t;
-
-void virt_mem_map_page(void *phys, void *virt);
 
 void virt_mem_initialize();
 
 int virt_mem_switch_dir(pml4_t *dir);
 pml4_t *virt_mem_get_current_dir();
+void virt_mem_flush_tlb(virt_addr addr);
+
+void *virt_mem_get_physical_addr(void *addr, pml4_t *dir);
+
+pml4_t *virt_mem_create_address_space();
+
+void virt_mem_clear_pt(ptable_t *table);
+void virt_mem_clear_pd(pdirectory_t *pdir);
+void virt_mem_clear_pdp(pdp_t *pdp);
+void virt_mem_destroy_address_space(pml4_t *dir);
+
+ptable_t *virt_mem_alloc_ptable();
+pdirectory_t *virt_mem_alloc_pdirectory();
+pdp_t *virt_mem_alloc_pdp();
+
+// TODO: Add flags for user-mode, writable, cache, remap, shared
+int virt_mem_map_page_p(void *phys, void *virt, uint64_t flags, pml4_t *dir);
+int virt_mem_map_page(void *phys, void *virt, uint64_t flags);
+int virt_mem_map_pages_p(void *phys, void *virt, size_t n_pages, uint64_t flags, pml4_t *dir);
+int virt_mem_map_pages(void *phys, void *virt, size_t n_pages, uint64_t flags);
+int virt_mem_unmap_page(void *virt);
+int virt_mem_unmap_pages(void *virt, size_t n_pages);
 
 #endif

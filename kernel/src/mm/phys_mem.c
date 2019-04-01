@@ -87,7 +87,7 @@ void phys_mem_init(memory_info_t *mem_info)
     phys_mem_deinit_region(mem_info->kernel_load_addr, mem_info->kernel_size);
 
     // Deinit memory used for the bitmap
-    phys_mem_deinit_region(_phys_mem.bitmap, phys_mem_get_block_count() / PHYS_MEM_BLOCKS_PER_BYTE);
+    phys_mem_deinit_region((phys_addr)_phys_mem.bitmap, phys_mem_get_block_count() / PHYS_MEM_BLOCKS_PER_BYTE);
 
     printf("[PMM] Initialized! Bitmap address: %#016x, (Entries: %i)\n", _phys_mem.bitmap, entries);
 }

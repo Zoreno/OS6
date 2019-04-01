@@ -30,7 +30,7 @@ arch_x86_64_idt_descriptor *arch_x86_64_get_ir(uint32_t i);
 
 void arch_x86_64_install_ir(uint32_t i, uint16_t flags, uint16_t sel, INT_HANDLER int_hander);
 
-void arch_x86_64_install_irq(int irq, IRQ_HANDLER);
+void arch_x86_64_install_irq(int irq, IRQ_HANDLER irq_handler);
 
 void arch_x86_64_initialize_idt(uint16_t code_sel);
 
