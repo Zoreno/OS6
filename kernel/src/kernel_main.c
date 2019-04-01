@@ -7,6 +7,7 @@
 #include <mm/phys_mem.h>
 #include <mm/memory_info.h>
 #include <mm/virt_mem.h>
+#include <mm/kheap.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -162,11 +163,13 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     parse_multiboot((unsigned char *)rbx, &mem_info);
 
-    printf("[MEMINFO] Memory size: %i\n", mem_info.memory_size);
+    //printf("[MEMINFO] Memory size: %i\n", mem_info.memory_size);
 
     phys_mem_init(&mem_info);
 
     virt_mem_initialize();
+
+    kheap_init();
 
     for (;;)
         __asm__ volatile("hlt");

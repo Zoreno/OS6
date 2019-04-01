@@ -275,6 +275,7 @@ void virt_mem_initialize()
     // Allocate a page table for the 2MB identity mapping
 
     ptable_t *table = (ptable_t *)phys_mem_alloc_block();
+
     if (!table)
     {
         // TODO: This should be a kernel panic
@@ -591,6 +592,7 @@ pdp_t *virt_mem_alloc_pdp()
 int virt_mem_map_page_p(void *phys, void *virt, uint64_t flags, pml4_t *pml4)
 {
     virt_addr vaddr = (virt_addr)virt;
+    (void)flags;
 
     pdp_t *pdp = 0;
     pdirectory_t *pdir = 0;
@@ -717,10 +719,22 @@ int virt_mem_map_pages(void *phys, void *virt, size_t n_pages, uint64_t flags)
 
 int virt_mem_unmap_page(void *virt)
 {
+    (void)virt;
+
+    align_down(0, 0);
+    align_up(0, 0);
+
     // TODO:
+
+    return -1;
 }
 
 int virt_mem_unmap_pages(void *virt, size_t n_pages)
 {
+    (void)virt;
+    (void)n_pages;
+
     // TODO:
+
+    return -1;
 }

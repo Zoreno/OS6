@@ -93,8 +93,8 @@ typedef signed long long int_fast64_t;
 #define INT_FAST64_MAX 9223372036858775807LL
 #define UINT_FAST64_MAX 18446744073709551615ULL
 
-typedef long intptr_t;
-typedef unsigned long uintptr_t;
+typedef long long intptr_t;
+typedef unsigned long long uintptr_t;
 
 #define INTPTR_MIN (-2147483647L - 1)
 #define INTPTR_MAX (2147483647L)
