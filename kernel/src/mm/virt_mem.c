@@ -6,6 +6,9 @@
 // https://github.com/thibault-reigner/userland_slab
 
 #define PAGE_SIZE 4096
+#define PAGE_OFFSET 0xFFFF880000000000
+
+#define ADD_PAGE_OFFSET(addr) ((void *)(((uint8_t *)addr) + PAGE_OFFSET))
 
 static pml4_t *_cur_dir = 0;
 
@@ -348,8 +351,22 @@ void virt_mem_initialize()
     pml4_entry_add_attrib(entry_pml4, PML4E_WRITABLE);
     pml4_entry_set_frame(entry_pml4, (phys_addr)pdp);
 
-    // Switch to the newly created page mapping structure
+    // This is a hack to map the first GB of memory to the address
+    // 0xFFFF880000000000. By adding this offset to any physical page,
+    // the kernel can reach any physical memory (up to 1 GB).
+    pdp_t *pdp_high = (pdp_t *)phys_mem_alloc_block();
+    memset(pdp_high, 0, sizeof(pdp_t));
+    pdp_entry_t *pdp_high_e = &pdp_high->entries[PDP_INDEX(PAGE_OFFSET)];
+    pdp_entry_add_attrib(pdp_high_e, PDPE_PRESENT);
+    pdp_entry_add_attrib(pdp_high_e, PDPE_WRITABLE);
+    pdp_entry_add_attrib(pdp_high_e, PDPE_1GB);
+    pdp_entry_set_frame(pdp_high_e, (phys_addr)0);
+    pml4_entry_t *entry_high = &pml4->entries[PML4_INDEX(PAGE_OFFSET)];
+    pml4_entry_add_attrib(entry_high, PML4E_PRESENT);
+    pml4_entry_add_attrib(entry_high, PML4E_WRITABLE);
+    pml4_entry_set_frame(entry_high, (phys_addr)pdp_high);
 
+    // Switch to the newly created page mapping structure
     virt_mem_switch_dir(pml4);
 
     printf("[VMM] VMM initialized!\n");
@@ -556,7 +573,7 @@ ptable_t *virt_mem_alloc_ptable()
         return p;
     }
 
-    memset(p, 0, sizeof(ptable_t));
+    memset(ADD_PAGE_OFFSET(p), 0, sizeof(ptable_t));
 
     return p;
 }
@@ -570,7 +587,7 @@ pdirectory_t *virt_mem_alloc_pdirectory()
         return p;
     }
 
-    memset(p, 0, sizeof(pdirectory_t));
+    memset(ADD_PAGE_OFFSET(p), 0, sizeof(pdirectory_t));
 
     return p;
 }
@@ -584,7 +601,7 @@ pdp_t *virt_mem_alloc_pdp()
         return p;
     }
 
-    memset(p, 0, sizeof(pdp_t));
+    memset(ADD_PAGE_OFFSET(p), 0, sizeof(pdp_t));
 
     return p;
 }
@@ -598,6 +615,8 @@ int virt_mem_map_page_p(void *phys, void *virt, uint64_t flags, pml4_t *pml4)
     pdirectory_t *pdir = 0;
     ptable_t *ptable = 0;
 
+    pml4 = ADD_PAGE_OFFSET(pml4);
+
     //=========================================================================
     // PML4 table
     //=========================================================================
@@ -606,6 +625,10 @@ int virt_mem_map_page_p(void *phys, void *virt, uint64_t flags, pml4_t *pml4)
 
     if (!pml4_entry_is_present(*pml4_entry))
     {
+
+        for (;;)
+            ;
+
         pdp = virt_mem_alloc_pdp();
 
         pml4_entry_add_attrib(pml4_entry, PML4E_PRESENT);
@@ -625,6 +648,8 @@ int virt_mem_map_page_p(void *phys, void *virt, uint64_t flags, pml4_t *pml4)
     //=========================================================================
     // PDP table
     //=========================================================================
+
+    pdp = ADD_PAGE_OFFSET(pdp);
 
     pdp_entry_t *pdp_entry = &pdp->entries[PDP_INDEX(vaddr)];
 
@@ -650,6 +675,8 @@ int virt_mem_map_page_p(void *phys, void *virt, uint64_t flags, pml4_t *pml4)
     // PD table
     //=========================================================================
 
+    pdir = ADD_PAGE_OFFSET(pdir);
+
     pd_entry_t *pd_entry = &pdir->entries[PD_INDEX(vaddr)];
 
     if (!pd_entry_is_present(*pd_entry))
@@ -673,6 +700,8 @@ int virt_mem_map_page_p(void *phys, void *virt, uint64_t flags, pml4_t *pml4)
     //=========================================================================
     // PT table
     //=========================================================================
+
+    ptable = ADD_PAGE_OFFSET(ptable);
 
     pt_entry_t *pt_entry = &ptable->entries[PT_INDEX(vaddr)];
 

@@ -171,6 +171,12 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     kheap_init();
 
+    int *i = kmalloc(sizeof(i));
+
+    *i = 14;
+
+    printf("%#016x: %i\n", i, *i);
+
     for (;;)
         __asm__ volatile("hlt");
 }

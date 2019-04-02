@@ -82,6 +82,7 @@ enum PDPE_FLAGS
     PDPE_PWT = 8,
     PDPE_PCD = 0x10,
     PDPE_ACCESSED = 0x20,
+    PDPE_1GB = 0x80,
     PDPE_FRAME = 0x7FFFFFFFFFFFF000
 };
 
@@ -100,7 +101,7 @@ int pdp_entry_is_accessed(pdp_entry_t e);
 phys_addr pdp_entry_pfn(pdp_entry_t e);
 
 //==============================================================================
-// Page Directory Pointer Entry
+// 4-level page directory pointer
 //==============================================================================
 
 enum PML4E_FLAGS
@@ -111,6 +112,7 @@ enum PML4E_FLAGS
     PML4E_PWT = 8,
     PML4E_PCD = 0x10,
     PML4E_ACCESSED = 0x20,
+    PML4E_DIRTY = 0x40,
     PML4E_FRAME = 0x7FFFFFFFFFFFF000
 };
 
