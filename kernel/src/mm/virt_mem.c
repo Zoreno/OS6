@@ -418,6 +418,8 @@ void *virt_mem_get_physical_addr(void *addr, pml4_t *dir)
         return NULL;
     }
 
+    current_dir = ADD_PAGE_OFFSET(current_dir);
+
     pml4_entry_t entry_pml4 = current_dir->entries[PML4_INDEX(vaddr)];
 
     if (!pml4_entry_is_present(entry_pml4))
@@ -435,6 +437,8 @@ void *virt_mem_get_physical_addr(void *addr, pml4_t *dir)
     {
         return NULL;
     }
+
+    pdp_table = ADD_PAGE_OFFSET(pdp_table);
 
     pdp_entry_t entry_pdp = pdp_table->entries[PDP_INDEX(vaddr)];
 
@@ -454,6 +458,8 @@ void *virt_mem_get_physical_addr(void *addr, pml4_t *dir)
         return NULL;
     }
 
+    dir = ADD_PAGE_OFFSET(dir);
+
     pd_entry_t entry_pd = pdir->entries[PD_INDEX(vaddr)];
 
     if (!pd_entry_is_present(entry_pd))
@@ -471,6 +477,8 @@ void *virt_mem_get_physical_addr(void *addr, pml4_t *dir)
     {
         return NULL;
     }
+
+    ptable = ADD_PAGE_OFFSET(ptable);
 
     pt_entry_t entry_pt = ptable->entries[PT_INDEX(vaddr)];
 
@@ -495,6 +503,8 @@ pml4_t *virt_mem_create_address_space()
         return dir;
     }
 
+    dir = ADD_PAGE_OFFSET(dir);
+
     memset(dir, 0, sizeof(pml4_t));
 
     return dir;
@@ -502,11 +512,15 @@ pml4_t *virt_mem_create_address_space()
 
 void virt_mem_clear_pt(ptable_t *table)
 {
+    table = ADD_PAGE_OFFSET(table);
+
     memset(table, 0, sizeof(ptable_t));
 }
 
 void virt_mem_clear_pd(pdirectory_t *pdir)
 {
+    pdir = ADD_PAGE_OFFSET(pdir);
+
     for (int i = 0; i < PD_ENTRIES; ++i)
     {
         pd_entry_t entry = pdir->entries[i];
@@ -526,6 +540,8 @@ void virt_mem_clear_pd(pdirectory_t *pdir)
 
 void virt_mem_clear_pdp(pdp_t *pdp)
 {
+    pdp = ADD_PAGE_OFFSET(pdp);
+
     for (int i = 0; i < PDP_ENTRIES; ++i)
     {
         pdp_entry_t entry = pdp->entries[i];
@@ -545,6 +561,8 @@ void virt_mem_clear_pdp(pdp_t *pdp)
 
 void virt_mem_destroy_address_space(pml4_t *dir)
 {
+    dir = ADD_PAGE_OFFSET(dir);
+
     for (int i = 0; i < PML4_ENTRIES; ++i)
     {
         pml4_entry_t e = dir->entries[i];

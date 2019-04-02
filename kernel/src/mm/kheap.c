@@ -303,7 +303,7 @@ void kheap_init()
 
         virt_mem_map_page(paddr, (void *)i, 0);
 
-        printf("Mapping %#016x to %#016x\n", paddr, i);
+        //printf("Mapping %#016x to %#016x\n", paddr, i);
     }
 
     regions = (kheap_region_t *)pmalloc(0, 0);
