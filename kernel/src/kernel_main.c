@@ -14,6 +14,9 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <util/list.h>
+#include <util/tree.h>
+
 extern void run_unit_tests();
 
 // https://www.gnu.org/software/grub/manual/multiboot2/html_node/kernel_002ec.html

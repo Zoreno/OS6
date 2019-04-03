@@ -2,9 +2,9 @@
 #include <stdint.h>
 #include <string.h>
 
-extern void kernel_free(void *addr);
+extern void kfree(void *addr);
 
 void free(void *ptr)
 {
-    kernel_free(ptr);
+    kfree(ptr);
 }

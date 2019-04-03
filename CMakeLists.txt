@@ -73,6 +73,9 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strcspn.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strlen.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strnlen.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strpbrk.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strtok_r.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strspn.c)
+
 
 # ctype.h header
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isalnum.c)
@@ -160,6 +163,11 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/kheap.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/serial/serial.c)
 
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/vfs.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/list.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/tree.c)
+
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
 
 target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${KERNEL_INCLUDE})
@@ -192,7 +200,7 @@ add_custom_command(OUTPUT ${ISO_IMAGE}
 #==============================================================================
 
 add_custom_target(run
-    COMMAND qemu-system-x86_64 -boot d -serial stdio -hdb disk.img -cdrom ${ISO_IMAGE}
+    COMMAND qemu-system-x86_64 -boot d -serial stdio -cdrom ${ISO_IMAGE}
     DEPENDS ${ISO_IMAGE}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 

@@ -2,9 +2,9 @@
 #include <stdint.h>
 #include <string.h>
 
-extern void *kernel_malloc(size_t size);
+extern void *kmalloc(size_t size);
 
 void *malloc(size_t size)
 {
-    return kernel_malloc(size);
+    return kmalloc(size);
 }
