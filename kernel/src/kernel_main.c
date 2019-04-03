@@ -9,6 +9,8 @@
 #include <mm/virt_mem.h>
 #include <mm/kheap.h>
 
+#include <serial/serial.h>
+
 #include <string.h>
 #include <stdio.h>
 
@@ -146,7 +148,11 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 {
     (void)rax;
 
+    serial_init_full();
+
     debug_terminal_initialize();
+
+    set_stdout(scom1_fd);
 
     printf("================================================================================");
     printf("|| Welcome to the OS6 operating system.                                       ||");
@@ -170,12 +176,6 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     virt_mem_initialize();
 
     kheap_init();
-
-    int *i = kmalloc(sizeof(i));
-
-    *i = 14;
-
-    printf("%#016x: %i\n", i, *i);
 
     for (;;)
         __asm__ volatile("hlt");

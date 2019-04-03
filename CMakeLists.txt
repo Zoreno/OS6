@@ -158,6 +158,8 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/mm_bitmap.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/virt_mem.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/kheap.c)
 
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/serial/serial.c)
+
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
 
 target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${KERNEL_INCLUDE})
@@ -190,7 +192,7 @@ add_custom_command(OUTPUT ${ISO_IMAGE}
 #==============================================================================
 
 add_custom_target(run
-    COMMAND qemu-system-x86_64 ${ISO_IMAGE}
+    COMMAND qemu-system-x86_64 -boot d -serial stdio -hdb disk.img -cdrom ${ISO_IMAGE}
     DEPENDS ${ISO_IMAGE}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
