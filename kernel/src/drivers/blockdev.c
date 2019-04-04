@@ -99,7 +99,7 @@ int reg_blockdev_class(uint64_t major, const char *desc, blockdev_read_func_t re
 
     blockdev_classes[major] = class;
 
-    printf("[Blockdev] Class %i registered\n", major);
+    printf("[Blockdev] Class %i registered [%s]\n", major, class->description);
 
     return 0;
 }
@@ -151,7 +151,7 @@ int reg_blockdev_instance(uint32_t major, uint32_t minor, const char *desc, size
 
     list_insert(class->instance_list, instance);
 
-    printf("[Blockdev] Instance %i of class %i registered\n", minor, major);
+    printf("[Blockdev] Instance %i of class %i registered [%s]\n", minor, major, instance->description);
 
     return 0;
 }
@@ -210,7 +210,7 @@ int unreg_blockdev_instance(uint32_t major, uint32_t minor)
 
 uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, size_t len, void *buffer)
 {
-    printf("[Blockdev] M:%i m:%i Read Off:%i, len:%i, buffer:%#016x\n", major, minor, offset, len, buffer);
+    //printf("[Blockdev] M:%i m:%i Read Off:%i, len:%i, buffer:%#016x\n", major, minor, offset, len, buffer);
 
     blockdev_class_t *class;
     blockdev_instance_t *instance;
@@ -232,7 +232,7 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
 
     class = blockdev_classes[major];
 
-    printf("[Blockdev] Class: %s\n", class->description);
+    //printf("[Blockdev] Class: %s\n", class->description);
 
     if (!class)
     {
@@ -241,7 +241,7 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
 
     instance = get_blockdev_instance(class, minor);
 
-    printf("[Blockdev] Instance: %s\n", instance->description);
+    //printf("[Blockdev] Instance: %s\n", instance->description);
 
     if (!instance)
     {

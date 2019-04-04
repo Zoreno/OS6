@@ -292,7 +292,7 @@ static ide_device_t *get_ide_device(unsigned int minor)
 
 static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t nblocks, void *buffer, int direction)
 {
-    printf("[IDE] %s m:%i, block: %i, nblocks: %i, buffer: %#016x\n", direction == IO_READ ? "Read" : "Write", minor, block, nblocks, buffer, direction);
+    //printf("[IDE] %s m:%i, block: %i, nblocks: %i, buffer: %#016x\n", direction == IO_READ ? "Read" : "Write", minor, block, nblocks, buffer, direction);
 
     ide_device_t *device;
     ide_controller_t *controller;
@@ -493,7 +493,7 @@ void init_ide_devices()
                     device->lba ? "YES" : "NO",
                     device->dma ? "YES" : "NO");
 
-            printf("%s\n", msg);
+            //printf("%s\n", msg);
 
             reg_blockdev_instance(0, i * NUM_DEVICES_PER_CONTROLLER + j, msg, BLOCK_SIZE, device->capacity);
         }
