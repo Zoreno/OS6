@@ -6,6 +6,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define MAX_DESCRIPTION_LENGTH 256
 
@@ -98,6 +99,8 @@ int reg_blockdev_class(uint64_t major, const char *desc, blockdev_read_func_t re
 
     blockdev_classes[major] = class;
 
+    printf("[Blockdev] Class %i registered\n", major);
+
     return 0;
 }
 
@@ -147,6 +150,8 @@ int reg_blockdev_instance(uint32_t major, uint32_t minor, const char *desc, size
     instance->description[MAX_DESCRIPTION_LENGTH - 1] = 0;
 
     list_insert(class->instance_list, instance);
+
+    printf("[Blockdev] Instance %i of class %i registered\n", minor, major);
 
     return 0;
 }
@@ -205,6 +210,8 @@ int unreg_blockdev_instance(uint32_t major, uint32_t minor)
 
 uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, size_t len, void *buffer)
 {
+    printf("[Blockdev] M:%i m:%i Read Off:%i, len:%i, buffer:%#016x\n", major, minor, offset, len, buffer);
+
     blockdev_class_t *class;
     blockdev_instance_t *instance;
 
@@ -225,12 +232,16 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
 
     class = blockdev_classes[major];
 
+    printf("[Blockdev] Class: %s\n", class->description);
+
     if (!class)
     {
         return -1;
     }
 
     instance = get_blockdev_instance(class, minor);
+
+    printf("[Blockdev] Instance: %s\n", instance->description);
 
     if (!instance)
     {

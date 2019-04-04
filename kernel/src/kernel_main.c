@@ -13,11 +13,13 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <util/list.h>
 #include <util/tree.h>
 
 #include <drivers/ide.h>
+#include <drivers/blockdev.h>
 
 extern void run_unit_tests();
 
@@ -183,6 +185,27 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     kheap_init();
 
     init_ide_devices();
+
+    uint8_t *bootsector = malloc(512);
+
+    int status;
+
+    status = blockdev_read(0, 0, 0, 512, bootsector);
+
+    if (status != 0)
+    {
+        printf("Error reading from blockdev\n");
+    }
+
+    for (uint32_t i = 0; i < 512; ++i)
+    {
+        printf("%02x ", bootsector[i]);
+
+        if (i % 16 == 15)
+        {
+            printf("\n");
+        }
+    }
 
     for (;;)
         __asm__ volatile("hlt");

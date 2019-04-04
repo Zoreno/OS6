@@ -215,7 +215,7 @@ add_custom_target(${HDD_NAME}
 #==============================================================================
 
 add_custom_target(run
-    COMMAND qemu-system-x86_64 -boot d -serial stdio -hda ${HDD_NAME} -cdrom ${ISO_IMAGE}
+    COMMAND qemu-system-x86_64 -boot d -serial stdio -drive file=${HDD_NAME},format=raw -cdrom ${ISO_IMAGE}
     DEPENDS ${ISO_IMAGE} ${HDD_NAME}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 

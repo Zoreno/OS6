@@ -146,11 +146,6 @@ static uint8_t reset_controller(ide_controller_t *controller)
 
     mdelay(2);
 
-    if (!wait_for_controller(controller, ATA_STATUS_BSY, ATA_STATUS_BSY, 1))
-    {
-        return 0;
-    }
-
     outportb(iobase + ATA_DEV_CTL, 0);
 
     if (!wait_for_controller(controller, ATA_STATUS_BSY, 0, ATA_TIMEOUT))
@@ -172,7 +167,7 @@ static uint8_t select_device(ide_device_t *device)
 
     outportb(iobase + ATA_DRV_HEAD, 0xa0 | (device->position << 4));
 
-    udelay(1);
+    udelay(10);
 
     if ((inportb(iobase + ATA_STATUS) & (ATA_STATUS_BSY | ATA_STATUS_DRQ)))
     {
@@ -204,7 +199,10 @@ static void identify_ide_device(ide_device_t *device)
 
     int reset = reset_controller(device->controller);
 
-    printf("%i\n", reset);
+    if (!reset)
+    {
+        return;
+    }
 
     if (!select_device(device))
     {
@@ -214,16 +212,12 @@ static void identify_ide_device(ide_device_t *device)
     uint8_t res1 = inportb(iobase + ATA_NSECTOR);
     uint8_t res2 = inportb(iobase + ATA_SECTOR);
 
-    printf("res1: %#x, res2: %#x\n", res1, res2);
-
     if (res1 == 0x01 && res2 == 0x01)
     {
         cl = inportb(iobase + ATA_LCYL);
         ch = inportb(iobase + ATA_HCYL);
 
         status = inportb(iobase + ATA_STATUS);
-
-        printf("cl: %#x, ch: %#x, status: %#x\n", cl, ch, status);
 
         if (cl == 0x14 && ch == 0xeb)
         {
@@ -298,6 +292,8 @@ static ide_device_t *get_ide_device(unsigned int minor)
 
 static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t nblocks, void *buffer, int direction)
 {
+    printf("[IDE] %s m:%i, block: %i, nblocks: %i, buffer: %#016x\n", direction == IO_READ ? "Read" : "Write", minor, block, nblocks, buffer, direction);
+
     ide_device_t *device;
     ide_controller_t *controller;
 
@@ -407,6 +403,17 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
         }
     }
 
+    if (direction == IO_WRITE)
+    {
+        // Send flush cache command
+        outportb(iobase + ATA_COMMAND, 0xE7);
+
+        if (!wait_for_controller(controller, ATA_STATUS_BSY, 0, ATA_TIMEOUT))
+        {
+            return 0;
+        }
+    }
+
     return nblocks;
 }
 
@@ -454,30 +461,28 @@ void init_ide_devices()
         return;
     }
 
-    printf("[IDE] Blockdev class registered\n");
-
     for (i = 0; i < NUM_IDE_CONTROLLERS; ++i)
     {
         controller = &controllers[i];
-        controller->iobase = i == 0 ? PRIMARY_IDE_CONTROLLER_IOBASE : SECONDARY_IDE_CONTROLLER_IOBASE;
+        controller->iobase = (i == 0) ? PRIMARY_IDE_CONTROLLER_IOBASE : SECONDARY_IDE_CONTROLLER_IOBASE;
         controller->irq = 0;
 
         for (j = 0; j < NUM_DEVICES_PER_CONTROLLER; ++j)
         {
-            device = &controller->devices[i];
+            device = &controller->devices[j];
             device->controller = controller;
-            device->position = j == 0 ? MASTER : SLAVE;
+            device->position = (j == 0) ? MASTER : SLAVE;
 
             identify_ide_device(device);
 
-            printf("[IDE] %i-%i: %i %i\n", i, j, device->present, device->atapi);
+            //printf("[IDE] %i-%i: %i %i\n", i, j, device->present, device->atapi);
 
             if (!device->present || device->atapi)
             {
                 continue;
             }
 
-            sprintf(msg, "%s [%i-%i]: %s (%i/%i/%i - %i sectors) LBA:%s - DMA:%s\n",
+            sprintf(msg, "%s [%i-%i]: %s (%i/%i/%i - %i sectors) LBA:%s - DMA:%s",
                     device->atapi ? "CD-ROM" : "Hard Disk",
                     i, device->position,
                     device->model,
@@ -488,7 +493,7 @@ void init_ide_devices()
                     device->lba ? "YES" : "NO",
                     device->dma ? "YES" : "NO");
 
-            printf("%s", msg);
+            printf("%s\n", msg);
 
             reg_blockdev_instance(0, i * NUM_DEVICES_PER_CONTROLLER + j, msg, BLOCK_SIZE, device->capacity);
         }
