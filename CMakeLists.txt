@@ -165,6 +165,9 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/serial/serial.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/vfs.c)
 
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/blockdev.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/ide.c)
+
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/list.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/tree.c)
 
@@ -196,12 +199,24 @@ add_custom_command(OUTPUT ${ISO_IMAGE}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
 #==============================================================================
+# Build HDD
+#==============================================================================
+
+set(HDD_NAME disk.img)
+set(HDD_IMAGE ${CMAKE_BINARY_DIR}/${HDD_NAME})
+
+add_custom_target(${HDD_NAME}
+    COMMAND ../create_hdd.sh ${HDD_NAME} 100M
+    COMMENT "Creating HDD"
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+
+#==============================================================================
 # Custom targets for running QEMU
 #==============================================================================
 
 add_custom_target(run
-    COMMAND qemu-system-x86_64 -boot d -serial stdio -cdrom ${ISO_IMAGE}
-    DEPENDS ${ISO_IMAGE}
+    COMMAND qemu-system-x86_64 -boot d -serial stdio -hda ${HDD_NAME} -cdrom ${ISO_IMAGE}
+    DEPENDS ${ISO_IMAGE} ${HDD_NAME}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
 add_custom_target(debug

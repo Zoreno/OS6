@@ -31,6 +31,24 @@ void outportb(uint16_t port, uint8_t value);
 void outportw(uint16_t port, uint16_t value);
 void outportl(uint16_t port, uint32_t value);
 
+static inline void udelay(uint32_t n)
+{
+    if (!n)
+    {
+        return;
+    }
+
+    __asm__ volatile("1: dec %%rax; jne 1b;" ::"a"(n * 1000));
+}
+
+static inline void mdelay(uint32_t n)
+{
+    while (n--)
+    {
+        udelay(1000);
+    }
+}
+
 void sti();
 void cli();
 
@@ -43,5 +61,8 @@ void set_irq_handler(int irq, IRQ_HANDLER irq_handler);
 uint32_t get_tick_count();
 
 void set_on_tick_handler(on_tick_handler_func on_tick_handler);
+
+void set_mask_interrupt(uint8_t irq);
+void clear_mask_interrupt(uint8_t irq);
 
 #endif

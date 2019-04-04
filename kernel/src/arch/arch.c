@@ -143,3 +143,13 @@ void set_on_tick_handler(on_tick_handler_func on_tick_handler)
 {
     arch_x86_64_set_on_tick_handler(on_tick_handler);
 }
+
+void set_mask_interrupt(uint8_t irq)
+{
+    arch_x86_64_pic_set_mask_interrupt(irq);
+}
+
+void clear_mask_interrupt(uint8_t irq)
+{
+    arch_x86_64_pic_clear_mask_interrupt(irq);
+}

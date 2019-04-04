@@ -17,6 +17,8 @@
 #include <util/list.h>
 #include <util/tree.h>
 
+#include <drivers/ide.h>
+
 extern void run_unit_tests();
 
 // https://www.gnu.org/software/grub/manual/multiboot2/html_node/kernel_002ec.html
@@ -179,6 +181,8 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     virt_mem_initialize();
 
     kheap_init();
+
+    init_ide_devices();
 
     for (;;)
         __asm__ volatile("hlt");
