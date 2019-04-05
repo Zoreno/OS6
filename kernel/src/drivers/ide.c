@@ -1,3 +1,4 @@
+
 #include <drivers/ide.h>
 
 #include <drivers/blockdev.h>
@@ -15,6 +16,9 @@
 #define PRIMARY_IDE_CONTROLLER 0
 #define SECONDARY_IDE_CONTROLLER 1
 
+// TODO: These should be read from the PCI, however the specification says
+// that the controller always boots in legacy mode, which have these IOBASE
+// registers as default.
 #define PRIMARY_IDE_CONTROLLER_IOBASE 0x1F0
 #define SECONDARY_IDE_CONTROLLER_IOBASE 0x170
 
