@@ -65,4 +65,9 @@ void set_on_tick_handler(on_tick_handler_func on_tick_handler);
 void set_mask_interrupt(uint8_t irq);
 void clear_mask_interrupt(uint8_t irq);
 
+int atomic_swap(volatile long long int *x, long long int v);
+void atomic_store(volatile long long int *p, long long int x);
+void atomic_inc(volatile long long int *x);
+void atomic_dec(volatile long long int *x);
+
 #endif

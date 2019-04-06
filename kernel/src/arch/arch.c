@@ -6,6 +6,7 @@
 #include <arch/x86-64/pic.h>
 #include <arch/x86-64/idt.h>
 #include <arch/x86-64/pit.h>
+#include <arch/x86-64/atomic.h>
 #endif
 
 void arch_initialize()
@@ -152,4 +153,24 @@ void set_mask_interrupt(uint8_t irq)
 void clear_mask_interrupt(uint8_t irq)
 {
     arch_x86_64_pic_clear_mask_interrupt(irq);
+}
+
+int atomic_swap(volatile long long int *x, long long int v)
+{
+    return arch_x86_64_atomic_swap(x, v);
+}
+
+void atomic_store(volatile long long int *p, long long int x)
+{
+    arch_x86_64_atomic_store(p, x);
+}
+
+void atomic_inc(volatile long long int *x)
+{
+    arch_x86_64_atomic_inc(x);
+}
+
+void atomic_dec(volatile long long int *x)
+{
+    arch_x86_64_atomic_dec(x);
 }

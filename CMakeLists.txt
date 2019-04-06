@@ -75,6 +75,7 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strnlen.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strpbrk.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strtok_r.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strspn.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strdup.c)
 
 
 # ctype.h header
@@ -155,11 +156,14 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/idt_flush.asm)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/default_irq_handler.asm)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/pic.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/pit.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/atomic.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/phys_mem.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/mm_bitmap.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/virt_mem.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/kheap.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/sync/spinlock.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/serial/serial.c)
 

@@ -21,6 +21,8 @@
 #include <drivers/ide.h>
 #include <drivers/blockdev.h>
 
+#include <vfs/vfs.h>
+
 extern void run_unit_tests();
 
 // https://www.gnu.org/software/grub/manual/multiboot2/html_node/kernel_002ec.html
@@ -183,6 +185,8 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     virt_mem_initialize();
 
     kheap_init();
+
+    vfs_install();
 
     init_ide_devices();
 
