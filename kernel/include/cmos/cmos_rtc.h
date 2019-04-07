@@ -126,4 +126,13 @@ void RTC_time_to_string(char *str, ktime_t *time);
  */
 uint32_t RTC_time_to_int(ktime_t *time);
 
+/**
+ * @brief Converts an integer to a time struct
+ * 
+ * @param time_int Time to convert
+ * @param time Struct to store the result
+ * 
+ */
+void RTC_int_to_time(uint32_t time_int, ktime_t *time);
+
 #endif

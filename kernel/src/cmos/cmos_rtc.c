@@ -563,8 +563,6 @@ static uint8_t get_update_in_progress_flag()
 
 static void handle_update_irq()
 {
-    printf("[RTC] Got update IRQ\n");
-
     ktime_t time;
 
     RTC_get_time(&time);
@@ -573,7 +571,7 @@ static void handle_update_irq()
 
     RTC_time_to_string(time_str, &time);
 
-    printf("[RTC] Current time: (%s) (%i)\n", time_str, RTC_time_to_int(&time));
+    printf("[RTC] Current time: (%s)\n", time_str);
 }
 
 static void handle_alarm_irq()
@@ -589,8 +587,6 @@ static void handle_periodic_irq()
 static void RTC_irq_handler(system_stack_t *regs)
 {
     (void)regs;
-
-    printf("[RTC] Got IRQ\n");
 
     rtc_status_reg_c_t status_c;
 
@@ -957,4 +953,46 @@ uint32_t RTC_time_to_int(ktime_t *time)
     time_int += time->second;
 
     return time_int;
+}
+
+void RTC_int_to_time(uint32_t time_int, ktime_t *time)
+{
+    uint32_t year = 1970;
+    uint8_t month = 1;
+    uint8_t day = 1;
+    uint8_t hour = 0;
+    uint8_t minute = 0;
+    uint8_t second = 0;
+
+    while (time_int > years_to_sec(year))
+    {
+        ++year;
+    }
+
+    time_int -= years_to_sec(year - 1);
+
+    while (time_int > months_to_sec(month, year))
+    {
+        ++month;
+    }
+
+    time_int -= months_to_sec(month - 1, year);
+
+    day = time_int / secs_per_day + 1;
+
+    time_int %= secs_per_day;
+
+    hour = time_int / secs_per_hour;
+
+    time_int %= secs_per_hour;
+
+    minute = time_int / secs_per_minute;
+    second = time_int % secs_per_minute;
+
+    time->year = year;
+    time->month = month;
+    time->day = day;
+    time->hour = hour;
+    time->minute = minute;
+    time->second = second;
 }
