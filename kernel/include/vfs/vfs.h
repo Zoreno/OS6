@@ -25,6 +25,9 @@
 
 #include <stdint.h>
 
+#define MAX_SYMLINK_DEPTH 8
+#define MAX_SYMLINK_SIZE 4096
+
 #define PATH_SEPARATOR '/'
 #define PATH_SEPARATOR_STRING "/"
 #define PATH_UP ".."
@@ -66,21 +69,21 @@ struct fs_node;
  * 
  * 
  */
-typedef uint32_t (*read_func_t)(struct fs_node *, uint32_t, uint32_t, uint8_t *);
+typedef uint32_t (*read_func_t)(struct fs_node *, uint64_t, uint32_t, uint8_t *);
 
 /**
  * @brief Type of function to write to node
  * 
  * 
  */
-typedef uint32_t (*write_func_t)(struct fs_node *, uint32_t, uint32_t, uint8_t *);
+typedef uint32_t (*write_func_t)(struct fs_node *, uint64_t, uint32_t, uint8_t *);
 
 /**
  * @brief Type of function to open a node
  * 
  * 
  */
-typedef void (*open_func_t)(struct fs_node *, uint8_t read, uint8_t write);
+typedef void (*open_func_t)(struct fs_node *, uint32_t flags);
 
 /**
  * @brief Type of function to close a node
@@ -355,9 +358,9 @@ extern fs_node_t *fs_root;
 
 int has_permissions(fs_node_t *node, int permission_bit);
 
-uint32_t read_fs(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer);
-uint32_t write_fs(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer);
-void open_fs(fs_node_t *node, uint8_t read, uint8_t write);
+uint32_t read_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer);
+uint32_t write_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer);
+void open_fs(fs_node_t *node, uint32_t flags);
 void close_fs(fs_node_t *node);
 struct dirent *readdir_fs(fs_node_t *node, uint32_t index);
 fs_node_t *finddir_fs(fs_node_t *node, char *name);

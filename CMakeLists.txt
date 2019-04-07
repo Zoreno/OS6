@@ -168,6 +168,7 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/sync/spinlock.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/serial/serial.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/vfs.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/ext2.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/cmos/cmos_rtc.c)
 

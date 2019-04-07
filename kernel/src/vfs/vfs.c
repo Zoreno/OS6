@@ -28,6 +28,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <arch/arch.h>
+
 #include <sync/spinlock.h>
 
 fs_node_t *fs_root = 0;
@@ -44,7 +46,7 @@ int has_permissions(fs_node_t *node, int permission_bit)
     return 1;
 }
 
-uint32_t read_fs(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer)
+uint32_t read_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
 {
     if (node && node->read)
     {
@@ -55,7 +57,7 @@ uint32_t read_fs(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffe
     return 0;
 }
 
-uint32_t write_fs(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer)
+uint32_t write_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
 {
     if (node && node->write)
     {
@@ -66,7 +68,7 @@ uint32_t write_fs(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buff
     return 0;
 }
 
-void open_fs(fs_node_t *node, uint8_t read, uint8_t write)
+void open_fs(fs_node_t *node, uint32_t flags)
 {
     if (!node)
     {
@@ -82,7 +84,7 @@ void open_fs(fs_node_t *node, uint8_t read, uint8_t write)
 
     if (node->open)
     {
-        node->open(node, read, write);
+        node->open(node, flags);
     }
 }
 
@@ -448,14 +450,76 @@ char *canonicalize_path(char *cwd, char *input)
     return output;
 }
 
-fs_node_t *get_mount_point(char *path, size_t path_depth)
+fs_node_t *get_mount_point(char *path, size_t path_depth, char **outpath, uint32_t *outdepth)
 {
-    (void)path;
-    (void)path_depth;
+    size_t depth;
 
-    return fs_root;
+    for (depth = 0; depth <= path_depth; ++depth)
+    {
+        path += strlen(path) + 1;
+    }
+
+    /* Last available node */
+    fs_node_t *last = fs_root;
+    tree_node_t *node = fs_tree->root;
+
+    char *at = *outpath;
+    int _depth = 1;
+    int _tree_depth = 0;
+
+    while (1)
+    {
+        if (at >= path)
+        {
+            break;
+        }
+
+        int found = 0;
+
+        for (list_node_t *child = node->children->head; child != NULL; child = child->next)
+        {
+            tree_node_t *tchild = (tree_node_t *)child->payload;
+
+            vfs_entry_t *ent = (vfs_entry_t *)tchild->value;
+
+            if (!strcmp(ent->name, at))
+            {
+                found = 1;
+                node = tchild;
+                at = at + strlen(at) + 1;
+
+                if (ent->file)
+                {
+                    _tree_depth = _depth;
+                    last = ent->file;
+                    *outpath = at;
+                }
+
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            break;
+        }
+
+        _depth++;
+    }
+
+    *outdepth = _tree_depth;
+
+    if (last)
+    {
+        fs_node_t *last_clone = malloc(sizeof(fs_node_t));
+        memcpy(last_clone, last, sizeof(fs_node_t));
+        return last_clone;
+    }
+
+    return last;
 }
 
+#if 0
 fs_node_t *kopen(char *filename, uint32_t flags)
 {
     (void)flags;
@@ -501,8 +565,11 @@ fs_node_t *kopen(char *filename, uint32_t flags)
 
     uint32_t depth;
     fs_node_t *node_ptr = malloc(sizeof(fs_node_t));
+
     fs_node_t *mount_point = get_mount_point(path, path_depth);
+
     memcpy(node_ptr, mount_point, sizeof(fs_node_t));
+
     fs_node_t *node_next = NULL;
 
     for (depth = 0; depth < path_depth; ++depth)
@@ -530,6 +597,8 @@ fs_node_t *kopen(char *filename, uint32_t flags)
 
     return NULL;
 }
+
+#endif
 
 int ioctl_fs(fs_node_t *node, int request, void *argp)
 {
@@ -775,6 +844,8 @@ static spinlock_t vfs_slock = {0, 0};
 
 void *vfs_mount(char *path, fs_node_t *local_root)
 {
+    printf("[VFS] Mounting %s to [%s]\n", local_root->name, path);
+
     if (!fs_tree)
     {
         return NULL;
@@ -879,6 +950,8 @@ void *vfs_mount(char *path, fs_node_t *local_root)
 
     free(p);
     spinlock_unlock(&vfs_slock);
+
+    printf("[VFS] Done!\n");
 }
 
 void vfs_lock(fs_node_t *node)
@@ -888,4 +961,167 @@ void vfs_lock(fs_node_t *node)
     node->refcount = -1;
 
     spinlock_unlock(&tmp_lock);
+}
+
+static fs_node_t *kopen_recur(char *filename, uint32_t flags,
+                              uint32_t symlink_depth, char *relative_to)
+{
+    if (!filename)
+    {
+        return NULL;
+    }
+
+    char *path = canonicalize_path(relative_to, filename);
+
+    size_t path_len = strlen(path);
+
+    if (path_len == 1)
+    {
+        fs_node_t *root_clone = malloc(sizeof(fs_node_t));
+        memcpy(root_clone, fs_root, sizeof(fs_node_t));
+
+        free(path);
+
+        open_fs(root_clone, flags);
+
+        return root_clone;
+    }
+
+    char *path_offset = path;
+
+    uint32_t path_depth = 0;
+
+    while (path_offset < path + path_len)
+    {
+        if (*path_offset == PATH_SEPARATOR)
+        {
+            *path_offset = '\0';
+            path_depth++;
+        }
+
+        path_offset++;
+    }
+
+    path[path_len] = '\0';
+    path_offset = path + 1;
+
+    uint32_t depth = 0;
+
+    fs_node_t *node_ptr = get_mount_point(path, path_depth, &path_offset, &depth);
+
+    if (!node_ptr)
+    {
+        return NULL;
+    }
+
+    do
+    {
+        if ((node_ptr->flags & FS_SYMLINK) &&
+            !((flags & O_NOFOLLOW) && (flags & O_PATH) && depth == path_depth))
+        {
+            if ((flags & O_NOFOLLOW) && depth == path_depth - 1)
+            {
+                free((void *)path);
+                free(node_ptr);
+
+                return NULL;
+            }
+
+            if (symlink_depth >= MAX_SYMLINK_DEPTH)
+            {
+                free((void *)path);
+                free(node_ptr);
+
+                return NULL;
+            }
+
+            char *symlink_buf = malloc(MAX_SYMLINK_SIZE);
+            int len = readlink_fs(node_ptr, symlink_buf, MAX_SYMLINK_SIZE);
+
+            if (len < 0)
+            {
+                free((void *)path);
+                free(node_ptr);
+                free(symlink_buf);
+                return NULL;
+            }
+
+            if (symlink_buf[len] != '\0')
+            {
+                free((void *)path);
+                free(node_ptr);
+                free(symlink_buf);
+                return NULL;
+            }
+
+            fs_node_t *old_node_ptr = node_ptr;
+
+            char *relpath = malloc(path_len + 1);
+            char *ptr = relpath;
+
+            memcpy(relpath, path, path_len + 1);
+
+            for (uint32_t i = 0; depth && i < depth - 1; ++i)
+            {
+                while (*ptr != '\0')
+                {
+                    ptr++;
+                }
+
+                *ptr = PATH_SEPARATOR;
+            }
+
+            node_ptr = kopen_recur(symlink_buf, 0, symlink_depth + 1, relpath);
+
+            free(relpath);
+
+            free(old_node_ptr);
+
+            if (!node_ptr)
+            {
+                free((void *)path);
+            }
+        }
+
+        if (path_offset >= path + path_len)
+        {
+            free(path);
+            open_fs(node_ptr, flags);
+
+            return node_ptr;
+        }
+
+        if (depth == path_depth)
+        {
+            open_fs(node_ptr, flags);
+            free((void *)path);
+
+            return node_ptr;
+        }
+
+        fs_node_t *node_next = finddir_fs(node_ptr, path_offset);
+
+        free(node_ptr);
+
+        node_ptr = node_next;
+
+        if (!node_ptr)
+        {
+            free((void *)path);
+
+            return NULL;
+        }
+
+        path_offset += strlen(path_offset) + 1;
+        ++depth;
+    } while (depth < path_depth + 1);
+
+    free((void *)path);
+
+    return NULL;
+}
+
+fs_node_t *kopen(char *filename, uint32_t flags)
+{
+    return kopen_recur(filename, flags, 0, "/");
 }

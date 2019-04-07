@@ -79,6 +79,7 @@ typedef struct
     uint32_t inode_bitmap;
     uint32_t inode_table;
     uint16_t free_blocks_count;
+    uint16_t free_inodes_count;
     uint16_t used_dirs_count;
     uint16_t pad;
     uint8_t reserved[12];
@@ -174,6 +175,7 @@ typedef struct
     uint8_t *cache_data;
 
     uint32_t flags;
+
 } ext2_fs_t;
 
 #define EXT2_FLAG_NOCACHE 0x0001

@@ -194,11 +194,15 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     init_ide_devices();
 
-    uint8_t *bootsector = malloc(512);
+    fs_node_t *node = kopen("/dev/hda", 0);
 
+    for (;;)
+        ;
+
+    uint8_t *file = malloc(512);
     int status;
 
-    status = blockdev_read(0, 0, 0, 512, bootsector);
+    status = read_fs(node, 1024, 512, file);
 
     if (status != 0)
     {
@@ -207,7 +211,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     for (uint32_t i = 0; i < 512; ++i)
     {
-        printf("%02x ", bootsector[i]);
+        printf("%02x ", file[i]);
 
         if (i % 16 == 15)
         {

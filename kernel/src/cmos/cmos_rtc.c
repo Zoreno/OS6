@@ -69,6 +69,13 @@ static uint8_t month;
 static uint32_t year;
 
 /**
+ * @brief Current number of subticks (1/1024th of a second)
+ * 
+ * 
+ */
+static volatile uint32_t subticks;
+
+/**
  * @brief IRQ line for the RTC
  * 
  * 
@@ -563,6 +570,8 @@ static uint8_t get_update_in_progress_flag()
 
 static void handle_update_irq()
 {
+    subticks = 0;
+
     ktime_t time;
 
     RTC_get_time(&time);
@@ -571,7 +580,7 @@ static void handle_update_irq()
 
     RTC_time_to_string(time_str, &time);
 
-    printf("[RTC] Current time: (%s)\n", time_str);
+    //printf("[RTC] Current time: (%s)\n", time_str);
 }
 
 static void handle_alarm_irq()
@@ -581,7 +590,8 @@ static void handle_alarm_irq()
 
 static void handle_periodic_irq()
 {
-    printf("[RTC] Got periodic IRQ\n");
+    //printf("[RTC] Got periodic IRQ\n");
+    ++subticks;
 }
 
 static void RTC_irq_handler(system_stack_t *regs)
@@ -638,7 +648,7 @@ void RTC_init()
     status_b.format_24_h = 1;
     status_b.data_mode = 0; // BCD
     status_b.irq_on_update = 1;
-    status_b.irq_periodic = 0;
+    status_b.irq_periodic = 1;
     status_b.irq_on_alarm = 0;
 
     write_status_b(status_b);

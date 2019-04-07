@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <vfs/vfs.h>
+
 #define MAX_DESCRIPTION_LENGTH 256
 
 typedef struct _blockdev_class
@@ -104,6 +106,20 @@ int reg_blockdev_class(uint64_t major, const char *desc, blockdev_read_func_t re
     return 0;
 }
 
+static uint32_t read_blockdev_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
+{
+    (void)node;
+
+    return blockdev_read(0, 0, offset, size, buffer);
+}
+
+static uint32_t write_blockdev_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
+{
+    (void)node;
+
+    return blockdev_write(0, 0, offset, size, buffer);
+}
+
 int reg_blockdev_instance(uint32_t major, uint32_t minor, const char *desc, size_t block_size, size_t capacity)
 {
     blockdev_class_t *class;
@@ -152,6 +168,28 @@ int reg_blockdev_instance(uint32_t major, uint32_t minor, const char *desc, size
     list_insert(class->instance_list, instance);
 
     printf("[Blockdev] Instance %i of class %i registered [%s]\n", minor, major, instance->description);
+
+    fs_node_t *fnode = malloc(sizeof(fs_node_t));
+
+    memset(fnode, 0, sizeof(fs_node_t));
+
+    fnode->inode = 0;
+    sprintf(fnode->name, "atadev%i%i", minor, major);
+    fnode->device = instance;
+    fnode->uid = 0;
+    fnode->gid = 0;
+    fnode->permissions = 0660;
+    fnode->length = instance->capacity * instance->block_size;
+    fnode->flags = FS_BLOCKDEVICE;
+    fnode->read = read_blockdev_fs;
+    fnode->write = write_blockdev_fs;
+    fnode->open = NULL;
+    fnode->close = NULL;
+    fnode->readdir = NULL;
+    fnode->finddir = NULL;
+    fnode->ioctl = NULL;
+
+    vfs_mount("/dev/hda", fnode);
 
     return 0;
 }
