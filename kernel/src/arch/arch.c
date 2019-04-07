@@ -109,12 +109,12 @@ void interrupt_done(uint32_t intno)
 {
     intno -= 0x20;
 
-    if (intno > 16)
+    if (intno >= 16)
     {
         return;
     }
 
-    if (intno > 8)
+    if (intno >= 8)
     {
         arch_x86_64_pic_send_command(PIC_OCW2_MASK_EOI, 1);
     }

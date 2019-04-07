@@ -169,6 +169,8 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/serial/serial.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/vfs.c)
 
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/cmos/cmos_rtc.c)
+
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/blockdev.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/ide.c)
 
@@ -219,7 +221,7 @@ add_custom_target(${HDD_NAME}
 #==============================================================================
 
 add_custom_target(run
-    COMMAND qemu-system-x86_64 -boot d -serial stdio -drive file=${HDD_NAME},format=raw -cdrom ${ISO_IMAGE}
+    COMMAND qemu-system-x86_64 -rtc base=localtime -boot d -serial stdio -drive file=${HDD_NAME},format=raw -cdrom ${ISO_IMAGE}
     DEPENDS ${ISO_IMAGE} ${HDD_NAME}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 

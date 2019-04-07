@@ -23,6 +23,8 @@
 
 #include <vfs/vfs.h>
 
+#include <cmos/cmos_rtc.h>
+
 extern void run_unit_tests();
 
 // https://www.gnu.org/software/grub/manual/multiboot2/html_node/kernel_002ec.html
@@ -171,6 +173,8 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     run_unit_tests();
 
     arch_initialize();
+
+    RTC_init();
 
     memory_info_t mem_info;
 

@@ -195,12 +195,39 @@ typedef struct fs_node
      */
     uint32_t length;
 
+    /**
+     * @brief Used to keep track of which file system it is using.
+     * 
+     * 
+     */
     uint32_t impl;
 
+    /**
+     * @brief Flags passed to open
+     * 
+     * 
+     */
     uint32_t open_flags;
 
+    /**
+     * @brief Accessed time
+     * 
+     * 
+     */
     uint32_t atime;
+
+    /**
+     * @brief Modified time
+     * 
+     * 
+     */
     uint32_t mtime;
+
+    /**
+     * @brief Created time
+     * 
+     * 
+     */
     uint32_t ctime;
 
     /**
