@@ -1077,6 +1077,8 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
 
             free(old_node_ptr);
 
+            free(symlink_buf);
+
             if (!node_ptr)
             {
                 free((void *)path);

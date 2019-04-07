@@ -22,6 +22,7 @@
 #include <drivers/blockdev.h>
 
 #include <vfs/vfs.h>
+#include <vfs/ext2.h>
 
 #include <cmos/cmos_rtc.h>
 
@@ -193,6 +194,8 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     vfs_install();
 
     init_ide_devices();
+
+    ext2_initialize();
 
     fs_node_t *node = kopen("/dev/hda", 0);
 
