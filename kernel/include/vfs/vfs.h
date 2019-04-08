@@ -386,4 +386,6 @@ int vfs_register(char *name, fs_node_t *(*vfs_mount_callback)(char *arg, char *m
 int vfs_mount_type(char *type, char *arg, char *mountpoint);
 void vfs_lock(fs_node_t *node);
 
+void print_vfs_tree(void);
+
 #endif

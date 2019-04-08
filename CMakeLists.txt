@@ -221,13 +221,15 @@ add_custom_target(${HDD_NAME}
 # Custom targets for running QEMU
 #==============================================================================
 
+set(QEMU_FLAGS -m 512M -rtc base=localtime -boot d -serial stdio -drive file=${HDD_NAME},format=raw -cdrom ${ISO_IMAGE})
+
 add_custom_target(run
-    COMMAND qemu-system-x86_64 -m 512M -rtc base=localtime -boot d -serial stdio -drive file=${HDD_NAME},format=raw -cdrom ${ISO_IMAGE}
+    COMMAND qemu-system-x86_64 ${QEMU_FLAGS}
     DEPENDS ${ISO_IMAGE} ${HDD_NAME}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
 add_custom_target(debug
-    COMMAND qemu-system-x86_64 -s -S ${ISO_IMAGE} &
+    COMMAND qemu-system-x86_64 -s -S ${QEMU_FLAGS} &
     COMMAND sudo ddd --gdb -command=${CMAKE_SOURCE_DIR}/gdbdebug 2> /dev/null
     DEPENDS ${ISO_IMAGE}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})

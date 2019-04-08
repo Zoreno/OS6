@@ -61,6 +61,8 @@ uint32_t read_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffe
 
 uint32_t write_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
 {
+    printf("[VFS] read_fs\n");
+
     if (node && node->write)
     {
         uint32_t ret = node->write(node, offset, size, buffer);
@@ -867,6 +869,9 @@ void *vfs_mount(char *path, fs_node_t *local_root)
 
     spinlock_lock(&vfs_slock);
 
+    printf("[VFS] Tree0\n");
+    print_vfs_tree();
+
     local_root->refcount = -1;
 
     tree_node_t *ret_val = NULL;
@@ -891,18 +896,25 @@ void *vfs_mount(char *path, fs_node_t *local_root)
 
     tree_node_t *root_node = fs_tree->root;
 
+    printf("[VFS] Tree1\n");
+    print_vfs_tree();
+
     if (*i == '\0')
     {
         vfs_entry_t *root = (vfs_entry_t *)root_node->value;
 
         if (root->file)
         {
+            printf("[VFS] vfs_mount: Path is already mounted\n");
             return -1;
         }
 
         root->file = local_root;
         fs_root = local_root;
         ret_val = root_node;
+
+        printf("[VFS] Tree2\n");
+        print_vfs_tree();
     }
     else
     {
@@ -957,10 +969,15 @@ void *vfs_mount(char *path, fs_node_t *local_root)
         ret_val = node;
     }
 
+    printf("[VFS] Root node children: %#016x\n", root_node->children);
+
     free(p);
     spinlock_unlock(&vfs_slock);
 
-    printf("[VFS] Done!\n");
+    printf("[VFS] Tree3\n");
+    print_vfs_tree();
+
+    printf("[VFS] Mounting Done!\n");
 }
 
 void vfs_lock(fs_node_t *node)
@@ -980,6 +997,7 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
 
     if (!filename)
     {
+        printf("[VFS] kopen_recur: Invalid file name\n");
         return NULL;
     }
 
@@ -1025,6 +1043,7 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
 
     if (!node_ptr)
     {
+        printf("[VFS] kopen_recur: Could not get mount point\n");
         return NULL;
     }
 
@@ -1042,6 +1061,7 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
                 free((void *)path);
                 free(node_ptr);
 
+                printf("[VFS] kopen_recur: NOFOLLOW symlink set\n");
                 return NULL;
             }
 
@@ -1050,6 +1070,7 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
                 free((void *)path);
                 free(node_ptr);
 
+                printf("[VFS] kopen_recur: Symlink recursion too deep\n");
                 return NULL;
             }
 
@@ -1061,6 +1082,9 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
                 free((void *)path);
                 free(node_ptr);
                 free(symlink_buf);
+
+                printf("[VFS] kopen_recur: Could not read symlink\n");
+
                 return NULL;
             }
 
@@ -1069,6 +1093,9 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
                 free((void *)path);
                 free(node_ptr);
                 free(symlink_buf);
+
+                printf("[VFS] kopen_recur: Symlink buffer empty\n");
+
                 return NULL;
             }
 
@@ -1131,6 +1158,9 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
 
         if (!node_ptr)
         {
+
+            printf("[VFS] kopen_recur: Could not find directory: [%s]\n", path_offset);
+
             free((void *)path);
 
             return NULL;
@@ -1144,6 +1174,8 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
 
     free((void *)path);
 
+    printf("[VFS] kopen_recur: Could not find file\n");
+
     return NULL;
 }
 
@@ -1152,4 +1184,38 @@ fs_node_t *kopen(char *filename, uint32_t flags)
     printf("[VFS] kopen: filename: [%s], flags: %#x\n", filename, flags);
 
     return kopen_recur(filename, flags, 0, "/");
+}
+
+static void print_vfs_tree_node(tree_node_t *node, size_t height)
+{
+    if (!node)
+    {
+        return;
+    }
+
+    for (uint32_t i = 0; i < height; ++i)
+    {
+        printf("  ");
+    }
+
+    vfs_entry_t *fnode = (vfs_entry_t *)node->value;
+
+    if (fnode->file)
+    {
+        printf("[%s], [%s]\n", fnode->name, fnode->file->name);
+    }
+    else
+    {
+        printf("[%s], (empty)\n", fnode->name);
+    }
+
+    for (list_node_t *child = node->children->head; child != NULL; child = child->next)
+    {
+        print_vfs_tree_node((tree_node_t *)child->payload, height + 1);
+    }
+}
+
+void print_vfs_tree(void)
+{
+    print_vfs_tree_node(fs_tree->root, 0);
 }
