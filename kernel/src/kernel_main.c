@@ -195,12 +195,9 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     init_ide_devices();
 
-    ext2_initialize();
+    //ext2_initialize();
 
     fs_node_t *node = kopen("/dev/hda", 0);
-
-    for (;;)
-        ;
 
     uint8_t *file = malloc(512);
     int status;
@@ -221,6 +218,9 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
             printf("\n");
         }
     }
+
+    for (;;)
+        ;
 
     for (;;)
         __asm__ volatile("hlt");

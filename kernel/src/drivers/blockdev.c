@@ -108,9 +108,13 @@ int reg_blockdev_class(uint64_t major, const char *desc, blockdev_read_func_t re
 
 static uint32_t read_blockdev_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
 {
-    (void)node;
+    blockdev_instance_t *instance = (blockdev_instance_t *)node->device;
+    blockdev_class_t *class = instance->class;
 
-    return blockdev_read(0, 0, offset, size, buffer);
+    printf("[Blockdev] read_blockdev_fs: M:%i,m:%i, offset:%#016x, size:%#08x\n",
+           class->major, instance->minor, offset, size);
+
+    return blockdev_read(class->major, instance->minor, offset, size, buffer);
 }
 
 static uint32_t write_blockdev_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
@@ -118,6 +122,17 @@ static uint32_t write_blockdev_fs(fs_node_t *node, uint64_t offset, uint32_t siz
     (void)node;
 
     return blockdev_write(0, 0, offset, size, buffer);
+}
+
+static int open_blockdev_fs(fs_node_t *node, uint32_t flags)
+{
+    blockdev_instance_t *instance = (blockdev_instance_t *)node->device;
+    blockdev_class_t *class = instance->class;
+
+    printf("[Blockdev] open_blockdev_fs: M:%i,m:%i,flags:%#x\n",
+           class->major, instance->minor, flags);
+
+    return 0;
 }
 
 int reg_blockdev_instance(uint32_t major, uint32_t minor, const char *desc, size_t block_size, size_t capacity)
@@ -183,7 +198,7 @@ int reg_blockdev_instance(uint32_t major, uint32_t minor, const char *desc, size
     fnode->flags = FS_BLOCKDEVICE;
     fnode->read = read_blockdev_fs;
     fnode->write = write_blockdev_fs;
-    fnode->open = NULL;
+    fnode->open = open_blockdev_fs;
     fnode->close = NULL;
     fnode->readdir = NULL;
     fnode->finddir = NULL;
@@ -248,7 +263,7 @@ int unreg_blockdev_instance(uint32_t major, uint32_t minor)
 
 uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, size_t len, void *buffer)
 {
-    //printf("[Blockdev] M:%i m:%i Read Off:%i, len:%i, buffer:%#016x\n", major, minor, offset, len, buffer);
+    printf("[Blockdev] blockdev_read: M:%i m:%i Read Off:%i, len:%i, buffer:%#016x\n", major, minor, offset, len, buffer);
 
     blockdev_class_t *class;
     blockdev_instance_t *instance;

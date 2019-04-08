@@ -35,7 +35,7 @@ char *strtok_r(char *str, const char *delim, char **saveptr)
 
     if (str == NULL)
     {
-        *saveptr = (char)lfind(token, '\0');
+        *saveptr = (char *)lfind(token, '\0');
     }
     else
     {

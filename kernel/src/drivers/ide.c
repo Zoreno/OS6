@@ -296,7 +296,7 @@ static ide_device_t *get_ide_device(unsigned int minor)
 
 static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t nblocks, void *buffer, int direction)
 {
-    //printf("[IDE] %s m:%i, block: %i, nblocks: %i, buffer: %#016x\n", direction == IO_READ ? "Read" : "Write", minor, block, nblocks, buffer, direction);
+    printf("[IDE] %s m:%i, block: %i, nblocks: %i, buffer: %#016x\n", direction == IO_READ ? "Read" : "Write", minor, block, nblocks, buffer, direction);
 
     ide_device_t *device;
     ide_controller_t *controller;

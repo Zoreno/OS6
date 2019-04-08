@@ -113,7 +113,7 @@ static uint32_t read_ext2(fs_node_t *node, uint64_t offset, uint32_t size,
                           uint8_t *buffer);
 static uint32_t write_ext2(fs_node_t *node, uint64_t offset, uint32_t size,
                            uint8_t *buffer);
-static void truncate_ext2(fs_node_t *node);
+static int truncate_ext2(fs_node_t *node);
 static void open_ext2(fs_node_t *node, uint32_t flags);
 static void close_ext2(fs_node_t *node);
 static struct dirent *readdir_ext2(fs_node_t *node, uint32_t index);
@@ -389,13 +389,13 @@ static int set_block_number(ext2_fs_t *this, ext2_inodetable_t *inode,
 
         read_block(this,
                    inode->block[EXT2_DIRECT_BLOCKS],
-                   (uint8_t *)tmp);
+                   tmp);
 
         ((uint32_t *)tmp)[iblock - EXT2_DIRECT_BLOCKS] = rblock;
 
         write_block(this,
                     inode->block[EXT2_DIRECT_BLOCKS],
-                    (uint32_t *)tmp);
+                    tmp);
 
         free(tmp);
 
@@ -710,7 +710,7 @@ static int allocate_block(ext2_fs_t *this)
     {
         write_block(this,
                     this->bgd_offset + i,
-                    (uint8_t *)((uint32_t)BGD + this->block_size * i));
+                    (uint8_t *)((uint64_t)BGD + this->block_size * i));
     }
 
     SB->free_blocks_count--;
@@ -755,7 +755,7 @@ static int write_inode(ext2_fs_t *this, ext2_inodetable_t *inode,
                inode_table_block + block_offset,
                (uint8_t *)inodet);
 
-    memcpy((uint8_t *)((uint32_t)inodet + offset_in_block * this->inode_size),
+    memcpy((uint8_t *)((uint64_t)inodet + offset_in_block * this->inode_size),
            inode,
            this->inode_size);
 
@@ -896,7 +896,7 @@ static uint32_t allocate_inode(ext2_fs_t *this)
     {
         write_block(this,
                     this->bgd_offset + i,
-                    (uint8_t *)((uint32_t)BGD + this->block_size * i));
+                    (uint8_t *)((uint64_t)BGD + this->block_size * i));
     }
 
     SB->free_inodes_count--;
@@ -931,7 +931,7 @@ static void refresh_inode(ext2_fs_t *this, ext2_inodetable_t *inodet, uint32_t i
     ext2_inodetable_t *inodes = (ext2_inodetable_t *)buf;
 
     memcpy(inodet,
-           (uint32_t *)((uint32_t)inodes + offset_in_block * this->inode_size),
+           (uint32_t *)((uint64_t)inodes + offset_in_block * this->inode_size),
            this->inode_size);
 
     free(buf);
@@ -975,7 +975,7 @@ static uint32_t write_inode_buffer(ext2_fs_t *this, ext2_inodetable_t *inode,
                          start_block,
                          buf);
 
-        memcpy((uint8_t *)(((uint32_t)buf) +
+        memcpy((uint8_t *)(((uint64_t)buf) +
                            ((uintptr_t)offset % this->block_size)),
                buffer,
                size_to_read);
@@ -1000,7 +1000,7 @@ static uint32_t write_inode_buffer(ext2_fs_t *this, ext2_inodetable_t *inode,
                                          inode, block_offset,
                                          buf);
 
-                memcpy((uint8_t *)(((uint32_t)buf) +
+                memcpy((uint8_t *)(((uint64_t)buf) +
                                    ((uintptr_t)offset % this->block_size)),
                        buffer,
                        this->block_size - (offset % this->block_size));
@@ -1383,7 +1383,7 @@ static int mkdir_ext2(fs_node_t *parent, char *name, uint16_t permission)
     {
         write_block(this,
                     this->bgd_offset + i,
-                    (uint8_t *)((uint32_t)BGD + this->block_size * i));
+                    (uint8_t *)((uint64_t)BGD + this->block_size * i));
     }
 
     ext2_sync(this);
@@ -1474,6 +1474,8 @@ static int chmod_ext2(fs_node_t *parent, int mode)
 static ext2_dir_t *direntry_ext2(ext2_fs_t *this, ext2_inodetable_t *inode,
                                  uint32_t no, uint32_t index)
 {
+    (void)no;
+
     uint8_t *block = malloc(this->block_size);
     uint8_t block_nr = 0;
 
@@ -1710,7 +1712,7 @@ static uint32_t read_ext2(fs_node_t *node, uint64_t offset, uint32_t size,
                          buf);
 
         memcpy(buffer,
-               (uint8_t *)(((uint32_t)buf) +
+               (uint8_t *)(((uint64_t)buf) +
                            ((uintptr_t)offset % this->block_size)),
                size_to_read);
     }
@@ -1730,7 +1732,7 @@ static uint32_t read_ext2(fs_node_t *node, uint64_t offset, uint32_t size,
                                  buf);
 
                 memcpy(buffer,
-                       (uint8_t *)(((uint32_t)buf) +
+                       (uint8_t *)(((uint64_t)buf) +
                                    ((uintptr_t)offset % this->block_size)),
                        this->block_size - (offset % this->block_size));
             }
@@ -1785,7 +1787,7 @@ static uint32_t write_ext2(fs_node_t *node, uint64_t offset, uint32_t size,
     return rv;
 }
 
-static void truncate_ext2(fs_node_t *node)
+static int truncate_ext2(fs_node_t *node)
 {
     ext2_fs_t *this = (ext2_fs_t *)node->device;
 
@@ -1794,6 +1796,8 @@ static void truncate_ext2(fs_node_t *node)
     inode->size = 0;
 
     write_inode(this, inode, node->inode);
+
+    return 0;
 }
 
 static void open_ext2(fs_node_t *node, uint32_t flags)
@@ -2106,7 +2110,7 @@ static fs_node_t *mount_ext2(fs_node_t *block_device, int flags)
 
     for (int i = 0; i < this->bgd_block_span; ++i)
     {
-        read_block(this, this->bgd_offset + i, (uint8_t *)((uint32_t)BGD + this->block_size * i));
+        read_block(this, this->bgd_offset + i, (uint8_t *)((uint64_t)BGD + this->block_size * i));
     }
 
     ext2_inodetable_t *root_inode = read_inode(this, 2);
