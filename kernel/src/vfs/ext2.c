@@ -2122,11 +2122,36 @@ static fs_node_t *mount_ext2(fs_node_t *block_device, int flags)
 
     if (!(this->flags & EXT2_FLAG_NOCACHE))
     {
+        printf("[EXT2] Allocating cache!\n");
         DC = malloc(sizeof(ext2_disk_cache_entry_t) * this->cache_entries);
+
+        if (!DC)
+        {
+            printf("[EXT2] Could not allocate cache\n");
+
+            for (;;)
+                ;
+        }
+
+        printf("[EXT2] DC: %#016x\n", DC);
 
         this->cache_data = malloc(this->block_size * this->cache_entries);
 
+        if (!this->cache_data)
+        {
+            printf("[EXT2] Could not allocate cache data\n");
+
+            for (;;)
+                ;
+        }
+
+        printf("[EXT2] cache_data: %#016x\n", this->cache_data);
+
+        printf("[EXT2] Cache size: %i\n", this->block_size * this->cache_entries);
+
         memset(this->cache_data, 0, this->block_size * this->cache_entries);
+
+        printf("[EXT2] Memory cleared!\n");
 
         for (uint32_t i = 0; i < this->cache_entries; ++i)
         {
@@ -2163,8 +2188,24 @@ static fs_node_t *mount_ext2(fs_node_t *block_device, int flags)
 
     // TODO: Debug the Group descriptor table
 
+    char *bg_buffer = malloc(sizeof(this->block_size));
+
+    for (uint32_t i = 0; i < BGDS; ++i)
+    {
+        printf("[BGD] %i at %i\n", i, this->bgd_offset + i * SB->blocks_per_group);
+
+        printf("[BGD] Block bitmap at %i\n", BGD[i].block_bitmap);
+        printf("[BGD] Inode bitmap at %i\n", BGD[i].inode_bitmap);
+        printf("[BGD] Inode table: %i\n", BGD[i].inode_table);
+        printf("[BGD] Free blocks count: %i\n", BGD[i].free_blocks_count);
+        printf("[BGD] Free inodes count: %i\n", BGD[i].free_inodes_count);
+    }
+
     printf("1\n");
     print_vfs_tree();
+
+    for (;;)
+        ;
 
     ext2_inodetable_t *root_inode = read_inode(this, 2);
 
@@ -2208,7 +2249,7 @@ int ext2_initialize()
         return -1;
     }
 
-    int flags = 0;
+    int flags = EXT2_FLAG_NOCACHE;
 
     fs_node_t *fs = mount_ext2(dev, flags);
 

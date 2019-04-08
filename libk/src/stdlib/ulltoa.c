@@ -13,7 +13,7 @@ void ulltoa(unsigned long long int i, int base, char *buf)
 
     char tbuf[65] = {0};
 
-    if ((!i) || (base > 16))
+    if ((!i) || (base > 16) || (base == 0))
     {
         buf[0] = '0';
         buf[1] = '\0';

@@ -62,7 +62,7 @@ header_end:
 ;;=============================================================================
 
 ; Stack size for the kernel
-STACK_SIZE equ 0x4000
+STACK_SIZE equ 0x10000
 
 ; Pointer to the video memory of the debug terminal
 VIDEO_MEM equ 0xb8000

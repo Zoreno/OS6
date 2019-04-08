@@ -869,9 +869,6 @@ void *vfs_mount(char *path, fs_node_t *local_root)
 
     spinlock_lock(&vfs_slock);
 
-    printf("[VFS] Tree0\n");
-    print_vfs_tree();
-
     local_root->refcount = -1;
 
     tree_node_t *ret_val = NULL;
@@ -896,9 +893,6 @@ void *vfs_mount(char *path, fs_node_t *local_root)
 
     tree_node_t *root_node = fs_tree->root;
 
-    printf("[VFS] Tree1\n");
-    print_vfs_tree();
-
     if (*i == '\0')
     {
         vfs_entry_t *root = (vfs_entry_t *)root_node->value;
@@ -912,9 +906,6 @@ void *vfs_mount(char *path, fs_node_t *local_root)
         root->file = local_root;
         fs_root = local_root;
         ret_val = root_node;
-
-        printf("[VFS] Tree2\n");
-        print_vfs_tree();
     }
     else
     {
@@ -969,13 +960,10 @@ void *vfs_mount(char *path, fs_node_t *local_root)
         ret_val = node;
     }
 
-    printf("[VFS] Root node children: %#016x\n", root_node->children);
+    //printf("[VFS] Root node children: %#016x\n", root_node->children);
 
     free(p);
     spinlock_unlock(&vfs_slock);
-
-    printf("[VFS] Tree3\n");
-    print_vfs_tree();
 
     printf("[VFS] Mounting Done!\n");
 }
@@ -1217,5 +1205,6 @@ static void print_vfs_tree_node(tree_node_t *node, size_t height)
 
 void print_vfs_tree(void)
 {
+    printf("Tree entries: %i\n", fs_tree->nodes);
     print_vfs_tree_node(fs_tree->root, 0);
 }
