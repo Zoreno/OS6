@@ -280,6 +280,7 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
 
     if (major > NUM_BLOCKDEV_CLASSES)
     {
+        printf("[Blockdev] Major class invalid\n");
         return -1;
     }
 
@@ -289,6 +290,7 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
 
     if (!class)
     {
+        printf("[Blockdev] Could not find class\n");
         return -1;
     }
 
@@ -298,6 +300,7 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
 
     if (!instance)
     {
+        printf("[Blockdev] Could not find instance\n");
         return -1;
     }
 
@@ -312,12 +315,15 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
 
         if (!tmp)
         {
+            printf("[Blockdev] Failed to allocate memory 1\n");
             release_blockdev_instance(instance);
             return -1;
         }
 
         if (!class->read(minor, block, 1, tmp))
         {
+            printf("[Blockdev] Error reading from device 1\n");
+
             free(tmp);
             release_blockdev_instance(instance);
             return -1;
@@ -337,6 +343,8 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
     {
         if (!(n = class->read(minor, block, nblocks, dest)))
         {
+            printf("[Blockdev] Read zero blocks\n");
+
             release_blockdev_instance(instance);
 
             return -1;
@@ -353,12 +361,15 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
 
         if (!tmp)
         {
+            printf("[Blockdev] Error allocating memory 2\n");
             release_blockdev_instance(instance);
             return -1;
         }
 
         if (!class->read(minor, block, 1, tmp))
         {
+            printf("[Blockdev] Error reading from device 2\n");
+
             free(tmp);
             release_blockdev_instance(instance);
             return -1;

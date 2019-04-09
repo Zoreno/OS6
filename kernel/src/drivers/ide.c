@@ -164,18 +164,33 @@ static uint8_t select_device(ide_device_t *device)
 {
     uint32_t iobase = device->controller->iobase;
 
-    if ((inportb(iobase + ATA_STATUS) & (ATA_STATUS_BSY | ATA_STATUS_DRQ)))
+    int num_reties = 100;
+
+    int i = 0;
+
+    while ((inportb(iobase + ATA_STATUS) & (ATA_STATUS_BSY | ATA_STATUS_DRQ)))
     {
-        return 0;
+        udelay(10);
+
+        ++i;
+
+        if (i >= num_reties)
+        {
+            printf("[IDE] Resetting controller\n");
+
+            reset_controller(device->controller);
+            i = 0;
+        }
     }
 
     outportb(iobase + ATA_DRV_HEAD, 0xa0 | (device->position << 4));
 
     udelay(10);
 
-    if ((inportb(iobase + ATA_STATUS) & (ATA_STATUS_BSY | ATA_STATUS_DRQ)))
+    while ((inportb(iobase + ATA_STATUS) & (ATA_STATUS_BSY | ATA_STATUS_DRQ)))
     {
-        return 0;
+        printf("1\n");
+        udelay(10);
     }
 
     return 1;
@@ -267,7 +282,7 @@ static void identify_ide_device(ide_device_t *device)
 
     if (device->lba)
     {
-        device->capacity = (uint32_t)info[60];
+        device->capacity = (uint32_t)info[60] + (uint32_t)(info[61] << 16);
     }
     else
     {
@@ -315,11 +330,13 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
 
     if (!device->present)
     {
+        printf("[IDE] Device not present\n");
         return 0;
     }
 
     if (!nblocks)
     {
+        printf("[IDE] Zero blocks requested\n");
         return 0;
     }
 
@@ -330,6 +347,8 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
 
     if (block + nblocks > device->capacity)
     {
+        printf("[IDE] Request outside capacity\n");
+        printf("[IDE] block+nblocks: %i, device->capacity: %i\n", block + nblocks, device->capacity);
         return 0;
     }
 
@@ -338,6 +357,7 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
 
     if (!select_device(device))
     {
+        printf("[IDE] Could not select device\n");
         return 0;
     }
 
@@ -374,11 +394,13 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
 
     if (!wait_for_controller(controller, ATA_STATUS_BSY, 0, ATA_TIMEOUT))
     {
+        printf("[IDE] Error waiting for controller 1\n");
         return 0;
     }
 
     if (inportb(iobase + ATA_STATUS) & ATA_STATUS_ERR)
     {
+        printf("[IDE] Device reported error 1\n");
         return 0;
     }
 
@@ -396,6 +418,7 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
 
     if (inportb(iobase + ATA_STATUS) & ATA_STATUS_ERR)
     {
+        printf("[IDE] Device reported error 2\n");
         return 0;
     }
 
@@ -414,6 +437,7 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
 
         if (!wait_for_controller(controller, ATA_STATUS_BSY, 0, ATA_TIMEOUT))
         {
+            printf("[IDE] Error waiting for controller after sending flush command\n");
             return 0;
         }
     }

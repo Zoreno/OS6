@@ -210,14 +210,21 @@ static int read_block(ext2_fs_t *this, uint32_t block_no, uint8_t *buffer)
     {
         printf("[EXT2] No disk cache\n");
 
-        read_fs(this->block_device,
-                block_no * this->block_size,
-                this->block_size,
-                (uint8_t *)buffer);
+        int ret;
+
+        ret = read_fs(this->block_device,
+                      block_no * this->block_size,
+                      this->block_size,
+                      (uint8_t *)buffer);
+
+        if (ret != 0)
+        {
+            printf("[EXT2] Error reading block from block device\n");
+        }
 
         spinlock_unlock(&this->lock);
 
-        return 0;
+        return ret;
     }
 
     int oldest = -1;
@@ -249,16 +256,21 @@ static int read_block(ext2_fs_t *this, uint32_t block_no, uint8_t *buffer)
         cache_flush_dirty(this, oldest);
     }
 
-    read_fs(this->block_device,
-            block_no * this->block_size,
-            this->block_size,
-            (uint8_t *)DC[oldest].block);
+    int ret;
 
-    memcpy(buffer, DC[oldest].block, this->block_size);
+    ret = read_fs(this->block_device,
+                  block_no * this->block_size,
+                  this->block_size,
+                  (uint8_t *)DC[oldest].block);
 
-    DC[oldest].block_no = block_no;
-    DC[oldest].last_use = get_cache_time(this);
-    DC[oldest].dirty = 0;
+    if (ret == 0)
+    {
+        memcpy(buffer, DC[oldest].block, this->block_size);
+
+        DC[oldest].block_no = block_no;
+        DC[oldest].last_use = get_cache_time(this);
+        DC[oldest].dirty = 0;
+    }
 
     spinlock_unlock(&this->lock);
 
@@ -916,9 +928,6 @@ static uint32_t allocate_inode(ext2_fs_t *this)
 static void refresh_inode(ext2_fs_t *this, ext2_inodetable_t *inodet, uint32_t inode)
 {
 
-    printf("1\n");
-    print_vfs_tree();
-
     uint32_t group = inode / this->inodes_per_group;
 
     printf("Group: %i, inode: %i, inodes per group: %i\n", group, inode, this->inodes_per_group);
@@ -939,17 +948,11 @@ static void refresh_inode(ext2_fs_t *this, ext2_inodetable_t *inodet, uint32_t i
 
     memset(buf, 0, this->block_size);
 
-    printf("2\n");
-    print_vfs_tree();
-
     printf("inode_table_block: %#016x\n", inode_table_block);
 
     read_block(this,
                inode_table_block + block_offset,
                buf);
-
-    printf("3\n");
-    print_vfs_tree();
 
     ext2_inodetable_t *inodes = (ext2_inodetable_t *)buf;
 
@@ -960,23 +963,16 @@ static void refresh_inode(ext2_fs_t *this, ext2_inodetable_t *inodet, uint32_t i
            (uint8_t *)((uint64_t)inodes + offset_in_block * this->inode_size),
            this->inode_size);
 
-    printf("4\n");
-    print_vfs_tree();
-
     free(buf);
 }
 
 static ext2_inodetable_t *read_inode(ext2_fs_t *this, uint32_t inode)
 {
-    ext2_inodetable_t *inodet = malloc(sizeof(this->inode_size));
+    printf("[EXT2] read_inode: inode: %i\n", inode);
 
-    printf("1\n");
-    print_vfs_tree();
+    ext2_inodetable_t *inodet = malloc(this->inode_size);
 
     refresh_inode(this, inodet, inode);
-
-    printf("2\n");
-    print_vfs_tree();
 
     return inodet;
 }
@@ -1228,6 +1224,7 @@ static uint32_t node_from_file(fs_node_t *this, ext2_inodetable_t *inode,
 {
     if (!fnode)
     {
+        printf("[EXT2] node_from_file: Invalid fnode\n");
         return 0;
     }
 
@@ -1308,7 +1305,7 @@ static uint32_t node_from_file(fs_node_t *this, ext2_inodetable_t *inode,
     fnode->close = close_ext2;
     fnode->ioctl = NULL;
 
-    return 0;
+    return 1;
 }
 
 //=============================================================================
@@ -1557,6 +1554,8 @@ static ext2_dir_t *direntry_ext2(ext2_fs_t *this, ext2_inodetable_t *inode,
 
 static fs_node_t *finddir_ext2(fs_node_t *node, char *name)
 {
+    printf("[EXT2] finddir_ext2: node->name: [%s], name: [%s]\n", node->name, name);
+
     ext2_fs_t *this = (ext2_fs_t *)node->device;
 
     ext2_inodetable_t *inode = read_inode(this, node->inode);
@@ -1593,8 +1592,11 @@ static fs_node_t *finddir_ext2(fs_node_t *node, char *name)
         memcpy(dname, &(d_ent->name), d_ent->name_len);
         dname[d_ent->name_len] = '\0';
 
+        printf("[EXT2] finddir_ext2: Comparing [%s], [%s]\n", dname, name);
+
         if (!strcmp(dname, name))
         {
+            printf("[EXT2] Found!\n");
             free(dname);
             direntry = malloc(d_ent->rec_len);
             memcpy(direntry, d_ent, d_ent->rec_len);
@@ -1623,6 +1625,8 @@ static fs_node_t *finddir_ext2(fs_node_t *node, char *name)
 
     if (!node_from_file(this, inode, direntry, outnode))
     {
+        printf("[EXT2] Could not get node from file\n");
+
         return 0;
     }
 
@@ -2015,9 +2019,9 @@ static uint32_t ext2_root(ext2_fs_t *this, ext2_inodetable_t *inode,
         return -1;
     }
 
-    if ((inode->mode & EXT2_S_IFDIR) == EXT2_S_IFDIR)
+    if (!(inode->mode & EXT2_S_IFDIR) == EXT2_S_IFDIR)
     {
-        printf("[EXT2] ext2_root: Root is directory\n");
+        printf("[EXT2] ext2_root: Root is not directory\n");
         return -1;
     }
 
@@ -2064,8 +2068,6 @@ static uint32_t ext2_root(ext2_fs_t *this, ext2_inodetable_t *inode,
 static fs_node_t *mount_ext2(fs_node_t *block_device, int flags)
 {
     printf("[EXT2] mount_ext2\n");
-
-    print_vfs_tree();
 
     ext2_fs_t *this = malloc(sizeof(ext2_fs_t));
 
@@ -2118,8 +2120,6 @@ static fs_node_t *mount_ext2(fs_node_t *block_device, int flags)
     printf("Inode size: %i\n", this->inode_size);
     printf("Cache entries: %i\n", this->cache_entries);
 
-    print_vfs_tree();
-
     if (!(this->flags & EXT2_FLAG_NOCACHE))
     {
         printf("[EXT2] Allocating cache!\n");
@@ -2166,8 +2166,6 @@ static fs_node_t *mount_ext2(fs_node_t *block_device, int flags)
         DC = NULL;
     }
 
-    print_vfs_tree();
-
     this->bgd_block_span = sizeof(ext2_bgdescriptor_t) * BGDS / this->block_size + 1;
 
     printf("BGD block span: %i\n", this->bgd_block_span);
@@ -2180,6 +2178,8 @@ static fs_node_t *mount_ext2(fs_node_t *block_device, int flags)
     {
         this->bgd_offset = 1;
     }
+
+    printf("[BGD] bgd: %#016x\n", BGD);
 
     for (int i = 0; i < this->bgd_block_span; ++i)
     {
@@ -2201,29 +2201,15 @@ static fs_node_t *mount_ext2(fs_node_t *block_device, int flags)
         printf("[BGD] Free inodes count: %i\n", BGD[i].free_inodes_count);
     }
 
-    printf("1\n");
-    print_vfs_tree();
-
-    for (;;)
-        ;
-
     ext2_inodetable_t *root_inode = read_inode(this, 2);
 
-    printf("2\n");
-    print_vfs_tree();
-
     RN = (fs_node_t *)malloc(sizeof(fs_node_t));
-
-    printf("3\n");
-    print_vfs_tree();
 
     if (ext2_root(this, root_inode, RN))
     {
         printf("[EXT2] mount_ext2: ext2_root returned non-zero\n");
         return NULL;
     }
-
-    print_vfs_tree();
 
     return RN;
 }
@@ -2236,8 +2222,6 @@ int ext2_initialize()
 {
 
     fs_node_t *dev = kopen("/dev/hda", 0);
-
-    print_vfs_tree();
 
     if (!dev)
     {

@@ -53,6 +53,9 @@ uint32_t read_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffe
     if (node && node->read)
     {
         uint32_t ret = node->read(node, offset, size, buffer);
+
+        printf("[VFS] node->read returned %i\n", ret);
+
         return ret;
     }
 
@@ -133,11 +136,24 @@ struct dirent *readdir_fs(fs_node_t *node, uint32_t index)
 
 fs_node_t *finddir_fs(fs_node_t *node, char *name)
 {
-    if (node && (node->flags & FS_DIRECTORY) && node->finddir)
+    if (!node)
     {
+        return NULL;
+    }
+
+    if ((node->flags & FS_DIRECTORY) && node->finddir)
+    {
+        printf("[VFS] finddir_fs: Finding directory\n");
+        printf("[VFS] node->name: [%s], name: [%s]\n", node->name, name);
+
         fs_node_t *ret = node->finddir(node, name);
 
         return ret;
+    }
+    else
+    {
+        printf("[VFS] finddir_fs: Node not a directory\n");
+        printf("[VFS] node->name: [%s], name: [%s]\n", node->name, name);
     }
 
     return (fs_node_t *)NULL;
@@ -438,7 +454,7 @@ char *canonicalize_path(char *cwd, char *input)
     }
     else
     {
-        output = malloc(sizeof(char) * (size - 1));
+        output = malloc(sizeof(char) * (size + 1));
         char *output_offset = output;
 
         for (list_node_t *lnode = out->head; lnode != NULL; lnode = lnode->next)
@@ -460,8 +476,8 @@ char *canonicalize_path(char *cwd, char *input)
 
 fs_node_t *get_mount_point(char *path, size_t path_depth, char **outpath, uint32_t *outdepth)
 {
-    printf("[VFS] get_mount_point: path: [%s], path_depth: %i, outpath: %#016x, outdepth: %#016x\n",
-           path, path_depth, outpath, outdepth);
+    printf("[VFS] get_mount_point: path: [%s], path_depth: %i, outpath: [%s], outdepth: %i\n",
+           path, path_depth, *outpath, *outdepth);
 
     size_t depth;
 
@@ -493,8 +509,11 @@ fs_node_t *get_mount_point(char *path, size_t path_depth, char **outpath, uint32
 
             vfs_entry_t *ent = (vfs_entry_t *)tchild->value;
 
+            printf("Comparing [%s] and [%s]\n", ent->name, at);
+
             if (!strcmp(ent->name, at))
             {
+                printf("Found!\n");
                 found = 1;
                 node = tchild;
                 at = at + strlen(at) + 1;
@@ -1036,6 +1055,8 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
     }
 
     printf("Node name: [%s]\n", node_ptr->name);
+    printf("Path depth: %i\n", path_depth);
+    printf("Depth: %i\n", depth);
 
     do
     {
@@ -1117,6 +1138,8 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
                 free((void *)path);
             }
         }
+
+        printf("[VFS] Path offset: %#016x, path+pathlen: %#016x\n", path_offset, path + path_len);
 
         if (path_offset >= path + path_len)
         {

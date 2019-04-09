@@ -197,9 +197,6 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     ext2_initialize();
 
-    for (;;)
-        ;
-
     fs_node_t *node = kopen("/testfile2", 0);
 
     if (!node)
@@ -210,144 +207,83 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
             ;
     }
 
-    for (;;)
-        ;
+    printf("/testfile opened!\n");
+    printf("Size: %i\n", node->length);
 
-    uint8_t *file = malloc(512);
-    int status;
+    uint32_t size = node->length;
 
-    status = read_fs(node, 1024, 512, file);
+    uint8_t *file = malloc(size);
+    int bytes_read;
 
-    if (status != 0)
+    bytes_read = read_fs(node, 0, size, file);
+
+    if (bytes_read != size)
     {
-        printf("Error reading from blockdev\n");
+        printf("Error reading from file\n");
     }
 
-    for (uint32_t i = 0; i < 512; ++i)
-    {
-        printf("%02x ", file[i]);
+    uint32_t bytes = size;
+    uint32_t bytes_per_col = 16;
 
-        if (i % 16 == 15)
+    int nrows = (bytes + bytes_per_col - 1) / bytes_per_col;
+
+    int width = 0;
+
+    while (bytes)
+    {
+        bytes /= 16;
+        width++;
+    }
+
+    for (uint32_t row = 0; row < nrows; ++row)
+    {
+        printf("%#0*x | ", width, row * bytes_per_col);
+
+        for (uint32_t col = 0; col < 16; ++col)
         {
-            printf("\n");
+            uint32_t offset = row * bytes_per_col + col;
+
+            if (offset >= size)
+            {
+                printf("-- ");
+            }
+            else
+            {
+                printf("%02x ", file[offset]);
+            }
         }
+
+        printf("|");
+
+        for (uint32_t col = 0; col < 16; ++col)
+        {
+            uint32_t offset = row * bytes_per_col + col;
+
+            if (offset >= size)
+            {
+                printf(" ");
+            }
+            else
+            {
+                char c = file[offset] & 0x7F;
+
+                if (c < 32 || c >= 127)
+                {
+                    c = '.';
+                }
+
+                char s[2] = {0};
+                s[0] = c;
+
+                printf("%s", s);
+            }
+        }
+
+        printf("|");
+
+        printf("\n");
     }
 
     for (;;)
         __asm__ volatile("hlt");
 }
-
-/*
-
-Buddy Allocation
-
-Order 4 upper limit
-
-2^0 = 1
-2^1 = 2
-2^2 = 4
-2^3 = 8
-2^4 = 16
-2^5 = 32
-2^6 = 64
-2^7 = 128
-2^8 = 256
-2^9 = 512
-
-const int highest_order = 9;
-
-typedef struct
-{
-    uint64_t start;
-    uint64_t bitmap[2 * highest_order / 64]; // 988777766666666
-} block_t;
-
-typedef struct
-{
-
-} page_frame_allocator_t;
-
-int is_set(uint64_t *bitmap, int bit)
-{
-    ...
-}
-
-int set(uint64_t *bitmap, int bit);
-int clear(uint64_t *bitmap, int bit);
-
-int _find_page(uint64_t *bitmap, int i, int order, int curr_order)
-{
-    if(is_set(bitmap, i))
-    {
-        return -1;
-    }
-
-    if(curr_order == order)
-    {
-        return i;
-    }
-
-    int res;
-
-    if((res = _find_page(bitmap, 2 * i + 1, order, curr_order - 1)) != -1)
-    {
-        return res;
-    }
-
-    return _find_page(bitmap, 2 * i  + 2, order, curr_order - 1);
-}
-
-void *_alloc_page(block_t *block, size_t size)
-{
-    int order = _get_order(size);
-
-    int page = _find_page(block->bitmap, 0, order, highest_order);
-
-    if(page != -1)
-    {
-        void *addr = _get_address(block, i);
-
-        return addr;
-    }
-
-    return NULL;
-}
-
-Request A for 1 block (Order 0)
-
-Memory before:
-4
-Step 1: Split smallest until we have a order 0
-3-3
-2-2-3
-1-1-2-3
-0-0-1-2-3
-Step 2: Allocate order 0 block
-0(A)-0-1-2-3
-
-Request B for 1 block
-
-0(A)-0(B)-1-2-3
-
-Request C for 2 blocks (order 1)
-
-0(A)-0(B)-1(C)-2-3
-
-Free A
-
-0-0(B)-1(C)-2-3
-
-Free B
-
-0-0-1(C)-2-3
-1-1(C)-2-3
-
-Free C
-
-1-1-2-3
-2-2-3
-3-3
-4
-
-
-*/
