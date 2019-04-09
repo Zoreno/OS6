@@ -26,6 +26,8 @@
 
 #include <cmos/cmos_rtc.h>
 
+#include <util/hexdump.h>
+
 extern void run_unit_tests();
 
 // https://www.gnu.org/software/grub/manual/multiboot2/html_node/kernel_002ec.html
@@ -199,7 +201,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     ext2_initialize();
 
-    const char *path = "/home/testfile";
+    const char *path = "/testfile2";
 
     fs_node_t *node = kopen(path, 0);
 
@@ -226,67 +228,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
         printf("Error reading from file\n");
     }
 
-    uint32_t bytes = size;
-    uint32_t bytes_per_col = 16;
-
-    int nrows = (bytes + bytes_per_col - 1) / bytes_per_col;
-
-    int width = 0;
-
-    while (bytes)
-    {
-        bytes /= 16;
-        width++;
-    }
-
-    for (uint32_t row = 0; row < nrows; ++row)
-    {
-        printf("%#0*x | ", width, row * bytes_per_col);
-
-        for (uint32_t col = 0; col < 16; ++col)
-        {
-            uint32_t offset = row * bytes_per_col + col;
-
-            if (offset >= size)
-            {
-                printf("-- ");
-            }
-            else
-            {
-                printf("%02x ", file[offset]);
-            }
-        }
-
-        printf("|");
-
-        for (uint32_t col = 0; col < 16; ++col)
-        {
-            uint32_t offset = row * bytes_per_col + col;
-
-            if (offset >= size)
-            {
-                printf(" ");
-            }
-            else
-            {
-                char c = file[offset] & 0x7F;
-
-                if (c < 32 || c >= 127)
-                {
-                    c = '.';
-                }
-
-                char s[2] = {0};
-                s[0] = c;
-
-                printf("%s", s);
-            }
-        }
-
-        printf("|");
-
-        printf("\n");
-    }
+    hexdump(file, size);
 
     for (;;)
         __asm__ volatile("hlt");

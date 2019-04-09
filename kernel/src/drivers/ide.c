@@ -133,9 +133,9 @@ static uint8_t wait_for_controller(ide_controller_t *controller, uint8_t mask, u
 
     do
     {
-        status = inportb(controller->iobase + ATA_STATUS);
-
         udelay(1);
+
+        status = inportb(controller->iobase + ATA_STATUS);
 
     } while ((status & mask) != value && --timeout);
 
@@ -160,18 +160,29 @@ static uint8_t reset_controller(ide_controller_t *controller)
     return 1;
 }
 
-static uint8_t select_device(ide_device_t *device)
+static uint8_t select_device(ide_device_t *device, int force)
 {
+
     uint32_t iobase = device->controller->iobase;
 
     int num_reties = 100;
 
     int i = 0;
 
+    printf("[IDE] Selecting device\n");
+
+    uint8_t tmp = inportb(iobase + ATA_DRV_HEAD);
+
+    if (!force && (tmp ^ (device->position << 4) == 0x10))
+    {
+        printf("[IDE] Device already selected\n");
+
+        return 1;
+    }
+
     while ((inportb(iobase + ATA_STATUS) & (ATA_STATUS_BSY | ATA_STATUS_DRQ)))
     {
-        udelay(10);
-
+        udelay(1);
         ++i;
 
         if (i >= num_reties)
@@ -183,14 +194,13 @@ static uint8_t select_device(ide_device_t *device)
         }
     }
 
-    outportb(iobase + ATA_DRV_HEAD, 0xa0 | (device->position << 4));
+    outportb(iobase + ATA_DRV_HEAD, 0xA0 | (device->lba << 6) | (device->position << 4));
 
-    udelay(10);
+    udelay(1);
 
     while ((inportb(iobase + ATA_STATUS) & (ATA_STATUS_BSY | ATA_STATUS_DRQ)))
     {
-        printf("1\n");
-        udelay(10);
+        udelay(1);
     }
 
     return 1;
@@ -223,7 +233,7 @@ static void identify_ide_device(ide_device_t *device)
         return;
     }
 
-    if (!select_device(device))
+    if (!select_device(device, 1))
     {
         return;
     }
@@ -355,7 +365,7 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
     controller = device->controller;
     iobase = controller->iobase;
 
-    if (!select_device(device))
+    if (!select_device(device, 1))
     {
         printf("[IDE] Could not select device\n");
         return 0;
@@ -387,7 +397,7 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
     outportb(iobase + ATA_SECTOR, sc);
     outportb(iobase + ATA_LCYL, cl);
     outportb(iobase + ATA_HCYL, ch);
-    outportb(iobase + ATA_DRV_HEAD, (device->lba << 6) | (device->position << 4) | hd);
+    outportb(iobase + ATA_DRV_HEAD, 0xA0 | (device->lba << 6) | (device->position << 4) | hd);
     outportb(iobase + ATA_COMMAND, cmd);
 
     udelay(1);
@@ -538,6 +548,11 @@ void init_ide_devices()
             //printf("%s\n", msg);
 
             reg_blockdev_instance(0, i * NUM_DEVICES_PER_CONTROLLER + j, msg, BLOCK_SIZE, device->capacity);
+
+            if (i == 0 && j == 0)
+            {
+                select_device(device, 1);
+            }
         }
     }
 

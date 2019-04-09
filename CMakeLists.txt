@@ -177,6 +177,7 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/ide.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/list.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/tree.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/hexdump.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
 
