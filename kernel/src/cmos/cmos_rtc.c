@@ -627,8 +627,6 @@ void RTC_init()
 {
     printf("[RTC] Initializing...\n");
 
-    cli();
-
     rtc_status_reg_a_t status_a;
 
     uint8_t rate = 0b0110;
@@ -647,8 +645,8 @@ void RTC_init()
     status_b.daylight_saving = 1;
     status_b.format_24_h = 1;
     status_b.data_mode = 0; // BCD
-    status_b.irq_on_update = 1;
-    status_b.irq_periodic = 1;
+    status_b.irq_on_update = 0;
+    status_b.irq_periodic = 0;
     status_b.irq_on_alarm = 0;
 
     write_status_b(status_b);
@@ -662,8 +660,6 @@ void RTC_init()
     set_irq_handler(CMOS_RTC_IRQ, RTC_irq_handler);
 
     clear_mask_interrupt(CMOS_RTC_IRQ);
-
-    sti();
 
     printf("[RTC] Done!\n");
 }

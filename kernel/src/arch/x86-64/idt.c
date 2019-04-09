@@ -122,8 +122,10 @@ static IRQ_HANDLER _irq_handlers[16] = {0};
 
 void arch_x86_64_default_irq_handler(system_stack_t *regs)
 {
+
     if (regs->int_no >= 32 && regs->int_no < 48)
     {
+
         int irq = regs->int_no - 32;
 
         if (_irq_handlers[irq])

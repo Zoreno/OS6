@@ -406,15 +406,20 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
 
     if (direction == IO_WRITE)
     {
-        for (i = 0; i < 256 * nblocks; ++i)
+        for (int block = 0; block < nblocks; ++block)
         {
-            outportw(iobase + ATA_DATA, *buf++);
+
+            for (i = 0; i < 256; ++i)
+            {
+                outportw(iobase + ATA_DATA, *buf++);
+            }
+
+            while (!controller->irq)
+                ;
         }
     }
 
     // TODO: Change to mutex
-    while (!controller->irq)
-        ;
 
     if (inportb(iobase + ATA_STATUS) & ATA_STATUS_ERR)
     {
@@ -424,9 +429,15 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
 
     if (direction == IO_READ)
     {
-        for (i = 0; i < 256 * nblocks; ++i)
+        while (!controller->irq)
+            ;
+
+        for (int block = 0; block < nblocks; ++block)
         {
-            *buf++ = inportw(iobase + ATA_DATA);
+            for (i = 0; i < 256; ++i)
+            {
+                *buf++ = inportw(iobase + ATA_DATA);
+            }
         }
     }
 
@@ -457,6 +468,9 @@ static uint32_t ide_read_blocks(uint32_t minor, uint32_t block, uint32_t nblocks
 
 static void ide_handle_interrupt(ide_controller_t *controller)
 {
+    // We must read the status register each read
+    volatile uint8_t dummy = inportb(controller->iobase + ATA_STATUS);
+
     controller->irq = 1;
 }
 

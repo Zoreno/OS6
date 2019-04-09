@@ -189,6 +189,8 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     virt_mem_initialize();
 
+    sti();
+
     kheap_init();
 
     vfs_install();
@@ -197,17 +199,19 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     ext2_initialize();
 
-    fs_node_t *node = kopen("/testfile2", 0);
+    const char *path = "/home/testfile";
+
+    fs_node_t *node = kopen(path, 0);
 
     if (!node)
     {
-        printf("Could not open /testfile2");
+        printf("Could not open %s", path);
 
         for (;;)
             ;
     }
 
-    printf("/testfile opened!\n");
+    printf("%s opened!\n", path);
     printf("Size: %i\n", node->length);
 
     uint32_t size = node->length;

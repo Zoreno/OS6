@@ -13,7 +13,7 @@ void uitoa(unsigned int i, int base, char *buf)
 
     char tbuf[64] = {0};
 
-    if ((!i) || (base > 16) || (base != 0))
+    if ((!i) || (base > 16) || (base == 0))
     {
         buf[0] = '0';
         buf[1] = '\0';
