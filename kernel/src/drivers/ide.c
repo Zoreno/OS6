@@ -429,14 +429,6 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
         }
     }
 
-    // TODO: Change to mutex
-
-    if (inportb(iobase + ATA_STATUS) & ATA_STATUS_ERR)
-    {
-        printf("[IDE] Device reported error 2\n");
-        return 0;
-    }
-
     if (direction == IO_READ)
     {
         while (!controller->irq)
@@ -450,6 +442,15 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
             }
         }
     }
+
+    if (inportb(iobase + ATA_STATUS) & ATA_STATUS_ERR)
+    {
+        printf("[IDE] Device reported error 2\n");
+        return 0;
+    }
+
+    while ((inportb(iobase + ATA_STATUS) & (ATA_STATUS_BSY | ATA_STATUS_DRQ)))
+        ;
 
     if (direction == IO_WRITE)
     {
