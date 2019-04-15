@@ -194,14 +194,24 @@ static uint8_t select_device(ide_device_t *device, int force)
         }
     }
 
+    printf("[IDE] Setting drive\n");
+
     outportb(iobase + ATA_DRV_HEAD, 0xA0 | (device->lba << 6) | (device->position << 4));
 
     udelay(1);
 
-    while ((inportb(iobase + ATA_STATUS) & (ATA_STATUS_BSY | ATA_STATUS_DRQ)))
+    printf("[IDE] Waiting for ack\n");
+
+    uint8_t status;
+
+    while (status = (inportb(iobase + ATA_STATUS) & (ATA_STATUS_BSY | ATA_STATUS_DRQ)))
     {
+        printf("Status: %#02x\n", status);
+
         udelay(1);
     }
+
+    printf("[IDE] Device selected\n");
 
     return 1;
 }
@@ -393,6 +403,8 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
 
     controller->irq = 0;
 
+    printf("[IDE] Sending command\n");
+
     outportb(iobase + ATA_NSECTOR, nblocks);
     outportb(iobase + ATA_SECTOR, sc);
     outportb(iobase + ATA_LCYL, cl);
@@ -432,7 +444,9 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
     if (direction == IO_READ)
     {
         while (!controller->irq)
-            ;
+        {
+            printf("Waiting for IRQ\n");
+        }
 
         for (int block = 0; block < nblocks; ++block)
         {

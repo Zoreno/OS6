@@ -18,8 +18,9 @@ enable_language(ASM_NASM)
 # Flags and compiler configuration
 #==============================================================================
 
+# TODO: Add toggle switch for -fomit-frame-pointer
 set(CFLAGS "-ffreestanding -std=c11 -Wall -Wextra -ffreestanding -fno-builtin \
--nostdlib -nostdinc -finline-functions -fno-stack-protector -fomit-frame-pointer \
+-nostdlib -nostdinc -finline-functions -fno-stack-protector \
 -Werror=implicit-function-declaration -mno-sse -fno-exceptions -g -nodefaultlibs")
 set(CMAKE_C_FLAGS "${CFLAGS}")
 set(CMAKE_C_LINK_EXECUTABLE "ld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")

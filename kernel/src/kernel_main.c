@@ -35,6 +35,79 @@ extern void run_unit_tests();
 extern void *__kernel_start;
 extern void *__kernel_end;
 
+typedef uint64_t Elf64_Addr;
+typedef uint64_t Elf64_Off;
+typedef uint16_t Elf64_Half;
+typedef uint32_t Elf64_Word;
+typedef int32_t Elf64_Sword;
+typedef uint64_t Elf64_Xword;
+typedef int64_t Elf64_Sxword;
+
+typedef struct
+{
+    Elf64_Word sh_name;
+    Elf64_Word sh_type;
+    Elf64_Xword sh_flags;
+    Elf64_Addr sh_addr;
+    Elf64_Off sh_offset;
+    Elf64_Xword sh_size;
+    Elf64_Word sh_link;
+    Elf64_Word sh_info;
+    Elf64_Xword sh_addralign;
+    Elf64_Xword sh_entsize;
+} __attribute__((packed)) Elf64_Shdr;
+
+typedef struct
+{
+    Elf64_Word st_name;
+    unsigned char st_info;
+    unsigned char st_other;
+    Elf64_Half st_shndx;
+    Elf64_Addr st_value;
+    Elf64_Xword st_size;
+} __attribute__((packed)) Elf64_Sym;
+
+#define STT_FUNC 2
+
+static Elf64_Sym *_symbol_section = NULL;
+static int _symbol_count = 0;
+static const char *_symbol_string_table = NULL;
+
+const char *lookup_symbol(void *addr, int64_t *offset)
+{
+    if (!_symbol_section || !_symbol_string_table)
+    {
+        return NULL;
+    }
+
+    Elf64_Sym *best_match = NULL;
+
+    // These could be placed in a map for log(N) access. This will do for now.
+    for (int i = 0; i < _symbol_count; ++i)
+    {
+        // Only handle function symbols
+        if ((_symbol_section[i].st_info & 0x0F) == STT_FUNC)
+        {
+            if (_symbol_section[i].st_value <= addr && (!best_match || best_match->st_value < _symbol_section[i].st_value))
+            {
+                best_match = &_symbol_section[i];
+            }
+        }
+    }
+
+    if (!best_match)
+    {
+        return NULL;
+    }
+
+    if (offset)
+    {
+        *offset = (Elf64_Addr)addr - best_match->st_value;
+    }
+
+    return _symbol_string_table + best_match->st_name;
+}
+
 // TODO: Move to separate file
 void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
 {
@@ -122,6 +195,44 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
             end_found = 1;
         }
         break;
+        case MULTIBOOT_TAG_TYPE_ELF_SECTIONS:
+        {
+            struct multiboot_tag_elf_sections *elf_sections = (struct multiboot_tag_elf_sections *)tag;
+
+            printf("Section count: %i\n", elf_sections->num);
+            printf("Section entry size: %i\n", elf_sections->entsize);
+            printf("Section shndx: %i\n", elf_sections->shndx);
+
+            Elf64_Shdr *sec_header = (Elf64_Shdr *)elf_sections->sections;
+
+            Elf64_Shdr *string_header = ((Elf64_Shdr *)elf_sections->sections) + elf_sections->shndx;
+
+            const char *string_table = string_header->sh_addr;
+
+            for (int i = 0; i < elf_sections->num; ++i)
+            {
+
+                printf("Section %i:\n", i);
+                printf("Name: %i (%s)\n", sec_header[i].sh_name, string_table + sec_header[i].sh_name);
+                printf("Type: %i\n", sec_header[i].sh_type);
+                printf("Addr: %#016x\n", sec_header[i].sh_addr);
+                printf("Size: %i\n", sec_header[i].sh_size);
+
+                if (strcmp(string_table + sec_header[i].sh_name, ".strtab") == 0)
+                {
+                    _symbol_string_table = sec_header[i].sh_addr;
+                    printf("Found .strtab at: %#016x\n", _symbol_string_table);
+                }
+
+                if (strcmp(string_table + sec_header[i].sh_name, ".symtab") == 0)
+                {
+                    _symbol_section = sec_header[i].sh_addr;
+                    _symbol_count = sec_header[i].sh_size / sizeof(Elf64_Sym);
+                    printf("Found .symtab at: %#016x. (%i entries)\n", _symbol_section, _symbol_count);
+                }
+            }
+        }
+        break;
         default:
         {
             printf("[Tag] type: %i size: %i\n", tag->type, tag->size);
@@ -158,6 +269,33 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
     mem_info->kernel_size = mem_info->kernel_end - mem_info->kernel_load_addr;
 }
 
+/*
+
+C 64 bit calling convention
+
+(caller regs)
+(return address)
+regs <-- rbp
+<-- rsp
+
+*/
+
+void func1(unsigned long long int val)
+{
+
+    register unsigned long long int *reg __asm__("rbp");
+
+    for (long long int i = -8; i < 8; ++i)
+    {
+        printf("rbp %s %#02x: %#016x\n", i >= 0 ? "+" : "-", (i >= 0 ? i : -i) * 8, *(reg + i));
+    }
+
+    int64_t offset;
+    const char *name = lookup_symbol(*(reg + 1), &offset);
+
+    printf("Called from %s+%#x\n", name, offset);
+}
+
 int kernel_main(unsigned long long rbx, unsigned long long rax)
 {
     (void)rax;
@@ -184,6 +322,8 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     memset(&mem_info, 0, sizeof(mem_info));
 
     parse_multiboot((unsigned char *)rbx, &mem_info);
+
+    func1(15);
 
     //printf("[MEMINFO] Memory size: %i\n", mem_info.memory_size);
 
