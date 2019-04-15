@@ -73,6 +73,9 @@ const char *get_interrupt_name(uint64_t int_no)
     }
 }
 
+extern void print_backtrace(unsigned long long int *reg);
+extern const char *lookup_symbol(void *addr, int64_t *offset);
+
 void print_regs(system_stack_t *regs)
 {
     debug_terminal_set_back_color(VGA_COLOR_BLUE);
@@ -93,6 +96,9 @@ void print_regs(system_stack_t *regs)
         int_name = get_interrupt_name(regs->int_no);
     }
 
+    int64_t offset;
+    const char *func_name = lookup_symbol(regs->rip, &offset);
+
     printf("[IRQ] ==========================================================================\n");
     printf("[IRQ] Unhandled Exception %i (Error code: %i) (%s)\n",
            regs->int_no, regs->err_code, int_name);
@@ -101,8 +107,8 @@ void print_regs(system_stack_t *regs)
            regs->rax, regs->rbx, regs->rcx);
     printf("[IRQ] RDX: %#016x RDI: %#016x RSI: %#016x\n",
            regs->rdx, regs->rdi, regs->rsi);
-    printf("[IRQ] RBP: %#016x RIP: %#016x\n",
-           regs->rbp, regs->rip);
+    printf("[IRQ] RBP: %#016x RIP: %#016x <%s+%#x>\n",
+           regs->rbp, regs->rip, func_name, offset);
 
     printf("[IRQ]  R8: %#016x  R9: %#016x R10: %#016x \n",
            regs->r8, regs->r9, regs->r10);
@@ -115,6 +121,10 @@ void print_regs(system_stack_t *regs)
            regs->cs, regs->userrsp, regs->ss);
     printf("[IRQ] RFLAGS: %064b\n",
            regs->rflags);
+    printf("[IRQ] Stacktrace: \n");
+    printf("<%s+%#x>\n", func_name, offset);
+    print_backtrace(regs->rbp);
+
     printf("[IRQ] ==========================================================================\n");
 }
 

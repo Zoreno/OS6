@@ -269,31 +269,29 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
     mem_info->kernel_size = mem_info->kernel_end - mem_info->kernel_load_addr;
 }
 
-/*
-
-C 64 bit calling convention
-
-(caller regs)
-(return address)
-regs <-- rbp
-<-- rsp
-
-*/
-
-void func1(unsigned long long int val)
+void print_backtrace(unsigned long long int *reg)
 {
-
-    register unsigned long long int *reg __asm__("rbp");
-
-    for (long long int i = -8; i < 8; ++i)
+    while (*reg)
     {
-        printf("rbp %s %#02x: %#016x\n", i >= 0 ? "+" : "-", (i >= 0 ? i : -i) * 8, *(reg + i));
+        int64_t offset;
+        const char *name = lookup_symbol(*(reg + 1), &offset);
+
+        printf("Called from <%s+%#x>\n", name, offset);
+
+        reg = *reg;
     }
+}
 
-    int64_t offset;
-    const char *name = lookup_symbol(*(reg + 1), &offset);
+void backtrace()
+{
+    register unsigned long long int *_rbp __asm__("rbp");
 
-    printf("Called from %s+%#x\n", name, offset);
+    print_backtrace(_rbp);
+}
+
+void func1()
+{
+    backtrace();
 }
 
 int kernel_main(unsigned long long rbx, unsigned long long rax)
@@ -323,7 +321,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     parse_multiboot((unsigned char *)rbx, &mem_info);
 
-    func1(15);
+    func1();
 
     //printf("[MEMINFO] Memory size: %i\n", mem_info.memory_size);
 

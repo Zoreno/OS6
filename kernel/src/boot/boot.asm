@@ -552,6 +552,7 @@ long_mode_start:
     call clear_screen64
 
     mov rdi, rbx
+    mov rbp, 0
 
     call kernel_main
 
