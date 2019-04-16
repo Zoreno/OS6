@@ -63,7 +63,6 @@ const char *get_interrupt_name(uint64_t int_no)
         return "Virtualization exception";
     case 30:
         return "Security exception";
-    // TODO: Fill out the IRQs
 
     // TODO: Update this to a non-hardcoded value
     case 128:
@@ -74,7 +73,7 @@ const char *get_interrupt_name(uint64_t int_no)
 }
 
 extern void print_backtrace(unsigned long long int *reg);
-extern const char *lookup_symbol(void *addr, int64_t *offset);
+extern const char *kernel_lookup_symbol(void *addr, int64_t *offset);
 
 void print_regs(system_stack_t *regs)
 {
@@ -97,7 +96,7 @@ void print_regs(system_stack_t *regs)
     }
 
     int64_t offset;
-    const char *func_name = lookup_symbol(regs->rip, &offset);
+    const char *func_name = kernel_lookup_symbol((void *)regs->rip, &offset);
 
     printf("[IRQ] ==========================================================================\n");
     printf("[IRQ] Unhandled Exception %i (Error code: %i) (%s)\n",
@@ -123,7 +122,7 @@ void print_regs(system_stack_t *regs)
            regs->rflags);
     printf("[IRQ] Stacktrace: \n");
     printf("<%s+%#x>\n", func_name, offset);
-    print_backtrace(regs->rbp);
+    print_backtrace((unsigned long long int *)regs->rbp);
 
     printf("[IRQ] ==========================================================================\n");
 }

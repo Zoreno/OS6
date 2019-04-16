@@ -21,7 +21,7 @@ enable_language(ASM_NASM)
 # TODO: Add toggle switch for -fomit-frame-pointer
 set(CFLAGS "-ffreestanding -std=c11 -Wall -Wextra -ffreestanding -fno-builtin \
 -nostdlib -nostdinc -finline-functions -fno-stack-protector \
--Werror=implicit-function-declaration -mno-sse -fno-exceptions -g -nodefaultlibs")
+-Werror=implicit-function-declaration -mno-sse -fno-exceptions -gdwarf-4 -nodefaultlibs")
 set(CMAKE_C_FLAGS "${CFLAGS}")
 set(CMAKE_C_LINK_EXECUTABLE "ld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/kernel/linker.ld")
@@ -175,6 +175,8 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/cmos/cmos_rtc.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/blockdev.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/ide.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/exec/elf64.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/list.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/tree.c)
