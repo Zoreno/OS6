@@ -9,7 +9,7 @@ static uint32_t divl(uint64_t num, uint64_t den)
     uint32_t rem;
 
     // TODO: Check if num_high and num_low needs to change place
-    __asm__("divl %4"
+    __asm__("divq %4"
             : "=d"(rem), "=a"(quot)
             : "0"(num_high), "1"(num_low), "rm"(den));
 

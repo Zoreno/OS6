@@ -3,10 +3,16 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 
+// Elf based symbol lookup
 static Elf64_Sym_t *_symbol_section = NULL;
 static int _symbol_count = 0;
 static const char *_symbol_string_table = NULL;
+
+// Dwarf based symbol lookup
+static Elf64_Addr_t _dwarf_line_info = NULL;
+static Elf64_Xword_t _dwarf_size = 0;
 
 unsigned long elf64_hash(const unsigned char *name)
 {
@@ -28,11 +34,11 @@ unsigned long elf64_hash(const unsigned char *name)
     return h;
 }
 
-const char *kernel_lookup_symbol(void *addr, int64_t *offset)
+void elf_kernel_lookup_symbol(void *addr)
 {
     if (!_symbol_section || !_symbol_string_table)
     {
-        return NULL;
+        return;
     }
 
     Elf64_Sym_t *best_match = NULL;
@@ -52,18 +58,44 @@ const char *kernel_lookup_symbol(void *addr, int64_t *offset)
 
     if (!best_match)
     {
-        return NULL;
+        return;
     }
 
-    if (offset)
-    {
-        *offset = (Elf64_Addr_t)addr - best_match->st_value;
-    }
+    uint64_t offset = (Elf64_Addr_t)addr - best_match->st_value;
 
-    return _symbol_string_table + best_match->st_name;
+    printf("%s", _symbol_string_table + best_match->st_name);
 }
 
-void init_kernel_symbol_context(struct multiboot_tag_elf_sections *elf_sections)
+void dwarf_kernel_lookup_symbol(void *addr)
+{
+    //printf("DWARF line info: %#016x, size: %i, addr: %#016x\n", _dwarf_line_info, _dwarf_size, addr);
+    dwarf_parse_debug_line_section(_dwarf_line_info, _dwarf_size, addr);
+}
+
+void kernel_lookup_symbol(void *addr)
+{
+    if (_symbol_section || _dwarf_line_info)
+    {
+
+        if (_symbol_section)
+        {
+            elf_kernel_lookup_symbol(addr);
+            printf("()");
+        }
+
+        if (_dwarf_line_info)
+        {
+            printf(" [");
+            dwarf_kernel_lookup_symbol(addr);
+            printf("]");
+        }
+        return;
+    }
+
+    printf("Error looking up symbol");
+}
+
+void init_kernel_symbol_context(struct multiboot_tag_elf_sections *elf_sections, memory_info_t *mem_info)
 {
     printf("Section count: %i\n", elf_sections->num);
     printf("Section entry size: %i\n", elf_sections->entsize);
@@ -78,11 +110,11 @@ void init_kernel_symbol_context(struct multiboot_tag_elf_sections *elf_sections)
     for (uint32_t i = 0; i < elf_sections->num; ++i)
     {
 
-        printf("Section %i:\n", i);
-        printf("Name: %i (%s)\n", sec_header[i].sh_name, string_table + sec_header[i].sh_name);
-        printf("Type: %i\n", sec_header[i].sh_type);
-        printf("Addr: %#016x\n", sec_header[i].sh_addr);
-        printf("Size: %i\n", sec_header[i].sh_size);
+        //printf("Section %i:\n", i);
+        //printf("Name: %i (%s)\n", sec_header[i].sh_name, string_table + sec_header[i].sh_name);
+        //printf("Type: %i\n", sec_header[i].sh_type);
+        //printf("Addr: %#016x\n", sec_header[i].sh_addr);
+        //printf("Size: %i\n", sec_header[i].sh_size);
 
         if (strcmp(string_table + sec_header[i].sh_name, ".strtab") == 0)
         {
@@ -97,9 +129,23 @@ void init_kernel_symbol_context(struct multiboot_tag_elf_sections *elf_sections)
             printf("Found .symtab at: %#016x. (%i entries)\n", _symbol_section, _symbol_count);
         }
 
+#ifdef OS6_DEBUG
+
         if (strcmp(string_table + sec_header[i].sh_name, ".debug_line") == 0)
         {
-            dwarf_parse_debug_line_section(sec_header[i].sh_addr, sec_header[i].sh_size);
+            //dwarf_parse_debug_line_section(sec_header[i].sh_addr, sec_header[i].sh_size);
+
+            _dwarf_line_info = sec_header[i].sh_addr;
+            _dwarf_size = sec_header[i].sh_size;
+
+            printf("Found .debug_line at: %#016x\n", _dwarf_line_info);
+        }
+
+#endif
+
+        if (sec_header[i].sh_addr + sec_header[i].sh_size > mem_info->kernel_end)
+        {
+            mem_info->kernel_end = sec_header[i].sh_addr + sec_header[i].sh_size;
         }
     }
 }
@@ -189,7 +235,8 @@ static size_t read_sleb128(const unsigned char *buf, const unsigned char *buf_en
 #define DW_LNE_define_file 3
 #define DW_LNE_set_discriminator 4
 
-void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
+void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header, uint64_t *start_addr_p,
+                                    uint64_t *end_addr_p, uint32_t *line_p, uint32_t *file_p, uint64_t target_addr)
 {
     uint8_t *op = (uint8_t *)header +
                   offsetof(DwarfDebugLineHeader_t, header_length) +
@@ -211,16 +258,23 @@ void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
     uint8_t isa = 0;
     uint32_t discriminator = 0;
 
+    uint64_t start_addr = UINT64_MAX;
+    uint64_t end_addr = 0;
+
+    uint32_t best_addr = end_addr;
+    uint32_t best_file = 1;
+    uint32_t best_line = 1;
+
     while (op < end)
     {
         uint8_t current_opcode = *op;
 
-        printf("Current opcode: %#02x\n", (uint64_t)current_opcode);
+        //printf("Current opcode: %#02x\n", (uint64_t)current_opcode);
 
         // Extended set
         if (current_opcode == 0)
         {
-            printf("Extended Opcode\n");
+            //printf("Extended Opcode\n");
 
             op += 1;
 
@@ -228,7 +282,7 @@ void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
             size_t n = read_uleb128(op, end, &bytes);
             op += n;
 
-            printf("Size: %i\n", bytes);
+            //printf("Size: %i\n", bytes);
 
             uint8_t ext_opcode = *op;
 
@@ -237,7 +291,25 @@ void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
             case DW_LNE_end_sequence:
             {
                 end_sequence = 1;
-                printf("Append line: %i, file: %i, address: %#016x\n", (uint64_t)line, file, addr);
+
+                if (addr > end_addr)
+                {
+                    end_addr = addr;
+                }
+
+                if (addr < start_addr)
+                {
+                    start_addr = addr;
+                }
+
+                if (addr < target_addr && addr >= best_addr)
+                {
+                    best_addr = addr;
+                    best_file = file;
+                    best_line = line;
+                }
+
+                //printf("Append line: %i, file: %i, address: %#016x\n", (uint64_t)line, file, addr);
 
                 addr = 0;
                 op_index = 0;
@@ -251,7 +323,7 @@ void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
                 isa = 0;
                 discriminator = 0;
 
-                printf("DW_LNE_end_sequence\n");
+                //printf("DW_LNE_end_sequence\n");
             }
             break;
             case DW_LNE_set_address:
@@ -266,7 +338,7 @@ void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
                 addr = new_addr;
 
                 op += 8;
-                printf("DW_LNE_set_address: %#016x\n", new_addr);
+                //printf("DW_LNE_set_address: %#016x\n", new_addr);
             }
             break;
             case DW_LNE_set_discriminator:
@@ -276,7 +348,7 @@ void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
                 discriminator = operand;
                 op += n;
 
-                printf("DW_LNE_set_discriminator: %i\n", operand);
+                //printf("DW_LNE_set_discriminator: %i\n", operand);
             }
             break;
             default:
@@ -294,14 +366,31 @@ void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
             {
             case DW_LNS_copy:
             {
-                printf("Append line: %i, file: %i, address: %#016x\n", (uint64_t)line, file, addr);
+                //printf("Append line: %i, file: %i, address: %#016x\n", (uint64_t)line, file, addr);
+
+                if (addr > end_addr)
+                {
+                    end_addr = addr;
+                }
+
+                if (addr < start_addr)
+                {
+                    start_addr = addr;
+                }
+
+                if (addr < target_addr && addr >= best_addr)
+                {
+                    best_addr = addr;
+                    best_file = file;
+                    best_line = line;
+                }
 
                 basic_block = 0;
                 prologue_end = 0;
                 epilogue_begin = 0;
                 discriminator = 0;
 
-                printf("DW_LNS_copy\n");
+                //printf("DW_LNS_copy\n");
             }
             break;
             case DW_LNS_advance_pc:
@@ -311,7 +400,7 @@ void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
                 addr += operand;
                 op += n;
 
-                printf("DW_LNS_advance_pc: %i\n", operand);
+                //printf("DW_LNS_advance_pc: %i\n", operand);
             }
             break;
             case DW_LNS_advance_line:
@@ -321,7 +410,7 @@ void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
                 line += operand;
                 op += n;
 
-                printf("DW_LNS_advance_line: %i\n", operand);
+                //printf("DW_LNS_advance_line: %i\n", operand);
             }
             break;
             case DW_LNS_set_file:
@@ -331,7 +420,7 @@ void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
                 file = operand;
                 op += n;
 
-                printf("DW_LNS_advance_file: %i\n", operand);
+                //printf("DW_LNS_advance_file: %i\n", operand);
             }
             break;
             case DW_LNS_set_column:
@@ -341,20 +430,20 @@ void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
                 column = operand;
                 op += n;
 
-                printf("DW_LNS_set_column: %i\n", operand);
+                //printf("DW_LNS_set_column: %i\n", operand);
             }
             case DW_LNS_negate_stmt:
             {
                 is_stmt = 1 - is_stmt;
 
-                printf("DW_LNS_negate_stmt\n");
+                //printf("DW_LNS_negate_stmt\n");
             }
             break;
             case DW_LNS_set_basic_block:
             {
                 basic_block = 1;
 
-                printf("DW_LNS_set_basic_block\n");
+                //printf("DW_LNS_set_basic_block\n");
             }
             break;
             case DW_LNS_const_add_pc:
@@ -364,7 +453,7 @@ void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
 
                 addr += header->min_instruction_length * operation_advance;
 
-                printf("DW_LNS_const_add_pc\n");
+                //printf("DW_LNS_const_add_pc\n");
             }
             break;
             case DW_LNS_fixed_advance_pc:
@@ -373,8 +462,8 @@ void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
 
                 operand = (*(op + 1)) << 8 | (*(op + 2));
                 addr += operand;
-                printf("DW_LNS_const_add_pc: %i\n", operand);
                 op += 2;
+                // printf("DW_LNS_const_add_pc: %i\n", operand);
             }
             break;
             case DW_LNS_set_prologue_end:
@@ -394,7 +483,7 @@ void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
                 isa = operand;
                 op += n;
 
-                printf("DW_LNS_set_isa: %i\n", operand);
+                //printf("DW_LNS_set_isa: %i\n", operand);
             }
             break;
             }
@@ -408,7 +497,24 @@ void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
             addr += header->min_instruction_length * operation_advance;
             line += header->line_base + (adjusted_opcode % header->line_range);
 
-            printf("Append line: %i, file: %i, address: %#016x\n", (uint64_t)line, file, addr);
+            if (addr > end_addr)
+            {
+                end_addr = addr;
+            }
+
+            if (addr < start_addr)
+            {
+                start_addr = addr;
+            }
+
+            if (addr < target_addr && addr >= best_addr)
+            {
+                best_addr = addr;
+                best_file = file;
+                best_line = line;
+            }
+
+            //printf("Append line: %i, file: %i, address: %#016x\n", (uint64_t)line, file, addr);
 
             basic_block = 0;
             prologue_end = 0;
@@ -418,48 +524,55 @@ void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header)
 
         ++op;
     }
+
+    *start_addr_p = start_addr;
+    *end_addr_p = end_addr;
+    *file_p = best_file;
+    *line_p = best_line;
 }
 
-void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t size)
+void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t size, uint64_t addr)
 {
-    printf("=======================================================\n");
-    printf("Dwarf debug line info:\n");
-    printf("Section start: %#016x, size: %i\n", section_start, size);
-    printf("=======================================================\n");
+    //printf("=======================================================\n");
+    //printf("Dwarf debug line info:\n");
+    //printf("Section start: %#016x, size: %i\n", section_start, size);
+    //printf("=======================================================\n");
 
     DwarfDebugLineHeader_t *header = (DwarfDebugLineHeader_t *)section_start;
 
     while (header < section_start + size)
     {
 
-        printf("Length: %i\n", header->length);
-        printf("DWARF version: %i\n", header->version);
-        printf("Header length: %i\n", header->header_length);
-        printf("Minimum instruction length: %i\n", header->min_instruction_length);
-        printf("Line base: %i\n", (int64_t)header->line_base);
-        printf("Line range: %i\n", header->line_range);
-        printf("Opcode base: %i\n", header->opcode_base);
+        //printf("Length: %i\n", header->length);
+        //printf("DWARF version: %i\n", header->version);
+        //printf("Header length: %i\n", header->header_length);
+        //printf("Minimum instruction length: %i\n", header->min_instruction_length);
+        //printf("Line base: %i\n", (int64_t)header->line_base);
+        //printf("Line range: %i\n", header->line_range);
+        //printf("Opcode base: %i\n", header->opcode_base);
 
         uint8_t *end_of_header = (uint8_t *)header + header->header_length;
 
         const char *dir_table = ((uint8_t *)header) + sizeof(DwarfDebugLineHeader_t);
+        const char *dir_table_start = dir_table;
 
-        printf("Directory table:\n");
+        //printf("Directory table:\n");
 
         while (*dir_table)
         {
-            printf("%s\n", dir_table);
+            //printf("%s\n", dir_table);
 
             dir_table += strlen(dir_table) + 1;
         }
 
         const char *file_table = dir_table + 1;
+        const char *file_table_start = file_table;
 
-        printf("File table:\n");
+        //printf("File table:\n");
 
         while (*file_table)
         {
-            printf(" * %s ", file_table);
+            //printf(" * %s ", file_table);
 
             file_table += strlen(file_table) + 1;
 
@@ -473,15 +586,24 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
 
             file_table += 3;
 
-            printf("dir: %i, mod: %i, len: %i\n", dir, mod, len);
+            //printf("dir: %i, mod: %i, len: %i\n", dir, mod, len);
         }
 
-        dwarf_parse_debug_line_program(header);
+        uint64_t start_addr;
+        uint64_t end_addr;
+        uint32_t line = 1;
+        uint32_t file = 1;
+
+        dwarf_parse_debug_line_program(header, &start_addr, &end_addr, &line, &file, addr);
+
+        //printf("Start addr: %#016x, end addr: %#016x\n", start_addr, end_addr);
+
+        if (addr <= end_addr && addr >= start_addr)
+        {
+            printf("%s:%i", file_table_start, line);
+        }
 
         // Advance to the next header
         header = ((uint8_t *)header) + header->length + sizeof(header->length);
     }
-
-    for (;;)
-        ;
 }

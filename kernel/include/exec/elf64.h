@@ -25,6 +25,7 @@
 
 #include <stdint.h>
 #include <boot/multiboot2.h>
+#include <mm/memory_info.h>
 
 //=============================================================================
 // Primitive types
@@ -288,8 +289,8 @@ typedef struct
 //=============================================================================
 
 unsigned long elf64_hash(const unsigned char *name);
-const char *kernel_lookup_symbol(void *addr, int64_t *offset);
-void init_kernel_symbol_context(struct multiboot_tag_elf_sections *elf_sections);
+void kernel_lookup_symbol(void *addr);
+void init_kernel_symbol_context(struct multiboot_tag_elf_sections *elf_sections, memory_info_t *mem_info);
 
 //=============================================================================
 // DWARF information
@@ -308,7 +309,7 @@ typedef struct
     uint8_t std_opcode_lengths[12];
 } __attribute__((packed)) DwarfDebugLineHeader_t;
 
-void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t size);
+void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t size, uint64_t addr);
 
 #endif
 

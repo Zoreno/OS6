@@ -11,23 +11,52 @@ project(OS6 C ASM_NASM)
 
 set(CAN_USE_ASSEMBLER TRUE)
 
-
 enable_language(ASM_NASM)
 
 #==============================================================================
 # Flags and compiler configuration
 #==============================================================================
 
+# Debug build
+set(DEBUG_BUILD true)
+
+set(CFLAGS "")
+
+# Set C standard
+set(CFLAGS "${CFLAGS} -std=c11")
+
+# Set warnings and error conditions
+set(CFLAGS "${CFLAGS} -Wall -Wextra -Werror=implicit-function-declaration")
+
+# Disable standard library
+set(CFLAGS "${CFLAGS} -ffreestanding -nostdlib -nostdinc -nodefaultlibs")
+
+# Disable language features
+set(CFLAGS "${CFLAGS} -fno-builtin -finline-functions -fno-stack-protector -mno-sse -fno-exceptions")
+
+set(ASMFLAGS "")
+
+if(${DEBUG_BUILD})
+
+    # Setup dwarf information
+    set(CFLAGS "${CFLAGS} -DOS6_DEBUG -gdwarf-4")
+    set(ASMFLAGS "${ASMFLAGS} -g -F dwarf")
+
+else()
+
+    # Set full optimization 
+    set(CFLAGS "${CFLAGS} -DOS6_RELEASE -O3")
+    set(ASMFLAGS "${ASMFLAGS} -Ox")
+
+endif()
+
 # TODO: Add toggle switch for -fomit-frame-pointer
-set(CFLAGS "-ffreestanding -std=c11 -Wall -Wextra -ffreestanding -fno-builtin \
--nostdlib -nostdinc -finline-functions -fno-stack-protector \
--Werror=implicit-function-declaration -mno-sse -fno-exceptions -gdwarf-4 -nodefaultlibs")
 set(CMAKE_C_FLAGS "${CFLAGS}")
 set(CMAKE_C_LINK_EXECUTABLE "ld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/kernel/linker.ld")
 set(CMAKE_ASM_NASM_OBJECT_FORMAT elf64)
 set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> \
-    -f ${CMAKE_ASM_NASM_OBJECT_FORMAT} -g -F dwarf -o <OBJECT> <SOURCE>")
+    -f ${CMAKE_ASM_NASM_OBJECT_FORMAT} ${ASMFLAGS} -o <OBJECT> <SOURCE>")
 
 #==============================================================================
 # Path macros
@@ -145,6 +174,7 @@ add_executable(${KERNEL_EXEC} "")
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/boot/boot.asm)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/debug/debug_terminal.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/debug/backtrace.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/test/unit_tests.c)
 

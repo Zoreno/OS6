@@ -30,6 +30,8 @@
 
 #include <exec/elf64.h>
 
+#include <debug/backtrace.h>
+
 extern void run_unit_tests();
 
 // https://www.gnu.org/software/grub/manual/multiboot2/html_node/kernel_002ec.html
@@ -128,7 +130,7 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
         {
             struct multiboot_tag_elf_sections *elf_sections = (struct multiboot_tag_elf_sections *)tag;
 
-            init_kernel_symbol_context(elf_sections);
+            init_kernel_symbol_context(elf_sections, mem_info);
         }
         break;
         default:
@@ -163,33 +165,31 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
     mem_info->memory_size = largest_mem;
 
     mem_info->kernel_load_addr = (uint64_t)&__kernel_start;
-    mem_info->kernel_end = (uint64_t)&__kernel_end;
+    //mem_info->kernel_end = (uint64_t)&__kernel_end;
     mem_info->kernel_size = mem_info->kernel_end - mem_info->kernel_load_addr;
 }
 
-void print_backtrace(unsigned long long int *reg)
+void func4()
 {
-    while (*reg)
-    {
-        int64_t offset;
-        const char *name = kernel_lookup_symbol((void *)*(reg + 1), &offset);
-
-        printf("Called from <%s+%#x>\n", name, offset);
-
-        reg = (unsigned long long int *)*reg;
-    }
+    backtrace();
 }
 
-void backtrace()
+void func3()
 {
-    register unsigned long long int *_rbp __asm__("rbp");
+    func4();
+}
 
-    print_backtrace(_rbp);
+void func2()
+{
+    func3();
 }
 
 void func1()
 {
-    backtrace();
+    func2();
+
+    for (;;)
+        ;
 }
 
 int kernel_main(unsigned long long rbx, unsigned long long rax)
@@ -219,13 +219,13 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     parse_multiboot((unsigned char *)rbx, &mem_info);
 
-    func1();
-
-    //printf("[MEMINFO] Memory size: %i\n", mem_info.memory_size);
+    printf("Kernel end: %#016x\n", mem_info.kernel_end);
 
     phys_mem_init(&mem_info);
 
     virt_mem_initialize();
+
+    func1();
 
     sti();
 
