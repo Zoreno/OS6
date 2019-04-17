@@ -558,11 +558,32 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
 
         //printf("Directory table:\n");
 
+        struct
+        {
+            const char *str;
+        } dir_table_entries[16];
+
+        memset(dir_table_entries, 0, sizeof(dir_table_entries));
+
+        struct
+        {
+            const char *str;
+            uint32_t dir;
+        } file_table_entries[16];
+
+        memset(file_table_entries, 0, sizeof(file_table_entries));
+
+        uint32_t curr_dir = 1;
+
         while (*dir_table)
         {
             //printf("%s\n", dir_table);
 
+            dir_table_entries[curr_dir].str = dir_table;
+
             dir_table += strlen(dir_table) + 1;
+
+            curr_dir++;
         }
 
         const char *file_table = dir_table + 1;
@@ -570,9 +591,13 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
 
         //printf("File table:\n");
 
+        uint32_t curr_file = 1;
+
         while (*file_table)
         {
             //printf(" * %s ", file_table);
+
+            file_table_entries[curr_file].str = file_table;
 
             file_table += strlen(file_table) + 1;
 
@@ -584,7 +609,11 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
             read_uleb128(file_table + 1, end_of_header, &mod);
             read_uleb128(file_table + 2, end_of_header, &len);
 
+            file_table_entries[curr_file].dir = dir;
+
             file_table += 3;
+
+            curr_file++;
 
             //printf("dir: %i, mod: %i, len: %i\n", dir, mod, len);
         }
@@ -600,7 +629,7 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
 
         if (addr <= end_addr && addr >= start_addr)
         {
-            printf("%s:%i", file_table_start, line);
+            printf("%s/%s:%i", dir_table_entries[file_table_entries[file].dir].str, file_table_entries[file].str, line);
         }
 
         // Advance to the next header

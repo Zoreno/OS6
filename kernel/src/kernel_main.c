@@ -225,9 +225,9 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     virt_mem_initialize();
 
-    func1();
-
     sti();
+
+    func1();
 
     kheap_init();
 
