@@ -31,7 +31,7 @@ void outportb(uint16_t port, uint8_t value);
 void outportw(uint16_t port, uint16_t value);
 void outportl(uint16_t port, uint32_t value);
 
-static inline void udelay(uint32_t n)
+static inline void udelay(uint64_t n)
 {
     if (!n)
     {

@@ -32,6 +32,8 @@
 
 #include <sync/spinlock.h>
 
+#include <debug/backtrace.h>
+
 fs_node_t *fs_root = 0;
 tree_t *fs_tree = 0;
 
@@ -48,13 +50,13 @@ int has_permissions(fs_node_t *node, int permission_bit)
 
 uint32_t read_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
 {
-    printf("[VFS] read_fs\n");
+    //printf("[VFS] read_fs\n");
 
     if (node && node->read)
     {
         uint32_t ret = node->read(node, offset, size, buffer);
 
-        printf("[VFS] node->read returned %i\n", ret);
+        //printf("[VFS] node->read returned %i\n", (uint64_t)ret);
 
         return ret;
     }
@@ -64,7 +66,7 @@ uint32_t read_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffe
 
 uint32_t write_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
 {
-    printf("[VFS] read_fs\n");
+    //printf("[VFS] read_fs\n");
 
     if (node && node->write)
     {
@@ -92,6 +94,11 @@ void open_fs(fs_node_t *node, uint32_t flags)
     if (node->open)
     {
         node->open(node, flags);
+
+        if (flags & O_TRUNC)
+        {
+            truncate_fs(node);
+        }
     }
 }
 
@@ -143,8 +150,8 @@ fs_node_t *finddir_fs(fs_node_t *node, char *name)
 
     if ((node->flags & FS_DIRECTORY) && node->finddir)
     {
-        printf("[VFS] finddir_fs: Finding directory\n");
-        printf("[VFS] node->name: [%s], name: [%s]\n", node->name, name);
+        //printf("[VFS] finddir_fs: Finding directory\n");
+        //printf("[VFS] node->name: [%s], name: [%s]\n", node->name, name);
 
         fs_node_t *ret = node->finddir(node, name);
 
@@ -152,8 +159,8 @@ fs_node_t *finddir_fs(fs_node_t *node, char *name)
     }
     else
     {
-        printf("[VFS] finddir_fs: Node not a directory\n");
-        printf("[VFS] node->name: [%s], name: [%s]\n", node->name, name);
+        //printf("[VFS] finddir_fs: Node not a directory\n");
+        //printf("[VFS] node->name: [%s], name: [%s]\n", node->name, name);
     }
 
     return (fs_node_t *)NULL;
@@ -227,7 +234,7 @@ int mkdir_fs(char *name, uint16_t permission)
     // TODO: read from current process
     char *cwd = "/";
 
-    char *path = canonicalize_path(cwd, path);
+    char *path = canonicalize_path(cwd, name);
 
     if (!name || !strlen(name))
     {
@@ -305,16 +312,26 @@ int mkdir_fs(char *name, uint16_t permission)
 int create_file_fs(char *name, uint16_t permission)
 {
     int32_t i = strlen(name);
+
     char *dir_name = malloc(i + 1);
+
     memcpy(dir_name, name, i);
+
     dir_name[i] = '\0';
+
     if (dir_name[i - 1] == '/')
+    {
         dir_name[i - 1] = '\0';
+    }
+
     if (strlen(dir_name) == 0)
     {
         free(dir_name);
+        printf("[VFS] Error: Invalid file name\n");
+        backtrace();
         return 1;
     }
+
     for (i = strlen(dir_name) - 1; i >= 0; i--)
     {
         if (dir_name[i] == '/')
@@ -339,11 +356,15 @@ int create_file_fs(char *name, uint16_t permission)
     if (node == NULL)
     {
         free(dir_name);
+        printf("[VFS] Error: Could not find parent directory\n");
+        backtrace();
         return 2;
     }
 
     if (!has_permissions(node, 02))
     {
+        printf("[VFS] Error: No permission to create file\n");
+        backtrace();
         return 3;
     }
 
@@ -377,7 +398,7 @@ fs_node_t *clone_fs(fs_node_t *source)
 
 char *canonicalize_path(char *cwd, char *input)
 {
-    printf("[VFS] canonicalize_path: cwd: [%s], input: [%s]\n", cwd, input);
+    //printf("[VFS] canonicalize_path: cwd: [%s], input: [%s]\n", cwd, input);
 
     list_t *out = list_create();
 
@@ -476,8 +497,8 @@ char *canonicalize_path(char *cwd, char *input)
 
 fs_node_t *get_mount_point(char *path, size_t path_depth, char **outpath, uint32_t *outdepth)
 {
-    printf("[VFS] get_mount_point: path: [%s], path_depth: %i, outpath: [%s], outdepth: %i\n",
-           path, path_depth, *outpath, *outdepth);
+    //printf("[VFS] get_mount_point: path: [%s], path_depth: %i, outpath: [%s], outdepth: %i\n",
+    //       path, path_depth, *outpath, *outdepth);
 
     size_t depth;
 
@@ -509,11 +530,11 @@ fs_node_t *get_mount_point(char *path, size_t path_depth, char **outpath, uint32
 
             vfs_entry_t *ent = (vfs_entry_t *)tchild->value;
 
-            printf("Comparing [%s] and [%s]\n", ent->name, at);
+            //printf("Comparing [%s] and [%s]\n", ent->name, at);
 
             if (!strcmp(ent->name, at))
             {
-                printf("Found!\n");
+                //printf("Found!\n");
                 found = 1;
                 node = tchild;
                 at = at + strlen(at) + 1;
@@ -999,8 +1020,8 @@ void vfs_lock(fs_node_t *node)
 static fs_node_t *kopen_recur(char *filename, uint32_t flags,
                               uint32_t symlink_depth, char *relative_to)
 {
-    printf("[VFS] kopen_recur: filename: [%s], flags: %#x, symlink_depth: %i, relative_to: [%s]\n",
-           filename, flags, symlink_depth, relative_to);
+    //printf("[VFS] kopen_recur: filename: [%s], flags: %#x, symlink_depth: %i, relative_to: [%s]\n",
+    //       filename, flags, symlink_depth, relative_to);
 
     if (!filename)
     {
@@ -1010,7 +1031,7 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
 
     char *path = canonicalize_path(relative_to, filename);
 
-    printf("[VFS] kopen_recur: canonical_path: [%s]\n", path);
+    //printf("[VFS] kopen_recur: canonical_path: [%s]\n", path);
 
     size_t path_len = strlen(path);
 
@@ -1054,9 +1075,9 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
         return NULL;
     }
 
-    printf("Node name: [%s]\n", node_ptr->name);
-    printf("Path depth: %i\n", path_depth);
-    printf("Depth: %i\n", depth);
+    //printf("Node name: [%s]\n", node_ptr->name);
+    //printf("Path depth: %i\n", path_depth);
+    //printf("Depth: %i\n", depth);
 
     do
     {
@@ -1139,11 +1160,11 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
             }
         }
 
-        printf("[VFS] Path offset: %#016x, path+pathlen: %#016x\n", path_offset, path + path_len);
+        //printf("[VFS] Path offset: %#016x, path+pathlen: %#016x\n", path_offset, path + path_len);
 
         if (path_offset >= path + path_len)
         {
-            printf("Opening file 1...\n");
+            //printf("Opening file 1...\n");
 
             free(path);
             open_fs(node_ptr, flags);
@@ -1151,9 +1172,10 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
             return node_ptr;
         }
 
+        //printf("depth: %i, path_depth: %i\n", depth, path_depth);
         if (depth == path_depth)
         {
-            printf("Opening file 2...\n");
+            //printf("Opening file 2...\n");
 
             open_fs(node_ptr, flags);
             free((void *)path);
@@ -1177,7 +1199,7 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
             return NULL;
         }
 
-        printf("Next node: [%s]\n", node_ptr->name);
+        //printf("Next node: [%s]\n", node_ptr->name);
 
         path_offset += strlen(path_offset) + 1;
         ++depth;
@@ -1192,7 +1214,7 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
 
 fs_node_t *kopen(char *filename, uint32_t flags)
 {
-    printf("[VFS] kopen: filename: [%s], flags: %#x\n", filename, flags);
+    //printf("[VFS] kopen: filename: [%s], flags: %#x\n", filename, flags);
 
     return kopen_recur(filename, flags, 0, "/");
 }

@@ -169,29 +169,6 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
     mem_info->kernel_size = mem_info->kernel_end - mem_info->kernel_load_addr;
 }
 
-void func4()
-{
-    backtrace();
-}
-
-void func3()
-{
-    func4();
-}
-
-void func2()
-{
-    func3();
-}
-
-void func1()
-{
-    func2();
-
-    for (;;)
-        ;
-}
-
 int kernel_main(unsigned long long rbx, unsigned long long rax)
 {
     (void)rax;
@@ -202,10 +179,10 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     set_stdout(scom1_fd);
 
-    printf("================================================================================");
-    printf("|| Welcome to the OS6 operating system.                                       ||");
-    printf("|| The kernel is now running in 64 bit mode.                                  ||");
-    printf("================================================================================");
+    printf("================================================================================\n");
+    printf("|| Welcome to the OS6 operating system.                                       ||\n");
+    printf("|| The kernel is now running in 64 bit mode.                                  ||\n");
+    printf("================================================================================\n");
 
     run_unit_tests();
 
@@ -227,8 +204,6 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     sti();
 
-    func1();
-
     kheap_init();
 
     vfs_install();
@@ -237,13 +212,70 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     ext2_initialize();
 
-    const char *path = "/testfile2";
+#if 1
+
+    int ret = mkdir_fs("newdir", 0);
+
+    printf("mkdir_fs returned %i\n", ret);
+
+    ret = create_file_fs("/newdir/testfile3", 0);
+
+    printf("create_file_fs returned %i\n", ret);
+
+    const char *pathw = "/newdir/testfile3";
+
+    fs_node_t *nodew = kopen(pathw, 0);
+
+    if (!nodew)
+    {
+        printf("Could not open %s", pathw);
+
+        for (;;)
+            ;
+    }
+
+    if (!(nodew->flags & FS_FILE))
+    {
+        printf("Not a file\n");
+
+        for (;;)
+            ;
+    }
+
+    const char *string = "This the new string that should be stored in the file";
+
+    int bytes_written;
+
+    // Discard current content of file
+    //truncate_fs(nodew);
+
+    // Write new content.
+    bytes_written = write_fs(nodew, 0, strlen(string), string);
+
+    if (bytes_written != strlen(string))
+    {
+        printf("Error writing to file\n");
+    }
+
+#endif
+
+#if 1
+
+    const char *path = "/newdir/testfile3";
 
     fs_node_t *node = kopen(path, 0);
 
     if (!node)
     {
         printf("Could not open %s", path);
+
+        for (;;)
+            ;
+    }
+
+    if (!(node->flags & FS_FILE))
+    {
+        printf("Not a file\n");
 
         for (;;)
             ;
@@ -265,6 +297,42 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     }
 
     hexdump(file, size);
+
+#endif
+
+#if 1
+
+    const char *pathd = "/";
+
+    fs_node_t *noded = kopen(pathd, 0);
+
+    if (!noded)
+    {
+        printf("Could not open %s", pathd);
+
+        for (;;)
+            ;
+    }
+
+    printf("Contents of %s\n", pathd);
+
+    if (!noded->flags & FS_DIRECTORY)
+    {
+        printf("Not a directory!\n");
+
+        for (;;)
+            ;
+    }
+
+    int index = 0;
+    struct dirent *d;
+
+    while ((d = readdir_fs(noded, index++)) != NULL)
+    {
+        printf("%s\n", d->name);
+    }
+
+#endif
 
     for (;;)
         __asm__ volatile("hlt");

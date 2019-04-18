@@ -10,6 +10,8 @@
 
 #include <vfs/vfs.h>
 
+#include <debug/backtrace.h>
+
 #define MAX_DESCRIPTION_LENGTH 256
 
 typedef struct _blockdev_class
@@ -111,8 +113,8 @@ static uint32_t read_blockdev_fs(fs_node_t *node, uint64_t offset, uint32_t size
     blockdev_instance_t *instance = (blockdev_instance_t *)node->device;
     blockdev_class_t *class = instance->class;
 
-    printf("[Blockdev] read_blockdev_fs: M:%i,m:%i, offset:%#016x, size:%#08x\n",
-           class->major, instance->minor, offset, size);
+    //printf("[Blockdev] read_blockdev_fs: M:%i,m:%i, offset:%#016x, size:%#08x\n",
+    //       class->major, instance->minor, offset, size);
 
     return blockdev_read(class->major, instance->minor, offset, size, buffer);
 }
@@ -129,8 +131,8 @@ static int open_blockdev_fs(fs_node_t *node, uint32_t flags)
     blockdev_instance_t *instance = (blockdev_instance_t *)node->device;
     blockdev_class_t *class = instance->class;
 
-    printf("[Blockdev] open_blockdev_fs: M:%i,m:%i,flags:%#x\n",
-           class->major, instance->minor, flags);
+    //printf("[Blockdev] open_blockdev_fs: M:%i,m:%i,flags:%#x\n",
+    //       class->major, instance->minor, flags);
 
     return 0;
 }
@@ -182,7 +184,7 @@ int reg_blockdev_instance(uint32_t major, uint32_t minor, const char *desc, size
 
     list_insert(class->instance_list, instance);
 
-    printf("[Blockdev] Instance %i of class %i registered [%s]\n", minor, major, instance->description);
+    //printf("[Blockdev] Instance %i of class %i registered [%s]\n", minor, major, instance->description);
 
     fs_node_t *fnode = malloc(sizeof(fs_node_t));
 
@@ -263,7 +265,7 @@ int unreg_blockdev_instance(uint32_t major, uint32_t minor)
 
 uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, size_t len, void *buffer)
 {
-    printf("[Blockdev] blockdev_read: M:%i m:%i Read Off:%i, len:%i, buffer:%#016x\n", major, minor, offset, len, buffer);
+    //printf("[Blockdev] blockdev_read: M:%i m:%i Read Off:%i, len:%i, buffer:%#016x\n", major, minor, offset, len, buffer);
 
     blockdev_class_t *class;
     blockdev_instance_t *instance;
@@ -462,6 +464,9 @@ uint32_t blockdev_write(unsigned int major, unsigned int minor, uint32_t offset,
     {
         if (!(n = class->write(minor, block, nblocks, src)))
         {
+            printf("[IDE] Error: Could not write to blockdev\n");
+            backtrace();
+
             release_blockdev_instance(instance);
 
             return -1;

@@ -120,6 +120,9 @@ void print_regs(system_stack_t *regs)
     printf("[IRQ] Backtrace: \n");
 
     kernel_lookup_symbol((void *)regs->rip);
+
+    printf("\n");
+
     print_backtrace((unsigned long long int *)regs->rbp);
 
     printf("[IRQ] ==========================================================================\n");

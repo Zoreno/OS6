@@ -10,6 +10,8 @@
 
 #include <arch/arch.h>
 
+#include <debug/backtrace.h>
+
 #define NUM_IDE_CONTROLLERS 2
 #define NUM_DEVICES_PER_CONTROLLER 2
 
@@ -36,6 +38,7 @@
 #define ATA_IDENTIFY 0xEC
 #define ATAPI_IDENTIFY 0xA1
 #define ATA_READ_BLOCK 0x20
+#define ATA_READ_MULTIPLE 0xC4
 #define ATA_WRITE_BLOCK 0x30
 
 #define ATA_STATUS_BSY 0x80
@@ -169,7 +172,7 @@ static uint8_t select_device(ide_device_t *device, int force)
 
     int i = 0;
 
-    printf("[IDE] Selecting device\n");
+    //printf("[IDE] Selecting device\n");
 
     uint8_t tmp = inportb(iobase + ATA_DRV_HEAD);
 
@@ -194,13 +197,14 @@ static uint8_t select_device(ide_device_t *device, int force)
         }
     }
 
-    printf("[IDE] Setting drive\n");
+    //printf("[IDE] Setting drive\n");
 
     outportb(iobase + ATA_DRV_HEAD, 0xA0 | (device->lba << 6) | (device->position << 4));
 
-    udelay(1);
-
-    printf("[IDE] Waiting for ack\n");
+    for (int i = 0; i < 4; ++i)
+    {
+        inportb(iobase + ATA_STATUS);
+    }
 
     uint8_t status;
 
@@ -211,7 +215,7 @@ static uint8_t select_device(ide_device_t *device, int force)
         udelay(1);
     }
 
-    printf("[IDE] Device selected\n");
+    //printf("[IDE] Device selected\n");
 
     return 1;
 }
@@ -331,7 +335,7 @@ static ide_device_t *get_ide_device(unsigned int minor)
 
 static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t nblocks, void *buffer, int direction)
 {
-    printf("[IDE] %s m:%i, block: %i, nblocks: %i, buffer: %#016x\n", direction == IO_READ ? "Read" : "Write", minor, block, nblocks, buffer, direction);
+    //printf("[IDE] %s m:%i, block: %i, nblocks: %i, buffer: %#016x\n", direction == IO_READ ? "Read" : "Write", minor, block, nblocks, buffer, direction);
 
     ide_device_t *device;
     ide_controller_t *controller;
@@ -403,21 +407,22 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
 
     controller->irq = 0;
 
-    printf("[IDE] Sending command\n");
+    // backtrace();
 
+    //printf("[IDE] Sending command\n");
+
+    outportb(iobase + ATA_DRV_HEAD, 0xE0 | (device->lba << 6) | (device->position << 4) | hd);
+    outportb(iobase + ATA_ERROR, 0);
     outportb(iobase + ATA_NSECTOR, nblocks);
     outportb(iobase + ATA_SECTOR, sc);
     outportb(iobase + ATA_LCYL, cl);
     outportb(iobase + ATA_HCYL, ch);
-    outportb(iobase + ATA_DRV_HEAD, 0xA0 | (device->lba << 6) | (device->position << 4) | hd);
+
     outportb(iobase + ATA_COMMAND, cmd);
 
-    udelay(1);
-
-    if (!wait_for_controller(controller, ATA_STATUS_BSY, 0, ATA_TIMEOUT))
+    for (int i = 0; i < 4; ++i)
     {
-        printf("[IDE] Error waiting for controller 1\n");
-        return 0;
+        inportb(iobase + ATA_STATUS);
     }
 
     if (inportb(iobase + ATA_STATUS) & ATA_STATUS_ERR)
@@ -430,7 +435,6 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
     {
         for (int block = 0; block < nblocks; ++block)
         {
-
             for (i = 0; i < 256; ++i)
             {
                 outportw(iobase + ATA_DATA, *buf++);
@@ -438,18 +442,20 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
 
             while (!controller->irq)
                 ;
+
+            controller->irq = 0;
         }
     }
 
     if (direction == IO_READ)
     {
-        while (!controller->irq)
-        {
-            printf("Waiting for IRQ\n");
-        }
-
         for (int block = 0; block < nblocks; ++block)
         {
+            while (!controller->irq)
+                ;
+
+            controller->irq = 0;
+
             for (i = 0; i < 256; ++i)
             {
                 *buf++ = inportw(iobase + ATA_DATA);
@@ -462,9 +468,6 @@ static uint32_t ide_read_write_blocks(uint32_t minor, uint32_t block, uint32_t n
         printf("[IDE] Device reported error 2\n");
         return 0;
     }
-
-    while ((inportb(iobase + ATA_STATUS) & (ATA_STATUS_BSY | ATA_STATUS_DRQ)))
-        ;
 
     if (direction == IO_WRITE)
     {
@@ -493,7 +496,7 @@ static uint32_t ide_read_blocks(uint32_t minor, uint32_t block, uint32_t nblocks
 
 static void ide_handle_interrupt(ide_controller_t *controller)
 {
-    // We must read the status register each read
+    // We must read the status register each irq
     volatile uint8_t dummy = inportb(controller->iobase + ATA_STATUS);
 
     controller->irq = 1;
@@ -515,6 +518,8 @@ static void ide_secondary_irq(system_stack_t *regs)
 
 void init_ide_devices()
 {
+    printf("[IDE] Initializing\n");
+
     int i;
     int j;
 
@@ -576,4 +581,6 @@ void init_ide_devices()
 
     clear_mask_interrupt(14);
     clear_mask_interrupt(15);
+
+    printf("[IDE] Done!\n");
 }
