@@ -82,6 +82,8 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memset.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memchr.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memcmp.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memcpy.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memcpyw.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memcpyl.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memmove.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memsetw.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memsetl.c)
@@ -194,6 +196,10 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/mm_bitmap.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/virt_mem.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/kheap.c)
 
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/pci/pci_io.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/pci/pci_device.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/pci/pci.c)
+
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/sync/spinlock.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/serial/serial.c)
@@ -205,6 +211,7 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/cmos/cmos_rtc.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/blockdev.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/ide.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/vbe.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/exec/elf64.c)
 

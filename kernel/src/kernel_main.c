@@ -20,6 +20,7 @@
 
 #include <drivers/ide.h>
 #include <drivers/blockdev.h>
+#include <drivers/vbe.h>
 
 #include <vfs/vfs.h>
 #include <vfs/ext2.h>
@@ -31,6 +32,8 @@
 #include <exec/elf64.h>
 
 #include <debug/backtrace.h>
+
+#include <pci/pci.h>
 
 extern void run_unit_tests();
 
@@ -179,10 +182,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     set_stdout(scom1_fd);
 
-    printf("================================================================================\n");
-    printf("|| Welcome to the OS6 operating system.                                       ||\n");
-    printf("|| The kernel is now running in 64 bit mode.                                  ||\n");
-    printf("================================================================================\n");
+    printf("Initializing kernel...\n");
 
     run_unit_tests();
 
@@ -212,7 +212,27 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     ext2_initialize();
 
-#if 1
+    pciInit();
+
+    vbe_bochs_set_gfx(1024, 768, 4);
+
+    vbe_pixel_t p;
+    p.red = 0xFF;
+    p.blue = 0x00;
+    p.green = 0x00;
+
+    vbe_fill_rect(p, 32, 32, 16, 16);
+
+    vbe_print_string(p, 16, 16, "Hello GFX World!");
+
+    printf("Kernel initailization done!\n");
+
+    printf("================================================================================\n");
+    printf("|| Welcome to the OS6 operating system.                                       ||\n");
+    printf("|| The kernel is now running in 64 bit mode.                                  ||\n");
+    printf("================================================================================\n");
+
+#if 0
 
     int ret = mkdir_fs("newdir", 0);
 
@@ -259,7 +279,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
 #endif
 
-#if 1
+#if 0
 
     const char *path = "/newdir/testfile3";
 
@@ -300,7 +320,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
 #endif
 
-#if 1
+#if 0
 
     const char *pathd = "/";
 
