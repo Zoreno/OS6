@@ -9,6 +9,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <debug/backtrace.h>
+
 //=============================================================================
 // Definitions
 //=============================================================================
@@ -106,7 +108,7 @@ void vbe_bochs_set_gfx(uint16_t width, uint16_t height, uint16_t bpp)
     _vbe_current_context.framebuffer_v = (uint64_t)0xE0000000 | _vbe_current_context.framebuffer_p & 0xFFF;
 
     // TODO_ Get page size from virtmem
-    size_t buf_pages = align_up(width * height * bpp, 4096) / 4096;
+    size_t buf_pages = (align_up(width * height * bpp, 4096) / 4096) + 1;
 
     virt_mem_map_pages(_vbe_current_context.framebuffer_p,
                        _vbe_current_context.framebuffer_v,
@@ -163,6 +165,11 @@ void vbe_fill_rect(vbe_pixel_t pixel, int32_t x, int32_t y, uint32_t width, uint
     }
 
     uint32_t stride = _vbe_current_context.width;
+
+    if (max_x < x)
+    {
+        return;
+    }
 
     for (; y < max_y; ++y)
     {

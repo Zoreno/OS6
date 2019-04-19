@@ -8,7 +8,7 @@ void hexdump(uint8_t *mem, size_t size)
     size_t bytes = size;
     const size_t bytes_per_col = 16;
 
-    int nrows = (bytes + bytes_per_col - 1) / bytes_per_col;
+    uint32_t nrows = (bytes + bytes_per_col - 1) / bytes_per_col;
 
     int width = 0;
 

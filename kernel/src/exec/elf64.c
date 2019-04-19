@@ -554,7 +554,6 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
         uint8_t *end_of_header = (uint8_t *)header + header->header_length;
 
         const char *dir_table = ((uint8_t *)header) + sizeof(DwarfDebugLineHeader_t);
-        const char *dir_table_start = dir_table;
 
         //printf("Directory table:\n");
 
@@ -587,7 +586,6 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
         }
 
         const char *file_table = dir_table + 1;
-        const char *file_table_start = file_table;
 
         //printf("File table:\n");
 
@@ -633,6 +631,6 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
         }
 
         // Advance to the next header
-        header = ((uint8_t *)header) + header->length + sizeof(header->length);
+        header = (DwarfDebugLineHeader_t *)(((uint8_t *)header) + header->length + sizeof(header->length));
     }
 }

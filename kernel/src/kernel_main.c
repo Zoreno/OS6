@@ -21,6 +21,8 @@
 #include <drivers/ide.h>
 #include <drivers/blockdev.h>
 #include <drivers/vbe.h>
+#include <drivers/keyboard.h>
+#include <drivers/mouse.h>
 
 #include <vfs/vfs.h>
 #include <vfs/ext2.h>
@@ -34,6 +36,10 @@
 #include <debug/backtrace.h>
 
 #include <pci/pci.h>
+
+#include <ctype.h>
+
+#include <gui/gui.h>
 
 extern void run_unit_tests();
 
@@ -172,6 +178,13 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
     mem_info->kernel_size = mem_info->kernel_end - mem_info->kernel_load_addr;
 }
 
+void mouse_moved_handler(mouse_moved_event_t *event)
+{
+    static int i = 0;
+
+    printf("Mouse moved [%i]: %i, %i\n", i++, (int64_t)event->x, (int64_t)event->y);
+}
+
 int kernel_main(unsigned long long rbx, unsigned long long rax)
 {
     (void)rax;
@@ -204,6 +217,9 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     sti();
 
+    keyboard_install();
+    mouse_install();
+
     kheap_init();
 
     vfs_install();
@@ -216,21 +232,13 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     vbe_bochs_set_gfx(1024, 768, 4);
 
-    vbe_pixel_t p;
-    p.red = 0xFF;
-    p.blue = 0x00;
-    p.green = 0x00;
-
-    vbe_fill_rect(p, 32, 32, 16, 16);
-
-    vbe_print_string(p, 16, 16, "Hello GFX World!");
-
     printf("Kernel initailization done!\n");
 
     printf("================================================================================\n");
-    printf("|| Welcome to the OS6 operating system.                                       ||\n");
-    printf("|| The kernel is now running in 64 bit mode.                                  ||\n");
+    printf("|| Launching GUI...                                                           ||\n");
     printf("================================================================================\n");
+
+    gui_init();
 
 #if 0
 

@@ -41,4 +41,5 @@
         "empty",
         "return"
     ],
+    "C_Cpp.errorSquiggles": "Disabled",
 }
