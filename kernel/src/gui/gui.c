@@ -1,18 +1,34 @@
 #include <gui/gui.h>
 
 #include <drivers/vbe.h>
-#include <drivers/keyboard.h>
-#include <drivers/mouse.h>
+#include <drivers/keyboard_ps2.h>
+#include <drivers/mouse_ps2.h>
 
 #include <gui/desktop.h>
 #include <gui/window.h>
 #include <gui/context.h>
 
+Desktop *desktop;
+
+void gui_mouse_callback(uint16_t mouse_x, uint16_t mouse_y, uint8_t buttons);
+
+void gui_mouse_moved_handler(mouse_moved_event_t *ev)
+{
+    //printf("Mouse pos: %i,%i\n", (int64_t)ev->x, (int64_t)-ev->y);
+    //printf("Mouse mov: %i,%i\n", (int64_t)ev->dx, (int64_t)-ev->dy);
+    gui_mouse_callback(ev->x, -ev->y, 0);
+}
+
+void gui_mouse_callback(uint16_t mouse_x, uint16_t mouse_y, uint8_t buttons)
+{
+    Desktop_process_mouse(desktop, mouse_x, mouse_y, buttons);
+}
+
 void gui_init()
 {
     uint16_t width = vbe_get_width();
     uint16_t height = vbe_get_height();
-    uint32_t *framebuffer = vbe_get_buffer();
+    uint32_t *framebuffer = (uint32_t *)vbe_get_buffer();
 
 #if 0
 
@@ -31,7 +47,7 @@ void gui_init()
 
     Context *context = Context_new(width, height, framebuffer);
 
-    Desktop *desktop = Desktop_new(context);
+    desktop = Desktop_new(context);
 
     Desktop_create_window(
         (Window *)desktop,
@@ -43,6 +59,8 @@ void gui_init()
         "Window 1");
 
     Window_paint((Window *)desktop, NULL, 1);
+
+    register_mouse_moved_handler(gui_mouse_moved_handler);
 
     for (;;)
         ;

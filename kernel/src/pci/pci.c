@@ -1,3 +1,25 @@
+/**
+ * @file pci.c
+ * @author Joakim Bertils
+ * @version 0.1
+ * @date 2019-04-20
+ * 
+ * @brief PCI bus enumeration and device driver initialization
+ * 
+ * @copyright Copyright (C) 2019,
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
+ * 
+ */
+
 #include <pci/pci.h>
 
 #include <arch/arch.h>
@@ -6,6 +28,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+
+#include <usb/usb_uhci.h>
 
 pci_device_list_t *device_list = 0;
 
@@ -29,6 +53,8 @@ void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
         return;
     }
 
+    PciDeviceInfo_t *devInfo = NULL;
+
     // Make sure there is a list
     if (device_list == 0)
     {
@@ -38,6 +64,8 @@ void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
 
         // read info into the first node.
         pci_read_device_info(id, &device_list->dev_info);
+
+        devInfo = &device_list->dev_info;
     }
     else
     {
@@ -59,6 +87,27 @@ void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
 
         // read info into the current node node.
         pci_read_device_info(id, &cur_node->dev_info);
+
+        devInfo = &cur_node->dev_info;
+    }
+
+    if (!devInfo)
+    {
+        return;
+    }
+
+    const PciDriver_t _pci_driver_table[] =
+        {
+            {usb_uhci_init},
+            {0},
+        };
+
+    const PciDriver_t *driver = _pci_driver_table;
+
+    while (*driver->init)
+    {
+        driver->init(id, devInfo);
+        ++driver;
     }
 }
 
@@ -164,3 +213,7 @@ void pciInit()
 
 #endif
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

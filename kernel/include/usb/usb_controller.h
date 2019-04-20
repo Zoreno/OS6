@@ -1,10 +1,10 @@
 /**
- * @file pci.h
+ * @file usb_controller.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-18
+ * @date 2019-04-20
  * 
- * @brief PCI device listing
+ * @brief USB controller interface
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,34 +20,28 @@
  * 
  */
 
-#ifndef _PCI_H
-#define _PCI_H
+#ifndef _USB_CONTROLLER_H
+#define _USB_CONTROLLER_H
 
-#include <stdint.h>
+//=============================================================================
+// Types
+//=============================================================================
 
-#include <pci/pci_device.h>
-
-extern pci_device_list_t *device_list;
-
-typedef struct _PciBAR
+typedef struct _usb_controller_t
 {
-    union {
-        void *address;
-        uint16_t port;
-    };
+    struct _usb_controller_t *next;
+    void *hc;
 
-    uint64_t size;
-    uint32_t flags;
-} PciBAR_t;
+    void (*poll)(struct _usb_controller_t *controller);
+} usb_controller_t;
 
-typedef struct _PciDriver_t
-{
-    void (*init)(uint32_t id, PciDeviceInfo_t *deviceInfo);
-} PciDriver_t;
+//=============================================================================
+// Functions
+//=============================================================================
 
-void pciInit();
+usb_controller_t *usb_get_controller_list();
 
-uint32_t pci_get_vga_lfb();
+void usb_set_controller_list(usb_controller_t *new_controller_list);
 
 #endif
 

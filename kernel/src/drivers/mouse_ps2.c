@@ -1,4 +1,4 @@
-#include <drivers/mouse.h>
+#include <drivers/mouse_ps2.h>
 #include <stdio.h>
 
 #include <arch/arch.h>
@@ -154,8 +154,6 @@ void mouse_wait_signal();
 uint8_t mouse_read();
 void mouse_write(uint8_t data);
 
-extern mouse_irq();
-
 static volatile int32_t mouse_x = 0;
 static volatile int32_t mouse_y = 0;
 static volatile int32_t mouse_z_vertical = 0;
@@ -232,6 +230,11 @@ void mouse_write(uint8_t data)
 void mouse_process_packet(mouse_packet *packet)
 {
     // printf("Starting to process mouse packet...\n");
+
+    //printf("Mouse packet:\n");
+    //printf("X: %i, sign: %i, of: %i\n", (int64_t)packet->x_movement, packet->x_sign, packet->x_overflow);
+    //printf("Y: %i, sign: %i, of: %i\n", (int64_t)packet->y_movement, packet->y_sign, packet->y_overflow);
+    //printf("Buttons: l: %i, m: %i, r: %i\n", packet->left_button, packet->middle_button, packet->right_button);
 
     //=========================================================
     // Check validity of packet
@@ -528,12 +531,12 @@ void mouse_irq_handler(system_stack_t *regs)
     static union {
         uint8_t bytes[4];
         mouse_packet packet;
-    } u;
+    } __attribute__((packed)) u;
 
     // Read the data from the mouse
     u.bytes[byteCounter] = data;
 
-    if (u.packet.always_one == 1)
+    if (byteCounter > 0 || data & 0x08)
     {
         ++byteCounter;
     }

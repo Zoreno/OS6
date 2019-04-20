@@ -418,7 +418,7 @@ void Context_draw_char_clipped(Context *context, char c, int x, int y, uint32_t 
 void Context_draw_char(Context *context, char c, int x, int y, uint32_t color)
 {
     int i;
-    rect_t *clip_area;
+    rect_t *clip_area = NULL;
     rect_t screen_area;
 
     if (context->clip_rects->count)
@@ -437,7 +437,7 @@ void Context_draw_char(Context *context, char c, int x, int y, uint32_t color)
             screen_area.left = 0;
             screen_area.bottom = context->height - 1;
             screen_area.right = context->width - 1;
-            Context_draw_char_clipped(context, c, x, y, color, clip_area);
+            Context_draw_char_clipped(context, c, x, y, color, &screen_area);
         }
     }
 }

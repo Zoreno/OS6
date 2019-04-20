@@ -870,10 +870,6 @@ static uint32_t inode_write_block(ext2_fs_t *this, ext2_inodetable_t *inode,
     //printf("inode_write_block: block: %i, inode->blocks: %i, this->block_size: %i\n", block, inode->blocks, this->block_size);
     if (block >= inode->blocks / (this->block_size / 512))
     {
-        //backtrace();
-        //debug_printf("[EXT2] Attempting to write beyond the allocated nodes \
-        for this inode\n");
-
         //return 0;
     }
 
@@ -2064,7 +2060,7 @@ static uint32_t ext2_root(ext2_fs_t *this, ext2_inodetable_t *inode,
         return -1;
     }
 
-    if (!(inode->mode & EXT2_S_IFDIR) == EXT2_S_IFDIR)
+    if (!((inode->mode & EXT2_S_IFDIR) == EXT2_S_IFDIR))
     {
         printf("[EXT2] ext2_root: Root is not directory\n");
         return -1;

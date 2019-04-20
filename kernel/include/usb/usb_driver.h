@@ -1,10 +1,10 @@
 /**
- * @file pci.h
+ * @file usb_driver.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-18
+ * @date 2019-04-20
  * 
- * @brief PCI device listing
+ * @brief USB driver interface
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,34 +20,17 @@
  * 
  */
 
-#ifndef _PCI_H
-#define _PCI_H
+#ifndef _USB_DRIVER_H
+#define _USB_DRIVER_H
 
-#include <stdint.h>
+#include <usb/usb_device.h>
 
-#include <pci/pci_device.h>
-
-extern pci_device_list_t *device_list;
-
-typedef struct _PciBAR
+typedef struct _usb_driver_t
 {
-    union {
-        void *address;
-        uint16_t port;
-    };
+    int (*init)(usb_device_t *device);
+} usb_driver_t;
 
-    uint64_t size;
-    uint32_t flags;
-} PciBAR_t;
-
-typedef struct _PciDriver_t
-{
-    void (*init)(uint32_t id, PciDeviceInfo_t *deviceInfo);
-} PciDriver_t;
-
-void pciInit();
-
-uint32_t pci_get_vga_lfb();
+usb_driver_t *usb_get_driver_table();
 
 #endif
 

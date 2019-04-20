@@ -105,13 +105,13 @@ void vbe_bochs_set_gfx(uint16_t width, uint16_t height, uint16_t bpp)
     _vbe_current_context.height = height;
     _vbe_current_context.bpp = bpp;
     _vbe_current_context.framebuffer_p = (uint64_t)pci_get_vga_lfb();
-    _vbe_current_context.framebuffer_v = (uint64_t)0xE0000000 | _vbe_current_context.framebuffer_p & 0xFFF;
+    _vbe_current_context.framebuffer_v = (uint64_t)0xE0000000 | (_vbe_current_context.framebuffer_p & 0xFFF);
 
     // TODO_ Get page size from virtmem
     size_t buf_pages = (align_up(width * height * bpp, 4096) / 4096) + 1;
 
-    virt_mem_map_pages(_vbe_current_context.framebuffer_p,
-                       _vbe_current_context.framebuffer_v,
+    virt_mem_map_pages((void *)_vbe_current_context.framebuffer_p,
+                       (void *)_vbe_current_context.framebuffer_v,
                        buf_pages,
                        0);
 }
@@ -332,7 +332,7 @@ static uint8_t font8x8_basic[128][8] =
 
 void vbe_put_char(vbe_pixel_t pixel, int32_t x, int32_t y, char c)
 {
-    uint8_t *character = font8x8_basic[c];
+    uint8_t *character = font8x8_basic[(size_t)c];
 
     for (uint32_t cy = 0; cy < char_height; ++cy)
     {

@@ -11,7 +11,7 @@ static int _symbol_count = 0;
 static const char *_symbol_string_table = NULL;
 
 // Dwarf based symbol lookup
-static Elf64_Addr_t _dwarf_line_info = NULL;
+static Elf64_Addr_t _dwarf_line_info = 0;
 static Elf64_Xword_t _dwarf_size = 0;
 
 unsigned long elf64_hash(const unsigned char *name)
@@ -69,7 +69,7 @@ void elf_kernel_lookup_symbol(void *addr)
 void dwarf_kernel_lookup_symbol(void *addr)
 {
     //printf("DWARF line info: %#016x, size: %i, addr: %#016x\n", _dwarf_line_info, _dwarf_size, addr);
-    dwarf_parse_debug_line_section(_dwarf_line_info, _dwarf_size, addr);
+    dwarf_parse_debug_line_section(_dwarf_line_info, _dwarf_size, (uint64_t)addr);
 }
 
 void kernel_lookup_symbol(void *addr)
@@ -540,7 +540,7 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
 
     DwarfDebugLineHeader_t *header = (DwarfDebugLineHeader_t *)section_start;
 
-    while (header < section_start + size)
+    while (header < (DwarfDebugLineHeader_t *)(section_start + size))
     {
 
         //printf("Length: %i\n", header->length);

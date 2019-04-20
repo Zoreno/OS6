@@ -1,10 +1,10 @@
 /**
- * @file pci.h
+ * @file usb_uhci.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-18
+ * @date 2019-04-20
  * 
- * @brief PCI device listing
+ * @brief USB UHCI Host Controller driver
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,34 +20,12 @@
  * 
  */
 
-#ifndef _PCI_H
-#define _PCI_H
-
-#include <stdint.h>
+#ifndef _USB_UHCI_H
+#define _USB_UHCI_H
 
 #include <pci/pci_device.h>
 
-extern pci_device_list_t *device_list;
-
-typedef struct _PciBAR
-{
-    union {
-        void *address;
-        uint16_t port;
-    };
-
-    uint64_t size;
-    uint32_t flags;
-} PciBAR_t;
-
-typedef struct _PciDriver_t
-{
-    void (*init)(uint32_t id, PciDeviceInfo_t *deviceInfo);
-} PciDriver_t;
-
-void pciInit();
-
-uint32_t pci_get_vga_lfb();
+void usb_uhci_init(uint32_t id, PciDeviceInfo_t *devInfo);
 
 #endif
 

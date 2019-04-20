@@ -26,7 +26,7 @@ set(CFLAGS "")
 set(CFLAGS "${CFLAGS} -std=c11")
 
 # Set warnings and error conditions
-set(CFLAGS "${CFLAGS} -Wall -Wextra -Werror=implicit-function-declaration -Wno-unused-parameter")
+set(CFLAGS "${CFLAGS} -Wall -Wextra -Werror=implicit-function-declaration -Wno-unused -Wno-sign-compare -Wno-pointer-sign")
 
 # Disable standard library
 set(CFLAGS "${CFLAGS} -ffreestanding -nostdlib -nostdinc -nodefaultlibs")
@@ -212,8 +212,8 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/cmos/cmos_rtc.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/blockdev.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/ide.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/vbe.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/keyboard.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/mouse.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/keyboard_ps2.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/mouse_ps2.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/exec/elf64.c)
 
@@ -221,6 +221,7 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/list.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/tree.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/hexdump.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/bitset.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/link.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/listnode.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/list.c)
@@ -229,6 +230,14 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/context.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/window.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/desktop.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/gui.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_controller.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_descriptors.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_device.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_driver.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_hub.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_uhci.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
 
@@ -273,7 +282,7 @@ add_custom_target(${HDD_NAME}
 # Custom targets for running QEMU
 #==============================================================================
 
-set(QEMU_FLAGS -m 512M -rtc base=localtime -boot d -serial stdio -display sdl -vga std -drive file=${HDD_NAME},format=raw -cdrom ${ISO_IMAGE})
+set(QEMU_FLAGS -m 512M -rtc base=localtime -boot d -usb -device usb-ehci -device usb-mouse -device usb-kbd -serial stdio -display sdl -vga std -drive file=${HDD_NAME},format=raw -cdrom ${ISO_IMAGE})
 
 add_custom_target(run
     COMMAND export SDL_VIDEO_X11_DGAMOUSE=0

@@ -1,10 +1,10 @@
 /**
- * @file pci.h
+ * @file usb_hub.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-18
+ * @date 2019-04-20
  * 
- * @brief PCI device listing
+ * @brief USB hub initialization routine
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,34 +20,23 @@
  * 
  */
 
-#ifndef _PCI_H
-#define _PCI_H
+#ifndef _USB_HUB_H
+#define _USB_HUB_H
 
-#include <stdint.h>
+#include <usb/usb_device.h>
 
-#include <pci/pci_device.h>
+//=============================================================================
+// Functions
+//=============================================================================
 
-extern pci_device_list_t *device_list;
-
-typedef struct _PciBAR
-{
-    union {
-        void *address;
-        uint16_t port;
-    };
-
-    uint64_t size;
-    uint32_t flags;
-} PciBAR_t;
-
-typedef struct _PciDriver_t
-{
-    void (*init)(uint32_t id, PciDeviceInfo_t *deviceInfo);
-} PciDriver_t;
-
-void pciInit();
-
-uint32_t pci_get_vga_lfb();
+/**
+ * @brief Initializes an USB hub
+ * 
+ * @param device Device pointer
+ * 
+ * @return int 1 on success
+ */
+int usb_hub_init(usb_device_t *device);
 
 #endif
 

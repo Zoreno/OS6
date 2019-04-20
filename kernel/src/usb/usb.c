@@ -1,10 +1,10 @@
 /**
- * @file pci.h
+ * @file usb.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-18
+ * @date 2019-04-20
  * 
- * @brief PCI device listing
+ * @brief Top level USB routines
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,36 +20,29 @@
  * 
  */
 
-#ifndef _PCI_H
-#define _PCI_H
+#include <usb/usb.h>
 
-#include <stdint.h>
+#include <usb/usb_controller.h>
+#include <usb/usb_device.h>
 
-#include <pci/pci_device.h>
-
-extern pci_device_list_t *device_list;
-
-typedef struct _PciBAR
+void usb_poll()
 {
-    union {
-        void *address;
-        uint16_t port;
-    };
+    for (usb_controller_t *c = usb_get_controller_list(); c; c = c->next)
+    {
+        if (c->poll)
+        {
+            c->poll(c);
+        }
+    }
 
-    uint64_t size;
-    uint32_t flags;
-} PciBAR_t;
-
-typedef struct _PciDriver_t
-{
-    void (*init)(uint32_t id, PciDeviceInfo_t *deviceInfo);
-} PciDriver_t;
-
-void pciInit();
-
-uint32_t pci_get_vga_lfb();
-
-#endif
+    for (usb_device_t *dev = usb_get_device_list(); dev; dev = dev->next)
+    {
+        if (dev->drvPoll)
+        {
+            dev->drvPoll(dev);
+        }
+    }
+}
 
 //=============================================================================
 // End of file

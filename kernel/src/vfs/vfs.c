@@ -702,7 +702,7 @@ int unlink_fs(char *name)
 
     // TODO: Read this from the process
     char *cwd = "/";
-    char path = canonicalize_path(cwd, name);
+    char *path = canonicalize_path(cwd, name);
 
     char *parent_path = malloc(strlen(path) + 4);
     sprintf(parent_path, "%s/..", path);
@@ -763,7 +763,7 @@ int symlink_fs(char *target, char *name)
 
     // TODO: Read this from the process
     char *cwd = "/";
-    char path = canonicalize_path(cwd, name);
+    char *path = canonicalize_path(cwd, name);
 
     char *parent_path = malloc(strlen(path) + 4);
     sprintf(parent_path, "%s/..", path);
@@ -893,6 +893,7 @@ void vfs_install(void)
 
 static spinlock_t vfs_slock = {0, 0};
 
+// TODO: Rework the return value from this function
 void *vfs_mount(char *path, fs_node_t *local_root)
 {
     printf("[VFS] Mounting %s to [%s]\n", local_root->name, path);
@@ -940,7 +941,7 @@ void *vfs_mount(char *path, fs_node_t *local_root)
         if (root->file)
         {
             printf("[VFS] vfs_mount: Path is already mounted\n");
-            return -1;
+            return NULL;
         }
 
         root->file = local_root;
@@ -993,7 +994,7 @@ void *vfs_mount(char *path, fs_node_t *local_root)
 
         if (ent->file)
         {
-            return -1;
+            return NULL;
         }
 
         ent->file = local_root;
@@ -1006,6 +1007,8 @@ void *vfs_mount(char *path, fs_node_t *local_root)
     spinlock_unlock(&vfs_slock);
 
     printf("[VFS] Mounting Done!\n");
+
+    return NULL;
 }
 
 void vfs_lock(fs_node_t *node)

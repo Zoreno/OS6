@@ -1,10 +1,10 @@
 /**
- * @file pci.h
+ * @file usb_registry.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-18
+ * @date 2019-04-20
  * 
- * @brief PCI device listing
+ * @brief USB definitions for device registration
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,34 +20,33 @@
  * 
  */
 
-#ifndef _PCI_H
-#define _PCI_H
+#ifndef _USB_REGISTRY_H
+#define _USB_REGISTRY_H
 
-#include <stdint.h>
+#define USB_CLASS_INTF 0x00
+#define USB_CLASS_AUDIO 0x01
+#define USB_CLASS_COMM 0x02
+#define USB_CLASS_HID 0x03
+#define USB_CLASS_PHYSICAL 0x05
+#define USB_CLASS_IMAGE 0x06
+#define USB_CLASS_PRINTER 0x07
+#define USB_CLASS_STORAGE 0x08
+#define USB_CLASS_HUB 0x09
+#define USB_CLASS_CDC_DATA 0x0a
+#define USB_CLASS_SMART_CARD 0x0b
+#define USB_CLASS_SECURITY 0x0d
+#define USB_CLASS_VIDEO 0x0e
+#define USB_CLASS_HEALTHCARE 0x0f
+#define USB_CLASS_DIAGNOSTIC 0xdc
+#define USB_CLASS_WIRELESS 0xe0
+#define USB_CLASS_MISC 0xef
+#define USB_CLASS_APP 0xfe
+#define USB_CLASS_VENDOR 0xff
 
-#include <pci/pci_device.h>
+#define USB_SUBCLASS_BOOT 0x01
 
-extern pci_device_list_t *device_list;
-
-typedef struct _PciBAR
-{
-    union {
-        void *address;
-        uint16_t port;
-    };
-
-    uint64_t size;
-    uint32_t flags;
-} PciBAR_t;
-
-typedef struct _PciDriver_t
-{
-    void (*init)(uint32_t id, PciDeviceInfo_t *deviceInfo);
-} PciDriver_t;
-
-void pciInit();
-
-uint32_t pci_get_vga_lfb();
+#define USB_PROTOCOL_KBD 0x01
+#define USB_PROTOCOL_MOUSE 0x02
 
 #endif
 

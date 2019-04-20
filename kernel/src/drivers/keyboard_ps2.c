@@ -1,4 +1,4 @@
-#include <drivers/keyboard.h>
+#include <drivers/keyboard_ps2.h>
 
 #include <arch/arch.h>
 
@@ -457,7 +457,7 @@ uint8_t keyboard_get_last_scan()
 KEYCODE keyboard_get_last_key()
 {
     // Check if scan code is valid
-    return (_scancode != INVALID_SCANCODE) ? ((KEYCODE)_keyboard_scancode_std[_scancode]) : (KEY_UNKNOWN);
+    return (_scancode != INVALID_SCANCODE) ? ((KEYCODE)_keyboard_scancode_std[(size_t)_scancode]) : (KEY_UNKNOWN);
 }
 
 void keyboard_discard_last_key()

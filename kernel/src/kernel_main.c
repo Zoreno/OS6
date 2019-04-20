@@ -21,8 +21,8 @@
 #include <drivers/ide.h>
 #include <drivers/blockdev.h>
 #include <drivers/vbe.h>
-#include <drivers/keyboard.h>
-#include <drivers/mouse.h>
+#include <drivers/keyboard_ps2.h>
+#include <drivers/mouse_ps2.h>
 
 #include <vfs/vfs.h>
 #include <vfs/ext2.h>

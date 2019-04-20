@@ -176,7 +176,7 @@ static uint8_t select_device(ide_device_t *device, int force)
 
     uint8_t tmp = inportb(iobase + ATA_DRV_HEAD);
 
-    if (!force && (tmp ^ (device->position << 4) == 0x10))
+    if (!force && ((tmp ^ (device->position << 4)) == 0x10))
     {
         printf("[IDE] Device already selected\n");
 
@@ -208,7 +208,7 @@ static uint8_t select_device(ide_device_t *device, int force)
 
     uint8_t status;
 
-    while (status = (inportb(iobase + ATA_STATUS) & (ATA_STATUS_BSY | ATA_STATUS_DRQ)))
+    while ((status = (inportb(iobase + ATA_STATUS) & (ATA_STATUS_BSY | ATA_STATUS_DRQ))))
     {
         printf("Status: %#02x\n", status);
 
