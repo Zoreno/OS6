@@ -231,10 +231,10 @@ void mouse_process_packet(mouse_packet *packet)
 {
     // printf("Starting to process mouse packet...\n");
 
-    //printf("Mouse packet:\n");
-    //printf("X: %i, sign: %i, of: %i\n", (int64_t)packet->x_movement, packet->x_sign, packet->x_overflow);
-    //printf("Y: %i, sign: %i, of: %i\n", (int64_t)packet->y_movement, packet->y_sign, packet->y_overflow);
-    //printf("Buttons: l: %i, m: %i, r: %i\n", packet->left_button, packet->middle_button, packet->right_button);
+    printf("Mouse packet:\n");
+    printf("X: %i, sign: %i, of: %i\n", (int64_t)packet->x_movement, packet->x_sign, packet->x_overflow);
+    printf("Y: %i, sign: %i, of: %i\n", (int64_t)packet->y_movement, packet->y_sign, packet->y_overflow);
+    printf("Buttons: l: %i, m: %i, r: %i\n", packet->left_button, packet->middle_button, packet->right_button);
 
     //=========================================================
     // Check validity of packet
@@ -518,7 +518,6 @@ void mouse_irq_handler(system_stack_t *regs)
     // Check if the data was an ack signal.
     if (data == 0xFA)
     {
-        // printf("Mouse got ACK");
         mouse_ack_recieved = 1;
 
         return;
@@ -564,7 +563,44 @@ void mouse_irq_handler(system_stack_t *regs)
 
     // This will print debug info.
     //printf("Handled mouse packet: x_[%i], y_[%i],z_[%i] buttons[%i]\n",
-    //       mouse_x, mouse_y, mouse_z_vertical, mouse_buttons);
+    //      (int64_t)mouse_x, (int64_t)mouse_y, mouse_z_vertical, mouse_buttons);
+}
+
+static int mouse_reset()
+{
+    mouse_write(MOUSE_COMMAND_RESET);
+
+    while (inportb(MOUSE_DATA_PORT) != 0xFA)
+        ;
+    uint8_t ret1 = inportb(MOUSE_DATA_PORT);
+    uint8_t ret2 = inportb(MOUSE_DATA_PORT);
+
+    if (ret1 == 0xAA && ret2 == 0x00)
+    {
+        return 0;
+    }
+
+    printf("[MOUSE] reset failed\n");
+
+    return 1;
+}
+
+static void mouse_set_scaling(int enable)
+{
+    mouse_write(enable ? MOUSE_SET_SCALING_2_1 : MOUSE_SET_SCALING_1_1);
+
+    mouse_wait_for_ack();
+}
+
+static void mouse_set_resolution(uint8_t res)
+{
+    mouse_write(MOUSE_COMMAND_SET_RESOLUTION);
+
+    mouse_wait_for_ack();
+
+    mouse_write(res);
+
+    mouse_wait_for_ack();
 }
 
 void mouse_install()
@@ -573,6 +609,12 @@ void mouse_install()
 
     set_irq_handler(12, mouse_irq_handler);
     clear_mask_interrupt(12);
+
+    if (mouse_reset())
+    {
+        printf("[MOUSE] Failed\n");
+        return;
+    }
 
     // Enable the mouse
     mouse_wait_signal();
@@ -617,10 +659,16 @@ void mouse_install()
         }
     }
 
-    mouse_set_sample_freq(80);
+    mouse_set_sample_freq(200);
+
+    mouse_set_scaling(0);
+
+    mouse_set_resolution(MOUSE_RESOLUTION_1_P_MM);
 
     // Enable the package stream
     mouse_write(MOUSE_COMMAND_ENA_PACK_STREAM);
+
+#if 0
 
     switch (mouse_type)
     {
@@ -636,6 +684,8 @@ void mouse_install()
         printf("Mouse\n");
         break;
     }
+
+#endif
 
     printf("[MOUSE] Done\n");
 }

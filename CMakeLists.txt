@@ -282,7 +282,29 @@ add_custom_target(${HDD_NAME}
 # Custom targets for running QEMU
 #==============================================================================
 
-set(QEMU_FLAGS -m 512M -rtc base=localtime -boot d -usb -device usb-ehci -device usb-mouse -device usb-kbd -serial stdio -display sdl -vga std -drive file=${HDD_NAME},format=raw -cdrom ${ISO_IMAGE})
+# Clear flags
+set(QEMU_FLAGS)
+
+# Set memory flags
+set(QEMU_FLAGS ${QEMU_FLAGS} -m 512M)
+
+# Set RTC flags
+set(QEMU_FLAGS ${QEMU_FLAGS} -rtc base=localtime)
+
+# Set boot deivce
+set(QEMU_FLAGS ${QEMU_FLAGS} -boot d)
+
+# Set USB devices
+#set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-ehci -device usb-mouse -device usb-kbd)
+
+# Set serial interface
+set(QEMU_FLAGS ${QEMU_FLAGS} -serial stdio)
+
+# Set display settings
+set(QEMU_FLAGS ${QEMU_FLAGS} -display sdl -vga std)
+
+#Set storage devices
+set(QEMU_FLAGS ${QEMU_FLAGS} -drive file=${HDD_NAME},format=raw -cdrom ${ISO_IMAGE})
 
 add_custom_target(run
     COMMAND export SDL_VIDEO_X11_DGAMOUSE=0
