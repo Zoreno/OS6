@@ -238,6 +238,7 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_driver.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_hub.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_uhci.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_ehci.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
 
@@ -295,7 +296,8 @@ set(QEMU_FLAGS ${QEMU_FLAGS} -rtc base=localtime)
 set(QEMU_FLAGS ${QEMU_FLAGS} -boot d)
 
 # Set USB devices
-#set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-ehci -device usb-mouse -device usb-kbd)
+set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-ehci,id=ehci -device usb-mouse,bus=ehci.0,port=1 -device usb-kbd,bus=ehci.0,port=2)
+#set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-mouse -device usb-kbd)
 
 # Set serial interface
 set(QEMU_FLAGS ${QEMU_FLAGS} -serial stdio)

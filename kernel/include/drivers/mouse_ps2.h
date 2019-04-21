@@ -57,6 +57,8 @@ typedef enum
 
 } mouse_type_t;
 
+void mouse_poll();
+
 void mouse_install();
 
 void mouse_set_sample_freq(uint8_t freq);

@@ -30,6 +30,7 @@
 #include <stdio.h>
 
 #include <usb/usb_uhci.h>
+#include <usb/usb_ehci.h>
 
 pci_device_list_t *device_list = 0;
 
@@ -99,6 +100,7 @@ void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
     const PciDriver_t _pci_driver_table[] =
         {
             {usb_uhci_init},
+            {usb_ehci_init},
             {0},
         };
 

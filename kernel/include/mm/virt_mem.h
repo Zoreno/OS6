@@ -173,6 +173,7 @@ pml4_t *virt_mem_get_current_dir();
 void virt_mem_flush_tlb(virt_addr addr);
 
 void *virt_mem_get_physical_addr(void *addr, pml4_t *dir);
+void *virt_mem_get_physical_addr_cur(void *addr);
 
 pml4_t *virt_mem_create_address_space();
 

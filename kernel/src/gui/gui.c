@@ -61,7 +61,4 @@ void gui_init()
     Window_paint((Window *)desktop, NULL, 1);
 
     register_mouse_moved_handler(gui_mouse_moved_handler);
-
-    for (;;)
-        ;
 }

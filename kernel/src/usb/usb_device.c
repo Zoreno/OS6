@@ -6,6 +6,8 @@
 
 #include <arch/arch.h>
 
+#include <debug/backtrace.h>
+
 usb_device_t *_usb_device_list;
 
 static uint32_t _next_usb_addr;
@@ -54,6 +56,7 @@ int usb_dev_init(usb_device_t *dev)
                          8,
                          &devDesc))
     {
+        backtrace();
         return 0;
     }
 
@@ -69,6 +72,7 @@ int usb_dev_init(usb_device_t *dev)
                          0,
                          0))
     {
+        backtrace();
         return 0;
     }
 
@@ -84,6 +88,7 @@ int usb_dev_init(usb_device_t *dev)
                          sizeof(usb_device_desc_t),
                          &devDesc))
     {
+        backtrace();
         return 0;
     }
 
@@ -203,6 +208,7 @@ int usb_dev_init(usb_device_t *dev)
                              0,
                              0))
         {
+            backtrace();
             return 0;
         }
 
@@ -222,6 +228,7 @@ int usb_dev_init(usb_device_t *dev)
         }
     }
 
+    backtrace();
     return 1;
 }
 

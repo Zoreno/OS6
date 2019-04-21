@@ -494,6 +494,11 @@ void *virt_mem_get_physical_addr(void *addr, pml4_t *dir)
     return (void *)paddr;
 }
 
+void *virt_mem_get_physical_addr_cur(void *addr)
+{
+    return virt_mem_get_physical_addr(addr, virt_mem_get_current_dir());
+}
+
 pml4_t *virt_mem_create_address_space()
 {
     pml4_t *dir = (pml4_t *)phys_mem_alloc_block();

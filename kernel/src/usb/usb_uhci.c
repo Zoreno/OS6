@@ -39,6 +39,7 @@
 #include <pci/pci_io.h>
 
 #include <debug/backtrace.h>
+#include <mm/virt_mem.h>
 
 //=============================================================================
 // Limits
@@ -420,6 +421,8 @@ static uint16_t uhci_reset_port(uhci_controller_t *controller, uint16_t port)
     mdelay(50);
     uhci_port_clr(controller->ioAddr + reg, PORT_RESET);
 
+    uhci_port_set(controller->ioAddr + reg, PORT_ENABLE | PORT_CONNECTION_CHANGE | PORT_ENABLE_CHANGE);
+
     uint16_t status = 0;
 
     for (uint32_t i = 0; i < 10; ++i)
@@ -430,17 +433,20 @@ static uint16_t uhci_reset_port(uhci_controller_t *controller, uint16_t port)
 
         if (~status & PORT_CONNECTION)
         {
+            printf("[UHCI] No device at port %i\n", port);
             break;
         }
 
         if (status & (PORT_ENABLE_CHANGE | PORT_CONNECTION_CHANGE))
         {
+            printf("[UHCI] Port change ack %i\n", port);
             uhci_port_clr(controller->ioAddr + reg, PORT_ENABLE_CHANGE | PORT_CONNECTION_CHANGE);
             continue;
         }
 
         if (status & PORT_ENABLE)
         {
+            printf("[UHCI] Enabled port %i\n", port);
             break;
         }
 
@@ -638,6 +644,10 @@ void usb_uhci_init(uint32_t id, PciDeviceInfo_t *devInfo)
     memset(hc->qhPool, 0, sizeof(uhci_qh_t) * MAX_QH);
     memset(hc->tdPool, 0, sizeof(uhci_td_t) * MAX_TD);
 
+    outportw(hc->ioAddr + REG_CMD, CMD_GRESET);
+    mdelay(50);
+    outportw(hc->ioAddr + REG_CMD, 0);
+
     uhci_qh_t *qh = uhci_alloc_qh(hc);
     qh->head = TD_PTR_TERMINATE;
     qh->element = TD_PTR_TERMINATE;
@@ -657,12 +667,20 @@ void usb_uhci_init(uint32_t id, PciDeviceInfo_t *devInfo)
     outportw(hc->ioAddr + REG_INTR, 0);
 
     outportw(hc->ioAddr + REG_FRNUM, 0);
-    outportl(hc->ioAddr + REG_FRBASEADD, (uint32_t)hc->frameList);
+    outportl(hc->ioAddr + REG_FRBASEADD, (uint32_t)virt_mem_get_physical_addr(hc->frameList, virt_mem_get_current_dir()));
     outportw(hc->ioAddr + REG_SOFMOD, 0x40);
 
     outportw(hc->ioAddr + REG_STS, 0xFFFF);
 
-    outportw(hc->ioAddr + REG_CMD, CMD_RS);
+    outportw(hc->ioAddr + REG_CMD, CMD_RS | CMD_CF | CMD_MAXP);
+
+    outportw(hc->ioAddr + REG_CMD, CMD_RS | CMD_CF | CMD_MAXP | CMD_FGR);
+
+    mdelay(20);
+
+    outportw(hc->ioAddr + REG_CMD, CMD_RS | CMD_CF | CMD_MAXP);
+
+    mdelay(100);
 
     uhci_probe(hc);
 
@@ -672,6 +690,8 @@ void usb_uhci_init(uint32_t id, PciDeviceInfo_t *devInfo)
     controller->poll = uhci_controller_poll;
 
     usb_set_controller_list(controller);
+
+    printf("[USB] UHCI Done\n");
 }
 
 //=============================================================================

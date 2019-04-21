@@ -603,6 +603,29 @@ static void mouse_set_resolution(uint8_t res)
     mouse_wait_for_ack();
 }
 
+void mouse_poll()
+{
+    mouse_write(MOUSE_COMMAND_SEND);
+
+    mouse_wait_for_ack();
+
+    static union {
+        uint8_t bytes[4];
+        mouse_packet packet;
+    } __attribute__((packed)) u;
+
+    u.bytes[0] = inportb(MOUSE_DATA_PORT);
+    u.bytes[1] = inportb(MOUSE_DATA_PORT);
+    u.bytes[2] = inportb(MOUSE_DATA_PORT);
+
+    if (mouse_type != MOUSE_NORMAL)
+    {
+        u.bytes[4] = inportb(MOUSE_DATA_PORT);
+    }
+
+    mouse_process_packet(&u.packet);
+}
+
 void mouse_install()
 {
     printf("[MOUSE] Initializing...\n");
@@ -625,8 +648,9 @@ void mouse_install()
     outportb(MOUSE_CONTROL_PORT, MOUSE_COMMAND_GET_COMPAQ_STATUS);
 
     uint8_t status = mouse_read();
-    uint8_t mod_status = status | 0x02; // Enable IRQ
-    mod_status &= ~0x20;                // Disable Mouse clock
+    uint8_t mod_status = status;
+    mod_status |= 0x02;  // Enable IRQ
+    mod_status &= ~0x20; // Disable Mouse clock
 
     mouse_wait_signal();
     outportb(MOUSE_CONTROL_PORT, MOUSE_COMMAND_SET_COMPAQ_STATUS);
