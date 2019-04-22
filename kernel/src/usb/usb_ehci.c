@@ -233,6 +233,44 @@ typedef struct _ehci_qh_t
 #define QH_CAP_MULT_MASK 0xc0000000 // High-Bandwidth Pipe Multiplier
 #define QH_CAP_MULT_SHIFT 30
 
+static void ehci_print_queue_head(ehci_qh_t *qh)
+{
+    printf("=========================================================================\n");
+    printf("[EHCI] Queue Head %#08x\n\n", qh);
+
+    printf("Queue Head Horizontal pointer: %#08x\n", qh->qhlp & ~0xF);
+    printf("Type: %i\n", (qh->qhlp & 0b110) >> 1);
+    printf("Terminate: %i\n\n", qh->qhlp & 0b1);
+
+    printf("NAK Count reload: %i\n", (qh->ch & QH_CH_NAK_RL_MASK) >> QH_CH_NAK_RL_SHIFT);
+    printf("Control endpoint: %i\n", (qh->ch & QH_CH_CONTROL) > 0 ? 1 : 0);
+    printf("Max packet length: %i\n", (qh->ch & QH_CH_MPL_MASK) >> QH_CH_MPL_SHIFT);
+    printf("Head of reclamation list: %i\n", (qh->ch & QH_CH_H) > 0 ? 1 : 0);
+    printf("Data toggle control: %i\n", (qh->ch & QH_CH_DTC) > 0 ? 1 : 0);
+    printf("Endpoint speed: %i\n", (qh->ch & QH_CH_ENDP_MASK) >> QH_CH_ENDP_SHIFT);
+    printf("Inactive on next transaction: %i\n", (qh->ch & QH_CH_INACTIVE) > 0 ? 1 : 0);
+    printf("Device address: %i\n\n", (qh->ch & QH_CH_DEVADDR_MASK));
+
+    printf("High BW Multiplier: %i\n", (qh->ch & QH_CAP_MULT_MASK) >> QH_CAP_MULT_SHIFT);
+    printf("Port number: %i\n", (qh->ch & QH_CAP_PORT_MASK) >> QH_CAP_PORT_SHIFT);
+    printf("Hub addr: %i\n", (qh->ch & QH_CAP_HUB_ADDR_MASK) >> QH_CAP_HUB_ADDR_SHIFT);
+    printf("Split completion: %i\n", (qh->ch & QH_CAP_SPLIT_C_MASK) >> QH_CAP_SPLIT_C_SHIFT);
+    printf("Interrupt schedule mask: %i\n\n", (qh->ch & QH_CAP_INT_SCHED_MASK) >> QH_CAP_INT_SCHED_SHIFT);
+
+    printf("Ping: %i\n", (qh->token & TD_TOK_PING) > 0 ? 1 : 0);
+    printf("STS: %i\n", (qh->token & TD_TOK_STS) > 0 ? 1 : 0);
+    printf("MMF: %i\n", (qh->token & TD_TOK_MMF) > 0 ? 1 : 0);
+    printf("XACT: %i\n", (qh->token & TD_TOK_XACT) > 0 ? 1 : 0);
+    printf("Babble: %i\n", (qh->token & TD_TOK_BABBLE) > 0 ? 1 : 0);
+    printf("Databuffer: %i\n", (qh->token & TD_TOK_DATABUFFER) > 0 ? 1 : 0);
+    printf("Halted: %i\n", (qh->token & TD_TOK_HALTED) > 0 ? 1 : 0);
+    printf("Active: %i\n", (qh->token & TD_TOK_ACTIVE) > 0 ? 1 : 0);
+    printf("PID: %i\n", (qh->token & TD_TOK_PID_MASK) >> TD_TOK_PID_SHIFT);
+    printf("Cerr: %i\n", (qh->token & TD_TOK_CERR_MASK) >> TD_TOK_CERR_SHIFT);
+    printf("Len: %i\n", (qh->token & TD_TOK_LEN_MASK) >> TD_TOK_LEN_SHIFT);
+    printf("=========================================================================\n");
+}
+
 typedef struct _ehci_controller_t
 {
     ehci_cap_regs_t *capRegs;
@@ -296,6 +334,9 @@ static void ehci_insert_async_qh(ehci_qh_t *list, ehci_qh_t *qh)
     end->qhlp = (uint32_t)(uintptr_t)qh | PTR_QH;
 
     link_before(&list->qhLink, &qh->qhLink);
+
+    ehci_print_queue_head(qh);
+    ehci_print_queue_head(end);
 }
 
 static void ehci_insert_periodic_qh(ehci_qh_t *list, ehci_qh_t *qh)
@@ -507,6 +548,8 @@ static void ehci_wait_for_qh(ehci_controller_t *hc, ehci_qh_t *qh)
 {
     printf("[EHCI] Waiting for QH\n");
 
+    //backtrace();
+
     usb_transfer_t *t = qh->transfer;
 
     while (!t->complete)
@@ -630,6 +673,7 @@ static void ehci_dev_control(usb_device_t *dev, usb_transfer_t *t)
     toggle = 1;
 
     packetType = type & RT_DEV_TO_HOST ? USB_PACKET_OUT : USB_PACKET_IN;
+
     ehci_init_td(td, prev, toggle, packetType, 0, 0);
 
     ehci_qh_t *qh = ehci_alloc_qh(hc);
@@ -638,14 +682,13 @@ static void ehci_dev_control(usb_device_t *dev, usb_transfer_t *t)
 
     ehci_insert_async_qh(hc->asyncQH, qh);
 
-    for (;;)
-        ;
-
     ehci_wait_for_qh(hc, qh);
 }
 
 static void ehci_dev_intr(usb_device_t *dev, usb_transfer_t *t)
 {
+    backtrace();
+
     ehci_controller_t *hc = (ehci_controller_t *)dev->hc;
 
     uint32_t speed = dev->speed;
@@ -659,6 +702,8 @@ static void ehci_dev_intr(usb_device_t *dev, usb_transfer_t *t)
     {
         t->success = 0;
         t->complete = 1;
+
+        return;
     }
 
     ehci_td_t *head = td;
@@ -779,20 +824,6 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
         printf("TD misaligned\n");
     }
 
-    printf("[EHCI] Resetting controller\n");
-
-    hc->opRegs->usbCmd &= ~CMD_RS;
-
-    while (!(hc->opRegs->usbSts & STS_HCHALTED))
-        ;
-
-    hc->opRegs->usbCmd |= CMD_HCRESET;
-
-    while (hc->opRegs->usbCmd & CMD_HCRESET)
-        ;
-
-    printf("[EHCI] Controller reset\n");
-
     memset(hc->qhPool, 0, sizeof(ehci_qh_t) * MAX_QH);
     memset(hc->tdPool, 0, sizeof(ehci_td_t) * MAX_TD);
 
@@ -804,7 +835,7 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
     qh->caps = 0;
     qh->curLink = 0;
     qh->nextLink = PTR_TERMINATE;
-    qh->altLink = 0;
+    qh->altLink = PTR_TERMINATE;
     qh->token = 0;
 
     for (uint32_t i = 0; i < 5; ++i)
@@ -818,6 +849,8 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
     qh->qhLink.next = &qh->qhLink;
 
     hc->asyncQH = qh;
+
+    ehci_print_queue_head(hc->asyncQH);
 
     printf("[EHCI] Allocating PERIODIC QH\n");
 
@@ -842,12 +875,28 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
 
     hc->periodicQH = qh;
 
+    ehci_print_queue_head(hc->periodicQH);
+
     printf("[EHCI] Creating framelist\n");
 
     for (uint32_t i = 0; i < 1024; ++i)
     {
         hc->frameList[i] = PTR_QH | (uint32_t)(uintptr_t)qh;
     }
+
+    printf("[EHCI] Resetting controller\n");
+
+    hc->opRegs->usbCmd &= ~CMD_RS;
+
+    while (!(hc->opRegs->usbSts & STS_HCHALTED))
+        mdelay(10);
+
+    hc->opRegs->usbCmd |= CMD_HCRESET;
+
+    while (hc->opRegs->usbCmd & CMD_HCRESET)
+        mdelay(10);
+
+    printf("[EHCI] Controller reset\n");
 
     hc->capRegs->hccParams |= (HCCPARAMS_64_BIT);
 
@@ -892,7 +941,7 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
 
     hc->opRegs->usbSts = 0x3F;
 
-    hc->opRegs->usbCmd = (8 << CMD_ITC_SHIFT) | CMD_ASE | CMD_RS;
+    hc->opRegs->usbCmd = (8 << CMD_ITC_SHIFT) | CMD_PSE | CMD_RS;
 
     printf("[EHCI] Enabling Host controller\n");
 
@@ -908,6 +957,9 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
     ehci_probe(hc);
 
     printf("[EHCI] Allocating controller\n");
+
+    for (;;)
+        ;
 
     usb_controller_t *controller = (usb_controller_t *)malloc(sizeof(usb_controller_t));
 

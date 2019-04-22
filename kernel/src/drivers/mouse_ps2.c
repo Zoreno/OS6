@@ -231,10 +231,10 @@ void mouse_process_packet(mouse_packet *packet)
 {
     // printf("Starting to process mouse packet...\n");
 
-    printf("Mouse packet:\n");
-    printf("X: %i, sign: %i, of: %i\n", (int64_t)packet->x_movement, packet->x_sign, packet->x_overflow);
-    printf("Y: %i, sign: %i, of: %i\n", (int64_t)packet->y_movement, packet->y_sign, packet->y_overflow);
-    printf("Buttons: l: %i, m: %i, r: %i\n", packet->left_button, packet->middle_button, packet->right_button);
+    //printf("Mouse packet:\n");
+    //printf("X: %i, sign: %i, of: %i\n", (int64_t)packet->x_movement, packet->x_sign, packet->x_overflow);
+    //printf("Y: %i, sign: %i, of: %i\n", (int64_t)packet->y_movement, packet->y_sign, packet->y_overflow);
+    //printf("Buttons: l: %i, m: %i, r: %i\n", packet->left_button, packet->middle_button, packet->right_button);
 
     //=========================================================
     // Check validity of packet

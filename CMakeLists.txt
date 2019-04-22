@@ -286,6 +286,8 @@ add_custom_target(${HDD_NAME}
 # Clear flags
 set(QEMU_FLAGS)
 
+#set(QEMU_FLAGS ${QEMU_FLAGS} --trace events=/tmp/events)
+
 # Set memory flags
 set(QEMU_FLAGS ${QEMU_FLAGS} -m 512M)
 
@@ -296,14 +298,14 @@ set(QEMU_FLAGS ${QEMU_FLAGS} -rtc base=localtime)
 set(QEMU_FLAGS ${QEMU_FLAGS} -boot d)
 
 # Set USB devices
-set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-ehci,id=ehci -device usb-mouse,bus=ehci.0,port=1 -device usb-kbd,bus=ehci.0,port=2)
+#set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-ehci,id=ehci -device usb-mouse,bus=ehci.0,port=1 -device usb-kbd,bus=ehci.0,port=2)
 #set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-mouse -device usb-kbd)
 
 # Set serial interface
 set(QEMU_FLAGS ${QEMU_FLAGS} -serial stdio)
 
 # Set display settings
-set(QEMU_FLAGS ${QEMU_FLAGS} -display sdl -vga std)
+set(QEMU_FLAGS ${QEMU_FLAGS} -vga std)
 
 #Set storage devices
 set(QEMU_FLAGS ${QEMU_FLAGS} -drive file=${HDD_NAME},format=raw -cdrom ${ISO_IMAGE})

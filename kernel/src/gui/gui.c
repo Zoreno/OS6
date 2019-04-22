@@ -8,6 +8,8 @@
 #include <gui/window.h>
 #include <gui/context.h>
 
+#include <arch/arch.h>
+
 Desktop *desktop;
 
 void gui_mouse_callback(uint16_t mouse_x, uint16_t mouse_y, uint8_t buttons);
@@ -58,7 +60,11 @@ void gui_init()
         0,
         "Window 1");
 
-    Window_paint((Window *)desktop, NULL, 1);
+    //register_mouse_moved_handler(gui_mouse_moved_handler);
 
-    register_mouse_moved_handler(gui_mouse_moved_handler);
+    while (1)
+    {
+        Window_paint((Window *)desktop, NULL, 1);
+        mdelay(1000);
+    }
 }

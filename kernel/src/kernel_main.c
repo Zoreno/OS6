@@ -218,7 +218,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     sti();
 
     keyboard_install();
-    mouse_install();
+    //mouse_install();
 
     kheap_init();
 
