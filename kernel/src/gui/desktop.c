@@ -397,9 +397,33 @@ void Desktop_paint_handler(Window *desktop_window)
         desktop_window->context,
         0,
         0,
-        desktop_window->context->width,
-        desktop_window->context->height,
-        0xFFFF9933);
+        desktop_window->context->width / 2,
+        desktop_window->context->height / 2,
+        0xFF69BEEF);
+
+    Context_fill_rect(
+        desktop_window->context,
+        desktop_window->context->width / 2,
+        0,
+        desktop_window->context->width / 2,
+        desktop_window->context->height / 2,
+        0xFFBEEF69);
+
+    Context_fill_rect(
+        desktop_window->context,
+        0,
+        desktop_window->context->height / 2,
+        desktop_window->context->width / 2,
+        desktop_window->context->height / 2,
+        0xFFBEEF69);
+
+    Context_fill_rect(
+        desktop_window->context,
+        desktop_window->context->width / 2,
+        desktop_window->context->height / 2,
+        desktop_window->context->width / 2,
+        desktop_window->context->height / 2,
+        0xFF69BEEF);
 }
 
 Window *Desktop_create_window(

@@ -24,8 +24,8 @@ void arch_initialize()
 
     printf("[ARCH] Initializing PIT\n");
 
-    arch_x86_64_initialize_pit();
-    arch_x86_64_pit_start_counter(100, ARCH_X86_64_PIT_OCW_COUNTER_0, ARCH_X86_64_PIT_OCW_MODE_SQUAREWAVEGEN);
+    //arch_x86_64_initialize_pit();
+    //arch_x86_64_pit_start_counter(100, ARCH_X86_64_PIT_OCW_COUNTER_0, ARCH_X86_64_PIT_OCW_MODE_SQUAREWAVEGEN);
 
     printf("[ARCH] PIT Done!\n");
 

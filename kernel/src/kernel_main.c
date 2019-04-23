@@ -110,8 +110,6 @@ ISO9660
  . May be used to install the OS on HDD
 
 VFS
- - Create zero device
- - Create null device
  - Create random device
  - Create procfs
  - Fix proper listing of mounted paths
@@ -126,11 +124,20 @@ Kernel terminal
 
 GUI
  - Double buffering (SIMD-blit)
- - Buttons
- - Alt-bars
- - Textbox
- - Text rendering
- - Application ownership (add window to process resource table)
+ - Widgets
+   - Buttons
+   - Alt-bars
+   - Textbox
+   - Label
+   - Checkbox
+   - Radio button
+   - Scroll bar
+   - Panels and tabs
+   - Canvas (rendering area)
+   - Progress bar
+   - Slider
+   - Dropdown
+ - Application ownership (add window to process resource table, unique window handle)
  - Input queue
  - Scroll
  - Change theme
@@ -141,12 +148,18 @@ GUI
  - Allow application to get rendering bitmap
  - Add debug limit checking in context
  - Create message box framework
+ - Window Icon
+ - Sizing problem
+ - Separate horizontal and vertical resize
+ - Context menu
+ - Window settings as separate struct
+ - Window Events that the application can subscribe to
 
 Applications
  - terminal
  - cat
  - cp
- - ehco
+ - echo
  - date
  - true
  - false

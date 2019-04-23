@@ -104,7 +104,7 @@ void vbe_bochs_set_gfx(uint16_t width, uint16_t height, uint16_t bpp)
     _vbe_current_context.width = width;
     _vbe_current_context.height = height;
     _vbe_current_context.bpp = bpp;
-    _vbe_current_context.framebuffer_p = (uint64_t)pci_get_vga_lfb();
+    _vbe_current_context.framebuffer_p = (uint64_t)pci_get_vga_lfb() & ~0xF;
     _vbe_current_context.framebuffer_v = (uint64_t)0xE0000000 | (_vbe_current_context.framebuffer_p & 0xFFF);
 
     // TODO_ Get page size from virtmem
