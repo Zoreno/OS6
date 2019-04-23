@@ -14,17 +14,41 @@ Desktop *desktop;
 
 void gui_mouse_callback(uint16_t mouse_x, uint16_t mouse_y, uint8_t buttons);
 
+static uint8_t buttons;
+static uint16_t mouse_x;
+static uint16_t mouse_y;
+
+void gui_mouse_button_handler(mouse_button_event_t *ev)
+{
+    if (ev->action == MOUSE_ACTION_PRESS)
+    {
+        buttons |= ev->button & 0xF;
+    }
+    else if (ev->action == MOUSE_ACTION_RELEASE)
+    {
+        buttons &= ~(ev->button & 0xF);
+    }
+
+    gui_mouse_callback(mouse_x, mouse_y, buttons);
+}
+
 void gui_mouse_moved_handler(mouse_moved_event_t *ev)
 {
-    //printf("Mouse pos: %i,%i\n", (int64_t)ev->x, (int64_t)-ev->y);
-    //printf("Mouse mov: %i,%i\n", (int64_t)ev->dx, (int64_t)-ev->dy);
-    gui_mouse_callback(ev->x, -ev->y, 0);
+    printf("Mouse pos: %i,%i\n", (int64_t)ev->x, (int64_t)-ev->y);
+    printf("Mouse mov: %i,%i\n", (int64_t)ev->dx, (int64_t)-ev->dy);
+
+    mouse_x = ev->x;
+    mouse_y = -ev->y;
+
+    gui_mouse_callback(ev->x, -ev->y, buttons);
 }
 
 void gui_mouse_callback(uint16_t mouse_x, uint16_t mouse_y, uint8_t buttons)
 {
     Desktop_process_mouse(desktop, mouse_x, mouse_y, buttons);
 }
+
+extern int timer_updated;
 
 void gui_init()
 {
@@ -51,6 +75,7 @@ void gui_init()
 
     desktop = Desktop_new(context);
 
+    cli();
     Desktop_create_window(
         (Window *)desktop,
         10,
@@ -60,11 +85,33 @@ void gui_init()
         0,
         "Window 1");
 
-    //register_mouse_moved_handler(gui_mouse_moved_handler);
+    Desktop_create_window(
+        (Window *)desktop,
+        400,
+        10,
+        300,
+        200,
+        0,
+        "Window 2");
+
+    sti();
+
+    register_mouse_moved_handler(gui_mouse_moved_handler);
+    register_mouse_button_handler(gui_mouse_button_handler);
 
     while (1)
     {
-        Window_paint((Window *)desktop, NULL, 1);
-        mdelay(1000);
+        if (timer_updated)
+        {
+            timer_updated = 0;
+            cli();
+            //Window_paint((Window *)desktop, NULL, 1);
+            Desktop_invalidate_start_bar(desktop);
+            sti();
+        }
+        else
+        {
+            __asm__ volatile("hlt");
+        }
     }
 }

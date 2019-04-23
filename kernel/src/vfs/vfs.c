@@ -34,6 +34,9 @@
 
 #include <debug/backtrace.h>
 
+#include <vfs/nulldev.h>
+#include <vfs/zerodev.h>
+
 fs_node_t *fs_root = 0;
 tree_t *fs_tree = 0;
 
@@ -541,6 +544,7 @@ fs_node_t *get_mount_point(char *path, size_t path_depth, char **outpath, uint32
 
                 if (ent->file)
                 {
+
                     _tree_depth = _depth;
                     last = ent->file;
                     *outpath = at;
@@ -888,6 +892,9 @@ void vfs_install(void)
 
     tree_set_root(fs_tree, root);
 
+    null_dev_init();
+    zero_dev_init();
+
     printf("[VFS] Installed!\n");
 }
 
@@ -1163,7 +1170,8 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
             }
         }
 
-        //printf("[VFS] Path offset: %#016x, path+pathlen: %#016x\n", path_offset, path + path_len);
+        //printf("[VFS] Path offset: %#016x (%s), path+pathlen: %#016x (%s)\n",
+        //       path_offset, path_offset, path + path_len, path + path_len);
 
         if (path_offset >= path + path_len)
         {
@@ -1175,7 +1183,7 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
             return node_ptr;
         }
 
-        //printf("depth: %i, path_depth: %i\n", depth, path_depth);
+        printf("depth: %i, path_depth: %i\n", depth, path_depth);
         if (depth == path_depth)
         {
             //printf("Opening file 2...\n");

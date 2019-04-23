@@ -206,6 +206,8 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/serial/serial.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/vfs.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/ext2.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/nulldev.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/zerodev.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/cmos/cmos_rtc.c)
 
@@ -287,6 +289,8 @@ add_custom_target(${HDD_NAME}
 set(QEMU_FLAGS)
 
 #set(QEMU_FLAGS ${QEMU_FLAGS} --trace events=/tmp/events)
+
+set(QEMU_FLAGS ${QEMU_FLAGS} -cpu Nehalem)
 
 # Set memory flags
 set(QEMU_FLAGS ${QEMU_FLAGS} -m 512M)

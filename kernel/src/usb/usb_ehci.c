@@ -941,7 +941,7 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
 
     hc->opRegs->usbSts = 0x3F;
 
-    hc->opRegs->usbCmd = (8 << CMD_ITC_SHIFT) | CMD_PSE | CMD_RS;
+    hc->opRegs->usbCmd = (8 << CMD_ITC_SHIFT) | CMD_PSE | CMD_ASE | CMD_RS;
 
     printf("[EHCI] Enabling Host controller\n");
 

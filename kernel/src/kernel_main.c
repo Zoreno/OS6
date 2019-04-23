@@ -41,6 +41,142 @@
 
 #include <gui/gui.h>
 
+/*
+
+Global todo list:
+
+Kernel
+ - Kernel Events
+   - Mouse moved
+   - Keyboard pressed
+   - Time tick
+ - Proper shutdown handling
+
+Libk
+ - time.h
+ - wchar
+
+Libkm (needed?)
+ - float
+ - simd
+
+ACPI
+ - Shutdown
+
+Multitasking:
+ - Kernel tasks
+ - Threads
+ - Processes
+ - Mutexes/Semaphores
+ - Shared memory
+ - Float/SIMD state save/restore
+
+Load Executables:
+ - ELF files
+ - Libraries
+    - System calls
+    - libc
+    - libc++
+    - c++ support lib
+    - unistd
+    - libos6 (Window management, keyboard input)
+    - libutil
+    - getopt
+    - 2D rendering library (SFML-like)
+    - 3D rendering library (Softrender/OpenGL-like)
+ - Command line parameters
+ - Working directory
+
+USB Drivers
+ - Get the drivers to work
+ - Mouse
+ - Keyboard
+ - Mass storage device
+
+Networking
+ - E1000 Network card
+ - Netstack
+ - Sockets
+
+SIMD
+ - Enable SIMD
+ - xmmintrin.h and such
+
+ATAPI
+ - Driver
+
+ISO9660
+ - FS on OS image
+ . May be used to install the OS on HDD
+
+VFS
+ - Create zero device
+ - Create null device
+ - Create random device
+ - Create procfs
+ - Fix proper listing of mounted paths
+ - Pipes
+
+Sound
+ - Sound card driver
+ - Kernel interface
+
+Kernel terminal
+ - Launch applications
+
+GUI
+ - Double buffering (SIMD-blit)
+ - Buttons
+ - Alt-bars
+ - Textbox
+ - Text rendering
+ - Application ownership (add window to process resource table)
+ - Input queue
+ - Scroll
+ - Change theme
+ - Change time format
+ - Color struct and conversion functions
+ - Image loading
+ - Change background
+ - Allow application to get rendering bitmap
+ - Add debug limit checking in context
+ - Create message box framework
+
+Applications
+ - terminal
+ - cat
+ - cp
+ - ehco
+ - date
+ - true
+ - false
+ - head
+ - kill
+ - killall
+ - ls
+ - mkdir
+ - mv
+ - rm
+ - readelf
+ - reboot
+ - shutdown
+ - pwd
+ - sleep
+ - sort
+ - stat
+ - touch
+ - uname
+ - ln
+ - chmod
+ - chown
+
+ - jedit
+ - jinterp
+ - jweb
+ - calculator
+
+*/
+
 extern void run_unit_tests();
 
 // https://www.gnu.org/software/grub/manual/multiboot2/html_node/kernel_002ec.html
@@ -218,7 +354,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     sti();
 
     keyboard_install();
-    //mouse_install();
+    mouse_install();
 
     kheap_init();
 
@@ -230,7 +366,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     pciInit();
 
-    vbe_bochs_set_gfx(1024, 768, 4);
+    vbe_bochs_set_gfx(800, 600, 4);
 
     printf("Kernel initailization done!\n");
 
@@ -289,7 +425,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
 #if 0
 
-    const char *path = "/newdir/testfile3";
+    const char *path = "/dev/zero";
 
     fs_node_t *node = kopen(path, 0);
 
@@ -312,7 +448,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     printf("%s opened!\n", path);
     printf("Size: %i\n", node->length);
 
-    uint32_t size = node->length;
+    uint32_t size = 128;
 
     uint8_t *file = malloc(size);
     int bytes_read;
@@ -330,13 +466,13 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
 #if 0
 
-    const char *pathd = "/";
+    const char *pathd = "/dev";
 
     fs_node_t *noded = kopen(pathd, 0);
 
     if (!noded)
     {
-        printf("Could not open %s", pathd);
+        printf("Could not open %s\n", pathd);
 
         for (;;)
             ;

@@ -568,6 +568,8 @@ static uint8_t get_update_in_progress_flag()
     return status_a.update_in_progress;
 }
 
+int timer_updated = 0;
+
 static void handle_update_irq()
 {
     subticks = 0;
@@ -581,6 +583,8 @@ static void handle_update_irq()
     RTC_time_to_string(time_str, &time);
 
     //printf("[RTC] Current time: (%s)\n", time_str);
+
+    timer_updated = 1;
 }
 
 static void handle_alarm_irq()
@@ -602,19 +606,19 @@ static void RTC_irq_handler(system_stack_t *regs)
 
     status_c = read_status_c();
 
-    if (status_c.update_irq)
+    if (status_c.periodic_irq)
+    {
+        handle_periodic_irq();
+    }
+
+    else if (status_c.update_irq)
     {
         handle_update_irq();
     }
 
-    if (status_c.alarm_irq)
+    else if (status_c.alarm_irq)
     {
         handle_alarm_irq();
-    }
-
-    if (status_c.periodic_irq)
-    {
-        handle_periodic_irq();
     }
 }
 
@@ -645,7 +649,7 @@ void RTC_init()
     status_b.daylight_saving = 1;
     status_b.format_24_h = 1;
     status_b.data_mode = 0; // BCD
-    status_b.irq_on_update = 0;
+    status_b.irq_on_update = 1;
     status_b.irq_periodic = 0;
     status_b.irq_on_alarm = 0;
 
