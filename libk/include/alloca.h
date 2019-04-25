@@ -1,10 +1,10 @@
 /**
- * @file _size_t.h
+ * @file alloca.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-25
  * 
- * @brief Defines a type that can reperent an array size
+ * @brief Automatically freed stack memory
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,16 +20,13 @@
  * 
  */
 
-#ifndef _LIBK__SIZE_T_H
-#define _LIBK__SIZE_T_H
+#ifndef _LIBK_ALLOCA_H
+#define _LIBK_ALLOCA_H
 
-// TODO: Check arch. We might compile for 32 bits.
-
-/**
- * @brief The array size type
- * 
- * 
- */
-typedef unsigned long long size_t;
+#ifdef __GNUC__
+#define alloca(size) __builtin_alloca(size)
+#else
+#error alloca requires GCC
+#endif
 
 #endif

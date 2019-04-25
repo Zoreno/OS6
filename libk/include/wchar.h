@@ -1,10 +1,10 @@
 /**
- * @file _size_t.h
+ * @file wchar.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-25
  * 
- * @brief Defines a type that can reperent an array size
+ * @brief Functions working on wide strings
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,16 +20,31 @@
  * 
  */
 
-#ifndef _LIBK__SIZE_T_H
-#define _LIBK__SIZE_T_H
+#ifndef _LIBK_WCHAR_H
+#define _LIBK_WCHAR_H
 
-// TODO: Check arch. We might compile for 32 bits.
+#include <stddef.h>
 
-/**
- * @brief The array size type
- * 
- * 
- */
-typedef unsigned long long size_t;
+int wcwidth(wchar_t c);
+
+wchar_t *wcsncpy(wchar_t *dest, const wchar_t *src, size_t n);
+
+size_t wcslen(const wchar_t *s);
+
+int wcscmp(const wchar_t *s1, const wchar_t *s2);
+
+wchar_t *wcscat(wchar_t *dest, const wchar_t *src);
+
+wchar_t *wcstok(wchar_t *str, const wchar_t *delim, wchar_t **saveptr);
+
+size_t wcsspn(const wchar_t *wcs, const wchar_t *accept);
+
+wchar_t *wcspbrk(const wchar_t *wcs, const wchar_t *accept);
+
+wchar_t *wcschr(const wchar_t *wcs, wchar_t wc);
+
+wchar_t *wcsrchr(const wchar_t *wcs, wchar_t wc);
+
+wchar_t *wcsncat(wchar_t *dest, const wchar_t *src, size_t n);
 
 #endif

@@ -1,10 +1,10 @@
 /**
- * @file _size_t.h
+ * @file wcsrchr.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-25
+ * @date 2019-04-26
  * 
- * @brief Defines a type that can reperent an array size
+ * @brief Wide character last occurance
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,16 +20,21 @@
  * 
  */
 
-#ifndef _LIBK__SIZE_T_H
-#define _LIBK__SIZE_T_H
+#include <wchar.h>
 
-// TODO: Check arch. We might compile for 32 bits.
+wchar_t *wcsrchr(const wchar_t *wcs, wchar_t wc)
+{
+    wchar_t *last = NULL;
 
-/**
- * @brief The array size type
- * 
- * 
- */
-typedef unsigned long long size_t;
+    while (*wcs != 0)
+    {
+        if (*wcs == wc)
+        {
+            last = (wchar_t *)wcs;
+        }
 
-#endif
+        wcs++;
+    }
+
+    return last;
+}

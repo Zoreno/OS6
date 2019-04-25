@@ -1,10 +1,10 @@
 /**
- * @file _size_t.h
+ * @file wcspbrk.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-25
+ * @date 2019-04-26
  * 
- * @brief Defines a type that can reperent an array size
+ * @brief Wide character
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,16 +20,22 @@
  * 
  */
 
-#ifndef _LIBK__SIZE_T_H
-#define _LIBK__SIZE_T_H
+#include <wchar.h>
 
-// TODO: Check arch. We might compile for 32 bits.
+wchar_t *wcspbrk(const wchar_t *wcs, const wchar_t *accept)
+{
+    while (*wcs)
+    {
+        for (const wchar_t *a = accept; *a; ++a)
+        {
+            if (*wcs == *a)
+            {
+                return (wchar_t *)wcs;
+            }
+        }
 
-/**
- * @brief The array size type
- * 
- * 
- */
-typedef unsigned long long size_t;
+        wcs++;
+    }
 
-#endif
+    return NULL;
+}

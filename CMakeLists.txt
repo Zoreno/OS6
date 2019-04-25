@@ -162,6 +162,27 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/puts.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/sprintf.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/vsprintf.c)
 
+# libgen.h header
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/libgen/basename.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/libgen/dirname.c)
+
+# errno.h header
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/errno/errno.c)
+
+# wchar.h header
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcwidth.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcsncpy.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcscmp.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcscat.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcsncat.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcslen.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcscpy.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcsspn.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcspbrk.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcschr.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcsrchr.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcstok.c)
+
 
 target_include_directories(${LIBK} SYSTEM PRIVATE ${LIBK_INCLUDE})
 

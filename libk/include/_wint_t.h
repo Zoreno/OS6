@@ -1,10 +1,10 @@
 /**
- * @file _size_t.h
+ * @file _null.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-25
  * 
- * @brief Defines a type that can reperent an array size
+ * @brief Defines an integer version of the wide character type
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,16 +20,14 @@
  * 
  */
 
-#ifndef _LIBK__SIZE_T_H
-#define _LIBK__SIZE_T_H
-
-// TODO: Check arch. We might compile for 32 bits.
+#ifndef _LIBK__WINT_T_H
+#define _LIBK__WINT_T_H
 
 /**
- * @brief The array size type
+ * @brief Wide int
  * 
  * 
  */
-typedef unsigned long long size_t;
+typedef unsigned int wint_t;
 
 #endif

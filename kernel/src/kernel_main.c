@@ -41,6 +41,8 @@
 
 #include <gui/gui.h>
 
+#include <assert.h>
+
 /*
 
 Global todo list:

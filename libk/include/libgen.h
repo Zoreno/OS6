@@ -1,10 +1,10 @@
 /**
- * @file _size_t.h
+ * @file libgen.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-25
  * 
- * @brief Defines a type that can reperent an array size
+ * @brief Extract file name and directory from path
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,16 +20,10 @@
  * 
  */
 
-#ifndef _LIBK__SIZE_T_H
-#define _LIBK__SIZE_T_H
+#ifndef _LIBK_LIGBEN_H
+#define _LIBK_LIBGEN_H
 
-// TODO: Check arch. We might compile for 32 bits.
-
-/**
- * @brief The array size type
- * 
- * 
- */
-typedef unsigned long long size_t;
+char *basename(char *path);
+char *dirname(char *path);
 
 #endif

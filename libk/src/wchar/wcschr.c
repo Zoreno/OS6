@@ -1,10 +1,10 @@
 /**
- * @file _size_t.h
+ * @file wcschr.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-25
+ * @date 2019-04-26
  * 
- * @brief Defines a type that can reperent an array size
+ * @brief Wide character first occurance
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,16 +20,19 @@
  * 
  */
 
-#ifndef _LIBK__SIZE_T_H
-#define _LIBK__SIZE_T_H
+#include <wchar.h>
 
-// TODO: Check arch. We might compile for 32 bits.
+wchar_t *wcschr(const wchar_t *wcs, wchar_t wc)
+{
+    while (*wcs != wc && *wcs != 0)
+    {
+        wcs++;
+    }
 
-/**
- * @brief The array size type
- * 
- * 
- */
-typedef unsigned long long size_t;
+    if (!*wcs)
+    {
+        return NULL;
+    }
 
-#endif
+    return (wchar_t *)wcs;
+}

@@ -1,10 +1,10 @@
 /**
- * @file _size_t.h
+ * @file assert.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-25
  * 
- * @brief Defines a type that can reperent an array size
+ * @brief C standard library assert macro
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,16 +20,29 @@
  * 
  */
 
-#ifndef _LIBK__SIZE_T_H
-#define _LIBK__SIZE_T_H
+#ifndef _LIBK_ASSERT_H
+#define _LIBK_ASSERT_H
 
-// TODO: Check arch. We might compile for 32 bits.
+#include <stdio.h>
 
-/**
- * @brief The array size type
- * 
- * 
- */
-typedef unsigned long long size_t;
+extern void backtrace();
+extern void cli();
+
+#ifdef OS6_DEBUG
+
+#define ASSERT(statement)                            \
+    if (!statement)                                  \
+    {                                                \
+        printf("[ASSERT] Failed: %s\n", #statement); \
+        backtrace();                                 \
+        cli();                                       \
+        __asm__ volatile("hlt");                     \
+    }
+
+#else
+
+#define ASSERT(statement) ((void)0)
+
+#endif
 
 #endif
