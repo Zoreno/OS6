@@ -7,6 +7,7 @@
 #include <arch/x86-64/idt.h>
 #include <arch/x86-64/pit.h>
 #include <arch/x86-64/atomic.h>
+#include <arch/x86-64/fpu.h>
 #endif
 
 void arch_initialize()
@@ -28,6 +29,12 @@ void arch_initialize()
     //arch_x86_64_pit_start_counter(100, ARCH_X86_64_PIT_OCW_COUNTER_0, ARCH_X86_64_PIT_OCW_MODE_SQUAREWAVEGEN);
 
     printf("[ARCH] PIT Done!\n");
+
+    printf("[ARCH] Initializing FPU\n");
+
+    arch_x64_64_install_fpu();
+
+    printf("[ARCH] FPU Done!\n");
 
     printf("[ARCH] x64-64 Done! \n");
 #endif

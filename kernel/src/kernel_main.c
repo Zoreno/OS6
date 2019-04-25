@@ -76,10 +76,10 @@ Load Executables:
  - Libraries
     - System calls
     - libc
-    - libc++
+    - libstdc++
     - c++ support lib
     - unistd
-    - libos6 (Window management, keyboard input)
+    - libos6 (Window management, keyboard input, network)
     - libutil
     - getopt
     - 2D rendering library (SFML-like)
@@ -137,7 +137,7 @@ GUI
    - Progress bar
    - Slider
    - Dropdown
- - Application ownership (add window to process resource table, unique window handle)
+ - Application ownership (add window to process resource table, unique window handle, inter-process communication)
  - Input queue
  - Scroll
  - Change theme
