@@ -32,7 +32,7 @@ set(CFLAGS "${CFLAGS} -Wall -Wextra -Werror=implicit-function-declaration -Wno-u
 set(CFLAGS "${CFLAGS} -ffreestanding -nostdlib -nostdinc -nodefaultlibs")
 
 # Disable language features
-set(CFLAGS "${CFLAGS} -fno-builtin -finline-functions -fno-stack-protector -mno-sse -fno-exceptions")
+set(CFLAGS "${CFLAGS} -fno-builtin -finline-functions -fno-stack-protector -fno-exceptions")
 
 set(ASMFLAGS "")
 
@@ -183,6 +183,58 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcschr.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcsrchr.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcstok.c)
 
+# math.h header
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/fmaxf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/fminf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/ceilf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/floorf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/fmodf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/fabsf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/fdimf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/nanf.c)
+
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/rcpf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/sqrtf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/rsqrtf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/log2f.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/logf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/log10f.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/logbf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/pow2f.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/expf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/powf.c)
+
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/sinf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/cosf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/tanf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/atanf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/asinf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/acosf.c)
+
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/sinhf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/coshf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/tanhf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/atanhf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/asinhf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/acoshf.c)
+
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/cscf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/secf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/cotf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/acscf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/asecf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/acotf.c)
+
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/cschf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/sechf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/cothf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/acschf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/asechf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/acothf.c)
+
+# fenv.h header
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/fenv/fegetround.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/fenv/fesetround.c)
 
 target_include_directories(${LIBK} SYSTEM PRIVATE ${LIBK_INCLUDE})
 

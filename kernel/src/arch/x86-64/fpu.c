@@ -5,6 +5,43 @@ void arch_x64_64_set_fpu_cw(const uint16_t cw)
     __asm__ volatile("fldcw %0" ::"m"(cw));
 }
 
+void arch_x64_64_get_fpu_cw(uint16_t *cw)
+{
+    __asm__ volatile("fstcw %0"
+                     : "=m"(*cw));
+}
+
+void arch_x86_64_set_rounding_mode(uint16_t mode)
+{
+    union {
+        uint16_t cwi;
+        arch_x86_64_fpu_cw_t cw;
+    } u;
+
+    if (mode > 3)
+    {
+        return;
+    }
+
+    arch_x64_64_get_fpu_cw(&u.cwi);
+
+    u.cw.rc = mode;
+
+    arch_x64_64_set_fpu_cw(u.cwi);
+}
+
+uint16_t arch_x86_64_get_rounding_mode()
+{
+    union {
+        uint16_t cwi;
+        arch_x86_64_fpu_cw_t cw;
+    } u;
+
+    arch_x64_64_get_fpu_cw(&u.cwi);
+
+    return u.cw.rc;
+}
+
 void arch_x64_64_enable_fpu()
 {
     __asm__ volatile("clts");
