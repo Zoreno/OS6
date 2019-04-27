@@ -1,5 +1,5 @@
 /**
- * @file _ptrdiff.h
+ * @file _ptrdiff_t.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-25

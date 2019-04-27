@@ -25,10 +25,33 @@
 
 #include <stddef.h>
 
+/**
+ * @brief Determine the number of columns needed for the character.
+ * 
+ * @param c Character
+ * 
+ * @return int Number of columns
+ */
 int wcwidth(wchar_t c);
 
+/**
+ * @brief Copies up to n characters of a wide string.
+ * 
+ * @param dest Destination address
+ * @param src Source address
+ * @param n Max number of characters to copy
+ * 
+ * @return Destination address 
+ */
 wchar_t *wcsncpy(wchar_t *dest, const wchar_t *src, size_t n);
 
+/**
+ * @brief Gets the length in characters of the wide string
+ * 
+ * @param s Wide string
+ * 
+ * @return Length of string
+ */
 size_t wcslen(const wchar_t *s);
 
 int wcscmp(const wchar_t *s1, const wchar_t *s2);
