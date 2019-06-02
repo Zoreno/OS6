@@ -150,7 +150,6 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/malloc.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/free.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/calloc.c)
 
-
 # stdio.h header
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/fputc.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/fputs.c)
