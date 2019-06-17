@@ -25,6 +25,10 @@
 #include <drivers/vbe.h>
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include <arch/arch.h>
 
 //=============================================================================
 // Terminal color
@@ -51,7 +55,28 @@ typedef struct _terminal_buffer
     char **lines;
     int num_lines;
 
+    char *input_line;
+    int input_line_size;
+
 } terminal_buffer_t;
+
+terminal_buffer_t *terminal_buffer_create();
+
+terminal_buffer_t *terminal_buffer_create()
+{
+    terminal_buffer_t *buffer = malloc(sizeof(terminal_buffer_t));
+
+    if (!buffer)
+    {
+        return NULL;
+    }
+
+    buffer->user = strdup("zoreno");
+    buffer->group = strdup("ubuntu");
+    buffer->working_directory = strdup("~/Docs/test");
+
+    return buffer;
+}
 
 //=============================================================================
 // Terminal context
@@ -92,6 +117,9 @@ typedef struct _terminal
 {
     terminal_context_t *context;
 
+    int max_lines;
+    int max_cols;
+
     terminal_buffer_t *current_buffer;
 
     terminal_buffer_t *buffers;
@@ -101,8 +129,77 @@ typedef struct _terminal
 
 terminal_t *terminal_create();
 
-terminal_buffer_t *terminal_create_buffer();
-void terminal_destroy_buffer(terminal_buffer_t *buffer);
+terminal_buffer_t *terminal_create_buffer(terminal_t *terminal);
+void terminal_destroy_buffer(terminal_t *terminal, terminal_buffer_t *buffer);
+void terminal_redraw(terminal_t *terminal);
+
+terminal_t *terminal_create()
+{
+    terminal_t *terminal = malloc(sizeof(terminal_t));
+
+    if (!terminal)
+    {
+        return NULL;
+    }
+
+    uint16_t width = vbe_get_width();
+    uint16_t height = vbe_get_height();
+    uint16_t bpp = vbe_get_bpp();
+    uint32_t *framebuffer = (uint32_t *)vbe_get_buffer();
+
+    terminal->context = terminal_context_create(width, height, bpp, framebuffer);
+
+    terminal->max_lines = height / 8;
+    terminal->max_cols = width / 8;
+
+    printf("Max Cols: %i, Max Lines: %i\n", terminal->max_cols, terminal->max_lines);
+
+    terminal_create_buffer(terminal);
+
+    return terminal;
+}
+
+terminal_buffer_t *terminal_create_buffer(terminal_t *terminal)
+{
+    terminal_buffer_t *buffer = terminal_buffer_create();
+
+    if (!buffer)
+    {
+        return NULL;
+    }
+
+    terminal->current_buffer = buffer;
+
+    // TODO: Add to the list of buffers
+
+    return buffer;
+}
+
+void terminal_destroy_buffer(terminal_t *terminal, terminal_buffer_t *buffer)
+{
+}
+
+void terminal_redraw(terminal_t *terminal)
+{
+    static int i = 0;
+
+    vbe_pixel_t black;
+    black.red = 0;
+    black.green = 0;
+    black.blue = 0;
+
+    vbe_pixel_t white;
+    white.red = 255;
+    white.green = 255;
+    white.blue = 255;
+
+    vbe_fill_rect(black, 0, 0, terminal->context->width, 8);
+    char str[100];
+    sprintf(str, "The awesome terminal: %i\n", i++);
+    vbe_print_string(white, 0, 8, str);
+
+    // TODO: Redirect to the current buffer
+}
 
 //=============================================================================
 // External Interface
@@ -112,21 +209,17 @@ static terminal_t *_terminal;
 
 void terminal_init()
 {
-    uint16_t width = vbe_get_width();
-    uint16_t height = vbe_get_height();
-    uint16_t bpp = vbe_get_bpp();
-    uint32_t *framebuffer = (uint32_t *)vbe_get_buffer();
 
-    vbe_pixel_t p;
-
-    p.red = 255;
-    p.green = 255;
-    p.blue = 255;
-
-    vbe_print_string(p, 0, 8, "joakim@os6:~/Documents/OS6$");
+    _terminal = terminal_create();
 
     while (1)
-        ;
+    {
+        cli();
+        terminal_redraw(_terminal);
+        sti();
+
+        mdelay(20);
+    }
 }
 
 //=============================================================================
