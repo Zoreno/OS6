@@ -1,10 +1,10 @@
 /**
- * @file malloc.c
+ * @file realloc.c
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-17
  * 
- * @brief Memory allocation
+ * @brief Realloc memory
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -21,15 +21,10 @@
  */
 
 #include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdio.h>
 
-extern void *kmalloc(size_t size);
+extern void *krealloc(void *ptr, size_t size);
 
-void *malloc(size_t size)
+void *realloc(void *ptr, size_t size)
 {
-    //printf("[Malloc]: %i bytes\n", size);
-
-    return kmalloc(size);
+    return krealloc(ptr, size);
 }

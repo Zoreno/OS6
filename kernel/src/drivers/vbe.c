@@ -346,6 +346,7 @@ void vbe_put_char(vbe_pixel_t pixel, int32_t x, int32_t y, char c)
     }
 }
 
+// TODO: Add support for scaling text
 void vbe_print_string(vbe_pixel_t pixel, int32_t x, int32_t y, char *str)
 {
     int32_t xpos = x;

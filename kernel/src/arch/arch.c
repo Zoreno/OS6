@@ -101,14 +101,14 @@ void outportl(uint16_t port, uint32_t value)
 
 void sti()
 {
-    printf("STI()\n");
+    //printf("STI()\n");
 
     __asm__ volatile("sti");
 }
 
 void cli()
 {
-    printf("CLI()\n");
+    //printf("CLI()\n");
 
     __asm__ volatile("cli");
 }

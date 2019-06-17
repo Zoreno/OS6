@@ -1,3 +1,25 @@
+/**
+ * @file kheap.c
+ * @author Joakim Bertils
+ * @version 0.1
+ * @date 2019-06-17
+ * 
+ * @brief Kernel heap implementation
+ * 
+ * @copyright Copyright (C) 2019,
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
+ * 
+ */
+
 #include <mm/kheap.h>
 #include <mm/phys_mem.h>
 #include <mm/virt_mem.h>
@@ -52,6 +74,7 @@ static void *pmalloc(size_t size, uint64_t alignment);
 static int heap_grow(size_t size, uint8_t *heap_end, int cont);
 static void *kmalloc_imp(size_t size, uint64_t alignment);
 static void kfree_imp(void *addr);
+static void *krealloc_imp(void *addr, size_t size);
 
 //==============================================================================
 // private Functions
@@ -280,6 +303,55 @@ static void kfree_imp(void *addr)
     }
 }
 
+static size_t find_allocated_size(void *addr)
+{
+    if (!addr)
+    {
+        return 0;
+    }
+
+    uint8_t *region_address = (uint8_t *)HEAP_START;
+
+    for (uint64_t i = 0; i < region_count; ++i)
+    {
+        if (region_address == addr && regions[i].res)
+        {
+            return regions[i].size;
+        }
+
+        region_address += regions[i].size;
+    }
+
+    return 0;
+}
+
+static void *krealloc_imp(void *addr, size_t size)
+{
+    size_t old_mem_size = find_allocated_size(addr);
+
+    // The old memory was not allocated
+    if (!old_mem_size)
+    {
+        return NULL;
+    }
+
+    void *new_mem = kmalloc(size);
+
+    // Could not allocate new memory
+    if (!new_mem)
+    {
+        return NULL;
+    }
+
+    // Copy the contents to the new address
+    memcpy(new_mem, addr, old_mem_size);
+
+    // Free the old memory
+    kfree(addr);
+
+    return new_mem;
+}
+
 //==============================================================================
 // Interface functions
 //==============================================================================
@@ -327,6 +399,11 @@ void *kmalloc_a(size_t size, uint64_t alignment)
 void kfree(void *addr)
 {
     kfree_imp(addr);
+}
+
+void *krealloc(void *addr, size_t size)
+{
+    return krealloc_imp(addr, size);
 }
 
 //==============================================================================

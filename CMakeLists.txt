@@ -149,6 +149,7 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/qsort.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/malloc.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/free.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/calloc.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/realloc.c)
 
 # stdio.h header
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/fputc.c)
@@ -297,6 +298,7 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/tree.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/hexdump.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/bitset.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/link.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/sha512.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/listnode.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/list.c)
@@ -305,6 +307,7 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/context.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/window.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/desktop.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/gui.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal_mode.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_controller.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_descriptors.c)

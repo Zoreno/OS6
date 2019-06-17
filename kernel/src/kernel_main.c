@@ -40,6 +40,7 @@
 #include <ctype.h>
 
 #include <gui/gui.h>
+#include <gui/terminal_mode.h>
 
 #include <assert.h>
 
@@ -389,7 +390,8 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     printf("|| Launching GUI...                                                           ||\n");
     printf("================================================================================\n");
 
-    gui_init();
+    //gui_init();
+    terminal_init();
 
 #if 0
 
