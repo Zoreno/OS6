@@ -30,9 +30,6 @@ typedef struct _terminal
 {
     terminal_context_t *context;
 
-    int max_lines;
-    int max_cols;
-
     terminal_buffer_t *current_buffer;
 
     terminal_buffer_t *buffers;
@@ -47,3 +44,7 @@ void terminal_destroy_buffer(terminal_t *terminal, terminal_buffer_t *buffer);
 void terminal_redraw(terminal_t *terminal);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

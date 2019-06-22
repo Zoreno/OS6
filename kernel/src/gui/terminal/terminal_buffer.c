@@ -45,6 +45,10 @@ terminal_buffer_t *terminal_buffer_create()
     buffer->input_line_length = 0;
     buffer->input_line_max_size = 128;
 
+    vector_init(buffer->lines);
+
+    vector_add(buffer->lines, strdup("Hello world"));
+
     return buffer;
 }
 
@@ -83,3 +87,7 @@ void terminal_buffer_delete_input(terminal_buffer_t *buffer)
         buffer->input_line[--buffer->input_line_length] = 0;
     }
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

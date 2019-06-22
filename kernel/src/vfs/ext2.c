@@ -1664,7 +1664,7 @@ static fs_node_t *finddir_ext2(fs_node_t *node, char *name)
 
     inode = read_inode(this, direntry->inode);
 
-    if (!node_from_file(this, inode, direntry, outnode))
+    if (!node_from_file((fs_node_t *)this, inode, direntry, outnode))
     {
         printf("[EXT2] Could not get node from file\n");
 

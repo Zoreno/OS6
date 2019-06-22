@@ -13,6 +13,8 @@ set(CAN_USE_ASSEMBLER TRUE)
 
 enable_language(ASM_NASM)
 
+enable_testing()
+
 #==============================================================================
 # Flags and compiler configuration
 #==============================================================================
@@ -299,9 +301,10 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/hexdump.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/bitset.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/link.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/sha512.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/vector.c)
 
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/listnode.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/list.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/gui_listnode.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/gui_list.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/rect.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/context.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/window.c)
@@ -405,7 +408,7 @@ add_custom_target(debug
     COMMAND export SDL_VIDEO_X11_DGAMOUSE=0
     COMMAND qemu-system-x86_64 -s -S ${QEMU_FLAGS} &
     COMMAND sudo ddd --gdb -command=${CMAKE_SOURCE_DIR}/gdbdebug 2> /dev/null
-    DEPENDS ${ISO_IMAGE}
+    DEPENDS ${ISO_IMAGE} ${HDD_NAME}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
 #==============================================================================

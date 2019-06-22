@@ -1,5 +1,5 @@
 /**
- * @file strncat.c
+ * @file gui_list.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
@@ -20,12 +20,20 @@
  * 
  */
 
-#include <string.h>
-#include <stdint.h>
+#ifndef _LIST_H_
+#define _LIST_H_
 
-char *strncat(char *str1, const char *str2, size_t n)
+#include <gui/gui_listnode.h>
+
+typedef struct _gui_list_t
 {
-    strncpy(str1 + strlen(str1), str2, n);
+    unsigned int count;
+    gui_list_node_t *root_node;
+} gui_list_t;
 
-    return str1;
-}
+gui_list_t *gui_list_new();
+int gui_list_add(gui_list_t *list, void *payload);
+void *gui_list_get_at(gui_list_t *list, unsigned int index);
+void *gui_list_remove_at(gui_list_t *list, unsigned int index);
+
+#endif // _LIST_H_

@@ -1,10 +1,10 @@
 /**
- * @file terminal_context.c
+ * @file vector.c
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-21
  * 
- * @brief Terminal rendering context
+ * @brief
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,29 +20,25 @@
  * 
  */
 
-#include <gui/terminal/terminal_context.h>
+#ifndef _VECTOR_H
+#define _VECTOR_H
 
-#include <stdlib.h>
-
-terminal_context_t *terminal_context_create(uint16_t width, uint16_t height, uint16_t bpp, uint32_t *framebuffer)
+typedef struct _vector
 {
-    terminal_context_t *context = malloc(sizeof(terminal_context_t));
+    void **data;
+    int size;
+    int count;
+} vector_t;
 
-    if (!context)
-    {
-        return context;
-    }
+void vector_init(vector_t *v);
+int vector_count(vector_t *v);
+void vector_add(vector_t *v, void *element);
+void vector_set(vector_t *v, int index, void *element);
+void *vector_get(vector_t *v, int index);
+void vector_delete(vector_t *v, int index);
+void vector_free(vector_t *v);
 
-    context->width = width;
-    context->height = height;
-    context->bpp = bpp;
-    context->framebuffer = framebuffer;
-
-    context->max_lines = height / 8;
-    context->max_cols = width / 8;
-
-    return context;
-}
+#endif
 
 //=============================================================================
 // End of file

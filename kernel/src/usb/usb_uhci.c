@@ -667,7 +667,7 @@ void usb_uhci_init(uint32_t id, PciDeviceInfo_t *devInfo)
     outportw(hc->ioAddr + REG_INTR, 0);
 
     outportw(hc->ioAddr + REG_FRNUM, 0);
-    outportl(hc->ioAddr + REG_FRBASEADD, (uint32_t)virt_mem_get_physical_addr(hc->frameList, virt_mem_get_current_dir()));
+    outportl(hc->ioAddr + REG_FRBASEADD, (uint32_t)((uint64_t)(virt_mem_get_physical_addr(hc->frameList, virt_mem_get_current_dir())) & 0xFFFFFFFF));
     outportw(hc->ioAddr + REG_SOFMOD, 0x40);
 
     outportw(hc->ioAddr + REG_STS, 0xFFFF);

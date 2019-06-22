@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <gui/rect.h>
-#include <gui/list.h>
+#include <gui/gui_list.h>
 
 #include <stdio.h>
 

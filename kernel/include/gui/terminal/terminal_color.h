@@ -36,3 +36,7 @@ terminal_color_t terminal_color_get_from_8bit(uint8_t val);
 terminal_color_t terminal_color_get_from_4bit(uint8_t val);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

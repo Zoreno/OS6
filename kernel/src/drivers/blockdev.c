@@ -1,3 +1,25 @@
+/**
+ * @file blockdev.c
+ * @author Joakim Bertils
+ * @version 0.1
+ * @date 2019-06-22
+ * 
+ * @brief Block device driver
+ * 
+ * @copyright Copyright (C) 2019,
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
+ * 
+ */
+
 #include <drivers/blockdev.h>
 
 #include <arch/arch.h>
@@ -126,15 +148,13 @@ static uint32_t write_blockdev_fs(fs_node_t *node, uint64_t offset, uint32_t siz
     return blockdev_write(0, 0, offset, size, buffer);
 }
 
-static int open_blockdev_fs(fs_node_t *node, uint32_t flags)
+static void open_blockdev_fs(fs_node_t *node, uint32_t flags)
 {
     blockdev_instance_t *instance = (blockdev_instance_t *)node->device;
     blockdev_class_t *class = instance->class;
 
     //printf("[Blockdev] open_blockdev_fs: M:%i,m:%i,flags:%#x\n",
     //       class->major, instance->minor, flags);
-
-    return 0;
 }
 
 int reg_blockdev_instance(uint32_t major, uint32_t minor, const char *desc, size_t block_size, size_t capacity)

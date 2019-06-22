@@ -1,3 +1,25 @@
+/**
+ * @file usb_ehci.c
+ * @author Joakim Bertils
+ * @version 0.1
+ * @date 2019-06-22
+ * 
+ * @brief 
+ * 
+ * @copyright Copyright (C) 2019,
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
+ * 
+ */
+
 #include <usb/usb_ehci.h>
 
 #include <usb/usb_device.h>
@@ -791,23 +813,23 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
 
     PciBAR_t *bar = (PciBAR_t *)&devInfo->type0.BaseAddresses[0];
 
-    uint32_t portAddr = bar->address;
+    uint64_t portAddr = (uint64_t)bar->address;
 
     ehci_controller_t *hc = malloc(sizeof(ehci_controller_t));
 
-    virt_mem_map_page(portAddr, portAddr, 0);
+    virt_mem_map_page((void *)portAddr, (void *)portAddr, 0);
 
     printf("[EHCI] Allocating memory\n");
 
-    uint64_t frameListBlock = phys_mem_alloc_block();
-    virt_mem_map_page(frameListBlock, frameListBlock, 0);
+    uint64_t frameListBlock = (uint64_t)phys_mem_alloc_block();
+    virt_mem_map_page((void *)frameListBlock, (void *)frameListBlock, 0);
 
     // TODO: This is 8k memory, but only 3k is needed.
-    uint64_t qhBlock = phys_mem_alloc_block();
-    virt_mem_map_page(qhBlock, qhBlock, 0);
+    uint64_t qhBlock = (uint64_t)phys_mem_alloc_block();
+    virt_mem_map_page((void *)qhBlock, (void *)qhBlock, 0);
 
-    uint64_t tdBlock = phys_mem_alloc_block();
-    virt_mem_map_page(tdBlock, tdBlock, 0);
+    uint64_t tdBlock = (uint64_t)phys_mem_alloc_block();
+    virt_mem_map_page((void *)tdBlock, (void *)tdBlock, 0);
 
     printf("[EHCI] Framelist block: %#016x\n", frameListBlock);
     printf("[EHCI] QH block: %#016x\n", qhBlock);
@@ -815,11 +837,11 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
 
     hc->capRegs = (ehci_cap_regs_t *)(uintptr_t)portAddr;
     hc->opRegs = (ehci_op_regs_t *)(uintptr_t)(portAddr + hc->capRegs->capLength);
-    hc->frameList = frameListBlock;
-    hc->qhPool = qhBlock;
-    hc->tdPool = tdBlock;
+    hc->frameList = (uint32_t *)frameListBlock;
+    hc->qhPool = (ehci_qh_t *)qhBlock;
+    hc->tdPool = (ehci_td_t *)tdBlock;
 
-    if ((uint32_t)hc->tdPool & 0x1F > 0)
+    if (((uint64_t)hc->tdPool & 0x1F) > 0)
     {
         printf("TD misaligned\n");
     }

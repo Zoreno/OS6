@@ -48,10 +48,7 @@ terminal_t *terminal_create()
 
     terminal->context = terminal_context_create(width, height, bpp, framebuffer);
 
-    terminal->max_lines = height / 8;
-    terminal->max_cols = width / 8;
-
-    printf("Max Cols: %i, Max Lines: %i\n", terminal->max_cols, terminal->max_lines);
+    printf("Max Cols: %i, Max Lines: %i\n", terminal->context->max_cols, terminal->context->max_lines);
 
     terminal_create_buffer(terminal);
 
@@ -127,3 +124,7 @@ void terminal_redraw(terminal_t *terminal)
         vbe_print_string(foreground, 8 * string_length, terminal->context->height, terminal->current_buffer->input_line);
     }
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

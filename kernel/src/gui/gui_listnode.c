@@ -1,10 +1,10 @@
 /**
- * @file terminal_context.c
+ * @file listnode.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-06-21
+ * @date 2019-06-22
  * 
- * @brief Terminal rendering context
+ * @brief 
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,30 +20,21 @@
  * 
  */
 
-#include <gui/terminal/terminal_context.h>
+#include <gui/gui_listnode.h>
 
+#include <stdint.h>
 #include <stdlib.h>
 
-terminal_context_t *terminal_context_create(uint16_t width, uint16_t height, uint16_t bpp, uint32_t *framebuffer)
+gui_list_node_t *gui_list_node_new(void *payload)
 {
-    terminal_context_t *context = malloc(sizeof(terminal_context_t));
+    gui_list_node_t *list_node;
 
-    if (!context)
-    {
-        return context;
-    }
+    if (!(list_node = (gui_list_node_t *)malloc(sizeof(gui_list_node_t))))
+        return list_node;
 
-    context->width = width;
-    context->height = height;
-    context->bpp = bpp;
-    context->framebuffer = framebuffer;
+    list_node->prev = (gui_list_node_t *)0;
+    list_node->next = (gui_list_node_t *)0;
+    list_node->payload = payload;
 
-    context->max_lines = height / 8;
-    context->max_cols = width / 8;
-
-    return context;
+    return list_node;
 }
-
-//=============================================================================
-// End of file
-//=============================================================================

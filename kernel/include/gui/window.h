@@ -2,7 +2,7 @@
 #define _WINDOW_H_
 
 #include <gui/context.h>
-#include <gui/list.h>
+#include <gui/gui_list.h>
 #include <gui/rect.h>
 
 #include <stdint.h>

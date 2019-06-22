@@ -23,6 +23,8 @@
 #ifndef _TERMINAL_BUFFER_H
 #define _TERMINAL_BUFFER_H
 
+#include <util/vector.h>
+
 typedef struct _terminal_buffer
 {
     char *user;
@@ -30,8 +32,7 @@ typedef struct _terminal_buffer
 
     char *working_directory;
 
-    char **lines;
-    int num_lines;
+    vector_t *lines;
 
     char *input_line;
     int input_line_length;
@@ -48,3 +49,7 @@ void terminal_buffer_append_string(terminal_buffer_t *buffer, const char *string
 void terminal_buffer_delete_input(terminal_buffer_t *buffer);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================
