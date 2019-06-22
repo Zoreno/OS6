@@ -1,10 +1,10 @@
 /**
- * @file terminal_color.h
+ * @file terminal_buffer.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-18
  * 
- * @brief Terminal color representation
+ * @brief Terminal buffer
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -31,6 +31,8 @@ typedef struct _terminal_buffer
     char *group;
 
     char *working_directory;
+
+    char *name;
 
     vector_t *lines;
 

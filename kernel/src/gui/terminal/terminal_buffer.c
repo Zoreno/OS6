@@ -40,13 +40,25 @@ terminal_buffer_t *terminal_buffer_create()
     // This should be a static buffer to be able to rewrite it
     buffer->working_directory = strdup("~/docs/test");
 
+    buffer->name = strdup("Terminal 1");
+
     buffer->input_line = malloc(128);
     memset(buffer->input_line, 0, 128);
     buffer->input_line_length = 0;
     buffer->input_line_max_size = 128;
 
+    buffer->lines = malloc(sizeof(vector_t));
+
     vector_init(buffer->lines);
 
+    vector_add(buffer->lines, strdup("Hello world"));
+    vector_add(buffer->lines, strdup("Hello world"));
+    vector_add(buffer->lines, strdup("Hello world"));
+    vector_add(buffer->lines, strdup("Hello world"));
+    vector_add(buffer->lines, strdup("Hello world"));
+    vector_add(buffer->lines, strdup("Hello world"));
+    vector_add(buffer->lines, strdup("Hello world"));
+    vector_add(buffer->lines, strdup("Hello world"));
     vector_add(buffer->lines, strdup("Hello world"));
 
     return buffer;

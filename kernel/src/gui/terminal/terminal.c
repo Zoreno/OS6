@@ -50,6 +50,10 @@ terminal_t *terminal_create()
 
     printf("Max Cols: %i, Max Lines: %i\n", terminal->context->max_cols, terminal->context->max_lines);
 
+    terminal->buffers = malloc(sizeof(vector_t));
+
+    vector_init(terminal->buffers);
+
     terminal_create_buffer(terminal);
 
     return terminal;
@@ -72,7 +76,7 @@ terminal_buffer_t *terminal_create_buffer(terminal_t *terminal)
 
     terminal_buffer_delete_input(buffer);
 
-    // TODO: Add to the list of buffers
+    vector_add(terminal->buffers, buffer);
 
     return buffer;
 }
@@ -108,8 +112,27 @@ void terminal_redraw(terminal_t *terminal)
     sprintf(str, "The awesome terminal: %i, %s\n", i++, full_time_buf);
     vbe_print_string(foreground, 0, 8, str);
 
+    vbe_fill_rect(background, 0, 8, terminal->context->width, 8);
+    sprintf(str, "|");
+
+    int terminal_count = vector_count(terminal->buffers);
+
+    for (int j = 0; j < terminal_count; ++j)
+    {
+        sprintf(str, "%s %s |", str, ((terminal_buffer_t *)vector_get(terminal->buffers, j))->name);
+    }
+
+    vbe_print_string(foreground, 0, 16, str);
+
     if (terminal->current_buffer)
     {
+        int lines_count = vector_count(terminal->current_buffer->lines);
+
+        for (int lines = 0; lines < lines_count; ++lines)
+        {
+            vbe_fill_rect(background, 0, 8 * lines + 16, terminal->context->width, 8);
+            vbe_print_string(foreground, 0, 8 * lines + 16 + 8, vector_get(terminal->current_buffer->lines, lines));
+        }
 
         vbe_fill_rect(background, 0, terminal->context->height - 8, terminal->context->width, 8);
         char str[100];

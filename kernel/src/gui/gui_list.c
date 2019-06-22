@@ -1,5 +1,5 @@
 /**
- * @file list.c
+ * @file gui_list.c
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22

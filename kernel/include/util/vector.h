@@ -1,5 +1,5 @@
 /**
- * @file vector.c
+ * @file vector.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-21

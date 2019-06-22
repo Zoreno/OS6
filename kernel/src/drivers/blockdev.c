@@ -68,7 +68,6 @@ static blockdev_class_t *blockdev_classes[NUM_BLOCKDEV_CLASSES] = {NULL};
 
 static blockdev_instance_t *get_blockdev_instance(blockdev_class_t *class, uint32_t minor)
 {
-
     for (list_node_t *lnode = class->instance_list->head; lnode != NULL; lnode = lnode->next)
     {
         blockdev_instance_t *instance = lnode->payload;

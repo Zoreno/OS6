@@ -1,5 +1,5 @@
 /**
- * @file listnode.c
+ * @file gui_listnode.c
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22

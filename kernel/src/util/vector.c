@@ -22,9 +22,12 @@
 
 #include <util/vector.h>
 
+#include <debug/backtrace.h>
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 void vector_init(vector_t *v)
 {
@@ -42,18 +45,40 @@ void vector_add(vector_t *v, void *element)
 {
     if (v->size == 0)
     {
+        printf("[VECTOR] Allocating memory\n");
+
         v->size = 10;
         v->data = malloc(sizeof(void *) * v->size);
+
+        if (!v->data)
+        {
+            printf("[VECTOR] Failed to allocate memory");
+            backtrace();
+            return;
+        }
+
         memset(v->data, 0, sizeof(void *) * v->size);
     }
 
     if (v->size == v->count)
     {
+        printf("[VECTOR] Reallocating memory\n");
+
         v->size *= 2;
         v->data = realloc(v->data, sizeof(void *) * v->size);
+
+        if (!v->data)
+        {
+            printf("[VECTOR] Failed to reallocate memory");
+            backtrace();
+            return;
+        }
     }
 
-    v->data[v->count++] = element;
+    printf("v->data: %#016x, v->size: %i, v->count: %i\n", v->data, v->size, v->count);
+
+    v->data[v->count] = element;
+    ++v->count;
 }
 
 void vector_set(vector_t *v, int index, void *element)

@@ -25,6 +25,7 @@
 
 #include <gui/terminal/terminal_context.h>
 #include <gui/terminal/terminal_buffer.h>
+#include <util/vector.h>
 
 typedef struct _terminal
 {
@@ -32,8 +33,7 @@ typedef struct _terminal
 
     terminal_buffer_t *current_buffer;
 
-    terminal_buffer_t *buffers;
-    int num_buffers;
+    vector_t *buffers;
 
 } terminal_t;
 
