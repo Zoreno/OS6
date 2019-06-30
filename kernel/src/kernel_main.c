@@ -66,6 +66,8 @@
 
 #include <assert.h>
 
+#include <mmintrin.h>
+
 /*
 
 Global todo list:
@@ -414,6 +416,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     printf("================================================================================\n");
 
     //gui_init();
+
     terminal_init();
 
 #if 0

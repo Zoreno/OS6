@@ -70,8 +70,12 @@ set(KERNEL_SRC ${CMAKE_SOURCE_DIR}/kernel/src)
 set(LIBK_INCLUDE ${CMAKE_SOURCE_DIR}/libk/include)
 set(LIBK_SRC ${CMAKE_SOURCE_DIR}/libk/src)
 
+set(LIBSIMD_INCLUDE ${CMAKE_SOURCE_DIR}/libsimd/include)
+set(LIBSIMD_SRC ${CMAKE_SOURCE_DIR}/libsimd/src)
+
 set(KERNEL_EXEC kernel.bin)
 set(LIBK k)
+set(LIBSIMD simd)
 
 #==============================================================================
 # LIBK kernel C standard library target
@@ -243,6 +247,20 @@ target_include_directories(${LIBK} SYSTEM PRIVATE ${LIBK_INCLUDE})
 set_target_properties(${LIBK} PROPERTIES SKIP_BUILD_RPATH 1)
 
 #==============================================================================
+# libsimd target
+#==============================================================================
+
+add_library(${LIBSIMD} "")
+
+target_sources(${LIBSIMD} PRIVATE ${LIBSIMD_SRC}/mm_alloc.c)
+target_include_directories(${LIBSIMD} SYSTEM PRIVATE ${LIBSIMD_INCLUDE})
+
+# TODO: Make this not depend on libk for porting to userspace
+target_include_directories(${LIBSIMD} SYSTEM PRIVATE ${LIBK_INCLUDE})
+
+set_target_properties(${LIBK} PROPERTIES SKIP_BUILD_RPATH 1)
+
+#==============================================================================
 # Kernel target
 #==============================================================================
 
@@ -330,8 +348,10 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
 
 target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${KERNEL_INCLUDE})
 target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${LIBK_INCLUDE})
+target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${LIBSIMD_INCLUDE})
 
 target_link_libraries(${KERNEL_EXEC} PRIVATE ${LIBK})
+target_link_libraries(${KERNEL_EXEC} PRIVATE ${LIBSIMD})
 
 set_target_properties(${KERNEL_EXEC} PROPERTIES LINKER_LANGUAGE C)
 set_target_properties(${KERNEL_EXEC} PROPERTIES LINK_FLAGS "-n -T ${LINKER_SCRIPT}")
