@@ -53,7 +53,7 @@ else()
 endif()
 
 # TODO: Add toggle switch for -fomit-frame-pointer
-set(CMAKE_C_FLAGS "${CFLAGS}")
+#set(CMAKE_C_FLAGS "${CFLAGS}")
 set(CMAKE_C_LINK_EXECUTABLE "ld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/kernel/linker.ld")
 set(CMAKE_ASM_NASM_OBJECT_FORMAT elf64)
@@ -244,6 +244,7 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/fenv/fesetround.c)
 
 target_include_directories(${LIBK} SYSTEM PRIVATE ${LIBK_INCLUDE})
 
+set_target_properties(${LIBK} PROPERTIES COMPILE_FLAGS ${CFLAGS})
 set_target_properties(${LIBK} PROPERTIES SKIP_BUILD_RPATH 1)
 
 #==============================================================================
@@ -258,7 +259,8 @@ target_include_directories(${LIBSIMD} SYSTEM PRIVATE ${LIBSIMD_INCLUDE})
 # TODO: Make this not depend on libk for porting to userspace
 target_include_directories(${LIBSIMD} SYSTEM PRIVATE ${LIBK_INCLUDE})
 
-set_target_properties(${LIBK} PROPERTIES SKIP_BUILD_RPATH 1)
+set_target_properties(${LIBSIMD} PROPERTIES COMPILE_FLAGS ${CFLAGS})
+set_target_properties(${LIBSIMD} PROPERTIES SKIP_BUILD_RPATH 1)
 
 #==============================================================================
 # Kernel target
@@ -353,6 +355,7 @@ target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${LIBSIMD_INCLUDE})
 target_link_libraries(${KERNEL_EXEC} PRIVATE ${LIBK})
 target_link_libraries(${KERNEL_EXEC} PRIVATE ${LIBSIMD})
 
+set_target_properties(${KERNEL_EXEC} PROPERTIES COMPILE_FLAGS ${CFLAGS})
 set_target_properties(${KERNEL_EXEC} PROPERTIES LINKER_LANGUAGE C)
 set_target_properties(${KERNEL_EXEC} PROPERTIES LINK_FLAGS "-n -T ${LINKER_SCRIPT}")
 set_target_properties(${KERNEL_EXEC} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
