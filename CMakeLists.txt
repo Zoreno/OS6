@@ -55,7 +55,6 @@ endif()
 # TODO: Add toggle switch for -fomit-frame-pointer
 #set(CMAKE_C_FLAGS "${CFLAGS}")
 set(CMAKE_C_LINK_EXECUTABLE "ld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
-set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/kernel/linker.ld")
 set(CMAKE_ASM_NASM_OBJECT_FORMAT elf64)
 set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> \
     -f ${CMAKE_ASM_NASM_OBJECT_FORMAT} ${ASMFLAGS} -o <OBJECT> <SOURCE>")
@@ -69,6 +68,7 @@ set(KERNEL_SRC ${CMAKE_SOURCE_DIR}/kernel/src)
 
 set(LIBK_INCLUDE ${CMAKE_SOURCE_DIR}/libk/include)
 set(LIBK_SRC ${CMAKE_SOURCE_DIR}/libk/src)
+set(LIBK_TEST ${CMAKE_SOURCE_DIR}/libk/test)
 
 set(LIBSIMD_INCLUDE ${CMAKE_SOURCE_DIR}/libsimd/include)
 set(LIBSIMD_SRC ${CMAKE_SOURCE_DIR}/libsimd/src)
@@ -81,289 +81,29 @@ set(LIBSIMD simd)
 # LIBK kernel C standard library target
 #==============================================================================
 
-add_library(${LIBK} "")
+#macro(declare_test PATH NAME)
+    #add_executable(test-${NAME} ${LIBK_TEST}/${PATH}/test-${NAME}.c)
+    #target_sources(test-${NAME} PRIVATE ${LIBK_SRC}/${PATH}/${NAME}.c)
+    #add_test(NAME ${NAME} COMMAND test-${NAME})
+#endmacro(declare_test)
 
-# string.h header
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memset.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memchr.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memcmp.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memcpy.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memcpyw.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memcpyl.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memmove.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memsetw.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memsetl.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memsetll.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memccpy.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memmem.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/mempcpy.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memrchr.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memfrob.c)
-
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strcat.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strncat.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strchr.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strcmp.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strncmp.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strcpy.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strncpy.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strcspn.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strlen.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strnlen.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strpbrk.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strtok_r.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strspn.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strdup.c)
-
-
-# ctype.h header
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isalnum.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isalpha.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/iscntrl.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isgraph.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isdigit.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/islower.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isprint.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/ispunct.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isspace.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isupper.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isxdigit.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/tolower.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/toupper.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isascii.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/toascii.c)
-
-# stdlib.h header
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/abs.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/bsearch.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/div.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/random.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/itoa.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/ltoa.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/lltoa.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/uitoa.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/ultoa.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/ulltoa.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/strtol.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/strtoul.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/strtoll.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/strtoull.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/atoi.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/atol.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/atoll.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/qsort.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/malloc.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/free.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/calloc.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/realloc.c)
-
-# stdio.h header
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/fputc.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/fputs.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/fprintf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/set_stdout.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/printf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/putchar.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/puts.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/sprintf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/vsprintf.c)
-
-# libgen.h header
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/libgen/basename.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/libgen/dirname.c)
-
-# errno.h header
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/errno/errno.c)
-
-# wchar.h header
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcwidth.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcsncpy.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcscmp.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcscat.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcsncat.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcslen.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcscpy.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcsspn.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcspbrk.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcschr.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcsrchr.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/wchar/wcstok.c)
-
-# math.h header
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/fmaxf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/fminf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/ceilf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/floorf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/fmodf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/fabsf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/fdimf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/nanf.c)
-
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/rcpf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/sqrtf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/rsqrtf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/log2f.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/logf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/log10f.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/logbf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/pow2f.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/expf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/powf.c)
-
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/sinf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/cosf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/tanf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/atanf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/asinf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/acosf.c)
-
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/sinhf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/coshf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/tanhf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/atanhf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/asinhf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/acoshf.c)
-
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/cscf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/secf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/cotf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/acscf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/asecf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/acotf.c)
-
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/cschf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/sechf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/cothf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/acschf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/asechf.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/acothf.c)
-
-# fenv.h header
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/fenv/fegetround.c)
-target_sources(${LIBK} PRIVATE ${LIBK_SRC}/fenv/fesetround.c)
-
-target_include_directories(${LIBK} SYSTEM PRIVATE ${LIBK_INCLUDE})
-
-set_target_properties(${LIBK} PROPERTIES COMPILE_FLAGS ${CFLAGS})
-set_target_properties(${LIBK} PROPERTIES SKIP_BUILD_RPATH 1)
+add_subdirectory(libk)
 
 #==============================================================================
 # libsimd target
 #==============================================================================
 
-add_library(${LIBSIMD} "")
-
-target_sources(${LIBSIMD} PRIVATE ${LIBSIMD_SRC}/mm_alloc.c)
-target_include_directories(${LIBSIMD} SYSTEM PRIVATE ${LIBSIMD_INCLUDE})
-
-# TODO: Make this not depend on libk for porting to userspace
-target_include_directories(${LIBSIMD} SYSTEM PRIVATE ${LIBK_INCLUDE})
-
-set_target_properties(${LIBSIMD} PROPERTIES COMPILE_FLAGS ${CFLAGS})
-set_target_properties(${LIBSIMD} PROPERTIES SKIP_BUILD_RPATH 1)
+add_subdirectory(libsimd)
 
 #==============================================================================
 # Kernel target
 #==============================================================================
 
-add_executable(${KERNEL_EXEC} "")
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/boot/boot.asm)
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/debug/debug_terminal.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/debug/backtrace.c)
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/test/unit_tests.c)
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/arch.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/cpu.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/gdt.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/idt.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/gdt_flush.asm)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/idt_flush.asm)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/default_irq_handler.asm)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/pic.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/pit.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/atomic.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/fpu.c)
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/phys_mem.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/mm_bitmap.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/virt_mem.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/kheap.c)
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/pci/pci_io.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/pci/pci_device.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/pci/pci.c)
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/sync/spinlock.c)
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/serial/serial.c)
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/vfs.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/ext2.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/nulldev.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/zerodev.c)
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/cmos/cmos_rtc.c)
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/blockdev.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/ide.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/vbe.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/keyboard_ps2.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/mouse_ps2.c)
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/exec/elf64.c)
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/list.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/tree.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/hexdump.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/bitset.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/link.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/sha512.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/vector.c)
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/gui_listnode.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/gui_list.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/rect.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/context.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/window.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/desktop.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/gui.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal_mode.c)
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal/terminal.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal/terminal_buffer.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal/terminal_context.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal/terminal_color.c)
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_controller.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_descriptors.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_device.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_driver.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_hub.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_uhci.c)
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_ehci.c)
-
-target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
-
-target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${KERNEL_INCLUDE})
-target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${LIBK_INCLUDE})
-target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${LIBSIMD_INCLUDE})
-
-target_link_libraries(${KERNEL_EXEC} PRIVATE ${LIBK})
-target_link_libraries(${KERNEL_EXEC} PRIVATE ${LIBSIMD})
-
-set_target_properties(${KERNEL_EXEC} PROPERTIES COMPILE_FLAGS ${CFLAGS})
-set_target_properties(${KERNEL_EXEC} PROPERTIES LINKER_LANGUAGE C)
-set_target_properties(${KERNEL_EXEC} PROPERTIES LINK_FLAGS "-n -T ${LINKER_SCRIPT}")
-set_target_properties(${KERNEL_EXEC} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
+add_subdirectory(kernel)
 
 #==============================================================================
 # Build ISO
 #==============================================================================
-
 
 set(ISO_NAME os.iso)
 set(ISO_IMAGE ${CMAKE_BINARY_DIR}/${ISO_NAME})

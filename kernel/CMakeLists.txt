@@ -1,0 +1,122 @@
+#==============================================================================
+# Cmake file for compiling the OS6 operating system kernel module
+#==============================================================================
+
+project(kernel)
+
+add_executable(${KERNEL_EXEC} "")
+
+#==============================================================================
+# Flags and compiler configuration
+#==============================================================================
+
+set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/kernel/linker.ld")
+
+set_target_properties(${KERNEL_EXEC} PROPERTIES COMPILE_FLAGS ${CFLAGS})
+set_target_properties(${KERNEL_EXEC} PROPERTIES LINKER_LANGUAGE C)
+set_target_properties(${KERNEL_EXEC} PROPERTIES LINK_FLAGS "-n -T ${LINKER_SCRIPT}")
+set_target_properties(${KERNEL_EXEC} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
+
+#==============================================================================
+# Path macros
+#==============================================================================
+
+#==============================================================================
+# Includes and dependencies
+#==============================================================================
+
+target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${KERNEL_INCLUDE})
+target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${LIBK_INCLUDE})
+target_include_directories(${KERNEL_EXEC} SYSTEM PRIVATE ${LIBSIMD_INCLUDE})
+
+target_link_libraries(${KERNEL_EXEC} PRIVATE ${LIBK})
+target_link_libraries(${KERNEL_EXEC} PRIVATE ${LIBSIMD})
+
+#==============================================================================
+# Sources
+#==============================================================================
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/boot/boot.asm)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/debug/debug_terminal.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/debug/backtrace.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/test/unit_tests.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/arch.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/cpu.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/gdt.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/idt.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/gdt_flush.asm)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/idt_flush.asm)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/default_irq_handler.asm)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/pic.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/pit.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/atomic.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/fpu.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/phys_mem.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/mm_bitmap.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/virt_mem.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/kheap.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/pci/pci_io.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/pci/pci_device.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/pci/pci.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/sync/spinlock.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/serial/serial.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/vfs.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/ext2.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/nulldev.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/vfs/zerodev.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/cmos/cmos_rtc.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/blockdev.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/ide.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/vbe.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/keyboard_ps2.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/mouse_ps2.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/exec/elf64.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/list.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/tree.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/hexdump.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/bitset.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/link.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/sha512.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/vector.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/gui_listnode.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/gui_list.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/rect.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/context.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/window.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/desktop.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/gui.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal_mode.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal/terminal.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal/terminal_buffer.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal/terminal_context.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal/terminal_color.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_controller.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_descriptors.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_device.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_driver.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_hub.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_uhci.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_ehci.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
+
+
+#==============================================================================
+# Tests
+#==============================================================================
