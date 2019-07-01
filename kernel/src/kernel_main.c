@@ -66,7 +66,7 @@
 
 #include <assert.h>
 
-#include <mmintrin.h>
+#include <immintrin.h>
 
 /*
 

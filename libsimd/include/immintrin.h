@@ -1,10 +1,10 @@
 /**
- * @file isalnum.c
+ * @file immintrin.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-27
+ * @date 2019-07-01
  * 
- * @brief 
+ * @brief Simd intrinsics for x86
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,13 +20,14 @@
  * 
  */
 
-#include <ctype.h>
+#ifndef _LIBSIMD_IMMINTRIN_H
+#define _LIBSIMD_IMMINTRIN_H
 
-#ifdef isalnum
-#undef isalnum
+#include <mmintrin.h>
+#include <xmmintrin.h>
+
 #endif
 
-int isalnum(char c)
-{
-    return isalpha(c) || isdigit(c);
-}
+//=============================================================================
+// End of file
+//=============================================================================

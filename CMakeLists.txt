@@ -52,13 +52,6 @@ else()
 
 endif()
 
-# TODO: Add toggle switch for -fomit-frame-pointer
-#set(CMAKE_C_FLAGS "${CFLAGS}")
-set(CMAKE_C_LINK_EXECUTABLE "ld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
-set(CMAKE_ASM_NASM_OBJECT_FORMAT elf64)
-set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> \
-    -f ${CMAKE_ASM_NASM_OBJECT_FORMAT} ${ASMFLAGS} -o <OBJECT> <SOURCE>")
-
 #==============================================================================
 # Path macros
 #==============================================================================
@@ -68,10 +61,11 @@ set(KERNEL_SRC ${CMAKE_SOURCE_DIR}/kernel/src)
 
 set(LIBK_INCLUDE ${CMAKE_SOURCE_DIR}/libk/include)
 set(LIBK_SRC ${CMAKE_SOURCE_DIR}/libk/src)
-set(LIBK_TEST ${CMAKE_SOURCE_DIR}/libk/test)
 
 set(LIBSIMD_INCLUDE ${CMAKE_SOURCE_DIR}/libsimd/include)
 set(LIBSIMD_SRC ${CMAKE_SOURCE_DIR}/libsimd/src)
+
+set(OS6_TESTS ${CMAKE_SOURCE_DIR}/tests)
 
 set(KERNEL_EXEC kernel.bin)
 set(LIBK k)
@@ -80,12 +74,6 @@ set(LIBSIMD simd)
 #==============================================================================
 # LIBK kernel C standard library target
 #==============================================================================
-
-#macro(declare_test PATH NAME)
-    #add_executable(test-${NAME} ${LIBK_TEST}/${PATH}/test-${NAME}.c)
-    #target_sources(test-${NAME} PRIVATE ${LIBK_SRC}/${PATH}/${NAME}.c)
-    #add_test(NAME ${NAME} COMMAND test-${NAME})
-#endmacro(declare_test)
 
 add_subdirectory(libk)
 
@@ -100,6 +88,12 @@ add_subdirectory(libsimd)
 #==============================================================================
 
 add_subdirectory(kernel)
+
+#==============================================================================
+# Tests
+#==============================================================================
+
+add_subdirectory(tests)
 
 #==============================================================================
 # Build ISO

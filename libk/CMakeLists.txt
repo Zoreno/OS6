@@ -13,6 +13,11 @@ add_library(${LIBK} "")
 set_target_properties(${LIBK} PROPERTIES COMPILE_FLAGS ${CFLAGS})
 set_target_properties(${LIBK} PROPERTIES SKIP_BUILD_RPATH 1)
 
+set(CMAKE_C_LINK_EXECUTABLE "ld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+set(CMAKE_ASM_NASM_OBJECT_FORMAT elf64)
+set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> \
+    -f ${CMAKE_ASM_NASM_OBJECT_FORMAT} ${ASMFLAGS} -o <OBJECT> <SOURCE>")
+
 #==============================================================================
 # Path macros
 #==============================================================================

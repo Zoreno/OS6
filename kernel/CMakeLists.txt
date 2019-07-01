@@ -17,6 +17,12 @@ set_target_properties(${KERNEL_EXEC} PROPERTIES LINKER_LANGUAGE C)
 set_target_properties(${KERNEL_EXEC} PROPERTIES LINK_FLAGS "-n -T ${LINKER_SCRIPT}")
 set_target_properties(${KERNEL_EXEC} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
 
+set(CMAKE_C_LINK_EXECUTABLE "ld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+set(CMAKE_ASM_NASM_OBJECT_FORMAT elf64)
+set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> \
+    -f ${CMAKE_ASM_NASM_OBJECT_FORMAT} ${ASMFLAGS} -o <OBJECT> <SOURCE>")
+
+
 #==============================================================================
 # Path macros
 #==============================================================================

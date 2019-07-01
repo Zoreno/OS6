@@ -24,20 +24,11 @@
 #define _LIBSIMD_MMINTRIN_H
 
 // TODO: Find the real architecture and SIMD support
-#define __LIBSIMD_X64
+#define __LIBSIMD_X64 1
 
 #pragma GCC target("sse2")
 
-//=============================================================================
-// Preprocessor macros
-//=============================================================================
-
-#define __ATTR(x) __attribute__(x)
-#define __VSIZE(x) __vector_size__(x)
-#define __ALIAS __may_alias__
-#define __ALIGN(x) __aligned__(x)
-#define __inline inline
-#define __always_inline(x) extern __inline x __attribute__((__gnu_inline__, __always_inline__, __artificial__))
+#include <__mm_defines.h>
 
 //=============================================================================
 // Type definitions
