@@ -21,3 +21,5 @@
  */
 
 #include <string.h>
+
+#include <__libk_common.h>

@@ -23,6 +23,8 @@
 #ifndef _LIBK__WINT_T_H
 #define _LIBK__WINT_T_H
 
+#include <__libk_common.h>
+
 /**
  * @brief Wide int
  * 

@@ -23,6 +23,8 @@
 #ifndef _LIBK__WCHAR_T_H
 #define _LIBK__WCHAT_T_H
 
+#include <__libk_common.h>
+
 /**
  * @brief Wide character type
  * 

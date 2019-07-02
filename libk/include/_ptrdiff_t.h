@@ -23,6 +23,8 @@
 #ifndef _LIBK__PTRDIFF_T_H
 #define _LIBK__PTRDIFF_T_H
 
+#include <__libk_common.h>
+
 /**
  * @brief Pointer difference type
  * 

@@ -23,6 +23,8 @@
 #ifndef _LIBK_ERRNO_H
 #define _LIBK_ERRNO_H
 
+#include <__libk_common.h>
+
 #define EPERM 1             /* Not super-user */
 #define ENOENT 2            /* No such file or directory */
 #define ESRCH 3             /* No such process */

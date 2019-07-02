@@ -23,6 +23,8 @@
 #ifndef _LIBK_ALLOCA_H
 #define _LIBK_ALLOCA_H
 
+#include <__libk_common.h>
+
 #ifdef __GNUC__
 #define alloca(size) __builtin_alloca(size)
 #else

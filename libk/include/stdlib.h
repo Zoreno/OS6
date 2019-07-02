@@ -23,6 +23,8 @@
 #ifndef _LIBK_STDLIB_H
 #define _LIBK_STDLIB_H
 
+#include <__libk_common.h>
+
 #include <_null.h>
 #include <_size_t.h>
 

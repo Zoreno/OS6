@@ -1,10 +1,10 @@
 /**
- * @file assert.h
+ * @file __libk_symbols.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-25
+ * @date 2019-04-27
  * 
- * @brief C standard library assert macro
+ * @brief Defines macros for symbol aliases
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,31 +20,21 @@
  * 
  */
 
-#ifndef _LIBK_ASSERT_H
-#define _LIBK_ASSERT_H
+#ifndef ___LIBK_SYMBOLS_H
+#define ___LIBK_SYMBOLS_H
 
-#include <__libk_common.h>
+#define __typeof(x) __typeof__(x)
 
-#include <stdio.h>
-
-extern void backtrace();
-extern void cli();
-
-#ifdef OS6_DEBUG
-
-#define ASSERT(statement)                            \
-    if (!statement)                                  \
-    {                                                \
-        printf("[ASSERT] Failed: %s\n", #statement); \
-        backtrace();                                 \
-        cli();                                       \
-        __asm__ volatile("hlt");                     \
-    }
-
+#define weak_alias(name, aliasname) _weak_alias(name, aliasname)
+#ifdef _LIBK
+#define _weak_alias(name, aliasname) \
+    extern __typeof(name) aliasname __attribute__((weak, alias(#name)));
 #else
-
-#define ASSERT(statement) ((void)0)
-
+#define _weak_alias(name, aliasame)
 #endif
 
 #endif
+
+//==============================================================================
+// End of file
+//==============================================================================

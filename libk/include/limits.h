@@ -23,6 +23,8 @@
 #ifndef _LIBK_LIMITS_H
 #define _LIBK_LIMITS_H
 
+#include <__libk_common.h>
+
 #define CHAR_BIT 8
 
 #define SCHAR_MIN -127

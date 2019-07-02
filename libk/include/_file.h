@@ -23,6 +23,8 @@
 #ifndef _LIBK__FILE_H
 #define _LIBK__FILE_H
 
+#include <__libk_common.h>
+
 #include <stdint.h>
 
 typedef char (*read_function)(void);

@@ -23,6 +23,8 @@
 #ifndef _LIBK_STDBOOL_H
 #define _LIBK_STDBOOL_H
 
+#include <__libk_common.h>
+
 #define USE_BUILT_IN_BOOL 1
 
 #define true 1

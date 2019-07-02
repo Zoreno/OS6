@@ -23,6 +23,8 @@
 #ifndef _LIBK_CTYPE_H
 #define _LIBK_CTYPE_H
 
+#include <__libk_common.h>
+
 int isalnum(char c);
 int isalpha(char c);
 int iscntrl(char c);
@@ -42,3 +44,7 @@ int isascii(char c);
 char toascii(char c);
 
 #endif
+
+//==============================================================================
+// End of file
+//==============================================================================

@@ -23,6 +23,8 @@
 #ifndef _LIBK_STDARG_H
 #define _LIBK_STDARG_H
 
+#include <__libk_common.h>
+
 #include <va_list.h>
 
 #if 1

@@ -23,6 +23,8 @@
 #ifndef _LIBK_WCHAR_H
 #define _LIBK_WCHAR_H
 
+#include <__libk_common.h>
+
 #include <stddef.h>
 
 /**
