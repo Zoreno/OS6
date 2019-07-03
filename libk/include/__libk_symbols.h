@@ -2,7 +2,7 @@
  * @file __libk_symbols.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-27
+ * @date 2019-07-01
  * 
  * @brief Defines macros for symbol aliases
  * 

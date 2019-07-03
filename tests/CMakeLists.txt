@@ -17,14 +17,16 @@ project(tests)
 #==============================================================================
 
 macro(declare_test PATH NAME)
-    add_executable(test-${NAME} ${OS6_TESTS}/${PATH}/test-${NAME}.c)
-    #target_sources(test-${NAME} PRIVATE ${LIBK_SRC}/${PATH}/${NAME}.c)
-    add_test(NAME ${NAME} COMMAND test-${NAME})
+	add_executable(test-${NAME} ${OS6_TESTS}/${PATH}/test-${NAME}.c ${OS6_TESTS}/driver/jtest.c)
+	target_include_directories(test-${NAME} SYSTEM PRIVATE ${OS6_TESTS}/driver)
+	add_test(NAME ${NAME} COMMAND test-${NAME})
 endmacro(declare_test)
 
 #==============================================================================
 # Tests
 #==============================================================================
+
+# TODO: Move tests to separate folders to reduce name clash
 
 declare_test(libk/ctype isalnum)
 

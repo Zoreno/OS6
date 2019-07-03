@@ -4,7 +4,7 @@
  * @version 0.1
  * @date 2019-04-27
  * 
- * @brief 
+ * @brief Unit test file for the isalnum function
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,19 @@
 
 #include "../../../libk/src/ctype/isalnum.c"
 
-int main(int argc, char **argv)
+#include <jtest.h>
+
+JTEST(isalnum, char)
 {
-    return 3; //libk_isalnum('c') == 0;
+	ASSERT_EQUAL(libk_isalnum('c'), 1);
+}
+
+JTEST(isalnum, colon)
+{
+	ASSERT_EQUAL(libk_isalnum(':'), 0);
+}
+
+JTEST(isalnum, number)
+{
+	ASSERT_EQUAL(libk_isalnum('1'), 1);
 }
