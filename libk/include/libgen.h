@@ -23,6 +23,8 @@
 #ifndef _LIBK_LIGBEN_H
 #define _LIBK_LIBGEN_H
 
+#include <__libk_common.h>
+
 char *basename(char *path);
 char *dirname(char *path);
 

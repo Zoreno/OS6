@@ -23,6 +23,8 @@
 #ifndef _LIBK_FENV_H
 #define _LIBK_FENV_H
 
+#include <__libk_common.h>
+
 #define FE_TONEAREST 0
 #define FE_DOWNWARD 1
 #define FE_UPWARD 2

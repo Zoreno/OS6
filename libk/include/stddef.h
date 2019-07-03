@@ -23,6 +23,8 @@
 #ifndef _LIBK_STDDEF_H
 #define _LIBK_STDDEF_H
 
+#include <__libk_common.h>
+
 #include <_size_t.h>
 #include <_ptrdiff_t.h>
 #include <_null.h>

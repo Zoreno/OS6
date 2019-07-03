@@ -23,6 +23,8 @@
 #ifndef _LIBK__NULL_H
 #define _LIBK__NULL_H
 
+#include <__libk_common.h>
+
 #ifdef NULL
 #undef NULL
 #endif

@@ -23,6 +23,8 @@
 #ifndef _LIBK_STRING_H
 #define _LIBK_STRING_H
 
+#include <__libk_common.h>
+
 #include <_size_t.h>
 #include <_null.h>
 

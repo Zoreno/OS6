@@ -23,6 +23,8 @@
 #ifndef _LIBK_VA_LIST_H
 #define _LIBK_VA_LIST_H
 
+#include <__libk_common.h>
+
 // TODO: This should depend on the arch. x86 may use custom built.
 #if 1
 

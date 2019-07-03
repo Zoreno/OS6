@@ -23,6 +23,8 @@
 #ifndef _LIBK_STDINT_H
 #define _LIBK_STDINT_H
 
+#include <__libk_common.h>
+
 #include <_size_t.h>
 
 typedef unsigned char uint8_t;

@@ -23,6 +23,8 @@
 #ifndef _LIBK_ASSERT_H
 #define _LIBK_ASSERT_H
 
+#include <__libk_common.h>
+
 #include <stdio.h>
 
 extern void backtrace();

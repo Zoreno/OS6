@@ -22,11 +22,11 @@
 
 #include <ctype.h>
 
-#ifdef isalnum
-#undef isalnum
-#endif
+#include "../../include/__libk_symbols.h"
 
-int isalnum(char c)
+int libk_isalnum(char c)
 {
     return isalpha(c) || isdigit(c);
 }
+
+weak_alias(libk_isalnum, isalnum);
