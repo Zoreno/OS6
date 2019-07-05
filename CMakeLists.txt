@@ -182,5 +182,14 @@ add_custom_target(cleandocs
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 #==============================================================================
+# Custom testing command
+#==============================================================================
+
+add_custom_target(run-tests
+    COMMAND make
+    COMMAND ctest --output-on-failure
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+
+#==============================================================================
 # End of file
 #==============================================================================

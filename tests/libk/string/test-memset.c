@@ -12,6 +12,6 @@ JTEST(memset, test)
 
 	for (int i = 0; i < 100; ++i)
 	{
-		ASSERT_EQUAL(data[i], 0);
+		ASSERT_EQUAL(0, data[i]);
 	}
 }

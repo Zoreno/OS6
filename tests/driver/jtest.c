@@ -103,6 +103,7 @@ static void msg_start(const char *color, const char *title)
 	{
 		print_errormsg("%s", color);
 	}
+
 	print_errormsg("  %s: ", title);
 }
 
@@ -112,6 +113,7 @@ static void msg_end(void)
 	{
 		print_errormsg(ANSI_NORMAL);
 	}
+
 	print_errormsg("\n");
 }
 
