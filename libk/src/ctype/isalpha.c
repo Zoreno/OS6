@@ -22,7 +22,11 @@
 
 #include <ctype.h>
 
-int isalpha(char c)
+#include "../../include/__libk_symbols.h"
+
+int libk_isalpha(char c)
 {
     return isupper(c) || islower(c);
 }
+
+weak_alias(libk_isalpha, isalpha);

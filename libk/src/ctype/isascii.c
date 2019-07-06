@@ -22,7 +22,11 @@
 
 #include <ctype.h>
 
-int isascii(char c)
+#include "../../include/__libk_symbols.h"
+
+int libk_isascii(char c)
 {
     return ((unsigned char)c) <= 0x7f;
 }
+
+weak_alias(libk_isascii, isascii);

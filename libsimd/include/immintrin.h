@@ -23,8 +23,20 @@
 #ifndef _LIBSIMD_IMMINTRIN_H
 #define _LIBSIMD_IMMINTRIN_H
 
+// MMX
 #include <mmintrin.h>
+
+// SSE
 #include <xmmintrin.h>
+
+// SSE2
+#include <emmintrin.h>
+
+// SSE3
+#include <pmmintrin.h>
+
+// SSSE3
+#include <tmmintrin.h>
 
 #endif
 

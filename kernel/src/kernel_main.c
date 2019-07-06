@@ -82,10 +82,6 @@ Kernel
 Libk
  - time.h
 
-Libkm (needed?)
- - float
- - simd
-
 ACPI
  - Shutdown
 
@@ -123,10 +119,6 @@ Networking
  - E1000 Network card
  - Netstack
  - Sockets
-
-SIMD
- - Enable SIMD
- - xmmintrin.h and such
 
 ATAPI
  - Driver

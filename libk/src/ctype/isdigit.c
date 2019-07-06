@@ -22,7 +22,11 @@
 
 #include <ctype.h>
 
-int isdigit(char c)
+#include "../../include/__libk_symbols.h"
+
+int libk_isdigit(char c)
 {
     return c >= '0' && c <= '9';
 }
+
+weak_alias(libk_isdigit, isdigit);
