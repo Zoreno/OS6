@@ -465,6 +465,8 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     printf("Got return: %i\n", ret);
 
+    double f = atof("0.01");
+
     for (;;)
         ;
 

@@ -8,8 +8,8 @@ project(tests)
 # Flags and compiler configuration
 #==============================================================================
 
-set(TEST_CFLAGS "-g -O0 -Wall -W -fprofile-arcs -ftest-coverage")
-set(TEST_LDFLAGS "-fprofile-arcs -ftest-coverage")
+set(TEST_CFLAGS "-g -O0 -Wall -W -std=c11")
+set(TEST_LDFLAGS "-fprofile-arcs")
 
 #==============================================================================
 # Path macros
@@ -24,6 +24,7 @@ macro(declare_test PATH NAME)
 	target_include_directories(test-${NAME} SYSTEM PRIVATE ${OS6_TESTS}/driver)
 	set_target_properties(test-${NAME} PROPERTIES COMPILE_FLAGS ${TEST_CFLAGS})
 	set_target_properties(test-${NAME} PROPERTIES LINK_FLAGS ${TEST_LDFLAGS})
+	target_link_libraries(test-${NAME} PUBLIC m)
 	add_test(NAME ${NAME} COMMAND test-${NAME})
 endmacro(declare_test)
 
@@ -36,6 +37,8 @@ endmacro(declare_test)
 declare_test(libk/ctype isalnum)
 
 declare_test(libk/string memset)
+
+declare_test(libk/stdlib strtod)
 
 #==============================================================================
 # End of file

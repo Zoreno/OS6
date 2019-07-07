@@ -51,6 +51,9 @@ typedef struct
     long long int rem;
 } lldiv_t;
 
+double atof(const char *str);
+double strtod(const char *str, char **endptr);
+
 int atoi(const char *str);
 long int atol(const char *str);
 long long int atoll(const char *str);
@@ -99,3 +102,7 @@ void qsort(
     int (*compare)(const void *, const void *));
 
 #endif
+
+//==============================================================================
+// End of file
+//==============================================================================

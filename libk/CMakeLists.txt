@@ -104,6 +104,8 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/malloc.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/free.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/calloc.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/realloc.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/atof.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdlib/strtod.c)
 
 # stdio.h header
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/fputc.c)
