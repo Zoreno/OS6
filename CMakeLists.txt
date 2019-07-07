@@ -104,8 +104,8 @@ set(ISO_IMAGE ${CMAKE_BINARY_DIR}/${ISO_NAME})
 
 add_custom_command(OUTPUT ${ISO_IMAGE}
     POST_BUILD
-    DEPENDS kernel.bin
-    COMMAND cp kernel.bin ${CMAKE_SOURCE_DIR}/mnt/boot
+    DEPENDS kernel/kernel.bin
+    COMMAND cp kernel/kernel.bin ${CMAKE_SOURCE_DIR}/mnt/boot
     COMMAND grub-mkrescue -o ${ISO_IMAGE} ${CMAKE_SOURCE_DIR}/mnt
     COMMENT "Creating ISO image"
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})

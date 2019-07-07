@@ -225,6 +225,7 @@ int reg_blockdev_instance(uint32_t major, uint32_t minor, const char *desc, size
     fnode->finddir = NULL;
     fnode->ioctl = NULL;
 
+    // TODO: This should map to a unique name like /dev/hda1 and /dev/hda2
     vfs_mount("/dev/hda", fnode);
 
     return 0;

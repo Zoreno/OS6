@@ -171,6 +171,17 @@ void arch_x86_64_default_irq_handler(system_stack_t *regs)
             return;
         }
     }
+    // System call special case
+    else if (regs->int_no == 0x80)
+    {
+        _irq_handlers[0x80](regs);
+
+        interrupt_done(regs->int_no);
+
+        sti();
+
+        return;
+    }
 
     print_regs(regs);
 

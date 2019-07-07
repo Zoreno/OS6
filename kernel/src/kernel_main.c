@@ -68,6 +68,8 @@
 
 #include <immintrin.h>
 
+#include <syscall/syscall.h>
+
 /*
 
 Global todo list:
@@ -354,6 +356,60 @@ void mouse_moved_handler(mouse_moved_event_t *event)
     printf("Mouse moved [%i]: %i, %i\n", i++, (int64_t)event->x, (int64_t)event->y);
 }
 
+int64_t do_syscall0(int64_t syscall)
+{
+    int64_t ret;
+
+    __asm__ volatile("int $0x80"
+                     : "=a"(ret)
+                     : "a"(syscall)
+                     : "memory");
+
+    return ret;
+}
+
+int64_t do_syscall1(int64_t syscall, int64_t arg1)
+{
+    int64_t ret;
+
+    __asm__ volatile("int $0x80"
+                     : "=a"(ret)
+                     : "a"(syscall),
+                       "b"(arg1)
+                     : "memory");
+
+    return ret;
+}
+
+int64_t do_syscall2(int64_t syscall, int64_t arg1, int64_t arg2)
+{
+    int64_t ret;
+
+    __asm__ volatile("int $0x80"
+                     : "=a"(ret)
+                     : "a"(syscall),
+                       "b"(arg1),
+                       "c"(arg2)
+                     : "memory");
+
+    return ret;
+}
+
+int64_t do_syscall3(int64_t syscall, int64_t arg1, int64_t arg2, int64_t arg3)
+{
+    int64_t ret;
+
+    __asm__ volatile("int $0x80"
+                     : "=a"(ret)
+                     : "a"(syscall),
+                       "b"(arg1),
+                       "c"(arg2),
+                       "d"(arg3)
+                     : "memory");
+
+    return ret;
+}
+
 int kernel_main(unsigned long long rbx, unsigned long long rax)
 {
     (void)rax;
@@ -400,6 +456,17 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     pciInit();
 
     vbe_bochs_set_gfx(800, 600, 4);
+
+    syscall_install();
+
+    long long int ret;
+
+    ret = do_syscall1(0, 0);
+
+    printf("Got return: %i\n", ret);
+
+    for (;;)
+        ;
 
     printf("Kernel initailization done!\n");
 
