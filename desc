@@ -1,0 +1,632 @@
+//******************************************************************************
+//==============================================================================
+// 
+// libjrt.so
+//
+//==============================================================================
+//******************************************************************************
+
+<cxxabi.h>
+
+typedef void (*unexpected_handler)();
+typedef void (*terminate_handler)();
+
+struct __cxa_exception;
+struct __cxa_dependent_exception;
+struct __cxa_thread_info;
+
+__cxa_demangle();
+
+<typeinfo>
+
+class std::type_info;
+class __cxxabiv1::__fundamental_type_info : public std::type_info;
+class __cxxabiv1::__array_type_info : public std::type_info;
+class __cxxabiv1::__function_type_info : public std::type_info;
+class __cxxabiv1::__enum_type_info : public std::type_info;
+class __cxxabiv1::__class_type_info : public std::type_info;
+class __cxxabiv1::__si_class_type_info : public __cxxabiv1::__class_type_info;
+class __cxxabiv1::__base_class_type_info;
+class __cxxabiv1::__vmi_class_type_info : public __cxxabiv1::__class_type_info;
+class __cxxabiv1::__pbase_type_info : public std::type_info;
+class __cxxabiv1::__pointer_type_info : public __cxxabiv1::__pbase_type_info;
+class __cxxabiv1::__pointer_to_member_type_info : public __cxxabiv1::__pbase_type_info;
+
+class std::bad_cast : public std::exception;
+class std::bad_typeid : public std::exception;
+
+<stdexcept>
+
+class std::exception;
+class std::bad_alloc : public std::exception;
+class std::bad_cast : public std::exception;
+class std::bad_typeid : public std::exception;
+class std::bad_array_new_length : public std::exception;
+
+<memory>
+
+struct std::nothrow_t {};
+
+void *operator new(size_t size);
+void *operator new(size_t size, const std::nothrow_t&);
+
+void operator delete(void *ptr);
+
+void *operator new[](size_t size);
+void *operator new[](size_t size, const std::nothrow_t&);
+
+void operator delete[](void *ptr);
+
+<dwarh_eh.h>
+
+typedef unsigned char *dw_eh_ptr_t;
+
+enum dwarf_data_encoding;
+enum dwarf_data_relative;
+
+static inline enum dwarf_data_encoding get_encoding(unsigned char x);
+static inline enum dwarf_data_relative get_base(unsigned char x);
+static int is_indirect(unsigned char x);
+static inline int dwarf_size_of_fixed_byte_field(unsigned char type);
+static uint64_t read_leb128(dw_eh_ptr_t *data, int *b);
+static int64_t read_uleb128(dw_eh_ptr_t *data);
+static int64_t read_sleb128(dw_eh_ptr_t *data);
+static uint64_t read_value(char encoding, dw_eh_ptr_t *data);
+static uint64_t resolve_indirect_value(_Unwind_Context *c,
+									   unsigned char encoding,
+									   int64_t v,
+									   dw_eh_ptr_t start);
+static inline void read_value_with_encoding(_Unwind_Context *context,
+											dw_eh_ptr_t *data,
+											uint64_t *out);
+struct dward_eh_lsda;
+static inline struct dwarf_eh_lsda parse_lsda(_Unwind_Context *context,
+											  unsigned char *data);
+
+struct dwarf_eh_action;
+static bool dwarf_eh_find_callsite(struct _Unwind_Context *context,
+								   struct dwarf_eh_lsda *lsda,
+								   struct dwarf_eh_action *result);
+
+<initializer_list>
+
+template<class _E>
+class std::initializer_list;
+
+template <class _E>
+const E *std::begin(std::initializer_list<E> il) noexcept;
+template <class _E>
+const E *std::end(std::initializer_list<E> il) noexcept;
+
+<atomic.h>
+
+ATOMIC_SWAP(addr, val)
+ATOMIC_LOAD(addr)
+
+//******************************************************************************
+//==============================================================================
+// 
+// libjstd.so
+//
+//==============================================================================
+//******************************************************************************
+
+//==============================================================================
+// Language support library
+//==============================================================================
+
+<limits>
+
+template <typename T>
+class std::numeric_limits;
+
+enum std::float_round_style;
+enum std::float_denorm_style;
+
+template <>
+class std::numeric_limits<bool>;
+template <>
+class std::numeric_limits<char>;
+template <>
+class std::numeric_limits<signed char>;
+template <>
+class std::numeric_limits<unsigned char>;
+template <>
+class std::numeric_limits<char16_t>;
+template <>
+class std::numeric_limits<char32_t>;
+template <>
+class std::numeric_limits<wchar_t>;
+template <>
+class std::numeric_limits<unsigned char>;
+
+template <>
+class std::numeric_limits<short>;
+template <>
+class std::numeric_limits<int>;
+template <>
+class std::numeric_limits<long>;
+template <>
+class std::numeric_limits<long long>;
+template <>
+class std::numeric_limits<unsigned short>;
+template <>
+class std::numeric_limits<unsigned int>;
+
+template <>
+class std::numeric_limits<float>;
+template <>
+class std::numeric_limits<double>;
+template <>
+class std::numeric_limits<long double>;
+
+template <class T>
+class std::numeric_limits<const T>;
+template <class T>
+class std::numeric_limits<volatile T>;
+template <class T>
+class std::numeric_limits<const volatile T>;
+
+<cstdlib>
+
+void _Exit(int status) noexcept;
+void abort(int status) noexcept;
+
+extern "C" int atexit(void (*f)(void)) noexcept;
+extern "C++" int atexit(void (*f)(void)) noexcept;
+
+void exit(int status);
+
+extern "C" int at_quick_exit(void (*f)(void)) noexcept;
+extern "C++" int at_quick_exit(void (*f)(void)) noexcept;
+
+void quick_exit(int status) noexcept;
+
+//==============================================================================
+// Diagnostics library
+//==============================================================================
+
+<stdexcept>
+
+class std::logic_error : public std::exception;
+
+class std::domain_error : public std::logic_error;
+class std::invalid_argument : public std::logic_error;
+class std::length_error : public std::logic_error;
+class std::out_of_range : public std::logic_error;
+
+class std::runtime_error : public std::exception;
+
+class std::range_error : public std::runtime_error;
+class std::overflow_error : public std::runtime_error;
+class std::underflow_error : public std::runtime_error;
+
+<system_error>
+
+class std::error_category;
+class std::error_code;
+class std::error_condition;
+class std::system_error : public std::runtime_error;
+
+template <class T>
+struct std::is_error_code_enum : public std::false_type {};
+template <class T>
+struct std::is_error_condition_enum : public std::false_type {};
+
+enum std::errc;
+
+template <> struct std::is_error_condition_enum<std::errc> : std::true_type {};
+
+std::error_code std::make_error_code(std::errc e) noexcept;
+std::error_condition std::make_error_condition(std::errc e) noexcept;
+
+bool std::operator==(const std::error_code& lhs, const std::error_code& rhs) noexcept;
+bool std::operator==(const std::error_code& lhs, const std::error_condition& rhs) noexcept;
+bool std::operator==(const std::error_condition& lhs, const std::error_code& rhs) noexcept;
+bool std::operator==(const std::error_condition& lhs, const std::error_condition& rhs) noexcept;
+
+bool std::operator!=(const std::error_code& lhs, const std::error_code& rhs) noexcept;
+bool std::operator!=(const std::error_code& lhs, const std::error_condition& rhs) noexcept;
+bool std::operator!=(const std::error_condition& lhs, const std::error_code& rhs) noexcept;
+bool std::operator!=(const std::error_condition& lhs, const std::error_condition& rhs) noexcept;
+
+template <class T>
+struct std::hash;
+
+template <>
+struct std::hash<std::error_code>;
+
+const std::error_category& std::generic_category() noexcept;
+const std::error_category& std::system_category() noexcept;
+
+//==============================================================================
+// General utilities library
+//==============================================================================
+
+<utility>
+
+template <class T>
+bool std::rel_ops::operator!=(const T&, const T&);
+template <class T>
+bool std::rel_ops::operator>(const T&, const T&);
+template <class T>
+bool std::rel_ops::operator<=(const T&, const T&);
+template <class T>
+bool std::rel_ops::operator>=(const T&, const T&);
+
+template <typename _Tp>
+constexpr _Tp&&
+std::forward(typename std::remove:reference<_Tp>::type& __t);
+template <typename _Tp>
+constexpr _Tp&&
+std::forward(typename std::remove:reference<_Tp>::type&& __t);
+
+template <typename _Tp>
+constexpr typename std::remove_reference<_Tp>::type&&
+std::move(_Tp&& __t);
+
+template <typename _Tp>
+inline void
+std::swap(_Tp& __a, _Tp& __b) noexcept;
+
+template <class T, size_t N>
+inline void
+std::swap(T (&a)[N], T (&b)[N]) noexcept(noexcept(swap(*a, *b)));
+
+template <class T>
+typename std::add_rvalue_reference<T>::type
+std::declval() noexcept;
+
+template <typename _T1, typename _T2>
+struct std::pair;
+
+template <class T>
+class std::tuple_size;
+
+template <size_t I, class T>
+class std::tuple_element;
+
+template <class T1, class T2>
+struct std::tuple_size<std::pair<T1, T2>>;
+
+template <class T1, class T2>
+struct std::tuple_element<0, std::pair<T1, T2>>; 
+
+template <class T1, class T2>
+struct std::tuple_element<1, std::pair<T1, T2>>;
+
+struct std::piecewise_construct_t {};
+
+constexpr std::piecewise_construct_t piecewise_construct = std::piecewise_construct_t {};
+
+template <typename _Tp, _Tp... _Idx>
+struct std::integer_sequence;
+
+<tuple>
+
+template <typename... _Elements>
+class std::tuple;
+
+<bitset>
+
+template <size_t _Nb>
+class std::bitset;
+
+<memory>
+
+template <class Ptr>
+struct std::pointer_traits;
+
+template <class T>
+struct std::pointer_traits<T*>;
+
+template <class Alloc>
+struct std::allocator_traits;
+
+template <class T>
+class std::allocator;
+
+template <>
+class std::allocator<void>;
+
+template <class OutputIterator, class T>
+class std::raw_storage_iterator;
+
+template <class T>
+T *std::addressof(T& r) noexcept;
+
+template <class T>
+class std::default_delete;
+
+template <class T>
+class std::default_delete<T[]>;
+
+template <class T, class D = std::default_delete<T>>
+class std::unique_ptr;
+
+template <class T, class D>
+class std::unique_ptr<T[], D>;
+
+class std::bad_weak_ptr;
+
+template <class T>
+class std::shared_ptr;
+
+template <class T>
+class std::weak_ptr;
+
+<functional>
+
+template <class Arg, class Result>
+struct std::unary_function;
+
+template <class Arg1, class Arg2, class Result>
+struct std::binary_function;
+
+template <class T>
+class std::reference_wrapper;
+
+template <class T>
+struct std::plus;
+template <class T>
+struct std::minus;
+template <class T>
+struct std::multiplies;
+template <class T>
+struct std::divides;
+template <class T>
+struct std::modulus;
+template <class T>
+struct std::negate;
+
+template <class T>
+struct std::equal_to;
+template <class T>
+struct std::not_equal_to;
+template <class T>
+struct std::greater;
+template <class T>
+struct std::less;
+template <class T>
+struct std::greater_equal;
+template <class T>
+struct std::less_equal;
+
+template <class T>
+struct std::logical_and;
+template <class T>
+struct std::logical_or;
+template <class T>
+struct std::logical_not;
+
+...
+
+<type_traits>
+
+template <typename _Tp, _Tp __v>
+struct std::integral_constant;
+
+typedef std::integral_constant<bool, true> std::true_type;
+typedef std::integral_constant<bool, false> std::false_type;
+
+lots of is_...-structs
+
+<ratio>
+
+template <intmax_t _Num, intmax_t _Den = 1>
+struct std::ratio;
+
+<chrono>
+
+template <typename _Rep, typename _Period = ratio<1>>
+struct std::chrono::duration;
+
+template <typename _Clock, typename _Dur = typename _Clock::duration>
+struct std::chrono::time_point;
+
+<typeindex>
+
+class std::type_index;
+
+template <class T>
+struct std::hash;
+
+template <>
+struct std::hash<std::type_index>;
+
+//==============================================================================
+// Strings library
+//==============================================================================
+
+<string>
+
+template <class charT>
+struct std::char_traits;
+
+template <>
+struct std::char_traits<char>;
+template <>
+struct std::char_traits<char16_t>;
+template <>
+struct std::char_traits<char32_t>;
+template <>
+struct std::char_traits<wchar_t>;
+
+template <class charT,
+		  class traits = std::char_traits<charT>,
+		  class Allocator = std::allocator<charT>>
+class std::basic_string;
+
+typedef std::basic_string<char> std::string;
+typedef std::basic_string<char16_t> std::u16string;
+typedef std::basic_string<char32_t> std::u32string;
+typedef std::basic_string<wchar_t> std::wstring;
+
+//==============================================================================
+// Containers library
+//==============================================================================
+
+<array>
+
+template <class T, size_t N>
+struct std::array;
+
+<deque>
+
+template <class T,
+		  class Allocator = std::allocator<T>>
+class std::deque;
+
+<forward_list>
+
+template <class T,
+		  class Allocator = std::allocator<T>>
+class std::forward_list;
+
+<list>
+
+template <class T,
+		  class Allocator = std::allocator<T>>
+class std::list;
+
+<vector>
+
+template <class T,
+		  class Allocator = std::allocator<T>>
+class std::vector;
+
+...
+
+//==============================================================================
+// Iterators library
+//==============================================================================
+
+<iterator>
+
+template <class Category,
+		  class T,
+		  class Distance = ptrdiff_t,
+		  class Pointer = T*,
+		  class Reference = T&>
+struct std::iterator;
+
+//==============================================================================
+// Algorithms library
+//==============================================================================
+
+//==============================================================================
+// Numeric library
+//==============================================================================
+
+//==============================================================================
+// Input/output library
+//==============================================================================
+
+<iosfwd>
+
+template <class charT>
+class std::char_traits;
+
+template <>
+class std::char_traits<char>;
+template <>
+class std::char_traits<char16_t>;
+template <>
+class std::char_traits<char32_t>;
+template <>
+class std::char_traits<wchar_t>;
+
+template <class T>
+class std::allocator;
+
+template <class charT,
+		  class traits = std::char_traits<charT>>
+class std::basic_ios;
+
+template <class charT,
+		  class traits = std::char_traits<charT>>
+class std::basic_streambuf;
+
+template <class charT,
+		  class traits = std::char_traits<charT>>
+class std::basic_istream;
+
+template <class charT,
+		  class traits = std::char_traits<charT>>
+class std::basic_ostream;
+
+template <class charT,
+		  class traits = std::char_traits<charT>>
+class std::basic_iostream;
+
+template <class charT,
+		  class traits = std::char_traits<charT>,
+		  class Allocator = std::allocator<charT>>
+class std::basic_stringbuf;
+
+template <class charT,
+		  class traits = std::char_traits<charT>,
+		  class Allocator = std::allocator<charT>>
+class std::basic_istringstream;
+
+template <class charT,
+		  class traits = std::char_traits<charT>,
+		  class Allocator = std::allocator<charT>>
+class std::basic_ostringstream;
+
+template <class charT,
+		  class traits = std::char_traits<charT>,
+		  class Allocator = std::allocator<charT>>
+class std::basic_stringstream;
+
+template <class charT,
+		  class traits = std::char_traits<charT>>
+class std::basic_filebuf;
+
+template <class charT,
+		  class traits = std::char_traits<charT>>
+class std::basic_ifstream;
+
+template <class charT,
+		  class traits = std::char_traits<charT>>
+class std::basic_ofstream;
+
+template <class charT,
+		  class traits = std::char_traits<charT>>
+class std::basic_fstream;
+
+template <class charT,
+		  class traits = std::char_traits<charT>>
+class std::istreambuf_iterator;
+
+template <class charT,
+		  class traits = std::char_traits<charT>>
+class std::ostreambuf_iterator;
+
+//==============================================================================
+// Regular expressions library
+//==============================================================================
+
+enum std::regex_constants::error_type;
+
+class std::regex_error;
+
+template <class charT>
+struct std::regex_traits;
+
+template <class charT,
+		  class traits = std::regex_traits<charT>>
+class std::basic_regex;
+
+typedef std::basic_regex<char> std::regex;
+typedef std::basic_regex<wchar_t> std::wregex;
+
+//==============================================================================
+// Atomics library
+//==============================================================================
+
+//==============================================================================
+// Thread support library
+//==============================================================================
+
+...
