@@ -22,7 +22,6 @@ set(CMAKE_ASM_NASM_OBJECT_FORMAT elf64)
 set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> \
     -f ${CMAKE_ASM_NASM_OBJECT_FORMAT} ${ASMFLAGS} -o <OBJECT> <SOURCE>")
 
-
 #==============================================================================
 # Path macros
 #==============================================================================
@@ -88,6 +87,7 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/keyboard_ps2.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/drivers/mouse_ps2.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/exec/elf64.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/exec/exec_elf.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/list.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/tree.c)
@@ -96,6 +96,7 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/bitset.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/link.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/sha512.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/vector.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/hashmap.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/gui_listnode.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/gui_list.c)

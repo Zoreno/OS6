@@ -1183,7 +1183,7 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
             return node_ptr;
         }
 
-        printf("depth: %i, path_depth: %i\n", depth, path_depth);
+        //printf("depth: %i, path_depth: %i\n", depth, path_depth);
         if (depth == path_depth)
         {
             //printf("Opening file 2...\n");

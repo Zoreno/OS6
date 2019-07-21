@@ -42,4 +42,5 @@
         "return"
     ],
     "C_Cpp.errorSquiggles": "Disabled",
+    "git.ignoreLimitWarning": true,
 }

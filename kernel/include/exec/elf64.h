@@ -62,6 +62,12 @@ typedef struct
 
 } __attribute__((packed)) Elf64_Ehdr_t;
 
+#define ELFMAG0 0x7f
+#define ELFMAG1 'E'
+#define ELFMAG2 'L'
+#define ELFMAG3 'F'
+#define EI_NIDENT 16
+
 #define EI_MAG0 0
 #define EI_MAG1 1
 #define EI_MAG2 2
@@ -221,7 +227,7 @@ typedef struct
 #define PT_LOAD 1
 #define PT_DYNAMIC 2
 #define PT_INERP 3
-#define PT_LOAD 4
+#define PT_NOTE 4
 #define PT_SHLIB 5
 #define PT_PHDR 6
 #define PT_LOOS 0x60000000
@@ -310,6 +316,12 @@ typedef struct
 } __attribute__((packed)) DwarfDebugLineHeader_t;
 
 void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t size, uint64_t addr);
+
+//=============================================================================
+// Image execution
+//=============================================================================
+
+int exec_elf(char *path, int argc, char **argv, char **env, int depth);
 
 #endif
 

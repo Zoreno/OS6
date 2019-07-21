@@ -459,13 +459,16 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     syscall_install();
 
+    /*
     long long int ret;
 
     ret = do_syscall1(0, 0);
 
     printf("Got return: %i\n", ret);
 
-    double f = atof("0.01");
+*/
+
+    exec_elf("bin/hello_world_cpp", 0, NULL, NULL, 0);
 
     for (;;)
         ;

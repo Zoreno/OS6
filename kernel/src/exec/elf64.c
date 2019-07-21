@@ -39,6 +39,8 @@ static const char *_symbol_string_table = NULL;
 static Elf64_Addr_t _dwarf_line_info = 0;
 static Elf64_Xword_t _dwarf_size = 0;
 
+static memory_info_t _mem_info;
+
 unsigned long elf64_hash(const unsigned char *name)
 {
 	unsigned long h = 0;
@@ -63,6 +65,12 @@ void elf_kernel_lookup_symbol(void *addr)
 {
 	if (!_symbol_section || !_symbol_string_table)
 	{
+		return;
+	}
+
+	if (addr > (void *)_mem_info.kernel_end || addr < (void *)_mem_info.kernel_load_addr)
+	{
+		printf("External code");
 		return;
 	}
 
@@ -173,6 +181,8 @@ void init_kernel_symbol_context(struct multiboot_tag_elf_sections *elf_sections,
 			mem_info->kernel_end = sec_header[i].sh_addr + sec_header[i].sh_size;
 		}
 	}
+
+	memcpy(&_mem_info, mem_info, sizeof(memory_info_t));
 }
 
 static size_t read_uleb128(const unsigned char *buf, const unsigned char *buf_end, uint64_t *r)
@@ -566,6 +576,8 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
 
 	DwarfDebugLineHeader_t *header = (DwarfDebugLineHeader_t *)section_start;
 
+	int found = 0;
+
 	while (header < (DwarfDebugLineHeader_t *)(section_start + size))
 	{
 
@@ -654,9 +666,15 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
 		if (addr <= end_addr && addr >= start_addr)
 		{
 			printf("%s/%s:%i", dir_table_entries[file_table_entries[file].dir].str, file_table_entries[file].str, line);
+			found = 1;
 		}
 
 		// Advance to the next header
 		header = (DwarfDebugLineHeader_t *)(((uint8_t *)header) + header->length + sizeof(header->length));
+	}
+
+	if (!found)
+	{
+		printf("External code");
 	}
 }

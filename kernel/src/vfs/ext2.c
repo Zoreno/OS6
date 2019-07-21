@@ -202,7 +202,7 @@ static int read_block(ext2_fs_t *this, uint32_t block_no, uint8_t *buffer)
 
     if (!block_no)
     {
-        printf("Block_no = 0\n");
+        //printf("Block_no = 0\n");
         return -1;
     }
 

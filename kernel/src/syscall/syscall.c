@@ -4,9 +4,27 @@
 
 #include <stdio.h>
 
+#include <debug/backtrace.h>
+
 void syscall_handler(system_stack_t *stack)
 {
-    printf("Got system call: %i\n", stack->rax);
+    //printf("Got system call: %i\n", stack->rax);
+
+    switch (stack->rax)
+    {
+    case 0:
+    {
+        printf("%s", stack->rbx);
+    }
+    break;
+    default:
+    {
+        printf("[SYSCALL] Invalid system call: %i", stack->rax);
+        for (;;)
+            ;
+    }
+    break;
+    }
 
     stack->rax = 14;
 }

@@ -1,45 +1,44 @@
 #==============================================================================
-# Cmake file for compiling the OS6 operating system tests
+# Cmake file for compiling the OS6 operating system stack unwinding module
 #==============================================================================
 
-project(tests)
+project(libunwind)
+
+add_library(${LIBUNWIND} "")
 
 #==============================================================================
 # Flags and compiler configuration
 #==============================================================================
 
-set(TEST_CFLAGS "-g -O0 -Wall -W -std=c11")
-set(TEST_LDFLAGS "-fprofile-arcs")
+set_target_properties(${LIBUNWIND} PROPERTIES COMPILE_FLAGS ${CPPFLAGS})
+set_target_properties(${LIBUNWIND} PROPERTIES SKIP_BUILD_RPATH 1)
+
+set(CMAKE_ASM_NASM_OBJECT_FORMAT elf64)
+set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> \
+    -f ${CMAKE_ASM_NASM_OBJECT_FORMAT} ${ASMFLAGS} -o <OBJECT> <SOURCE>")
 
 #==============================================================================
 # Path macros
 #==============================================================================
 
 #==============================================================================
-# Test macro
+# Includes and dependencies
 #==============================================================================
 
-macro(declare_test PATH NAME)
-	add_executable(test-${NAME} ${OS6_TESTS}/${PATH}/test-${NAME}.c ${OS6_TESTS}/driver/jtest.c)
-	target_include_directories(test-${NAME} SYSTEM PRIVATE ${OS6_TESTS}/driver)
-	set_target_properties(test-${NAME} PROPERTIES COMPILE_FLAGS ${TEST_CFLAGS})
-	set_target_properties(test-${NAME} PROPERTIES LINK_FLAGS ${TEST_LDFLAGS})
-	target_link_libraries(test-${NAME} PUBLIC m)
-	add_test(NAME ${NAME} COMMAND test-${NAME})
-endmacro(declare_test)
+target_include_directories(${LIBUNWIND} SYSTEM PRIVATE ${LIBUNWIND_INCLUDE})
+target_include_directories(${LIBUNWIND} SYSTEM PRIVATE ${LIBC_INCLUDE})
+
+target_link_libraries(${LIBUNWIND} PRIVATE ${LIBC})
+
+#==============================================================================
+# Sources
+#==============================================================================
+
+target_sources(${LIBUNWIND} PRIVATE ${LIBUNWIND_SRC}/eh_frame.cpp)
+target_sources(${LIBUNWIND} PRIVATE ${LIBUNWIND_SRC}/dwarf4.cpp)
+target_sources(${LIBUNWIND} PRIVATE ${LIBUNWIND_SRC}/registers_intel_x64.asm)
+target_sources(${LIBUNWIND} PRIVATE ${LIBUNWIND_SRC}/ia64_cxx_abi.cpp)
 
 #==============================================================================
 # Tests
-#==============================================================================
-
-# TODO: Move tests to separate folders to reduce name clash
-
-#declare_test(libk/ctype isalnum)
-
-#declare_test(libk/string memset)
-
-#declare_test(libk/stdlib strtod)
-
-#==============================================================================
-# End of file
 #==============================================================================

@@ -1,44 +1,46 @@
 #==============================================================================
-# Cmake file for compiling the OS6 operating system tests
+# Cmake file for compiling the OS6 operating system apps
 #==============================================================================
 
-project(tests)
+project(hello_world)
+
+set(APP_NAME hello_world)
+
+add_executable(${APP_NAME} "")
 
 #==============================================================================
 # Flags and compiler configuration
 #==============================================================================
 
-set(TEST_CFLAGS "-g -O0 -Wall -W -std=c11")
-set(TEST_LDFLAGS "-fprofile-arcs")
+set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/libc/linker.ld")
+
+set_target_properties(${APP_NAME} PROPERTIES COMPILE_FLAGS ${CFLAGS})
+
+set_target_properties(${APP_NAME} PROPERTIES LINK_FLAGS "-n -T ${LINKER_SCRIPT}")
+set_target_properties(${APP_NAME} PROPERTIES DEPENDS ${LINKER_SCRIPT})
+
+set(CMAKE_C_LINK_EXECUTABLE "ld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+set(CMAKE_ASM_NASM_OBJECT_FORMAT elf64)
+set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> \
+    -f ${CMAKE_ASM_NASM_OBJECT_FORMAT} ${ASMFLAGS} -o <OBJECT> <SOURCE>")
 
 #==============================================================================
 # Path macros
 #==============================================================================
 
 #==============================================================================
-# Test macro
+# Includes and dependencies
 #==============================================================================
 
-macro(declare_test PATH NAME)
-	add_executable(test-${NAME} ${OS6_TESTS}/${PATH}/test-${NAME}.c ${OS6_TESTS}/driver/jtest.c)
-	target_include_directories(test-${NAME} SYSTEM PRIVATE ${OS6_TESTS}/driver)
-	set_target_properties(test-${NAME} PROPERTIES COMPILE_FLAGS ${TEST_CFLAGS})
-	set_target_properties(test-${NAME} PROPERTIES LINK_FLAGS ${TEST_LDFLAGS})
-	target_link_libraries(test-${NAME} PUBLIC m)
-	add_test(NAME ${NAME} COMMAND test-${NAME})
-endmacro(declare_test)
+target_include_directories(${APP_NAME} SYSTEM PRIVATE ${LIBC_INCLUDE})
+
+target_link_libraries(${APP_NAME} PRIVATE ${LIBC})
 
 #==============================================================================
-# Tests
+# Sources
 #==============================================================================
 
-# TODO: Move tests to separate folders to reduce name clash
-
-#declare_test(libk/ctype isalnum)
-
-#declare_test(libk/string memset)
-
-#declare_test(libk/stdlib strtod)
+target_sources(${APP_NAME} PRIVATE hello_world.c)
 
 #==============================================================================
 # End of file

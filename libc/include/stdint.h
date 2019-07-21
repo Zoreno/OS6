@@ -20,10 +20,12 @@
  * 
  */
 
-#ifndef _LIBK_STDINT_H
-#define _LIBK_STDINT_H
+#ifndef _LIBC_STDINT_H
+#define _LIBC_STDINT_H
 
-#include <__libk_common.h>
+#include <_cheader.h>
+
+_c_header_begin;
 
 #include <_size_t.h>
 
@@ -138,5 +140,7 @@ typedef uint64_t uintmax_t;
 #define PTRDIFF_MAX INT32_MAX
 
 #define SIZE_MAX UINT32_MAX
+
+_c_header_end;
 
 #endif

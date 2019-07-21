@@ -5,15 +5,25 @@
 cmake_minimum_required(VERSION 3.5)
 
 set(CMAKE_ASM_SOURCE_FILE_EXTENSIONS "asm")
-set(CMAKE_C_COMPILER gcc)
 
-project(OS6 C ASM_NASM)
+set(OS6_COMPILER_PATH "${CMAKE_SOURCE_DIR}/toolchain/OS6_cross_cc/x86_64-elf/bin")
+
+set(CMAKE_C_COMPILER "${OS6_COMPILER_PATH}/gcc")
+set(CMAKE_CXX_COMPILER "${OS6_COMPILER_PATH}/g++")
+
+set(CMAKE_C_COMPILER_WORKS 1)
+set(CMAKE_CXX_COMPILER_WORKS 1)
+#set(CMAKE_CROSSCOMPILING 1)
+
+project(OS6 C CXX ASM_NASM)
 
 set(CAN_USE_ASSEMBLER TRUE)
 
+enable_language(C)
+enable_language(CXX)
 enable_language(ASM_NASM)
 
-enable_testing()
+#enable_testing()
 
 #==============================================================================
 # Flags and compiler configuration
@@ -22,19 +32,21 @@ enable_testing()
 # Debug build
 set(DEBUG_BUILD true)
 
-set(CFLAGS "")
-
-# Set C standard
-set(CFLAGS "${CFLAGS} -std=c11")
+set(CFLAGS "-m64")
 
 # Set warnings and error conditions
-set(CFLAGS "${CFLAGS} -Wall -Wextra -Werror=implicit-function-declaration -Wno-unused -Wno-sign-compare -Wno-pointer-sign")
+set(CFLAGS "${CFLAGS} -Wall -Wextra -Werror=implicit-function-declaration -Wno-unused -Wno-sign-compare")
 
 # Disable standard library
-set(CFLAGS "${CFLAGS} -ffreestanding -nostdlib -nostdinc -nodefaultlibs")
+set(CFLAGS "${CFLAGS} -ffreestanding")
 
 # Disable language features
-set(CFLAGS "${CFLAGS} -fno-builtin -finline-functions -fno-stack-protector -fno-exceptions")
+set(CFLAGS "${CFLAGS} -fno-builtin -finline-functions -fno-stack-protector")
+
+set(CPPFLAGS "${CFLAGS} -std=c++11 -static-libgcc")
+
+# Set C standard
+set(CFLAGS "${CFLAGS} -Wno-pointer-sign -std=c11")
 
 set(ASMFLAGS "")
 
@@ -62,13 +74,26 @@ set(KERNEL_SRC ${CMAKE_SOURCE_DIR}/kernel/src)
 set(LIBK_INCLUDE ${CMAKE_SOURCE_DIR}/libk/include)
 set(LIBK_SRC ${CMAKE_SOURCE_DIR}/libk/src)
 
+set(LIBC_INCLUDE ${CMAKE_SOURCE_DIR}/libc/include)
+set(LIBC_SRC ${CMAKE_SOURCE_DIR}/libc/src)
+
 set(LIBSIMD_INCLUDE ${CMAKE_SOURCE_DIR}/libsimd/include)
 set(LIBSIMD_SRC ${CMAKE_SOURCE_DIR}/libsimd/src)
+
+set(LIBSUPCXX_INCLUDE ${CMAKE_SOURCE_DIR}/libsupc++/include)
+set(LIBSUPCXX_SRC ${CMAKE_SOURCE_DIR}/libsupc++/src)
+
+set(LIBUNWIND_INCLUDE ${CMAKE_SOURCE_DIR}/libunwind/include)
+set(LIBUNWIND_SRC ${CMAKE_SOURCE_DIR}/libunwind/src)
+
 
 set(OS6_TESTS ${CMAKE_SOURCE_DIR}/tests)
 
 set(KERNEL_EXEC kernel.bin)
 set(LIBK k)
+set(LIBC c)
+set(LIBSUPCXX supc++)
+set(LIBUNWIND unwind)
 set(LIBSIMD simd)
 
 #==============================================================================
@@ -90,6 +115,25 @@ add_subdirectory(libsimd)
 add_subdirectory(kernel)
 
 #==============================================================================
+# libc
+#==============================================================================
+
+add_subdirectory(libc)
+
+#==============================================================================
+# c++ support
+#==============================================================================
+
+add_subdirectory(libunwind)
+add_subdirectory(libsupc++)
+
+#==============================================================================
+# Apps
+#==============================================================================
+
+add_subdirectory(apps)
+
+#==============================================================================
 # Tests
 #==============================================================================
 
@@ -100,12 +144,13 @@ add_subdirectory(tests)
 #==============================================================================
 
 set(ISO_NAME os.iso)
-set(ISO_IMAGE ${CMAKE_BINARY_DIR}/${ISO_NAME})
+set(ISO_IMAGE ${ISO_NAME})
 
-add_custom_command(OUTPUT ${ISO_IMAGE}
-    POST_BUILD
-    DEPENDS kernel/kernel.bin
-    COMMAND cp kernel/kernel.bin ${CMAKE_SOURCE_DIR}/mnt/boot
+add_custom_target(${ISO_IMAGE}
+    DEPENDS kernel/kernel.bin apps/hello_world/hello_world apps/hello_world_cpp/hello_world_cpp
+    COMMAND cp -u kernel/kernel.bin ${CMAKE_SOURCE_DIR}/mnt/boot
+    COMMAND cp -u apps/hello_world/hello_world ${CMAKE_SOURCE_DIR}/root/bin
+    COMMAND cp -u apps/hello_world_cpp/hello_world_cpp ${CMAKE_SOURCE_DIR}/root/bin
     COMMAND grub-mkrescue -o ${ISO_IMAGE} ${CMAKE_SOURCE_DIR}/mnt
     COMMENT "Creating ISO image"
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
