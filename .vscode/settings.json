@@ -3,7 +3,8 @@
     "C_Cpp.default.includePath": [],
     "files.associations": {
         "*.cu": "cpp",
-        "*.h": "c"
+        "*.h": "c",
+        "typeinfo": "cpp"
     },
     "doxdocgen.generic.authorEmail": "",
     "doxdocgen.generic.authorName": "Joakim Bertils",

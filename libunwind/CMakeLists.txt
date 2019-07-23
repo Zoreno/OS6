@@ -36,6 +36,7 @@ target_link_libraries(${LIBUNWIND} PRIVATE ${LIBC})
 
 target_sources(${LIBUNWIND} PRIVATE ${LIBUNWIND_SRC}/eh_frame.cpp)
 target_sources(${LIBUNWIND} PRIVATE ${LIBUNWIND_SRC}/dwarf4.cpp)
+target_sources(${LIBUNWIND} PRIVATE ${LIBUNWIND_SRC}/eh_framelist.cpp)
 target_sources(${LIBUNWIND} PRIVATE ${LIBUNWIND_SRC}/registers_intel_x64.asm)
 target_sources(${LIBUNWIND} PRIVATE ${LIBUNWIND_SRC}/ia64_cxx_abi.cpp)
 

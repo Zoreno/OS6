@@ -1,19 +1,14 @@
 #ifndef _CXXABI_H
 #define _CXXABI_H
 
-#include <stdint.h>
+#pragma GCC system_header
 
-namespace __cxxabiv1
-{
-struct __class_type_info
-{
-    virtual void foo() {}
-} ti;
-} // namespace __cxxabiv1
+#include <stdint.h>
 
 extern "C"
 {
-#include <unwind.h>
+#include <ia64_cxx_abi.h>
+#include <typeinfo>
 
     typedef void (*unexpected_handler_t)(void);
     typedef void (*terminate_handler_t)(void);
@@ -49,5 +44,7 @@ extern "C"
         _Unwind_Exception *unwind_exception,
         _Unwind_Context *context);
 }
+
+namespace abi = __cxxabiv1;
 
 #endif

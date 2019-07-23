@@ -36,7 +36,9 @@ SECTIONS
 
 	.eh_frame BLOCK(4K) : ALIGN(4K)
 	{
+		__start_eh_frame = .;
 		*(.eh_frame)
+		__end_eh_frame = .;
 	}
 
 	.init :

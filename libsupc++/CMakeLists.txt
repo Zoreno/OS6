@@ -37,6 +37,7 @@ target_link_libraries(${LIBSUPCXX} PRIVATE ${LIBUNWIND})
 #==============================================================================
 
 target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/cxxabi.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/exception.cpp)
 
 #==============================================================================
 # Tests

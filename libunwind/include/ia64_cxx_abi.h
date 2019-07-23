@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 
+namespace std
+{
+class type_info;
+}
+
 struct _Unwind_Exception;
 struct _Unwind_Context;
 

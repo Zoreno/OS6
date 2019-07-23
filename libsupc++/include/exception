@@ -1,0 +1,20 @@
+#ifndef _EXCEPTION
+#define _EXCEPTION
+
+#pragma GCC system_header
+
+#include <exception.h>
+
+namespace std
+{
+class bad_exception : public exception
+{
+public:
+    bad_exception() noexcept {}
+    virtual ~bad_exception() noexcept;
+
+    virtual const char *what() const noexcept;
+};
+} // namespace std
+
+#endif
