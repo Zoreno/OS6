@@ -7,11 +7,8 @@
 
 namespace __cxxabiv1
 {
-struct __class_type_info
-{
-    virtual void foo() {}
-} ti;
-} // namespace __cxxabiv1
+class __class_type_info;
+}
 
 namespace std
 {

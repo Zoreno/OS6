@@ -39,6 +39,13 @@ target_link_libraries(${LIBSUPCXX} PRIVATE ${LIBUNWIND})
 target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/cxxabi.cpp)
 target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/exception.cpp)
 
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/delete_op.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/new_op.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/delete_opv.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/new_opv.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/pure_virtual.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/deleted_virtual.cpp)
+
 #==============================================================================
 # Tests
 #==============================================================================

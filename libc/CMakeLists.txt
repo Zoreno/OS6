@@ -42,6 +42,10 @@ target_sources(${LIBC} PRIVATE ${LIBC_SRC}/_syscall.c)
 # stdio.h header
 target_sources(${LIBC} PRIVATE ${LIBC_SRC}/stdio/puts.c)
 
+# stdlib.h header
+target_sources(${LIBC} PRIVATE ${LIBC_SRC}/stdlib/malloc.c)
+target_sources(${LIBC} PRIVATE ${LIBC_SRC}/stdlib/free.c)
+
 #==============================================================================
 # Tests
 #==============================================================================

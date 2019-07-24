@@ -1,0 +1,23 @@
+#ifndef __NEW_
+#define __NEW_
+
+#pragma GCC system_header
+
+#include <exception>
+#include <stdint.h>
+
+namespace std
+{
+typedef unsigned long int size_t;
+
+// std::bad_alloc
+// std::bad_array_new_length
+} // namespace std
+
+void *operator new(std::size_t size) __attribute__((__externally_visible__));
+void *operator new[](std::size_t size) __attribute__((__externally_visible__));
+
+void operator delete(void *ptr) noexcept __attribute__((__externally_visible__));
+void operator delete[](void *ptr) noexcept __attribute__((__externally_visible__));
+
+#endif

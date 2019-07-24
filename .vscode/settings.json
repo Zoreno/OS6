@@ -4,7 +4,8 @@
     "files.associations": {
         "*.cu": "cpp",
         "*.h": "c",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "exception": "cpp"
     },
     "doxdocgen.generic.authorEmail": "",
     "doxdocgen.generic.authorName": "Joakim Bertils",

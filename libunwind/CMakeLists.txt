@@ -27,8 +27,10 @@ set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> \
 
 target_include_directories(${LIBUNWIND} SYSTEM PRIVATE ${LIBUNWIND_INCLUDE})
 target_include_directories(${LIBUNWIND} SYSTEM PRIVATE ${LIBC_INCLUDE})
+target_include_directories(${LIBUNWIND} SYSTEM PRIVATE ${LIBSUPCXX_INCLUDE})
 
 target_link_libraries(${LIBUNWIND} PRIVATE ${LIBC})
+target_link_libraries(${LIBUNWIND} PRIVATE ${LIBSUPCXX})
 
 #==============================================================================
 # Sources

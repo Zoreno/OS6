@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 // TODO: Proper include
-extern void _exit(int ret);
+extern "C" void _exit(int ret);
 
 inline void abort(const char *msg, const char *func)
 {

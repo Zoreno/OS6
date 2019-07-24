@@ -23,8 +23,14 @@
 #include <stdlib.h>
 
 extern void *krealloc(void *ptr, size_t size);
+extern void *kmalloc(size_t size);
 
 void *realloc(void *ptr, size_t size)
 {
+    if (!ptr)
+    {
+        return kmalloc(size);
+    }
+
     return krealloc(ptr, size);
 }

@@ -2,6 +2,7 @@
 #define _LIBUNWIND_IA64_CXX_ABI_H
 
 #include <stdint.h>
+#include <new>
 
 namespace std
 {
