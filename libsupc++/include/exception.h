@@ -3,26 +3,27 @@
 
 #pragma GCC system_header
 
+#include <new>
+
 extern "C++"
 {
+	namespace std
+	{
+	class exception
+	{
+	public:
+		exception() noexcept {}
 
-    namespace std
-    {
-    class exception
-    {
-    public:
-        exception() noexcept {}
+		virtual ~exception() noexcept;
 
-        virtual ~exception() noexcept;
+		exception(const exception &) = default;
+		exception &operator=(const exception &) = default;
+		exception(exception &&) = default;
+		exception &operator=(exception &&) = default;
 
-        exception(const exception &) = default;
-        exception &operator=(const exception &) = default;
-        exception(exception &&) = default;
-        exception &operator=(exception &&) = default;
-
-        virtual const char *what() const noexcept;
-    };
-    } // namespace std
+		virtual const char *what() const noexcept;
+	};
+	} // namespace std
 }
 
 #endif

@@ -30,7 +30,9 @@ rm -f gcc-8.3.0.tar.gz
 # Build Binutils
 #=========================================================
 
-export PREFIX="$HOME/Documents/OS6/toolchain/OS6_cross_cc"
+CUR_DIR=$(pwd)
+
+export PREFIX="$CUR_DIR/OS6_cross_cc"
 export TARGET=x86_64-elf
 export PATH="$PREFIX/bin:$PATH"
 
@@ -74,10 +76,10 @@ make -j8 install-gcc
 make -j8 all-target-libgcc
 make -j8 install-target-libgcc
 
-#cd ../..
+cd ../..
 
 #=========================================================
 # Final Cleanup
 #=========================================================
 
-#rm -rf src
+rm -rf src

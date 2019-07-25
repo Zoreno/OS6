@@ -20,13 +20,11 @@
  * 
  */
 
-struct Exception
-{
-};
+#include <exception>
 
 int main(int argc, char **argv)
 {
-    throw Exception();
+	throw std::exception();
 
-    return 0;
+	return 0;
 }

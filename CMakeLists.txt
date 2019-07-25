@@ -6,14 +6,20 @@ cmake_minimum_required(VERSION 3.5)
 
 set(CMAKE_ASM_SOURCE_FILE_EXTENSIONS "asm")
 
-set(OS6_COMPILER_PATH "${CMAKE_SOURCE_DIR}/toolchain/OS6_cross_cc/x86_64-elf/bin")
+set(TOOLCHAIN_DIR "${CMAKE_SOURCE_DIR}/toolchain")
+
+if(NOT EXISTS "${TOOLCHAIN_DIR}/OS6_cross_cc")
+message(FATAL_ERROR "Did not find cross-compiler directory. Did you run ./build_toolchain.sh from the ${TOOLCHAIN_DIR} directory?")
+endif()
+
+set(OS6_COMPILER_PATH "${TOOLCHAIN_DIR}/OS6_cross_cc/x86_64-elf/bin")
 
 set(CMAKE_C_COMPILER "${OS6_COMPILER_PATH}/gcc")
 set(CMAKE_CXX_COMPILER "${OS6_COMPILER_PATH}/g++")
 
 set(CMAKE_C_COMPILER_WORKS 1)
 set(CMAKE_CXX_COMPILER_WORKS 1)
-#set(CMAKE_CROSSCOMPILING 1)
+set(CMAKE_CROSSCOMPILING 1)
 
 project(OS6 C CXX ASM_NASM)
 
@@ -233,8 +239,8 @@ add_custom_target(cleandocs
 add_custom_target(run-tests
     COMMAND make
     COMMAND ctest --output-on-failure
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-
+	WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+	
 #==============================================================================
 # End of file
 #==============================================================================
