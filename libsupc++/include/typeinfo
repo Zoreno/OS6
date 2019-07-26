@@ -5,6 +5,8 @@
 
 #include <exception>
 
+#include <string.h>
+
 namespace __cxxabiv1
 {
 class __class_type_info;
@@ -12,64 +14,73 @@ class __class_type_info;
 
 namespace std
 {
+
+// TODO: Move to <cstddef.h>
+using nullptr_t = decltype(nullptr);
+
 class type_info
 {
 public:
-    virtual ~type_info();
+	virtual ~type_info();
 
-    const char *name() const noexcept
-    {
-        return __name[0] == '*' ? __name + 1 : __name;
-    }
+	const char *name() const noexcept
+	{
+		return __name[0] == '*' ? __name + 1 : __name;
+	}
 
-    bool before(const type_info &__arg) const noexcept
-    {
-        return (__name[0] == '*' && __arg.__name[0] == '*')
-                   ? __name < __arg.__name
-                   : __builtin_strcmp(__name, __arg.__name) < 0;
-    }
+	bool before(const type_info &__arg) const noexcept
+	{
+		return (__name[0] == '*' && __arg.__name[0] == '*')
+				   ? __name < __arg.__name
+				   : __builtin_strcmp(__name, __arg.__name) < 0;
+	}
 
-    bool operator==(const type_info &__arg) const noexcept
-    {
-        return ((__name == __arg.__name) || (__name[0] != '*' &&
-                                             __builtin_strcmp(__name, __arg.__name) == 0));
-    }
+	bool operator==(const type_info &__arg) const noexcept
+	{
+		return ((__name == __arg.__name) || (__name[0] != '*' &&
+											 __builtin_strcmp(__name, __arg.__name) == 0));
+	}
 
-    // TODO: Fix hash func
-    // size_t hash_code() const noexcept;
+	bool operator!=(const type_info &__arg) const noexcept
+	{
+		return !(*this == __arg);
+	}
 
-    virtual bool __is_pointer_p() const;
-    virtual bool __is_function_p() const;
+	// TODO: Fix hash func
+	// size_t hash_code() const noexcept;
 
-    virtual bool __do_catch(const type_info *__thr_type, void **__thr_obj,
-                            unsigned __outer) const;
-    virtual bool __do_upcast(const __cxxabiv1::__class_type_info *__target,
-                             void **__obj_ptr) const;
+	virtual bool __is_pointer_p() const;
+	virtual bool __is_function_p() const;
+
+	virtual bool __do_catch(const type_info *__thr_type, void **__thr_obj,
+							unsigned __outer) const;
+	virtual bool __do_upcast(const __cxxabiv1::__class_type_info *__target,
+							 void **__obj_ptr) const;
 
 protected:
-    const char *__name;
+	const char *__name;
 
-    explicit type_info(const char *__n) : __name(__n) {}
+	explicit type_info(const char *__n) : __name(__n) {}
 
 private:
-    type_info &operator=(const type_info &);
-    type_info(const type_info &);
+	type_info &operator=(const type_info &);
+	type_info(const type_info &);
 };
 
 class bad_cast : public exception
 {
 public:
-    bad_cast() noexcept {}
-    virtual ~bad_cast() noexcept;
-    virtual const char *what() const noexcept;
+	bad_cast() noexcept {}
+	virtual ~bad_cast() noexcept;
+	virtual const char *what() const noexcept;
 };
 
 class bad_typeid : public exception
 {
 public:
-    bad_typeid() noexcept {}
-    virtual ~bad_typeid() noexcept;
-    virtual const char *what() const noexcept;
+	bad_typeid() noexcept {}
+	virtual ~bad_typeid() noexcept;
+	virtual const char *what() const noexcept;
 };
 
 } // namespace std

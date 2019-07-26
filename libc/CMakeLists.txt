@@ -46,6 +46,10 @@ target_sources(${LIBC} PRIVATE ${LIBC_SRC}/stdio/puts.c)
 target_sources(${LIBC} PRIVATE ${LIBC_SRC}/stdlib/malloc.c)
 target_sources(${LIBC} PRIVATE ${LIBC_SRC}/stdlib/free.c)
 
+# string.h header
+target_sources(${LIBC} PRIVATE ${LIBC_SRC}/string/strcmp.c)
+
+
 #==============================================================================
 # Tests
 #==============================================================================

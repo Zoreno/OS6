@@ -46,6 +46,18 @@ target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/new_opv.cpp)
 target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/pure_virtual.cpp)
 target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/deleted_virtual.cpp)
 
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/type_info.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/fundamental_type_info.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/array_type_info.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/function_type_info.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/enum_type_info.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/pbase_type_info.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/pointer_type_info.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/pointer_to_member_type_info.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/class_type_info.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/si_class_type_info.cpp)
+
+
 #==============================================================================
 # Tests
 #==============================================================================
