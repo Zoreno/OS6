@@ -24,6 +24,8 @@
 
 #include <arch/arch.h>
 
+#include <process/process.h>
+
 void spinlock_lock(spinlock_t *lock)
 {
     while (atomic_swap(&lock->val, 1))
@@ -35,7 +37,7 @@ void spinlock_lock(spinlock_t *lock)
 
         while (lock->val)
         {
-            // TODO: This should switch task
+            process_yield(1);
         }
 
         if (lock->waiters)
@@ -60,7 +62,7 @@ void spinlock_unlock(spinlock_t *lock)
         // This may be customized to check the priority of the process running
         if (lock->waiters)
         {
-            // This should switch task
+            process_yield(1);
         }
     }
 }
