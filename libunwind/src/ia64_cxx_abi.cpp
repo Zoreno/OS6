@@ -151,6 +151,7 @@ extern "C"
         context = _Unwind_Context(&state, exception_object);
 
         ret = private_phase2(&context);
+
         if (ret != _URC_NO_REASON)
         {
             return ret;

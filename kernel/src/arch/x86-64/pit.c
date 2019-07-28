@@ -26,6 +26,8 @@
 
 #include <stdio.h>
 
+#include <process/process.h>
+
 #define ARCH_X86_64_PIT_REG_COUNTER0 0x40
 #define ARCH_X86_64_PIT_REG_COUNTER1 0x41
 #define ARCH_X86_64_PIT_REG_COUNTER2 0x42
@@ -47,7 +49,7 @@ void arch_x86_64_pit_irq(system_stack_t *regs)
 
     ++_pit_ticks;
 
-    //printf("[PIC] PIT tick: %8i\n", _pit_ticks);
+    printf("[PIC] PIT tick: %8i\n", _pit_ticks);
 
     if (_on_tick_handler)
     {

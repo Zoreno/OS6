@@ -70,6 +70,8 @@
 
 #include <syscall/syscall.h>
 
+#include <process/process.h>
+
 /*
 
 Global todo list:
@@ -468,10 +470,32 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
 */
 
-    exec_elf("bin/hello_world_cpp", 0, NULL, NULL, 0);
+    tasking_install();
+
+    //exec_elf("bin/hello_world", 0, NULL, NULL, 0);
+
+    //printf("My pid: %d\n", pid);
+
+    //fork();
+
+    //switch_task(1);
+
+    printf("After switch\n");
+
+    fork();
+
+    fork();
+
+    debug_print_process_tree();
 
     for (;;)
-        ;
+    {
+        pid_t pid = get_pid();
+
+        printf("My pid: %d\n", pid);
+
+        mdelay(200);
+    }
 
     printf("Kernel initailization done!\n");
 

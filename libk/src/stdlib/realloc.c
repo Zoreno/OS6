@@ -25,7 +25,7 @@
 extern void *krealloc(void *ptr, size_t size);
 extern void *kmalloc(size_t size);
 
-void *realloc(void *ptr, size_t size)
+__attribute__((malloc)) void *realloc(void *ptr, size_t size)
 {
     if (!ptr)
     {

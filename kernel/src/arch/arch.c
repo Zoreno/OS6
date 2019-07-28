@@ -48,7 +48,7 @@ void arch_initialize()
     printf("[ARCH] Initializing PIT\n");
 
     //arch_x86_64_initialize_pit();
-    //arch_x86_64_pit_start_counter(100, ARCH_X86_64_PIT_OCW_COUNTER_0, ARCH_X86_64_PIT_OCW_MODE_SQUAREWAVEGEN);
+    //arch_x86_64_pit_start_counter(10, ARCH_X86_64_PIT_OCW_COUNTER_0, ARCH_X86_64_PIT_OCW_MODE_SQUAREWAVEGEN);
 
     printf("[ARCH] PIT Done!\n");
 
@@ -123,14 +123,14 @@ void outportl(uint16_t port, uint32_t value)
 
 void sti()
 {
-    //printf("STI()\n");
+    printf("STI()\n");
 
     __asm__ volatile("sti");
 }
 
 void cli()
 {
-    //printf("CLI()\n");
+    printf("CLI()\n");
 
     __asm__ volatile("cli");
 }

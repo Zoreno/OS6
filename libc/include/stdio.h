@@ -5,8 +5,13 @@
 
 _c_header_begin;
 
+#include <stdarg.h>
+
 // TODO: Implement with syscall
 int puts(const char *s);
+
+int printf(const char *format, ...);
+int vsprintf(char *str, const char *format, va_list arg);
 
 _c_header_end;
 

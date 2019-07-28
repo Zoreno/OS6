@@ -154,7 +154,6 @@ static IRQ_HANDLER _irq_handlers[16] = {0};
 
 void arch_x86_64_default_irq_handler(system_stack_t *regs)
 {
-    cli();
     if (regs->int_no >= 32 && regs->int_no < 48)
     {
 
@@ -166,8 +165,6 @@ void arch_x86_64_default_irq_handler(system_stack_t *regs)
 
             interrupt_done(regs->int_no);
 
-            sti();
-
             return;
         }
     }
@@ -177,8 +174,6 @@ void arch_x86_64_default_irq_handler(system_stack_t *regs)
         _irq_handlers[0x80](regs);
 
         interrupt_done(regs->int_no);
-
-        sti();
 
         return;
     }

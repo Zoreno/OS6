@@ -37,7 +37,9 @@ SECTIONS
 	.eh_frame BLOCK(4K) : ALIGN(4K)
 	{
 		__start_eh_frame = .;
+		*(.eh_frame_hdr)
 		*(.eh_frame)
+		*(.gcc_except_table .gcc_except_table.*)
 		__end_eh_frame = .;
 	}
 

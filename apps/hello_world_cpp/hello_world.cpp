@@ -21,10 +21,18 @@
  */
 
 #include <exception>
+#include <stdio.h>
 
 int main(int argc, char **argv)
 {
-	throw std::exception();
+	try
+	{
+		throw std::exception();
+	}
+	catch (const std::exception &ex)
+	{
+		puts(ex.what());
+	}
 
 	return 0;
 }

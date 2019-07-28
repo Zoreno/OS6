@@ -71,10 +71,10 @@ void uitoa(unsigned int i, int base, char *buf);
 void ultoa(unsigned long int i, int base, char *buf);
 void ulltoa(unsigned long long int i, int base, char *buf);
 
-void *calloc(size_t nitems, size_t size);
+void *calloc(size_t nitems, size_t size) __attribute__((malloc));
 void free(void *ptr);
-void *malloc(size_t size);
-void *realloc(void *ptr, size_t size);
+void *malloc(size_t size) __attribute__((malloc));
+void *realloc(void *ptr, size_t size) __attribute__((malloc));
 
 int abs(int x);
 long int labs(long int x);

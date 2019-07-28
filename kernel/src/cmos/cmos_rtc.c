@@ -26,6 +26,8 @@
 
 #include <stdio.h>
 
+#include <process/process.h>
+
 /**
  * @brief Last read seconds value
  * 
@@ -585,6 +587,8 @@ static void handle_update_irq()
 	//printf("[RTC] Current time: (%s)\n", time_str);
 
 	timer_updated = 1;
+
+	printf("Timer IRQ\n");
 }
 
 static void handle_alarm_irq()

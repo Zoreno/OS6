@@ -24,7 +24,7 @@
 #include <stdint.h>
 #include <string.h>
 
-void *calloc(size_t nitems, size_t size)
+__attribute__((malloc)) void *calloc(size_t nitems, size_t size)
 {
     void *mem = malloc(nitems * size);
 

@@ -5,7 +5,7 @@
 
 #define MAX_NUM_MODULES 1
 
-#define LOG(...)
+#define LOG(x) puts(x)
 
 uint64_t decode_pointer(char **addr, uint64_t encoding)
 {
@@ -136,6 +136,7 @@ common_entry &common_entry::operator++()
 
 void common_entry::non_virtual_parse(char *addr)
 {
+    LOG("common_entry 1\n");
     auto len = 0ULL;
 
     if ((m_entry_start = addr) == nullptr)
@@ -143,10 +144,14 @@ void common_entry::non_virtual_parse(char *addr)
         goto failure;
     }
 
+    LOG("common_entry 2\n");
+
     if (m_entry_start < m_eh_frame.addr)
     {
         goto failure;
     }
+
+    LOG("common_entry 3\n");
 
     if (*reinterpret_cast<uint32_t *>(m_entry_start) != 0xFFFFFFFF)
     {
@@ -159,23 +164,37 @@ void common_entry::non_virtual_parse(char *addr)
         m_payload_start = m_entry_start + 12;
     }
 
+    LOG("common_entry 4\n");
+
     if (len == 0)
     {
         goto failure;
     }
 
+    LOG("common_entry 5\n");
+
     m_payload_end = m_payload_start + len;
     m_entry_end = m_payload_end;
+
+    printf("eh_frame.addr = %#016x\n", m_eh_frame.addr);
+    printf("eh_frame.size = %#016x\n", m_eh_frame.size);
+
+    printf("m_payload_start = %#016x\n", m_payload_start);
+    printf("m_payload_end = %#016x\n", m_payload_end);
 
     if (m_entry_end > reinterpret_cast<char *>(m_eh_frame.addr) + m_eh_frame.size)
     {
         goto failure;
     }
 
+    LOG("common_entry 6\n");
+
     m_is_cie = (*reinterpret_cast<uint32_t *>(m_payload_start) == 0);
     return;
 
 failure:
+
+    LOG("common_entry 7\n");
 
     m_is_cie = false;
     m_entry_start = nullptr;
@@ -325,17 +344,25 @@ void fd_entry::parse(char *addr)
 
 void fd_entry::non_virtual_parse(char *addr)
 {
+    LOG("fd_entry 1\n");
+
     common_entry::non_virtual_parse(addr);
+
+    LOG("fd_entry 2\n");
 
     if (!*this)
     {
         return;
     }
 
+    LOG("fd_entry 3\n");
+
     if (!is_fde())
     {
         return;
     }
+
+    LOG("fd_entry 4\n");
 
     auto p = payload_start();
     auto p_cie = reinterpret_cast<char *>(reinterpret_cast<uint64_t>(p) - *reinterpret_cast<uint32_t *>(p));
@@ -348,6 +375,7 @@ void fd_entry::non_virtual_parse(char *addr)
 
     if (m_cie.augmentation_string(0) == 'z')
     {
+        LOG("fd_entry 5\n");
         auto len = dwarf4::decode_uleb128(&p);
 
         for (auto i = 1U; m_cie.augmentation_string(i) != 0 && i <= len; i++)
@@ -370,6 +398,8 @@ void fd_entry::non_virtual_parse(char *addr)
         }
     }
 
+    LOG("fd_entry 6\n");
+
     m_instructions = p;
 }
 
@@ -377,10 +407,14 @@ fd_entry eh_frame::find_fde(register_state *state)
 {
     auto eh_frame_list = get_eh_frame_list();
 
+    LOG("Got framelist\n");
+
     for (auto m = 0U; m < MAX_NUM_MODULES; m++)
     {
+        LOG("Module\n");
         for (auto fde = fd_entry(eh_frame_list[m]); fde; ++fde)
         {
+            LOG("FDE\n");
             if (fde.is_cie())
             {
                 continue;
@@ -394,12 +428,11 @@ fd_entry eh_frame::find_fde(register_state *state)
     }
 
     LOG("ERROR: An exception was thrown, but the unwinder was unable to "
-        "locate a stack frame for RIP = %p. Possible reasons include\n",
-        reinterpret_cast<void *>(state->get_ip()));
+        "locate a stack frame for RIP. Possible reasons include\n");
     LOG("  - Throwing from a destructor\n");
     LOG("  - Throwing from a function labeled noexcept\n");
     LOG("  - Bug in the unwinder\n");
-    LOG("\n\nAborting!!!\n\n")
+    LOG("\n\nAborting!!!\n\n");
 
     state->dump();
 

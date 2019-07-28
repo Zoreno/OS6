@@ -527,7 +527,10 @@ int vsprintf(char *str, const char *format, va_list arg)
                 // TODO: Do we need to copy the string at all?
                 char s[65] = {0};
 
-                strcpy(s, (const char *)c);
+                if (c != NULL)
+                {
+                    strcpy(s, (const char *)c);
+                }
 
                 int width_delta = width - strlen(s);
 

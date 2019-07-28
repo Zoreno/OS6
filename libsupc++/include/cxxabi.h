@@ -44,8 +44,8 @@ extern "C"
 
     void *__cxa_allocate_exception(size_t thrown_size);
     void __cxa_free_exception(void *thrown_exception);
-    void __cxa_throw(void *thrown_exception, struct type_info *tinfo, void (*dest)(void *));
-    void __cxa_begin_catch();
+    void __cxa_throw(void *thrown_exception, std::type_info *tinfo, void (*dest)(void *));
+    void *__cxa_begin_catch(_Unwind_Exception *exception);
     void __cxa_end_catch();
 
     _Unwind_Reason_Code __gxx_personality_v0(
