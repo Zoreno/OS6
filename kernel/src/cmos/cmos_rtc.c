@@ -588,7 +588,7 @@ static void handle_update_irq()
 
 	timer_updated = 1;
 
-	printf("Timer IRQ\n");
+	//printf("Timer IRQ\n");
 }
 
 static void handle_alarm_irq()

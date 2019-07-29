@@ -412,6 +412,8 @@ int64_t do_syscall3(int64_t syscall, int64_t arg1, int64_t arg2, int64_t arg3)
     return ret;
 }
 
+spinlock_t print_lock;
+
 int kernel_main(unsigned long long rbx, unsigned long long rax)
 {
     (void)rax;
@@ -472,7 +474,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     tasking_install();
 
-    //exec_elf("bin/hello_world", 0, NULL, NULL, 0);
+    // exec_elf("bin/hello_world", 0, NULL, NULL, 0);
 
     //printf("My pid: %d\n", pid);
 
@@ -480,21 +482,26 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     //switch_task(1);
 
+    spinlock_init(&print_lock);
+
     printf("After switch\n");
 
     fork();
 
     fork();
 
-    debug_print_process_tree();
+    //debug_print_process_tree();
 
     for (;;)
     {
+
+        mdelay(100);
+
         pid_t pid = get_pid();
 
+        spinlock_lock(&print_lock);
         printf("My pid: %d\n", pid);
-
-        mdelay(200);
+        spinlock_unlock(&print_lock);
     }
 
     printf("Kernel initailization done!\n");

@@ -317,7 +317,7 @@ pid_t fork()
 {
     PRINT("Fork\n");
 
-    //cli();
+    cli();
 
     uintptr_t return_addr = (uintptr_t)__builtin_return_address(0);
 
@@ -359,7 +359,7 @@ pid_t fork()
 
     make_process_ready(new_proc);
 
-    //sti();
+    sti();
 
     return new_proc->id;
 }

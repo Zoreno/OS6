@@ -29,6 +29,8 @@
 #include <exec/elf64.h>
 #include <debug/backtrace.h>
 
+#include <process/process.h>
+
 extern void arch_x86_64_idt_flush(uint64_t idtr_ptr);
 
 typedef struct
@@ -164,6 +166,13 @@ void arch_x86_64_default_irq_handler(system_stack_t *regs)
 			_irq_handlers[irq](regs);
 
 			interrupt_done(regs->int_no);
+
+			sti();
+
+			if (irq == 0)
+			{
+				switch_task(1);
+			}
 
 			return;
 		}
