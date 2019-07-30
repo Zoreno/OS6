@@ -171,7 +171,7 @@ void arch_x86_64_default_irq_handler(system_stack_t *regs)
 
 			if (irq == 0)
 			{
-				switch_task(1);
+				switch_task(0);
 			}
 
 			return;

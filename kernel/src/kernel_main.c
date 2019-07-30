@@ -225,245 +225,245 @@ extern void *__kernel_end;
 void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
 {
 
-    struct multiboot_start_tag *start_tag = (struct multiboot_start_tag *)mb_ptr;
+	struct multiboot_start_tag *start_tag = (struct multiboot_start_tag *)mb_ptr;
 
-    uint32_t mb_size = start_tag->total_size;
+	uint32_t mb_size = start_tag->total_size;
 
-    printf("Multiboot total size: %i\n", mb_size);
+	printf("Multiboot total size: %i\n", mb_size);
 
-    int end_found = 0;
+	int end_found = 0;
 
-    mb_ptr += sizeof(struct multiboot_start_tag);
+	mb_ptr += sizeof(struct multiboot_start_tag);
 
-    while (!end_found)
-    {
-        struct multiboot_tag *tag = (struct multiboot_tag *)mb_ptr;
+	while (!end_found)
+	{
+		struct multiboot_tag *tag = (struct multiboot_tag *)mb_ptr;
 
-        switch (tag->type)
-        {
-        case MULTIBOOT_TAG_TYPE_CMDLINE:
-        {
-            struct multiboot_tag_string *cmdline = (struct multiboot_tag_string *)tag;
-            printf("[Command line] \"%s\"\n", cmdline->string);
-        }
-        break;
+		switch (tag->type)
+		{
+		case MULTIBOOT_TAG_TYPE_CMDLINE:
+		{
+			struct multiboot_tag_string *cmdline = (struct multiboot_tag_string *)tag;
+			printf("[Command line] \"%s\"\n", cmdline->string);
+		}
+		break;
 
-        case MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME:
-        {
-            struct multiboot_tag_string *boot_loader = (struct multiboot_tag_string *)tag;
-            printf("[Boot loader name] \"%s\"\n", boot_loader->string);
-        }
-        break;
-        case MULTIBOOT_TAG_TYPE_BASIC_MEMINFO:
-        {
-            struct multiboot_tag_basic_meminfo *basic_mem =
-                (struct multiboot_tag_basic_meminfo *)tag;
-            printf("[Basic memory] lower: %i upper: %i\n", basic_mem->mem_lower, basic_mem->mem_upper);
-        }
-        break;
-        case MULTIBOOT_TAG_TYPE_BOOTDEV:
-        {
-            struct multiboot_tag_bootdev *bootdev = (struct multiboot_tag_bootdev *)tag;
+		case MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME:
+		{
+			struct multiboot_tag_string *boot_loader = (struct multiboot_tag_string *)tag;
+			printf("[Boot loader name] \"%s\"\n", boot_loader->string);
+		}
+		break;
+		case MULTIBOOT_TAG_TYPE_BASIC_MEMINFO:
+		{
+			struct multiboot_tag_basic_meminfo *basic_mem =
+				(struct multiboot_tag_basic_meminfo *)tag;
+			printf("[Basic memory] lower: %i upper: %i\n", basic_mem->mem_lower, basic_mem->mem_upper);
+		}
+		break;
+		case MULTIBOOT_TAG_TYPE_BOOTDEV:
+		{
+			struct multiboot_tag_bootdev *bootdev = (struct multiboot_tag_bootdev *)tag;
 
-            printf("[Bootdev] biosdev: %i, partition: %i, sub_partition: %i\n",
-                   bootdev->biosdev, bootdev->slice, bootdev->part);
-        }
-        break;
-        case MULTIBOOT_TAG_TYPE_MMAP:
-        {
-            struct multiboot_tag_mmap *mmap = (struct multiboot_tag_mmap *)tag;
+			printf("[Bootdev] biosdev: %i, partition: %i, sub_partition: %i\n",
+				   bootdev->biosdev, bootdev->slice, bootdev->part);
+		}
+		break;
+		case MULTIBOOT_TAG_TYPE_MMAP:
+		{
+			struct multiboot_tag_mmap *mmap = (struct multiboot_tag_mmap *)tag;
 
-            int count = mmap->size / mmap->entry_size;
+			int count = mmap->size / mmap->entry_size;
 
-            printf("[mmap] entry_size: %i, count: %i\n", mmap->entry_size, count);
+			printf("[mmap] entry_size: %i, count: %i\n", mmap->entry_size, count);
 
-            int j = 0;
+			int j = 0;
 
-            for (int i = 0; i < count; ++i)
-            {
-                struct multiboot_mmap_entry mmap_entry = mmap->entries[i];
+			for (int i = 0; i < count; ++i)
+			{
+				struct multiboot_mmap_entry mmap_entry = mmap->entries[i];
 
-                printf("[mmap_entry] addr: %#016x len: %#016x type: %i\n",
-                       mmap_entry.addr, mmap_entry.len, mmap_entry.type);
+				printf("[mmap_entry] addr: %#016x len: %#016x type: %i\n",
+					   mmap_entry.addr, mmap_entry.len, mmap_entry.type);
 
-                if (mmap_entry.type == MULTIBOOT_MEMORY_AVAILABLE)
-                {
-                    mem_info->regions[j].addr = mmap_entry.addr;
-                    mem_info->regions[j].len = mmap_entry.len;
+				if (mmap_entry.type == MULTIBOOT_MEMORY_AVAILABLE)
+				{
+					mem_info->regions[j].addr = mmap_entry.addr;
+					mem_info->regions[j].len = mmap_entry.len;
 
-                    ++j;
-                }
-            }
-        }
-        break;
-        case MULTIBOOT_TAG_TYPE_LOAD_BASE_ADDR:
-        {
-            struct multiboot_tag_load_base_addr *lba = (struct multiboot_tag_load_base_addr *)tag;
+					++j;
+				}
+			}
+		}
+		break;
+		case MULTIBOOT_TAG_TYPE_LOAD_BASE_ADDR:
+		{
+			struct multiboot_tag_load_base_addr *lba = (struct multiboot_tag_load_base_addr *)tag;
 
-            printf("[Load Base Address] addr: %#08x\n", lba->load_base_addr);
-        }
-        break;
-        case MULTIBOOT_TAG_TYPE_END:
-        {
-            end_found = 1;
-        }
-        break;
-        case MULTIBOOT_TAG_TYPE_ELF_SECTIONS:
-        {
-            struct multiboot_tag_elf_sections *elf_sections = (struct multiboot_tag_elf_sections *)tag;
+			printf("[Load Base Address] addr: %#08x\n", lba->load_base_addr);
+		}
+		break;
+		case MULTIBOOT_TAG_TYPE_END:
+		{
+			end_found = 1;
+		}
+		break;
+		case MULTIBOOT_TAG_TYPE_ELF_SECTIONS:
+		{
+			struct multiboot_tag_elf_sections *elf_sections = (struct multiboot_tag_elf_sections *)tag;
 
-            init_kernel_symbol_context(elf_sections, mem_info);
-        }
-        break;
-        default:
-        {
-            printf("[Tag] type: %i size: %i\n", tag->type, tag->size);
-        }
-        break;
-        }
+			init_kernel_symbol_context(elf_sections, mem_info);
+		}
+		break;
+		default:
+		{
+			printf("[Tag] type: %i size: %i\n", tag->type, tag->size);
+		}
+		break;
+		}
 
-        if (tag->type == MULTIBOOT_TAG_TYPE_END)
-        {
-            end_found = 1;
-        }
+		if (tag->type == MULTIBOOT_TAG_TYPE_END)
+		{
+			end_found = 1;
+		}
 
-        mb_ptr += (tag->size + 7) & ~7;
-    }
+		mb_ptr += (tag->size + 7) & ~7;
+	}
 
-    uint64_t largest_mem = 0;
+	uint64_t largest_mem = 0;
 
-    for (int i = 0; i < MEM_INFO_MAX_REGIONS; ++i)
-    {
-        mem_region_t region = mem_info->regions[i];
+	for (int i = 0; i < MEM_INFO_MAX_REGIONS; ++i)
+	{
+		mem_region_t region = mem_info->regions[i];
 
-        uint64_t region_end = region.addr + region.len;
+		uint64_t region_end = region.addr + region.len;
 
-        if (region_end > largest_mem)
-        {
-            largest_mem = region_end;
-        }
-    }
+		if (region_end > largest_mem)
+		{
+			largest_mem = region_end;
+		}
+	}
 
-    mem_info->memory_size = largest_mem;
+	mem_info->memory_size = largest_mem;
 
-    mem_info->kernel_load_addr = (uint64_t)&__kernel_start;
-    //mem_info->kernel_end = (uint64_t)&__kernel_end;
-    mem_info->kernel_size = mem_info->kernel_end - mem_info->kernel_load_addr;
+	mem_info->kernel_load_addr = (uint64_t)&__kernel_start;
+	//mem_info->kernel_end = (uint64_t)&__kernel_end;
+	mem_info->kernel_size = mem_info->kernel_end - mem_info->kernel_load_addr;
 }
 
 void mouse_moved_handler(mouse_moved_event_t *event)
 {
-    static int i = 0;
+	static int i = 0;
 
-    printf("Mouse moved [%i]: %i, %i\n", i++, (int64_t)event->x, (int64_t)event->y);
+	printf("Mouse moved [%i]: %i, %i\n", i++, (int64_t)event->x, (int64_t)event->y);
 }
 
 int64_t do_syscall0(int64_t syscall)
 {
-    int64_t ret;
+	int64_t ret;
 
-    __asm__ volatile("int $0x80"
-                     : "=a"(ret)
-                     : "a"(syscall)
-                     : "memory");
+	__asm__ volatile("int $0x80"
+					 : "=a"(ret)
+					 : "a"(syscall)
+					 : "memory");
 
-    return ret;
+	return ret;
 }
 
 int64_t do_syscall1(int64_t syscall, int64_t arg1)
 {
-    int64_t ret;
+	int64_t ret;
 
-    __asm__ volatile("int $0x80"
-                     : "=a"(ret)
-                     : "a"(syscall),
-                       "b"(arg1)
-                     : "memory");
+	__asm__ volatile("int $0x80"
+					 : "=a"(ret)
+					 : "a"(syscall),
+					   "b"(arg1)
+					 : "memory");
 
-    return ret;
+	return ret;
 }
 
 int64_t do_syscall2(int64_t syscall, int64_t arg1, int64_t arg2)
 {
-    int64_t ret;
+	int64_t ret;
 
-    __asm__ volatile("int $0x80"
-                     : "=a"(ret)
-                     : "a"(syscall),
-                       "b"(arg1),
-                       "c"(arg2)
-                     : "memory");
+	__asm__ volatile("int $0x80"
+					 : "=a"(ret)
+					 : "a"(syscall),
+					   "b"(arg1),
+					   "c"(arg2)
+					 : "memory");
 
-    return ret;
+	return ret;
 }
 
 int64_t do_syscall3(int64_t syscall, int64_t arg1, int64_t arg2, int64_t arg3)
 {
-    int64_t ret;
+	int64_t ret;
 
-    __asm__ volatile("int $0x80"
-                     : "=a"(ret)
-                     : "a"(syscall),
-                       "b"(arg1),
-                       "c"(arg2),
-                       "d"(arg3)
-                     : "memory");
+	__asm__ volatile("int $0x80"
+					 : "=a"(ret)
+					 : "a"(syscall),
+					   "b"(arg1),
+					   "c"(arg2),
+					   "d"(arg3)
+					 : "memory");
 
-    return ret;
+	return ret;
 }
 
 spinlock_t print_lock;
 
 int kernel_main(unsigned long long rbx, unsigned long long rax)
 {
-    (void)rax;
+	(void)rax;
 
-    serial_init_full();
+	serial_init_full();
 
-    debug_terminal_initialize();
+	debug_terminal_initialize();
 
-    set_stdout(scom1_fd);
+	set_stdout(scom1_fd);
 
-    printf("Initializing kernel...\n");
+	printf("Initializing kernel...\n");
 
-    run_unit_tests();
+	run_unit_tests();
 
-    arch_initialize();
+	arch_initialize();
 
-    RTC_init();
+	RTC_init();
 
-    memory_info_t mem_info;
+	memory_info_t mem_info;
 
-    memset(&mem_info, 0, sizeof(mem_info));
+	memset(&mem_info, 0, sizeof(mem_info));
 
-    parse_multiboot((unsigned char *)rbx, &mem_info);
+	parse_multiboot((unsigned char *)rbx, &mem_info);
 
-    printf("Kernel end: %#016x\n", mem_info.kernel_end);
+	printf("Kernel end: %#016x\n", mem_info.kernel_end);
 
-    phys_mem_init(&mem_info);
+	phys_mem_init(&mem_info);
 
-    virt_mem_initialize();
+	virt_mem_initialize();
 
-    sti();
+	sti();
 
-    keyboard_install();
-    mouse_install();
+	keyboard_install();
+	mouse_install();
 
-    kheap_init();
+	kheap_init();
 
-    vfs_install();
+	vfs_install();
 
-    init_ide_devices();
+	init_ide_devices();
 
-    ext2_initialize();
+	ext2_initialize();
 
-    pciInit();
+	pciInit();
 
-    vbe_bochs_set_gfx(800, 600, 4);
+	vbe_bochs_set_gfx(800, 600, 4);
 
-    syscall_install();
+	syscall_install();
 
-    /*
+	/*
     long long int ret;
 
     ret = do_syscall1(0, 0);
@@ -472,47 +472,46 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
 */
 
-    tasking_install();
+	tasking_install();
 
-    // exec_elf("bin/hello_world", 0, NULL, NULL, 0);
+	// exec_elf("bin/hello_world", 0, NULL, NULL, 0);
 
-    //printf("My pid: %d\n", pid);
+	//printf("My pid: %d\n", pid);
 
-    //fork();
+	//fork();
 
-    //switch_task(1);
+	//switch_task(1);
 
-    spinlock_init(&print_lock);
+	spinlock_init(&print_lock);
 
-    printf("After switch\n");
+	printf("After switch\n");
 
-    fork();
+	fork();
 
-    fork();
+	fork();
 
-    //debug_print_process_tree();
+	//debug_print_process_tree();
 
-    for (;;)
-    {
+	for (;;)
+	{
+		process_sleep(100);
 
-        mdelay(100);
+		pid_t pid = get_pid();
 
-        pid_t pid = get_pid();
+		spinlock_lock(&print_lock);
+		printf("My pid: %d\n", pid);
+		spinlock_unlock(&print_lock);
+	}
 
-        spinlock_lock(&print_lock);
-        printf("My pid: %d\n", pid);
-        spinlock_unlock(&print_lock);
-    }
+	printf("Kernel initailization done!\n");
 
-    printf("Kernel initailization done!\n");
+	printf("================================================================================\n");
+	printf("|| Launching GUI...                                                           ||\n");
+	printf("================================================================================\n");
 
-    printf("================================================================================\n");
-    printf("|| Launching GUI...                                                           ||\n");
-    printf("================================================================================\n");
+	//gui_init();
 
-    //gui_init();
-
-    terminal_init();
+	terminal_init();
 
 #if 0
 
@@ -636,6 +635,6 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
 #endif
 
-    for (;;)
-        __asm__ volatile("hlt");
+	for (;;)
+		__asm__ volatile("hlt");
 }
