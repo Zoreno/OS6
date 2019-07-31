@@ -200,7 +200,7 @@ process_t *spawn_idle_thread()
 	uint64_t *stack = (uint64_t *)malloc(sizeof(uint64_t) * KERNEL_STACK_SIZE);
 	memset(stack, 0, sizeof(uint64_t) * (KERNEL_STACK_SIZE));
 
-	idle->image.stack = stack + KERNEL_STACK_SIZE;
+	idle->image.stack = (uint64_t)(stack + KERNEL_STACK_SIZE);
 
 	stack[KERNEL_STACK_SIZE - 1] = (uint64_t)&kernel_idle;
 	idle->thread.rsp = &(stack[KERNEL_STACK_SIZE - 17]);
@@ -241,7 +241,7 @@ process_t *spawn_init()
 
 	init->image.entry = 0;
 	init->image.size = 0;
-	init->image.stack = &stack_top;
+	init->image.stack = (uint64_t)&stack_top;
 	init->image.start = 0;
 
 	init->finished = 0;
@@ -283,9 +283,9 @@ process_t *spawn_process(process_t *parent)
 
 	PRINT("Child stack: %#016x-%#016x\n", stack, stack + KERNEL_STACK_SIZE);
 
-	memcpy(stack, parent->image.stack, sizeof(uint64_t) * (KERNEL_STACK_SIZE));
+	memcpy(stack, (void *)parent->image.stack, sizeof(uint64_t) * (KERNEL_STACK_SIZE));
 
-	proc->image.stack = stack + KERNEL_STACK_SIZE;
+	proc->image.stack = (uint64_t)(stack + KERNEL_STACK_SIZE);
 
 	stack[KERNEL_STACK_SIZE - 1] = (uint64_t)parent->thread.rip;
 	proc->thread.rsp = &(stack[KERNEL_STACK_SIZE - 17]);
@@ -375,6 +375,74 @@ pid_t fork()
 // Process cleanup
 //=============================================================================
 
+void delete_process(process_t *proc)
+{
+	tree_node_t *entry = proc->tree_entry;
+
+	if (!entry)
+	{
+		return;
+	}
+
+	// Check if we are trying to kill init
+	ASSERT((entry != process_tree->root));
+
+	if (process_tree->root == entry)
+	{
+		return;
+	}
+
+	spinlock_lock(&tree_lock);
+
+	int has_children = entry->children->length;
+
+	// TODO: All the reparented processes should be marked as orphans
+	tree_remove_reparent_root(process_tree, entry);
+
+	list_delete(process_list, list_find(process_list, proc));
+	spinlock_unlock(&tree_lock);
+
+	// Release our PID
+	bitset_clear(&pid_set, proc->id);
+
+	free(proc);
+}
+
+void cleanup_process(process_t *proc, int retval)
+{
+	proc->status = retval;
+	proc->finished = 1;
+}
+
+void reap_process(process_t *proc)
+{
+	free(proc->name);
+
+	if (proc->description)
+	{
+		free(proc->description);
+	}
+
+	delete_process(proc);
+}
+
+void task_exit(int retval)
+{
+	printf("Task %d exited with code: %d\n", current_process->id, retval);
+
+	if (current_process->id == 0)
+	{
+		// This should be a kernel panic. We tried to exit kernel idle
+		switch_task(1);
+		return;
+	}
+
+	cleanup_process(get_current_process(), retval);
+
+	// Do not reschedule
+	switch_task(0);
+}
+
 //=============================================================================
 // Task switch
 //=============================================================================
@@ -416,7 +484,7 @@ void switch_next(uintptr_t return_addr)
 
 	PRINT("Switch next\n");
 
-	process_t *old_process = current_process;
+	process_t *old_process = (process_t *)current_process;
 	thread_t *old_thread = &old_process->thread;
 
 	current_process = next_ready_process();
@@ -436,7 +504,7 @@ void switch_next(uintptr_t return_addr)
 	LOOKUP_SYMBOL(old_thread->rip);
 	PRINT("\n");
 
-	switch_to(&old_thread, &current_process->thread);
+	switch_to(&old_thread, (thread_t *)&current_process->thread);
 }
 
 void make_process_ready(process_t *proc)
@@ -461,7 +529,7 @@ void switch_task(uint8_t reschedule)
 
 	wakeup_sleeping_processes();
 
-	debug_print_process(current_process);
+	debug_print_process((process_t *)current_process);
 
 	if (!current_process->running)
 	{
@@ -544,6 +612,18 @@ process_t *process_get_parent(process_t *process)
 	return result;
 }
 
+void process_disown(process_t *proc)
+{
+	ASSERT(process_tree->root);
+
+	tree_node_t *entry = proc->tree_entry;
+
+	spinlock_lock(&tree_lock);
+	tree_break_off(process_tree, entry);
+	tree_node_insert_child_node(process_tree, process_tree->root, entry);
+	spinlock_unlock(&tree_lock);
+}
+
 //=============================================================================
 // FD
 //=============================================================================
@@ -556,12 +636,26 @@ process_t *process_get_parent(process_t *process)
 // Sleep
 //=============================================================================
 
-void process_sleep(uint64_t ticks)
+void process_sleep(uint64_t ms)
 {
-	current_process->sleep_ticks = ticks;
+	uint64_t ticks = ms * TIMER_FREQ / 1000;
+
+	//printf("Task %i entering sleep mode for %d ticks\n", get_pid(), ticks);
+
+	// We do not append tasks to the sleep queue that do not sleep for a full
+	// timeslice
+	if (!ticks)
+	{
+		switch_task(1);
+
+		return;
+	}
+
+	current_process->sleep_ticks = ticks + get_tick_count();
+	current_process->sleeping = 1;
 
 	spinlock_lock(&process_sleeping_lock);
-	list_append(process_sleeping_list, &current_process->sched_node);
+	list_append(process_sleeping_list, (list_node_t *)&current_process->sched_node);
 	spinlock_unlock(&process_sleeping_lock);
 
 	//printf("Task %i entered sleep mode for %d ticks\n", get_pid(), ticks);
@@ -575,6 +669,8 @@ void wakeup_sleeping_processes()
 
 	cli();
 
+	tick_count_t current_ticks = get_tick_count();
+
 	spinlock_lock(&process_sleeping_lock);
 
 	list_node_t *node = process_sleeping_list->head;
@@ -584,10 +680,9 @@ void wakeup_sleeping_processes()
 	{
 		process_t *process = next_node->payload;
 
-		process->sleep_ticks -= 1;
-
-		if (process->sleep_ticks == 0)
+		if (process->sleep_ticks < current_ticks)
 		{
+			process->sleeping = 0;
 			list_delete(process_sleeping_list, next_node);
 			make_process_ready(process);
 		}

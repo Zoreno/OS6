@@ -352,7 +352,6 @@ int create_file_fs(char *name, uint16_t permission)
     }
     else
     {
-        /* XXX This is wrong */
         node = kopen(".", 0);
     }
 

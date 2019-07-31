@@ -6,6 +6,8 @@
 
 #include <debug/backtrace.h>
 
+#include <process/process.h>
+
 void syscall_handler(system_stack_t *stack)
 {
     //printf("Got system call: %i\n", stack->rax);
@@ -15,6 +17,10 @@ void syscall_handler(system_stack_t *stack)
     case 0:
     {
         printf("%s", stack->rbx);
+    }
+    case 1:
+    {
+        task_exit(stack->rbx);
     }
     break;
     default:

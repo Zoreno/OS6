@@ -85,6 +85,7 @@ Kernel
 
 Libk
  - time.h
+ - Fork / POSIX Threading
 
 ACPI
  - Shutdown
@@ -121,8 +122,13 @@ USB Drivers
 
 Networking
  - E1000 Network card
- - Netstack
+ - Ethernet
+ - IPv4
+ - UDP
+ - TCP
  - Sockets
+ - HTTP
+ - FTP
 
 ATAPI
  - Driver
@@ -136,6 +142,8 @@ VFS
  - Create procfs
  - Fix proper listing of mounted paths
  - Pipes
+ - Serial device
+ - RAMdevice (May not be needed as the VFS is initialized early. Still nice for completion)
 
 Sound
  - Sound card driver
@@ -487,20 +495,22 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     printf("After switch\n");
 
     fork();
-
-    fork();
-
     //debug_print_process_tree();
 
     for (;;)
     {
-        process_sleep(100);
+        process_sleep(1000);
 
         pid_t pid = get_pid();
 
         spinlock_lock(&print_lock);
         printf("My pid: %d\n", pid);
         spinlock_unlock(&print_lock);
+
+        if (pid == 2)
+        {
+            task_exit(1);
+        }
     }
 
     printf("Kernel initailization done!\n");

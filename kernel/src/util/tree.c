@@ -190,6 +190,29 @@ void tree_remove(tree_t *tree, tree_node_t *node)
     list_merge(parent->children, node->children);
 }
 
+void tree_remove_reparent_root(tree_t *tree, tree_node_t *node)
+{
+    tree_node_t *parent = node->parent;
+
+    if (!parent)
+    {
+        return;
+    }
+
+    tree->nodes--;
+
+    list_delete(parent->children, list_find(parent->children, node));
+
+    for (list_node_t *child = node->children->head; child != NULL; child = child->next)
+    {
+        ((tree_node_t *)child->payload)->parent = tree->root;
+    }
+
+    list_merge(tree->root->children, node->children);
+
+    free(node);
+}
+
 void tree_break_off(tree_t *tree, tree_node_t *node)
 {
     (void)tree;

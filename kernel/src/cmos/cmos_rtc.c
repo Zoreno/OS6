@@ -574,6 +574,8 @@ int timer_updated = 0;
 
 static void handle_update_irq()
 {
+	static tick_count_t pit_ticks = 0;
+
 	subticks = 0;
 
 	ktime_t time;
@@ -585,6 +587,12 @@ static void handle_update_irq()
 	RTC_time_to_string(time_str, &time);
 
 	//printf("[RTC] Current time: (%s)\n", time_str);
+
+	tick_count_t new_pit_ticks = get_tick_count();
+
+	printf("[RTC] Current tick rate: %d\n", new_pit_ticks - pit_ticks);
+
+	pit_ticks = new_pit_ticks;
 
 	timer_updated = 1;
 

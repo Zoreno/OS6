@@ -154,6 +154,11 @@ typedef struct fs_node
      */
     char name[256];
 
+    /**
+     * @brief Pointer to the device specific data
+     * 
+     * 
+     */
     void *device;
 
     /**

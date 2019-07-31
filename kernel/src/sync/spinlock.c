@@ -28,6 +28,9 @@
 
 void spinlock_lock(spinlock_t *lock)
 {
+
+#if 0
+
 	while (atomic_swap(&lock->val, 1))
 	{
 		if (lock->waiters)
@@ -45,6 +48,27 @@ void spinlock_lock(spinlock_t *lock)
 			atomic_dec(&lock->waiters);
 		}
 	}
+
+#else
+	while (1)
+	{
+		if (!xchg_64(&lock->val, 1))
+		{
+			return;
+		}
+
+		while (lock->val)
+		{
+			process_yield(1);
+		}
+	}
+
+#endif
+}
+
+void spinlock_trylock(spinlock_t *lock)
+{
+	return xchg_64(&lock->val, 1);
 }
 
 void spinlock_init(spinlock_t *lock)
@@ -55,6 +79,8 @@ void spinlock_init(spinlock_t *lock)
 
 void spinlock_unlock(spinlock_t *lock)
 {
+#if 0
+
 	if (lock->val)
 	{
 		atomic_store(&lock->val, 0);
@@ -65,4 +91,11 @@ void spinlock_unlock(spinlock_t *lock)
 			//process_yield(1);
 		}
 	}
+
+#else
+
+	BARRIER;
+	lock->val = 0;
+
+#endif
 }

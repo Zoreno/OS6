@@ -27,6 +27,8 @@
 
 #define ARCH_X86_64
 
+#define TIMER_FREQ 50
+
 typedef uint64_t tick_count_t;
 
 typedef void (*INT_HANDLER)(void);
@@ -91,9 +93,64 @@ void set_on_tick_handler(on_tick_handler_func on_tick_handler);
 void set_mask_interrupt(uint8_t irq);
 void clear_mask_interrupt(uint8_t irq);
 
+//=============================================================================
+// Atomic operations
+//=============================================================================
+
 int atomic_swap(volatile long long int *x, long long int v);
 void atomic_store(volatile long long int *p, long long int x);
 void atomic_inc(volatile long long int *x);
 void atomic_dec(volatile long long int *x);
+
+#define ATOMIC_XADD(P, V) __sync_fetch_and_add((P), (V))
+#define ATOMIC_CMPXCHG(P, O, N) __sync_val_compare_and_swap((P), (O), (N))
+#define ATOMIC_INC(P) __sync_add_and_fetch((P), 1);
+#define ATOMIC_DEC(P) __sync_add_and_fetch((P), -1);
+#define ATOMIC_ADD(P, V) __sync_and_fetch((P), (V))
+#define ATOMIC_SET_BIT(P, B) __sync_or_and_fetch((P), 1 << (V))
+#define ATOMIC_CLEAR_BIT(P, B) __sync_and_and_fetch((P), ~(1 << (V)))
+#define BARRIER __asm__ volatile("" :: \
+                                     : "memory")
+static inline void *xchg_64(void *ptr, void *x)
+{
+    __asm__ __volatile__("xchgq %0,%1"
+                         : "=r"((unsigned long long)x)
+                         : "m"(*(volatile long long *)ptr), "0"((unsigned long long)x)
+                         : "memory");
+
+    return x;
+}
+
+static inline unsigned xchg_32(void *ptr, unsigned x)
+{
+    __asm__ __volatile__("xchgl %0,%1"
+                         : "=r"((unsigned)x)
+                         : "m"(*(volatile unsigned *)ptr), "0"(x)
+                         : "memory");
+
+    return x;
+}
+
+static inline unsigned short xchg_16(void *ptr, unsigned short x)
+{
+    __asm__ __volatile__("xchgw %0,%1"
+                         : "=r"((unsigned short)x)
+                         : "m"(*(volatile unsigned short *)ptr), "0"(x)
+                         : "memory");
+
+    return x;
+}
+
+static inline char atomic_bitsetandtest(void *ptr, int x)
+{
+    char out;
+    __asm__ __volatile__("lock; bts %2,%1\n"
+                         "sbb %0,%0\n"
+                         : "=r"(out), "=m"(*(volatile long long *)ptr)
+                         : "Ir"(x)
+                         : "memory");
+
+    return out;
+}
 
 #endif
