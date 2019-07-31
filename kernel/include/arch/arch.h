@@ -27,6 +27,8 @@
 
 #define ARCH_X86_64
 
+typedef uint64_t tick_count_t;
+
 typedef void (*INT_HANDLER)(void);
 
 typedef struct __system_stack
@@ -82,7 +84,7 @@ void set_interrupt_handler(int intno, INT_HANDLER int_handler, int flags);
 
 void set_irq_handler(int irq, IRQ_HANDLER irq_handler);
 
-uint32_t get_tick_count();
+tick_count_t get_tick_count();
 
 void set_on_tick_handler(on_tick_handler_func on_tick_handler);
 

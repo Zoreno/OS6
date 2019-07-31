@@ -165,7 +165,7 @@ void set_irq_handler(int irq, IRQ_HANDLER irq_handler)
     arch_x86_64_install_irq(irq, irq_handler);
 }
 
-uint32_t get_tick_count()
+tick_count_t get_tick_count()
 {
     return arch_x86_64_pit_get_tick_count();
 }

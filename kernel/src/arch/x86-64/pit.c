@@ -33,7 +33,7 @@
 #define ARCH_X86_64_PIT_REG_COUNTER2 0x42
 #define ARCH_X86_64_PIT_REG_COMMAND 0x43
 
-static volatile uint32_t _pit_ticks = 0;
+static volatile tick_count_t _pit_ticks = 0;
 static int _is_initialized = 0;
 
 static on_tick_handler_func _on_tick_handler = NULL;
@@ -110,14 +110,14 @@ uint8_t arch_x86_64_pit_read_data(uint16_t counter)
     return inportb(port);
 }
 
-uint32_t arch_x86_64_pit_set_tick_count(uint32_t i)
+tick_count_t arch_x86_64_pit_set_tick_count(tick_count_t i)
 {
-    uint32_t old_val = _pit_ticks;
+    tick_count_t old_val = _pit_ticks;
     _pit_ticks = i;
     return old_val;
 }
 
-uint32_t arch_x86_64_pit_get_tick_count()
+tick_count_t arch_x86_64_pit_get_tick_count()
 {
     return _pit_ticks;
 }
