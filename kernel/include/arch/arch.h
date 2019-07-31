@@ -60,7 +60,9 @@ static inline void udelay(uint64_t n)
         return;
     }
 
-    __asm__ volatile("1: dec %%rax; jne 1b;" ::"a"(n * 1000));
+    __asm__ volatile("1: dec %%rax; jne 1b;"
+                     :
+                     : "a"(n * 1000));
 }
 
 static inline void mdelay(uint32_t n)
