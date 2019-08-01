@@ -22,6 +22,8 @@
 
 #include <stdio.h>
 
+#include <_syscall.h>
+
 extern int main(int argc, char **argv);
 extern void print_string(const char *string);
 
@@ -43,18 +45,16 @@ extern func_t __fini_array_end;
 
 extern char **__get_argv()
 {
-    return __argv;
+	return __argv;
 }
 
 void _exit(int val)
 {
-    puts("Program exited\n");
+	puts("Program exited\n");
 
-    // TODO: Replace with syscall_exit
-    for (;;)
-        ;
+	do_syscall1(1, val);
 
-    __builtin_unreachable();
+	__builtin_unreachable();
 }
 
 void initialize_standard_library(void)
@@ -63,14 +63,14 @@ void initialize_standard_library(void)
 
 int pre_main(int argc, char **argv)
 {
-    if (!__get_argv())
-    {
-        __argv = argv;
-    }
+	if (!__get_argv())
+	{
+		__argv = argv;
+	}
 
-    initialize_standard_library();
+	initialize_standard_library();
 
-    int ret = main(argc, argv);
+	int ret = main(argc, argv);
 
-    _exit(ret);
+	_exit(ret);
 }
