@@ -72,6 +72,8 @@
 
 #include <process/process.h>
 
+#include <util/json.h>
+
 /*
 
 Global todo list:
@@ -495,6 +497,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     printf("After switch\n");
 
     fork();
+
     //debug_print_process_tree();
 
     for (;;)
@@ -526,7 +529,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     //gui_init();
 
-    terminal_init();
+    //terminal_init();
 
 #if 0
 

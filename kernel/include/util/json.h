@@ -94,6 +94,7 @@ void json_init_hooks(json_hooks_t *hooks);
 
 json_t *json_parse(const char *string);
 json_t *json_parse_with_opts(const char *string, const char **endptr, json_bool_t require_null_terminate);
+const char *json_get_error_ptr(void);
 
 //==============================================================================
 // JSON Print (json_print.c)
@@ -113,6 +114,9 @@ void json_delete(json_t *item);
 
 json_t *json_get_object_item(const json_t *object, const char *string);
 json_t *json_get_object_item_case_sensitive(const json_t *object, const char *string);
+json_bool_t json_has_object_item(const json_t *object, const char *string);
+json_bool_t json_is_object(const json_t *item);
+json_t *json_create_object();
 
 //==============================================================================
 // JSON Array (json_array.c)
@@ -120,6 +124,79 @@ json_t *json_get_object_item_case_sensitive(const json_t *object, const char *st
 
 int json_get_array_size(const json_t *json);
 json_t *json_get_array_item(const json_t *json);
+json_bool_t *json_is_array(const json_t *item);
+json_t *json_create_array();
+json_t *json_create_int_array(const int *numbers, int count);
+json_t *json_create_float_array(const float *numbers, int count);
+json_t *json_create_double_array(const double *numbers, int count);
+json_t *json_create_string_array(const char **strings, int count);
+void json_add_item_to_array(json_t *array, json_t *item);
+void json_add_item_reference_to_array(json_t *array, json_t *item);
+
+//==============================================================================
+// JSON Invalid (json_invalid.c)
+//==============================================================================
+
+json_bool_t
+json_is_invalid(const json_t *item);
+
+//==============================================================================
+// JSON True (json_true.c)
+//==============================================================================
+
+json_bool_t json_is_true(const json_t *item);
+json_t *json_create_true();
+
+//==============================================================================
+// JSON False (json_false.c)
+//==============================================================================
+
+json_bool_t json_is_false(const json_t *item);
+json_t *json_create_false();
+
+//==============================================================================
+// JSON Bool (json_bool.c)
+//==============================================================================
+
+json_bool_t json_is_bool(const json_t *item);
+json_t *json_create_bool(json_bool_t bool);
+
+//==============================================================================
+// JSON Null (json_null.c)
+//==============================================================================
+
+json_bool_t json_is_null(const json_t *item);
+json_t *json_create_null();
+
+//==============================================================================
+// JSON Number (json_number.c)
+//==============================================================================
+
+json_bool_t json_is_number(const json_t *item);
+json_t *json_create_number(double number);
+
+//==============================================================================
+// JSON String (json_string.c)
+//==============================================================================
+
+json_bool_t json_is_string(const json_t *item);
+json_t *json_create_string(const char *string);
+char *json_get_string_value(json_t *item);
+
+//==============================================================================
+// JSON Raw (json_raw.c)
+//==============================================================================
+
+json_bool_t json_is_raw(const json_t *item);
+json_t *json_create_raw(const char *raw);
+
+//==============================================================================
+// JSON Reference (json_reference.c)
+//==============================================================================
+
+json_t *json_create_string_reference(const char *string);
+json_t *json_create_object_reference(const json_t *child);
+json_t *json_create_array_reference(const json_t *child);
 
 #endif
 

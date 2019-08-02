@@ -125,14 +125,16 @@ void sti()
 {
     //printf("STI()\n");
 
-    __asm__ volatile("sti");
+    __asm__ volatile("sti" ::
+                         : "memory");
 }
 
 void cli()
 {
     //printf("CLI()\n");
 
-    __asm__ volatile("cli");
+    __asm__ volatile("cli" ::
+                         : "memory");
 }
 
 void interrupt_done(uint32_t intno)
