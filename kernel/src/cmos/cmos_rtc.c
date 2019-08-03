@@ -590,7 +590,7 @@ static void handle_update_irq()
 
 	tick_count_t new_pit_ticks = get_tick_count();
 
-	printf("[RTC] Current tick rate: %d\n", new_pit_ticks - pit_ticks);
+	//printf("[RTC] Current tick rate: %d\n", new_pit_ticks - pit_ticks);
 
 	pit_ticks = new_pit_ticks;
 

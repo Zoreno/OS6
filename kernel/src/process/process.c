@@ -183,7 +183,7 @@ static void kernel_idle(void)
 {
 	while (1)
 	{
-		printf("Idle thread\n");
+		//printf("Idle thread\n");
 		sti();
 		__asm__ volatile("hlt"); // TODO: Make this arch-agnostic
 
@@ -200,17 +200,19 @@ process_t *spawn_idle_thread()
 	idle->id = -1;
 	idle->name = strdup("[kernel idle thread]");
 
+	// Setup the stack
 	uint64_t *stack = (uint64_t *)malloc(sizeof(uint64_t) * KERNEL_STACK_SIZE);
 	memset(stack, 0, sizeof(uint64_t) * (KERNEL_STACK_SIZE));
-
 	idle->image.stack = (uint64_t)(stack + KERNEL_STACK_SIZE);
-
 	stack[KERNEL_STACK_SIZE - 1] = (uint64_t)&kernel_idle;
 	idle->thread.rsp = &(stack[KERNEL_STACK_SIZE - 17]);
+
 	idle->thread.rip = (uintptr_t)&kernel_idle;
 
 	idle->started = 1;
 	idle->running = 1;
+
+	idle->page_directory = virt_mem_get_current_dir();
 
 	return idle;
 }
@@ -237,6 +239,7 @@ process_t *spawn_init()
 	init->id = 1;
 	init->name = strdup("init");
 	init->cmdline = NULL;
+	init->argc = 0;
 	init->status = 0;
 
 	init->thread.rip = 0;
@@ -244,8 +247,12 @@ process_t *spawn_init()
 
 	init->image.entry = 0;
 	init->image.size = 0;
+	init->image.heap = 0;
+	init->image.heap_actual = 0;
 	init->image.stack = (uint64_t)&stack_top;
 	init->image.start = 0;
+
+	spinlock_init(&init->image.lock);
 
 	init->finished = 0;
 	init->suspended = 0;
@@ -280,6 +287,7 @@ process_t *spawn_process(process_t *parent)
 	proc->name = strdup("new process");
 	proc->description = NULL;
 	proc->cmdline = parent->cmdline;
+	proc->argc = parent->argc;
 
 	//proc->thread.fpu_enabled = 0;
 	//memcpy((void *)proc->thread.fp_regs, (void *)parent->thread.fp_regs, 512);
@@ -298,7 +306,11 @@ process_t *spawn_process(process_t *parent)
 
 	proc->image.entry = parent->image.entry;
 	proc->image.size = parent->image.size;
+	proc->image.heap = parent->image.heap;
+	proc->image.heap_actual = parent->image.heap_actual;
 	proc->image.start = parent->image.start;
+
+	spinlock_init(&proc->image.lock);
 
 	proc->status = 0;
 	proc->finished = 0;

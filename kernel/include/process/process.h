@@ -9,6 +9,8 @@
 
 #include <mm/virt_mem.h>
 
+#include <sync/spinlock.h>
+
 #define MAX_PIDS 256
 
 typedef int32_t pid_t;
@@ -29,9 +31,14 @@ typedef struct _image
     size_t size;
     uintptr_t entry;
 
+    uintptr_t heap;
+    uintptr_t heap_actual;
+
     uintptr_t stack;
 
     uintptr_t start;
+
+    spinlock_t lock;
 } image_t;
 
 typedef struct _process
@@ -42,6 +49,7 @@ typedef struct _process
     char *description;
 
     char **cmdline;
+    int argc;
 
     thread_t thread;
 

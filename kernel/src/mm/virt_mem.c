@@ -27,7 +27,6 @@
 
 // https://github.com/thibault-reigner/userland_slab
 
-#define PAGE_SIZE 4096
 #define PAGE_OFFSET 0xFFFF880000000000
 
 #define SAFE_PAGE_OFFSET 1

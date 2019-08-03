@@ -100,6 +100,7 @@ Multitasking:
  - Float/SIMD state save/restore
  - Address space separation
  - Sleep
+ - Working directory
 
 Load Executables:
  - ELF files
@@ -487,11 +488,11 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     // exec_elf("bin/hello_world", 0, NULL, NULL, 0);
 
-    //printf("My pid: %d\n", pid);
+    // printf("My pid: %d\n", pid);
 
-    //fork();
+    // fork();
 
-    //switch_task(1);
+    // switch_task(1);
 
     spinlock_init(&print_lock);
 
