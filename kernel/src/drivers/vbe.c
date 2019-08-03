@@ -135,7 +135,7 @@ void vbe_bochs_set_gfx(uint16_t width, uint16_t height, uint16_t bpp)
     virt_mem_map_pages((void *)_vbe_current_context.framebuffer_p,
                        (void *)_vbe_current_context.framebuffer_v,
                        buf_pages,
-                       0);
+                       VIRT_MEM_WRITABLE);
 }
 
 void vbe_clear_screen(vbe_pixel_t pixel)

@@ -153,4 +153,10 @@ static inline char atomic_bitsetandtest(void *ptr, int x)
     return out;
 }
 
+//=============================================================================
+// FPU State
+//=============================================================================
+
+// TODO: Abstact from the fpu file
+
 #endif

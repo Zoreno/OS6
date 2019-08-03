@@ -128,7 +128,7 @@ static int heap_grow(size_t size, uint8_t *heap_end, int cont)
     {
         void *addr = phys_mem_alloc_block();
 
-        virt_mem_map_page(addr, heap_end + offset, 0);
+        virt_mem_map_page(addr, heap_end + offset, VIRT_MEM_WRITABLE);
 
         offset += PAGE_SIZE;
     }
@@ -373,7 +373,7 @@ void kheap_init()
     {
         void *paddr = phys_mem_alloc_block();
 
-        virt_mem_map_page(paddr, (void *)i, 0);
+        virt_mem_map_page(paddr, (void *)i, VIRT_MEM_WRITABLE);
 
         //printf("Mapping %#016x to %#016x\n", paddr, i);
     }

@@ -133,7 +133,7 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
 
                 void *paddr = phys_mem_alloc_block();
 
-                virt_mem_map_page(paddr, (void *)i, 0);
+                virt_mem_map_page(paddr, (void *)i, VIRT_MEM_WRITABLE | VIRT_MEM_USER);
             }
 
             read_fs(file, phdr.p_offset, phdr.p_filesz, (uint8_t *)phdr.p_vaddr);

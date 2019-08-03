@@ -22,6 +22,8 @@
 
 #include <arch/x86-64/fpu.h>
 
+#include <string.h>
+
 void arch_x64_64_set_fpu_cw(const uint16_t cw)
 {
     __asm__ volatile("fldcw %0" ::"m"(cw));
@@ -107,4 +109,22 @@ void arch_x64_64_install_fpu()
 {
     arch_x64_64_enable_fpu();
     arch_x64_64_init_fpu();
+}
+
+// This buffer must be at least 512 bytes large and
+// the memory must be 16 byte aligned to avoid GP faults
+static uint8_t __fxsave_buffer[512] __attribute__((aligned(16)));
+
+void arch_x64_64_restore_fpu(process_t *process)
+{
+    memcpy(&__fxsave_buffer, (uint8_t *)&process->thread.fp_regs, 512);
+
+    __asm__ volatile("fxrstor (%0)" ::"r"(__fxsave_buffer));
+}
+
+void arch_x64_64_save_fpu(process_t *process)
+{
+    __asm__ volatile("fxsave (%0)" ::"r"(__fxsave_buffer));
+
+    memcpy((uint8_t *)&process->thread.fp_regs, &__fxsave_buffer, 512);
 }

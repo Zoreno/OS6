@@ -7,6 +7,8 @@
 #include <util/list.h>
 #include <arch/arch.h>
 
+#include <mm/virt_mem.h>
+
 #define MAX_PIDS 256
 
 typedef int32_t pid_t;
@@ -60,6 +62,8 @@ typedef struct _process
     list_node_t sched_node;
 
     uint64_t sleep_ticks;
+
+    pml4_t *page_directory;
 
 } process_t;
 

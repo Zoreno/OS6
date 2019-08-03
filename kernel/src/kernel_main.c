@@ -93,12 +93,13 @@ ACPI
  - Shutdown
 
 Multitasking:
- - Kernel tasks
- - Threads
- - Processes
+ - Threads (Clone)
+ - Processes (Fork)
  - Mutexes/Semaphores
  - Shared memory
  - Float/SIMD state save/restore
+ - Address space separation
+ - Sleep
 
 Load Executables:
  - ELF files
@@ -496,7 +497,27 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     printf("After switch\n");
 
+    pid_t pid = get_pid();
+
     fork();
+
+    if (get_pid() != pid)
+    {
+        exec_elf("bin/hello_world", 0, NULL, NULL, 0);
+
+        printf("[ERROR] Exec elf returned\n");
+    }
+
+    pid = get_pid();
+
+    fork();
+
+    if (get_pid() != pid)
+    {
+        exec_elf("bin/hello_world", 0, NULL, NULL, 0);
+
+        printf("[ERROR] Exec elf returned\n");
+    }
 
     //debug_print_process_tree();
 
@@ -509,16 +530,6 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
         spinlock_lock(&print_lock);
         printf("My pid: %d\n", pid);
         spinlock_unlock(&print_lock);
-
-        if (pid == 2)
-        {
-            exec_elf("bin/hello_world", 0, NULL, NULL, 0);
-
-            printf("[ERROR] Exec elf returned\n");
-
-            for (;;)
-                ;
-        }
     }
 
     printf("Kernel initailization done!\n");

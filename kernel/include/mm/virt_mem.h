@@ -40,7 +40,8 @@ enum PTE_FLAGS
     PTE_ACCESS = 0x20,
     PTE_DIRTY = 0x40,
     PTE_PAT = 0x80, // Page attribute table
-    PTE_FRAME = 0x7FFFFFFFFFFFF000
+    PTE_ON_CLONE = PTE_PRESENT | PTE_WRITABLE | PTE_USER | PTE_WRITETHROUGH | PTE_NOT_CAHCEABLE,
+    PTE_FRAME = 0x7FFFFFFFFFFFF000,
 };
 
 typedef uint64_t pt_entry_t;
@@ -75,7 +76,9 @@ enum PDE_FLAGS
     PDE_4MB = 0x80,
     PDE_CPU_GLOBAL = 0x100,
     PDE_LV4_GLOBAL = 0x200,
-    PDE_FRAME = 0x7FFFFFFFFFFFF000
+
+    PDE_ON_CLONE = PDE_PRESENT | PDE_WRITABLE | PDE_USER | PDE_PWT | PDE_PCD | PDE_4MB | PDE_CPU_GLOBAL | PDE_LV4_GLOBAL,
+    PDE_FRAME = 0x7FFFFFFFFFFFF000,
 };
 
 typedef uint64_t pd_entry_t;
@@ -90,6 +93,9 @@ int pd_entry_is_user(pd_entry_t e);
 int pd_entry_is_pwt(pd_entry_t e);
 int pd_entry_is_pcd(pd_entry_t e);
 int pd_entry_is_accessed(pd_entry_t e);
+int pd_entry_is_huge(pd_entry_t e);
+int pd_entry_is_cpu_global(pd_entry_t e);
+int pd_entry_is_lv4_global(pd_entry_t e);
 phys_addr pd_entry_pfn(pd_entry_t e);
 
 //==============================================================================
@@ -105,6 +111,8 @@ enum PDPE_FLAGS
     PDPE_PCD = 0x10,
     PDPE_ACCESSED = 0x20,
     PDPE_1GB = 0x80,
+
+    PDPE_ON_CLONE = PDPE_PRESENT | PDPE_WRITABLE | PDPE_USER | PDPE_PWT | PDPE_PCD | PDPE_1GB,
     PDPE_FRAME = 0x7FFFFFFFFFFFF000
 };
 
@@ -120,6 +128,7 @@ int pdp_entry_is_user(pdp_entry_t e);
 int pdp_entry_is_pwt(pdp_entry_t e);
 int pdp_entry_is_pcd(pdp_entry_t e);
 int pdp_entry_is_accessed(pdp_entry_t e);
+int pdp_entry_is_huge(pdp_entry_t e);
 phys_addr pdp_entry_pfn(pdp_entry_t e);
 
 //==============================================================================
@@ -135,6 +144,8 @@ enum PML4E_FLAGS
     PML4E_PCD = 0x10,
     PML4E_ACCESSED = 0x20,
     PML4E_DIRTY = 0x40,
+
+    PML4E_ON_CLONE = PML4E_PRESENT | PML4E_WRITABLE | PML4E_USER | PML4E_PWT | PML4E_PCD,
     PML4E_FRAME = 0x7FFFFFFFFFFFF000
 };
 
@@ -186,6 +197,7 @@ typedef struct
 typedef struct
 {
     pml4_entry_t entries[PML4_ENTRIES];
+    // TODO: Look into adding a refcount to the struct
 } pml4_t;
 
 void virt_mem_initialize();
@@ -207,13 +219,25 @@ void virt_mem_destroy_address_space(pml4_t *dir);
 ptable_t *virt_mem_alloc_ptable();
 pdirectory_t *virt_mem_alloc_pdirectory();
 pdp_t *virt_mem_alloc_pdp();
+pml4_t *virt_mem_alloc_pml4();
 
-// TODO: Add flags for user-mode, writable, cache, remap, shared
+void virt_mem_print_cur_dir();
+void virt_mem_print_dir(pml4_t *dir);
+
+enum VIRT_MEM_FLAGS
+{
+    VIRT_MEM_USER = 0x01,
+    VIRT_MEM_WRITABLE = 0x02
+};
+
+// TODO: Add flags for cache, remap, shared
 int virt_mem_map_page_p(void *phys, void *virt, uint64_t flags, pml4_t *dir);
 int virt_mem_map_page(void *phys, void *virt, uint64_t flags);
 int virt_mem_map_pages_p(void *phys, void *virt, size_t n_pages, uint64_t flags, pml4_t *dir);
 int virt_mem_map_pages(void *phys, void *virt, size_t n_pages, uint64_t flags);
 int virt_mem_unmap_page(void *virt);
 int virt_mem_unmap_pages(void *virt, size_t n_pages);
+
+pml4_t *virt_mem_clone_address_space(pml4_t *src);
 
 #endif

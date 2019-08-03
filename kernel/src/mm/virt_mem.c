@@ -30,7 +30,15 @@
 #define PAGE_SIZE 4096
 #define PAGE_OFFSET 0xFFFF880000000000
 
+#define SAFE_PAGE_OFFSET 1
+
+#if SAFE_PAGE_OFFSET == 1
+#define ADD_PAGE_OFFSET(addr) ((void *)((((void *)addr) >= (void *)PAGE_OFFSET) ? ((uint8_t *)addr) : (((uint8_t *)addr) + PAGE_OFFSET)))
+#define REMOVE_PAGE_OFFSET(addr) ((void *)((((void *)addr) < (void *)PAGE_OFFSET) ? ((uint8_t *)addr) : (((uint8_t *)addr) - PAGE_OFFSET)))
+#else
 #define ADD_PAGE_OFFSET(addr) ((void *)(((uint8_t *)addr) + PAGE_OFFSET))
+#define REMOVE_PAGE_OFFSET(addr) ((void *)(((uint8_t *)addr) - PAGE_OFFSET))
+#endif
 
 static pml4_t *_cur_dir = 0;
 
@@ -147,6 +155,21 @@ int pd_entry_is_accessed(pd_entry_t e)
     return e & PDE_ACCESSED;
 }
 
+int pd_entry_is_huge(pd_entry_t e)
+{
+    return e & PDE_4MB;
+}
+
+int pd_entry_is_cpu_global(pd_entry_t e)
+{
+    return e & PDE_CPU_GLOBAL;
+}
+
+int pd_entry_is_lv4_global(pd_entry_t e)
+{
+    return e & PDE_LV4_GLOBAL;
+}
+
 phys_addr pd_entry_pfn(pd_entry_t e)
 {
     return e & PDE_FRAME;
@@ -199,6 +222,11 @@ int pdp_entry_is_pcd(pdp_entry_t e)
 int pdp_entry_is_accessed(pdp_entry_t e)
 {
     return e & PDPE_ACCESSED;
+}
+
+int pdp_entry_is_huge(pdp_entry_t e)
+{
+    return e & PDPE_1GB;
 }
 
 phys_addr pdp_entry_pfn(pdp_entry_t e)
@@ -651,10 +679,156 @@ pdp_t *virt_mem_alloc_pdp()
     return p;
 }
 
+pml4_t *virt_mem_alloc_pml4()
+{
+    pml4_t *p = (pml4_t *)phys_mem_alloc_block();
+
+    if (!p)
+    {
+        return p;
+    }
+
+    memset(ADD_PAGE_OFFSET(p), 0, sizeof(pml4_t));
+
+    return p;
+}
+
+void virt_mem_print_cur_dir()
+{
+    virt_mem_print_dir(_cur_dir);
+}
+
+static void virt_mem_print_pt(ptable_t *pt, uint64_t pml4_entry, uint64_t pdp_entry, uint64_t pd_entry)
+{
+    pt = ADD_PAGE_OFFSET(pt);
+
+    for (int i = 0; i < PT_ENTRIES; ++i)
+    {
+        if (pt->entries[i])
+        {
+            printf("PT Entry %#03x: %s%s%s%s%s",
+                   i,
+                   pt_entry_is_present(pt->entries[i]) ? "P" : "-",  // Present
+                   pt_entry_is_writable(pt->entries[i]) ? "W" : "-", // Writable
+                   pt_entry_is_user(pt->entries[i]) ? "U" : "-",     // User
+                   pt_entry_is_accessed(pt->entries[i]) ? "A" : "-", // Accessed
+                   pt_entry_is_dirty(pt->entries[i]) ? "D" : "-");   // Dirty
+
+            uint64_t virt = (0xFFFFULL << 48) + (pml4_entry << 39) + (pdp_entry << 30) + (pd_entry << 21) + (i << 12);
+            uint64_t phys = pt_entry_pfn(pt->entries[i]);
+
+            printf(" %#016x mapped to %#016x (%#016x bytes)\n", virt, phys, 1 << 12);
+        }
+    }
+}
+
+static void virt_mem_print_pd(pdirectory_t *pd, uint64_t pml4_entry, uint64_t pdp_entry)
+{
+    pd = ADD_PAGE_OFFSET(pd);
+
+    for (int i = 0; i < PD_ENTRIES; ++i)
+    {
+        if (pd->entries[i])
+        {
+            printf("PD Entry %#03x: %s%s%s%s%s%s%s%s%s",
+                   i,
+                   pd_entry_is_present(pd->entries[i]) ? "P" : "-",     // Present
+                   pd_entry_is_writable(pd->entries[i]) ? "W" : "-",    // Writable
+                   pd_entry_is_user(pd->entries[i]) ? "U" : "-",        // User
+                   pd_entry_is_pwt(pd->entries[i]) ? "T" : "-",         // Write through
+                   pd_entry_is_pcd(pd->entries[i]) ? "C" : "-",         // Cache disable
+                   pd_entry_is_accessed(pd->entries[i]) ? "A" : "-",    // Accessed
+                   pd_entry_is_huge(pd->entries[i]) ? "H" : "-",        // Huge
+                   pd_entry_is_cpu_global(pd->entries[i]) ? "G" : "-",  // CPU Global
+                   pd_entry_is_lv4_global(pd->entries[i]) ? "L" : "-"); // LV4 Global
+
+            if (pd_entry_is_huge(pd->entries[i]))
+            {
+                uint64_t virt = (0xFFFFULL << 48) + (pml4_entry << 39) + (pdp_entry << 30) + (i << 21);
+                uint64_t phys = pd_entry_pfn(pd->entries[i]);
+
+                printf(" %#016x mapped to %#016x (%#016x bytes)\n", virt, phys, 1 << 21);
+            }
+            else
+            {
+                printf("\n");
+
+                ptable_t *pt = (ptable_t *)pd_entry_pfn(pd->entries[i]);
+
+                if (pdp_entry == 0x3F)
+                {
+                    virt_mem_print_pt(pt, pml4_entry, pdp_entry, i);
+                }
+            }
+        }
+    }
+}
+
+static void virt_mem_print_pdp(pdp_t *pdp, uint64_t pml4_entry)
+{
+    pdp = ADD_PAGE_OFFSET(pdp);
+
+    for (int i = 0; i < PDP_ENTRIES; ++i)
+    {
+        if (pdp->entries[i])
+        {
+            printf("PDP Entry %#03x: %s%s%s%s%s%s%s",
+                   i,
+                   pdp_entry_is_present(pdp->entries[i]) ? "P" : "-",  // Present
+                   pdp_entry_is_writable(pdp->entries[i]) ? "W" : "-", // Writable
+                   pdp_entry_is_user(pdp->entries[i]) ? "U" : "-",     // User
+                   pdp_entry_is_pwt(pdp->entries[i]) ? "T" : "-",      // Write through
+                   pdp_entry_is_pcd(pdp->entries[i]) ? "C" : "-",      // Cache disable
+                   pdp_entry_is_accessed(pdp->entries[i]) ? "A" : "-", // Accessed
+                   pdp_entry_is_huge(pdp->entries[i]) ? "H" : "-");    // Huge
+
+            if (pdp_entry_is_huge(pdp->entries[i]))
+            {
+                uint64_t virt = (0xFFFFULL << 48) + (pml4_entry << 39) + (i << 30);
+                uint64_t phys = pdp_entry_pfn(pdp->entries[i]);
+
+                printf(" %#016x mapped to %#016x (%#016x bytes)\n", virt, phys, 1 << 30);
+            }
+            else
+            {
+                printf("\n");
+                pdirectory_t *pd = (pdirectory_t *)pdp_entry_pfn(pdp->entries[i]);
+
+                virt_mem_print_pd(pd, pml4_entry, i);
+            }
+        }
+    }
+}
+
+void virt_mem_print_dir(pml4_t *dir)
+{
+    dir = ADD_PAGE_OFFSET(dir);
+
+    for (int i = 0; i < PML4_ENTRIES; ++i)
+    {
+        if (dir->entries[i])
+        {
+            printf("PML4 Entry %#03x: %s%s%s%s%s%s",
+                   i,
+                   pml4_entry_is_present(dir->entries[i]) ? "P" : "-",   // Present
+                   pml4_entry_is_writable(dir->entries[i]) ? "W" : "-",  // Writable
+                   pml4_entry_is_user(dir->entries[i]) ? "U" : "-",      // User
+                   pml4_entry_is_pwt(dir->entries[i]) ? "T" : "-",       // Write through
+                   pml4_entry_is_pcd(dir->entries[i]) ? "C" : "-",       // Cache disable
+                   pml4_entry_is_accessed(dir->entries[i]) ? "A" : "-"); // Accessed
+
+            printf("\n");
+
+            pdp_t *pdp = (pdp_t *)pml4_entry_pfn(dir->entries[i]);
+
+            virt_mem_print_pdp(pdp, i);
+        }
+    }
+}
+
 int virt_mem_map_page_p(void *phys, void *virt, uint64_t flags, pml4_t *pml4)
 {
     virt_addr vaddr = (virt_addr)virt;
-    (void)flags;
 
     pdp_t *pdp = 0;
     pdirectory_t *pdir = 0;
@@ -670,18 +844,34 @@ int virt_mem_map_page_p(void *phys, void *virt, uint64_t flags, pml4_t *pml4)
 
     if (!pml4_entry_is_present(*pml4_entry))
     {
-
-        for (;;)
-            ;
-
         pdp = virt_mem_alloc_pdp();
 
         pml4_entry_add_attrib(pml4_entry, PML4E_PRESENT);
-        pml4_entry_add_attrib(pml4_entry, PML4E_WRITABLE);
+
+        if (flags & VIRT_MEM_WRITABLE)
+        {
+            pml4_entry_add_attrib(pml4_entry, PML4E_WRITABLE);
+        }
+
+        if (flags & VIRT_MEM_USER)
+        {
+            pml4_entry_add_attrib(pml4_entry, PML4E_USER);
+        }
+
         pml4_entry_set_frame(pml4_entry, (phys_addr)pdp);
     }
     else
     {
+        if (!pml4_entry_is_writable(*pml4_entry) && flags & VIRT_MEM_WRITABLE)
+        {
+            pml4_entry_add_attrib(pml4_entry, PML4E_WRITABLE);
+        }
+
+        if (!pml4_entry_is_user(*pml4_entry) && flags & VIRT_MEM_USER)
+        {
+            pml4_entry_add_attrib(pml4_entry, PML4E_USER);
+        }
+
         pdp = (pdp_t *)pml4_entry_pfn(*pml4_entry);
     }
 
@@ -703,11 +893,31 @@ int virt_mem_map_page_p(void *phys, void *virt, uint64_t flags, pml4_t *pml4)
         pdir = virt_mem_alloc_pdirectory();
 
         pdp_entry_add_attrib(pdp_entry, PDPE_PRESENT);
-        pdp_entry_add_attrib(pdp_entry, PDPE_WRITABLE);
+
+        if (flags & VIRT_MEM_WRITABLE)
+        {
+            pdp_entry_add_attrib(pdp_entry, PDPE_WRITABLE);
+        }
+
+        if (flags & VIRT_MEM_USER)
+        {
+            pdp_entry_add_attrib(pdp_entry, PDPE_USER);
+        }
+
         pdp_entry_set_frame(pdp_entry, (phys_addr)pdir);
     }
     else
     {
+        if (!pdp_entry_is_writable(*pdp_entry) && flags & VIRT_MEM_WRITABLE)
+        {
+            pdp_entry_add_attrib(pdp_entry, PDPE_WRITABLE);
+        }
+
+        if (!pdp_entry_is_user(*pdp_entry) && flags & VIRT_MEM_USER)
+        {
+            pdp_entry_add_attrib(pdp_entry, PDPE_USER);
+        }
+
         pdir = (pdirectory_t *)pdp_entry_pfn(*pdp_entry);
     }
 
@@ -729,11 +939,31 @@ int virt_mem_map_page_p(void *phys, void *virt, uint64_t flags, pml4_t *pml4)
         ptable = virt_mem_alloc_ptable();
 
         pd_entry_add_attrib(pd_entry, PDE_PRESENT);
-        pd_entry_add_attrib(pd_entry, PDE_WRITABLE);
+
+        if (flags & VIRT_MEM_WRITABLE)
+        {
+            pd_entry_add_attrib(pd_entry, PDE_USER);
+        }
+
+        if (flags & VIRT_MEM_USER)
+        {
+            pd_entry_add_attrib(pd_entry, PDE_USER);
+        }
+
         pd_entry_set_frame(pd_entry, (phys_addr)ptable);
     }
     else
     {
+        if (!pd_entry_is_writable(*pd_entry) && flags & VIRT_MEM_WRITABLE)
+        {
+            pd_entry_add_attrib(pd_entry, PDE_WRITABLE);
+        }
+
+        if (!pd_entry_is_user(*pd_entry) && flags & VIRT_MEM_USER)
+        {
+            pd_entry_add_attrib(pd_entry, PDE_USER);
+        }
+
         ptable = (ptable_t *)pd_entry_pfn(*pd_entry);
     }
 
@@ -755,7 +985,17 @@ int virt_mem_map_page_p(void *phys, void *virt, uint64_t flags, pml4_t *pml4)
     memset(pt_entry, 0, sizeof(pt_entry_t));
 
     pt_entry_add_attrib(pt_entry, PTE_PRESENT);
-    pt_entry_add_attrib(pt_entry, PTE_WRITABLE);
+
+    if (flags & VIRT_MEM_WRITABLE)
+    {
+        pt_entry_add_attrib(pt_entry, PTE_WRITABLE);
+    }
+
+    if (flags & VIRT_MEM_USER)
+    {
+        pt_entry_add_attrib(pt_entry, PTE_USER);
+    }
+
     pt_entry_set_frame(pt_entry, (phys_addr)phys);
     return 0;
 }
@@ -812,3 +1052,162 @@ int virt_mem_unmap_pages(void *virt, size_t n_pages)
 
     return -1;
 }
+
+static void copy_page(void *dst, const void *src)
+{
+    memcpy(ADD_PAGE_OFFSET(dst),
+           ADD_PAGE_OFFSET(src),
+           PAGE_SIZE);
+}
+
+static ptable_t *clone_ptable(ptable_t *src)
+{
+    ptable_t *table = virt_mem_alloc_ptable();
+
+    table = ADD_PAGE_OFFSET(table);
+    src = ADD_PAGE_OFFSET(src);
+
+    for (int i = 0; i < PT_ENTRIES; ++i)
+    {
+        if (!src->entries[i])
+        {
+            continue;
+        }
+
+        if (!pt_entry_is_user(src->entries[i]))
+        {
+            // TODO: Lookup. This will copy accessed and dirty flag. This may not be desireable.
+            table->entries[i] = src->entries[i];
+        }
+        else
+        {
+            void *src_block = (void *)pt_entry_pfn(src->entries[i]);
+            void *dst_block = phys_mem_alloc_block();
+
+            copy_page(dst_block, src_block);
+
+            pt_entry_set_frame(&table->entries[i], (phys_addr)dst_block);
+
+            // Copy the needed flags
+            table->entries[i] |= (src->entries[i] & (PTE_ON_CLONE));
+        }
+    }
+
+    table = REMOVE_PAGE_OFFSET(table);
+
+    return table;
+}
+
+static pdirectory_t *clone_pdirectory(pdirectory_t *src)
+{
+    pdirectory_t *dir = virt_mem_alloc_pdirectory();
+
+    dir = ADD_PAGE_OFFSET(dir);
+    src = ADD_PAGE_OFFSET(src);
+
+    for (int i = 0; i < PD_ENTRIES; ++i)
+    {
+        if (!src->entries[i])
+        {
+            continue;
+        }
+
+        if (!pd_entry_is_user(src->entries[i]))
+        {
+            // TODO: Lookup. This will copy accessed and dirty flag. This may not be desireable.
+            dir->entries[i] = src->entries[i];
+        }
+        else
+        {
+            ptable_t *src_table = (ptable_t *)pd_entry_pfn(src->entries[i]);
+            ptable_t *new_table = clone_ptable(src_table);
+
+            pd_entry_set_frame(&dir->entries[i], (phys_addr)new_table);
+
+            dir->entries[i] |= (src->entries[i] & (PDE_ON_CLONE));
+        }
+    }
+
+    dir = REMOVE_PAGE_OFFSET(dir);
+
+    return dir;
+}
+
+static pdp_t *clone_pdp(pdp_t *src)
+{
+    pdp_t *dir = virt_mem_alloc_pdp();
+
+    dir = ADD_PAGE_OFFSET(dir);
+    src = ADD_PAGE_OFFSET(src);
+
+    for (int i = 0; i < PDP_ENTRIES; ++i)
+    {
+        if (!src->entries[i])
+        {
+            continue;
+        }
+
+        if (!pdp_entry_is_user(src->entries[i]))
+        {
+            // TODO: Lookup. This will copy accessed and dirty flag. This may not be desireable.
+            dir->entries[i] = src->entries[i];
+        }
+        else
+        {
+            pdirectory_t *src_table = (pdirectory_t *)pdp_entry_pfn(src->entries[i]);
+            pdirectory_t *new_table = clone_pdirectory(src_table);
+
+            pdp_entry_set_frame(&dir->entries[i], (phys_addr)new_table);
+
+            dir->entries[i] |= (src->entries[i] & (PDPE_ON_CLONE));
+        }
+    }
+
+    dir = REMOVE_PAGE_OFFSET(dir);
+
+    return dir;
+}
+
+static pml4_t *clone_pml4(pml4_t *src)
+{
+    pml4_t *dir = virt_mem_alloc_pml4();
+
+    dir = ADD_PAGE_OFFSET(dir);
+    src = ADD_PAGE_OFFSET(src);
+
+    for (int i = 0; i < PML4_ENTRIES; ++i)
+    {
+        if (!src->entries[i])
+        {
+            continue;
+        }
+
+        // TODO: Check if user flag is enough to trigger copy
+        if (!pml4_entry_is_user(src->entries[i]))
+        {
+            dir->entries[i] = src->entries[i];
+        }
+        else
+        {
+            pdp_t *src_table = (pdp_t *)pml4_entry_pfn(src->entries[i]);
+            pdp_t *new_table = clone_pdp(src_table);
+
+            pml4_entry_set_frame(&dir->entries[i], (phys_addr)new_table);
+
+            dir->entries[i] |= (src->entries[i] & (PML4E_ON_CLONE));
+        }
+    }
+
+    dir = REMOVE_PAGE_OFFSET(dir);
+
+    return dir;
+}
+
+pml4_t *virt_mem_clone_address_space(pml4_t *src)
+{
+    return clone_pml4(src);
+}
+
+//==============================================================================
+// End of file
+//==============================================================================

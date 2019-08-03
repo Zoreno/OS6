@@ -14,6 +14,9 @@
 #include <debug/backtrace.h>
 #include <exec/elf64.h>
 
+// TODO: This should not be included directly
+#include <arch/x86-64/fpu.h>
+
 #define DEBUG_SCHED 0
 
 #if DEBUG_SCHED
@@ -252,6 +255,8 @@ process_t *spawn_init()
 
 	init->sched_node.payload = init;
 
+	init->page_directory = virt_mem_get_current_dir();
+
 	return init;
 }
 
@@ -334,7 +339,7 @@ pid_t fork()
 
 	ASSERT(parent);
 
-	// TODO: Clone address space
+	current_process->page_directory = virt_mem_clone_address_space(parent->page_directory);
 
 	parent->thread.rip = return_addr;
 
@@ -370,6 +375,10 @@ pid_t fork()
 
 	return new_proc->id;
 }
+
+//=============================================================================
+// Clone
+//=============================================================================
 
 //=============================================================================
 // Process cleanup
@@ -489,7 +498,7 @@ void switch_next(uintptr_t return_addr)
 
 	current_process = next_ready_process();
 
-	// TODO: Switch FPU
+	arch_x64_64_restore_fpu(current_process);
 
 	if (current_process->finished)
 	{
@@ -503,6 +512,8 @@ void switch_next(uintptr_t return_addr)
 	PRINT("Old thread rip: %#016x\n", old_thread->rip);
 	LOOKUP_SYMBOL(old_thread->rip);
 	PRINT("\n");
+
+	virt_mem_switch_dir(current_process->page_directory);
 
 	switch_to(&old_thread, (thread_t *)&current_process->thread);
 }
@@ -539,7 +550,7 @@ void switch_task(uint8_t reschedule)
 
 	current_process->running = 0;
 
-	// TODO: Save FPU state
+	arch_x64_64_save_fpu(current_process);
 
 	if (reschedule && current_process != kernel_idle_task)
 	{
