@@ -115,16 +115,16 @@ void arch_x64_64_install_fpu()
 // the memory must be 16 byte aligned to avoid GP faults
 static uint8_t __fxsave_buffer[512] __attribute__((aligned(16)));
 
-void arch_x64_64_restore_fpu(process_t *process)
+void arch_x64_64_restore_fpu(void *buffer)
 {
-    memcpy(&__fxsave_buffer, (uint8_t *)&process->thread.fp_regs, 512);
+    memcpy(__fxsave_buffer, buffer, 512);
 
     __asm__ volatile("fxrstor (%0)" ::"r"(__fxsave_buffer));
 }
 
-void arch_x64_64_save_fpu(process_t *process)
+void arch_x64_64_save_fpu(void *buffer)
 {
     __asm__ volatile("fxsave (%0)" ::"r"(__fxsave_buffer));
 
-    memcpy((uint8_t *)&process->thread.fp_regs, &__fxsave_buffer, 512);
+    memcpy(buffer, __fxsave_buffer, 512);
 }

@@ -498,7 +498,7 @@ void switch_next(uintptr_t return_addr)
 
 	current_process = next_ready_process();
 
-	arch_x64_64_restore_fpu(current_process);
+	arch_x64_64_restore_fpu((void *)current_process->thread.fp_regs);
 
 	if (current_process->finished)
 	{
@@ -550,7 +550,7 @@ void switch_task(uint8_t reschedule)
 
 	current_process->running = 0;
 
-	arch_x64_64_save_fpu(current_process);
+	arch_x64_64_save_fpu((void *)current_process->thread.fp_regs);
 
 	if (reschedule && current_process != kernel_idle_task)
 	{

@@ -25,9 +25,6 @@
 
 #include <stdint.h>
 
-// TODO: This should probably not ne included here
-#include <process/process.h>
-
 #define FPU_ROUND_NEAREST 0
 #define FPU_ROUND_DOWN 1
 #define FPU_ROUND_UP 2
@@ -57,7 +54,7 @@ void arch_x64_64_enable_fpu();
 void arch_x64_64_disable_fpu();
 void arch_x64_64_init_fpu();
 void arch_x64_64_install_fpu();
-void arch_x64_64_restore_fpu(process_t *process);
-void arch_x64_64_save_fpu(process_t *process);
+void arch_x64_64_restore_fpu(void *buffer);
+void arch_x64_64_save_fpu(void *buffer);
 
 #endif
