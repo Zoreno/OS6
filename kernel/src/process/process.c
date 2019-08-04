@@ -242,6 +242,9 @@ process_t *spawn_init()
 	init->argc = 0;
 	init->status = 0;
 
+	init->wd_node = clone_fs(fs_root);
+	init->wd_path = strdup("/");
+
 	init->thread.rip = 0;
 	init->thread.rsp = 0;
 
@@ -311,6 +314,9 @@ process_t *spawn_process(process_t *parent)
 	proc->image.start = parent->image.start;
 
 	spinlock_init(&proc->image.lock);
+
+	proc->wd_node = clone_fs(parent->wd_node);
+	proc->wd_path = strdup(parent->wd_path);
 
 	proc->status = 0;
 	proc->finished = 0;

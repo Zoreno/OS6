@@ -37,6 +37,8 @@
 #include <vfs/nulldev.h>
 #include <vfs/zerodev.h>
 
+#include <process/process.h>
+
 fs_node_t *fs_root = 0;
 tree_t *fs_tree = 0;
 
@@ -1226,7 +1228,9 @@ fs_node_t *kopen(char *filename, uint32_t flags)
 {
     //printf("[VFS] kopen: filename: [%s], flags: %#x\n", filename, flags);
 
-    return kopen_recur(filename, flags, 0, "/");
+    process_t *current_process = get_current_process();
+
+    return kopen_recur(filename, flags, 0, current_process->wd_path);
 }
 
 static void print_vfs_tree_node(tree_node_t *node, size_t height)

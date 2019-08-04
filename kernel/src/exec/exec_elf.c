@@ -222,7 +222,7 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
 
     //const char *args[2] = {"Test", "Fisk"};
 
-    int ret = entry_func(argc, argv_);
+    int ret = entry_func(argc, (const char **)argv_);
 
     __builtin_unreachable();
 }

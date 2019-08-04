@@ -11,6 +11,8 @@
 
 #include <sync/spinlock.h>
 
+#include <vfs/vfs.h>
+
 #define MAX_PIDS 256
 
 typedef int32_t pid_t;
@@ -56,6 +58,9 @@ typedef struct _process
     tree_node_t *tree_entry;
 
     image_t image;
+
+    fs_node_t *wd_node;
+    char *wd_path;
 
     status_t status;
 
