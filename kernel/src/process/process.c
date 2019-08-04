@@ -242,6 +242,15 @@ process_t *spawn_init()
 	init->argc = 0;
 	init->status = 0;
 
+	init->file_descriptors = malloc(sizeof(fd_table_t));
+
+	init->file_descriptors->refs = 1;
+	init->file_descriptors->length = 0;
+	init->file_descriptors->capacity = 4;
+	init->file_descriptors->entries = malloc(sizeof(fs_node_t *) * init->file_descriptors->capacity);
+	init->file_descriptors->modes = malloc(sizeof(int) * init->file_descriptors->capacity);
+	init->file_descriptors->offsets = malloc(sizeof(uint64_t) * init->file_descriptors->capacity);
+
 	init->wd_node = clone_fs(fs_root);
 	init->wd_path = strdup("/");
 
@@ -314,6 +323,22 @@ process_t *spawn_process(process_t *parent)
 	proc->image.start = parent->image.start;
 
 	spinlock_init(&proc->image.lock);
+
+	proc->file_descriptors = malloc(sizeof(fd_table_t));
+	proc->file_descriptors->refs = 1;
+	proc->file_descriptors->length = parent->file_descriptors->length;
+	proc->file_descriptors->capacity = parent->file_descriptors->capacity;
+
+	proc->file_descriptors->entries = malloc(sizeof(fs_node_t *) * proc->file_descriptors->capacity);
+	proc->file_descriptors->modes = malloc(sizeof(int) * proc->file_descriptors->capacity);
+	proc->file_descriptors->offsets = malloc(sizeof(uint64_t) * proc->file_descriptors->capacity);
+
+	for (uint32_t i = 0; i < parent->file_descriptors->length; ++i)
+	{
+		proc->file_descriptors->entries[i] = clone_fs(parent->file_descriptors->entries[i]);
+		proc->file_descriptors->modes[i] = parent->file_descriptors->modes[i];
+		proc->file_descriptors->offsets[i] = parent->file_descriptors->offsets[i];
+	}
 
 	proc->wd_node = clone_fs(parent->wd_node);
 	proc->wd_path = strdup(parent->wd_path);
@@ -656,6 +681,55 @@ void process_disown(process_t *proc)
 //=============================================================================
 // FD
 //=============================================================================
+
+size_t process_append_fd(process_t *proc, fs_node_t *node)
+{
+	for (size_t i = 0; i < proc->file_descriptors->length; ++i)
+	{
+		if (!proc->file_descriptors->entries[i])
+		{
+			proc->file_descriptors->entries[i] = node;
+			proc->file_descriptors->modes[i] = 0;
+			proc->file_descriptors->offsets[i] = 0;
+			return i;
+		}
+	}
+
+	if (proc->file_descriptors->length = proc->file_descriptors->capacity)
+	{
+		proc->file_descriptors->capacity *= 2;
+		proc->file_descriptors->entries = realloc(proc->file_descriptors->entries, sizeof(fs_node_t *) * proc->file_descriptors->capacity);
+		proc->file_descriptors->modes = realloc(proc->file_descriptors->modes, sizeof(int) * proc->file_descriptors->capacity);
+		proc->file_descriptors->offsets = realloc(proc->file_descriptors->offsets, sizeof(uint64_t) * proc->file_descriptors->capacity);
+	}
+
+	proc->file_descriptors->entries[proc->file_descriptors->length] = node;
+	proc->file_descriptors->modes[proc->file_descriptors->length] = 0;
+	proc->file_descriptors->offsets[proc->file_descriptors->length] = 0;
+	proc->file_descriptors->length++;
+	return proc->file_descriptors->length - 1;
+}
+
+size_t process_move_fd(process_t *proc, int src, int dest)
+{
+	if ((size_t)src > proc->file_descriptors->length || (dest != -1 && (size_t)dest > proc->file_descriptors->length))
+	{
+		return -1;
+	}
+	if (dest == -1)
+	{
+		dest = process_append_fd(proc, NULL);
+	}
+	if (proc->file_descriptors->entries[dest] != proc->file_descriptors->entries[src])
+	{
+		close_fs(proc->file_descriptors->entries[dest]);
+		proc->file_descriptors->entries[dest] = proc->file_descriptors->entries[src];
+		proc->file_descriptors->modes[dest] = proc->file_descriptors->modes[src];
+		proc->file_descriptors->offsets[dest] = proc->file_descriptors->offsets[src];
+		open_fs(proc->file_descriptors->entries[dest], 0);
+	}
+	return dest;
+}
 
 //=============================================================================
 // waitpid

@@ -218,6 +218,15 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
 
     current_process->image.start = entry;
 
+    for (unsigned int i = 3; i < current_process->file_descriptors->length; ++i)
+    {
+        if (current_process->file_descriptors->entries[i])
+        {
+            close_fs(current_process->file_descriptors->entries[i]);
+            current_process->file_descriptors->entries[i] = NULL;
+        }
+    }
+
     entry_func_t entry_func = (entry_func_t)entry;
 
     //const char *args[2] = {"Test", "Fisk"};

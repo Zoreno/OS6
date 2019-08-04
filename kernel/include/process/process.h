@@ -43,6 +43,16 @@ typedef struct _image
     spinlock_t lock;
 } image_t;
 
+typedef struct _fd_table
+{
+    fs_node_t **entries;
+    uint64_t *offsets;
+    int *modes;
+    size_t length;
+    size_t capacity;
+    size_t refs;
+} fd_table_t;
+
 typedef struct _process
 {
     pid_t id;
@@ -61,6 +71,8 @@ typedef struct _process
 
     fs_node_t *wd_node;
     char *wd_path;
+
+    fd_table_t *file_descriptors;
 
     status_t status;
 
@@ -95,5 +107,8 @@ pid_t get_pid();
 void process_yield(uint8_t reschedule);
 void process_sleep(uint64_t ms);
 void process_disown(process_t *process);
+
+size_t process_append_fd(process_t *proc, fs_node_t *node);
+size_t process_move_fd(process_t *proc, int src, int dest);
 
 #endif
