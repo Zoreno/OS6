@@ -189,7 +189,6 @@ typedef struct _uhci_qh_t
 
     uint32_t tdHead;
     uint32_t active;
-    uint8_t pad;
 } __attribute__((packed)) uhci_qh_t;
 
 //=============================================================================

@@ -194,8 +194,10 @@ set(QEMU_FLAGS ${QEMU_FLAGS} -rtc base=localtime)
 set(QEMU_FLAGS ${QEMU_FLAGS} -boot d)
 
 # Set USB devices
-#set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-ehci,id=ehci -device usb-mouse,bus=ehci.0,port=1 -device usb-kbd,bus=ehci.0,port=2)
+#set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-ehci,id=ehci -device usb-tablet,bus=ehci.0,port=1 -device usb-kbd,bus=ehci.0,port=2)
 #set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-mouse -device usb-kbd)
+
+#set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-tablet)
 
 # Set serial interface
 set(QEMU_FLAGS ${QEMU_FLAGS} -serial stdio)

@@ -761,6 +761,8 @@ static void ehci_probe(ehci_controller_t *hc)
 
             if (dev)
             {
+                printf("USB dev for port %i created\n", port);
+
                 dev->parent = 0;
                 dev->hc = hc;
                 dev->port = port;
@@ -857,7 +859,7 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
     qh->caps = 0;
     qh->curLink = 0;
     qh->nextLink = PTR_TERMINATE;
-    qh->altLink = PTR_TERMINATE;
+    qh->altLink = 0;
     qh->token = 0;
 
     for (uint32_t i = 0; i < 5; ++i)

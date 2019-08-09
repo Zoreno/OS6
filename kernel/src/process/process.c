@@ -464,6 +464,27 @@ void cleanup_process(process_t *proc, int retval)
 {
 	proc->status = retval;
 	proc->finished = 1;
+
+	proc->file_descriptors->refs--;
+
+	if (proc->file_descriptors->refs == 0)
+	{
+		printf("Releasing FDS for process %i\n", get_pid());
+
+		for (size_t i = 0; i < proc->file_descriptors->capacity; ++i)
+		{
+			if (proc->file_descriptors->entries[i])
+			{
+				close_fs(proc->file_descriptors->entries[i]);
+				proc->file_descriptors->entries[i] = NULL;
+			}
+		}
+
+		free(proc->file_descriptors->entries);
+		free(proc->file_descriptors->offsets);
+		free(proc->file_descriptors->modes);
+		free(proc->file_descriptors);
+	}
 }
 
 void reap_process(process_t *proc)
@@ -695,7 +716,7 @@ size_t process_append_fd(process_t *proc, fs_node_t *node)
 		}
 	}
 
-	if (proc->file_descriptors->length = proc->file_descriptors->capacity)
+	if (proc->file_descriptors->length == proc->file_descriptors->capacity)
 	{
 		proc->file_descriptors->capacity *= 2;
 		proc->file_descriptors->entries = realloc(proc->file_descriptors->entries, sizeof(fs_node_t *) * proc->file_descriptors->capacity);
