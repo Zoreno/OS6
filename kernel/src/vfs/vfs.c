@@ -1228,7 +1228,7 @@ fs_node_t *kopen(char *filename, uint32_t flags)
 {
     //printf("[VFS] kopen: filename: [%s], flags: %#x\n", filename, flags);
 
-    process_t *current_process = get_current_process();
+    process_t *current_process = process_get_current();
 
     return kopen_recur(filename, flags, 0, current_process->wd_path);
 }

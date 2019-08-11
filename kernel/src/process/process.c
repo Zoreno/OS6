@@ -368,7 +368,7 @@ process_t *spawn_process(process_t *parent)
 // Fork
 //=============================================================================
 
-pid_t fork()
+pid_t process_fork()
 {
 	PRINT("Fork\n");
 
@@ -427,7 +427,7 @@ pid_t fork()
 // Process cleanup
 //=============================================================================
 
-void delete_process(process_t *proc)
+void process_delete(process_t *proc)
 {
 	tree_node_t *entry = proc->tree_entry;
 
@@ -460,7 +460,7 @@ void delete_process(process_t *proc)
 	free(proc);
 }
 
-void cleanup_process(process_t *proc, int retval)
+void process_cleanup(process_t *proc, int retval)
 {
 	proc->status = retval;
 	proc->finished = 1;
@@ -469,7 +469,7 @@ void cleanup_process(process_t *proc, int retval)
 
 	if (proc->file_descriptors->refs == 0)
 	{
-		printf("Releasing FDS for process %i\n", get_pid());
+		printf("Releasing FDS for process %i\n", process_get_pid());
 
 		for (size_t i = 0; i < proc->file_descriptors->capacity; ++i)
 		{
@@ -487,7 +487,7 @@ void cleanup_process(process_t *proc, int retval)
 	}
 }
 
-void reap_process(process_t *proc)
+void process_reap(process_t *proc)
 {
 	free(proc->name);
 
@@ -496,24 +496,24 @@ void reap_process(process_t *proc)
 		free(proc->description);
 	}
 
-	delete_process(proc);
+	process_delete(proc);
 }
 
-void task_exit(int retval)
+void process_exit(int retval)
 {
 	printf("Task %d exited with code: %d\n", current_process->id, retval);
 
 	if (current_process->id == 0)
 	{
 		// This should be a kernel panic. We tried to exit kernel idle
-		switch_task(1);
+		process_switch_task(1);
 		return;
 	}
 
-	cleanup_process(get_current_process(), retval);
+	process_cleanup(process_get_current(), retval);
 
 	// Do not reschedule
-	switch_task(0);
+	process_switch_task(0);
 }
 
 //=============================================================================
@@ -590,7 +590,7 @@ void make_process_ready(process_t *proc)
 	spinlock_unlock(&process_queue_lock);
 }
 
-void switch_task(uint8_t reschedule)
+void process_switch_task(uint8_t reschedule)
 {
 	uintptr_t return_addr = (uintptr_t)__builtin_return_address(0);
 
@@ -626,19 +626,19 @@ void switch_task(uint8_t reschedule)
 
 void process_yield(uint8_t reschedule)
 {
-	switch_task(reschedule);
+	process_switch_task(reschedule);
 }
 
 //=============================================================================
 // Process queries
 //=============================================================================
 
-process_t *get_current_process()
+process_t *process_get_current()
 {
 	return (process_t *)current_process;
 }
 
-pid_t get_pid()
+pid_t process_get_pid()
 {
 	return current_process->id;
 }
@@ -770,7 +770,7 @@ void process_sleep(uint64_t ms)
 	// timeslice
 	if (!ticks)
 	{
-		switch_task(1);
+		process_switch_task(1);
 
 		return;
 	}
@@ -784,7 +784,7 @@ void process_sleep(uint64_t ms)
 
 	//printf("Task %i entered sleep mode for %d ticks\n", get_pid(), ticks);
 
-	switch_task(0);
+	process_switch_task(0);
 }
 
 void wakeup_sleeping_processes()

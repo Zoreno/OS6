@@ -95,20 +95,21 @@ typedef struct _process
 void debug_print_process(process_t *process);
 void debug_print_process_tree();
 
-void delete_process(process_t *process);
-void cleanup_process(process_t *process, int retval);
-void reap_process(process_t *proc);
-void task_exit(int retval);
-void tasking_install();
-pid_t fork();
-void switch_task(uint8_t reschedule);
-process_t *get_current_process();
-pid_t get_pid();
+void process_delete(process_t *process);
+void process_cleanup(process_t *process, int retval);
+void process_reap(process_t *proc);
+void process_exit(int retval);
+pid_t process_fork();
+void process_switch_task(uint8_t reschedule);
+process_t *process_get_current();
+pid_t process_get_pid();
 void process_yield(uint8_t reschedule);
 void process_sleep(uint64_t ms);
 void process_disown(process_t *process);
 
 size_t process_append_fd(process_t *proc, fs_node_t *node);
 size_t process_move_fd(process_t *proc, int src, int dest);
+
+void tasking_install();
 
 #endif

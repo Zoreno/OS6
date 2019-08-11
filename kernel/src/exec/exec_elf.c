@@ -32,7 +32,7 @@ typedef int (*entry_func_t)(int argc, const char **argv);
 
 int exec_elf(char *path, int argc, char **argv, char **env, int depth)
 {
-    process_t *current_process = get_current_process();
+    process_t *current_process = process_get_current();
 
     Elf64_Ehdr_t header;
 

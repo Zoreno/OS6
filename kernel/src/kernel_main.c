@@ -498,22 +498,22 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     printf("After switch\n");
 
-    pid_t pid = get_pid();
+    pid_t pid = process_get_pid();
 
-    fork();
+    process_fork();
 
-    if (get_pid() != pid)
+    if (process_get_pid() != pid)
     {
         exec_elf("bin/hello_world", 0, NULL, NULL, 0);
 
         printf("[ERROR] Exec elf returned\n");
     }
 
-    pid = get_pid();
+    pid = process_get_pid();
 
-    fork();
+    process_fork();
 
-    if (get_pid() != pid)
+    if (process_get_pid() != pid)
     {
         exec_elf("bin/hello_world", 0, NULL, NULL, 0);
 
@@ -526,7 +526,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     {
         process_sleep(1000);
 
-        pid_t pid = get_pid();
+        pid_t pid = process_get_pid();
 
         spinlock_lock(&print_lock);
         printf("My pid: %d\n", pid);

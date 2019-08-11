@@ -23,7 +23,7 @@ void syscall_handler(system_stack_t *stack)
 	break;
 	case 1:
 	{
-		task_exit(stack->rbx);
+		process_exit(stack->rbx);
 	}
 	break;
 	case 2:
