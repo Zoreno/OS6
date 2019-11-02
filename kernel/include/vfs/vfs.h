@@ -25,21 +25,104 @@
 
 #include <stdint.h>
 
+/**
+ * @brief Maximum symbolic link depth that the VFS will try to interpret.
+ * 
+ * 
+ */
 #define MAX_SYMLINK_DEPTH 8
+
+/**
+ * @brief Maximum symbolic link size
+ * 
+ * 
+ */
 #define MAX_SYMLINK_SIZE 4096
 
+/**
+ * @brief The separator used to distinguish levels in a path
+ * 
+ * 
+ */
 #define PATH_SEPARATOR '/'
+
+/**
+ * @brief The separator used to distinguish levels in a path as a string
+ * 
+ * 
+ */
 #define PATH_SEPARATOR_STRING "/"
+
+/**
+ * @brief The path indicating the parent directory of the current folder
+ * 
+ * 
+ */
 #define PATH_UP ".."
+
+/**
+ * @brief The path indicating the current folder
+ * 
+ * 
+ */
 #define PATH_DOT "."
 
+/**
+ * @brief Open the file for reading only
+ * 
+ * 
+ */
 #define O_RDONLY 0x0000
+
+/**
+ * @brief Open the file for writing only
+ * 
+ * 
+ */
 #define O_WRONLY 0x0001
+
+/**
+ * @brief Open the file for reading and writing
+ * 
+ * 
+ */
 #define O_RDWR 0x0002
+
+/**
+ * @brief The file offset should be set to the end of the file before each write.
+ * 
+ * 
+ */
 #define O_APPEND 0x0008
+
+/**
+ * @brief Create the file if it does not exist.
+ * 
+ * If the file exists, this flag has no effect except when used in combination with O_EXCL.
+ * Otherwise, the file is created.
+ */
 #define O_CREAT 0x0200
+
+/**
+ * @brief Truncate the file on open.
+ * 
+ * If the file exists and it is a regular file, and the file is successfully opened as O_RDWR or
+ * O_WRONLY, its length should be set to 0.
+ */
 #define O_TRUNC 0x0400
+
+/**
+ * @brief If O_EXCL and O_CREAT is both set, open() should fail if the fail already exists.
+ * 
+ * 
+ */
 #define O_EXCL 0x0800
+
+/**
+ * @brief Do not follow symbolic links.
+ * 
+ * 
+ */
 #define O_NOFOLLOW 0x1000
 #define O_PATH 0x2000
 #define O_NONBLOCK 0x4000
@@ -53,14 +136,61 @@
 #define FS_SYMLINK 0x20
 #define FS_MOUNTPOINT 0x40
 
-#define _IFMT 0170000   /* type of file */
-#define _IFDIR 0040000  /* directory */
-#define _IFCHR 0020000  /* character special */
-#define _IFBLK 0060000  /* block special */
-#define _IFREG 0100000  /* regular */
-#define _IFLNK 0120000  /* symbolic link */
+/**
+ * @brief Type of file
+ * 
+ * 
+ */
+#define _IFMT 0170000 /* type of file */
+
+/**
+ * @brief Directory
+ * 
+ * 
+ */
+#define _IFDIR 0040000 /* directory */
+
+/**
+ * @brief Character special
+ * 
+ * 
+ */
+#define _IFCHR 0020000 /* character special */
+
+/**
+ * @brief Block special
+ * 
+ * 
+ */
+#define _IFBLK 0060000 /* block special */
+
+/**
+ * @brief Regular file
+ * 
+ * 
+ */
+#define _IFREG 0100000 /* regular */
+
+/**
+ * @brief Symbolic link
+ * 
+ * 
+ */
+#define _IFLNK 0120000 /* symbolic link */
+
+/**
+ * @brief Socket
+ * 
+ * 
+ */
 #define _IFSOCK 0140000 /* socket */
-#define _IFIFO 0010000  /* fifo */
+
+/**
+ * @brief FIFO
+ * 
+ * 
+ */
+#define _IFIFO 0010000 /* fifo */
 
 struct fs_node;
 
@@ -113,6 +243,11 @@ typedef struct fs_node *(*finddir_func_t)(struct fs_node *, char *name);
  */
 typedef int (*create_func_t)(struct fs_node *, char *name, uint16_t permission);
 
+/**
+ * @brief Type of function to unlink a file
+ * 
+ * 
+ */
 typedef int (*unlink_func_t)(struct fs_node *, char *name);
 
 /**
@@ -122,22 +257,67 @@ typedef int (*unlink_func_t)(struct fs_node *, char *name);
  */
 typedef int (*mkdir_func_t)(struct fs_node *, char *name, uint16_t permission);
 
+/**
+ * @brief Type of function to perform IO control opertations
+ * 
+ * 
+ */
 typedef int (*ioctl_func_t)(struct fs_node *, int request, void *argp);
 
+/**
+ * @brief Type of function to get the size of a node
+ * 
+ * 
+ */
 typedef int (*get_size_func_t)(struct fs_node *);
 
+/**
+ * @brief Type of function to change the permissions of a file
+ * 
+ * 
+ */
 typedef int (*chmod_func_t)(struct fs_node *, int mode);
 
+/**
+ * @brief Type of function to create a symbolic link
+ * 
+ * 
+ */
 typedef int (*symlink_func_t)(struct fs_node *, char *name, char *value);
 
+/**
+ * @brief Type of function to read a symbolic link
+ * 
+ * 
+ */
 typedef int (*readlink_func_t)(struct fs_node *, char *buf, size_t size);
 
+/**
+ * @brief Type of function to perform a selectcheck operation
+ * 
+ * 
+ */
 typedef int (*selectcheck_func_t)(struct fs_node *);
 
+/**
+ * @brief Type of function to perform a selectwait operation
+ * 
+ * 
+ */
 typedef int (*selectwait_func_t)(struct fs_node *, void *process);
 
+/**
+ * @brief Type of function to change owner file
+ * 
+ * 
+ */
 typedef int (*chown_func_t)(struct fs_node *, int, int);
 
+/**
+ * @brief Type of function to truncate a file.
+ * 
+ * 
+ */
 typedef int (*truncate_func_t)(struct fs_node *);
 
 /**
@@ -294,20 +474,60 @@ typedef struct fs_node
      */
     mkdir_func_t mkdir;
 
+    /**
+     * @brief Function used by IO control options
+     * 
+     * 
+     */
     ioctl_func_t ioctl;
 
+    /**
+     * @brief Function used to get the size of the node
+     * 
+     * 
+     */
     get_size_func_t get_size;
 
+    /**
+     * @brief Function used to change the permissions of the node.
+     * 
+     * 
+     */
     chmod_func_t chmod;
 
+    /**
+     * @brief Function used to unlink this node
+     * 
+     * 
+     */
     unlink_func_t unlink;
 
+    /**
+     * @brief Function used to create a symlink
+     * 
+     * 
+     */
     symlink_func_t symlink;
 
+    /**
+     * @brief Function used to read a symlink
+     * 
+     * 
+     */
     readlink_func_t readlink;
 
+    /**
+     * @brief Function used to change the owner of the node
+     * 
+     * 
+     */
     chown_func_t chown;
 
+    /**
+     * @brief Function used to truncate the node.
+     * 
+     * 
+     */
     truncate_func_t truncate;
 
     /**
@@ -317,6 +537,11 @@ typedef struct fs_node
      */
     struct fs_node *ptr;
 
+    /**
+     * @brief Current amount of references to this node
+     * 
+     * 
+     */
     int32_t refcount;
 
     uint32_t nlink;
@@ -394,3 +619,7 @@ void vfs_lock(fs_node_t *node);
 void print_vfs_tree(void);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================
