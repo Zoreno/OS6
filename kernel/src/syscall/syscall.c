@@ -302,7 +302,23 @@ int syscall_readdir(int fd, int index, struct dirent *entry)
 	return 0;
 }
 
-int syscall_access(const char *file, int flags);
+int syscall_access(const char *file, int flags)
+{
+	// TODO: Fill out this debug message with more info.
+	printf("[ACCESS]\n");
+
+	// Try to open the file with the given flags
+	fs_node_t *node = kopen((char *)file, flags);
+
+	if (!node)
+	{
+		return -ENOENT;
+	}
+
+	close_fs(node);
+
+	return 0;
+}
 
 int syscall_ioctl(int fd, int request, void *argp)
 {
@@ -314,24 +330,225 @@ int syscall_ioctl(int fd, int request, void *argp)
 	return ioctl_fs(FILE_DESC_ENTRY(fd), request, argp);
 }
 
-int syscall_statf(char *file, uintptr_t st);
-int syscall_stat(int fd, uintptr_t st);
-int syscall_mkdir(char *path, int mode);
-int syscall_unlink(char *file);
-int syscall_symlink(char *target, char *name);
-int syscall_readlink(const char *file, char *ptr, int len);
-int syscall_lstat(char *file, uintptr_t st);
+static int stat_node(fs_node_t *node, uintptr_t addr)
+{
+	struct stat *f = (struct stat *)addr;
+
+	// TODO: Validate the pointer
+
+	if (!node)
+	{
+		memset(f, 0, sizeof(struct stat));
+
+		printf("[STAT] Tried to stat a non-existent file\n");
+
+		return -ENOENT;
+	}
+
+	f->st_dev = (uint16_t)(((uint32_t)node->device & 0xFFFF0) >> 8);
+	f->st_ino = node->inode;
+
+	uint32_t flags = 0;
+
+	if (node->flags & FS_FILE)
+	{
+		flags |= _IFREG;
+	}
+
+	if (node->flags & FS_DIRECTORY)
+	{
+		flags |= _IFDIR;
+	}
+
+	if (node->flags & FS_CHARDEVICE)
+	{
+		flags |= _IFCHR;
+	}
+
+	if (node->flags & FS_BLOCKDEVICE)
+	{
+		flags |= _IFBLK;
+	}
+
+	if (node->flags & FS_PIPE)
+	{
+		flags |= _IFIFO;
+	}
+
+	if (node->flags & FS_SYMLINK)
+	{
+		flags |= _IFLNK;
+	}
+
+	f->st_nlink = node->nlink;
+	f->st_uid = node->uid;
+	f->st_gid = node->gid;
+	f->st_rdev = 0;
+
+	f->st_atime = node->atime;
+	f->st_mtime = node->mtime;
+	f->st_ctime = node->ctime;
+
+	f->st_blksize = 512;
+
+	if (node->get_size)
+	{
+		f->st_size = node->get_size(node);
+	}
+	else
+	{
+		f->st_size = node->length;
+	}
+
+	return 0;
+}
+
+int syscall_statf(char *file, uintptr_t addr)
+{
+	int result;
+
+	fs_node_t *node = kopen(file, 0);
+
+	result = stat_node(node, addr);
+
+	if (node)
+	{
+		close_fs(node);
+	}
+
+	return result;
+}
+
+int syscall_stat(int fd, uintptr_t addr)
+{
+	if (FILE_DESC_CHECK(fd))
+	{
+		return stat_node(FILE_DESC_ENTRY(fd), addr);
+	}
+
+	return -EBADF;
+}
+
+int syscall_mkdir(char *path, int mode)
+{
+	return mkdir_fs(path, mode);
+}
+
+int syscall_unlink(char *file)
+{
+	return unlink_fs(file);
+}
+
+int syscall_symlink(char *target, char *name)
+{
+	return symlink_fs(target, name);
+}
+
+int syscall_readlink(const char *file, char *ptr, int len)
+{
+	fs_node_t *node = kopen((char *)file, O_PATH | O_NOFOLLOW);
+
+	if (!node)
+	{
+		return -ENOENT;
+	}
+
+	int rv = readlink_fs(node, ptr, len);
+
+	close_fs(node);
+
+	return rv;
+}
+
+int syscall_lstat(char *file, uintptr_t addr)
+{
+	int result;
+
+	fs_node_t *node = kopen(file, O_PATH | O_NOFOLLOW);
+
+	result = stat_node(node, addr);
+
+	if (node)
+	{
+		close_fs(node);
+	}
+
+	return result;
+}
 
 int syscall_chmod(char *file, int mode);
 int syscall_chown(char *file, int uid, int gid);
 
 int syscall_sbrk(uint64_t size);
 
-int syscall_getpid();
-int syscall_gettid();
+int syscall_getpid()
+{
+	// TODO: This should return the group ID if the process is in a group
+	return process_get_current()->id;
+}
 
-int syscall_chdir(char *newdir);
-int syscall_getcwd(char *buf, size_t size);
+int syscall_gettid()
+{
+	return syscall_getpid();
+}
+
+int syscall_chdir(char *newdir)
+{
+	char *path = canonicalize_path(process_get_current()->wd_path, newdir);
+
+	fs_node_t *chd = kopen(path, 0);
+
+	if (chd)
+	{
+		if ((chd->flags & FS_DIRECTORY) == 0)
+		{
+			close_fs(chd);
+			return -ENOTDIR;
+		}
+
+		if (!has_permissions(chd, 01))
+		{
+			close_fs(chd);
+			return -EACCES;
+		}
+
+		close_fs(chd);
+
+		process_t *current_process = process_get_current();
+
+		free(current_process->wd_path);
+		current_process->wd_path = malloc(strlen(path) + 1);
+		memcpy(current_process->wd_path, path, strlen(path) + 1);
+
+		return 0;
+	}
+
+	return -ENOENT;
+}
+
+int syscall_getcwd(char *buf, size_t size)
+{
+	if (!buf)
+	{
+		return -EFAULT;
+	}
+
+	if (buf && (size == 0))
+	{
+		return -EINVAL;
+	}
+
+	size_t len = strlen(process_get_current()->wd_path) + 1;
+
+	if (len > size)
+	{
+		return -ERANGE;
+	}
+
+	memcpy(buf, process_get_current()->wd_path, len);
+
+	return 0;
+}
 
 // int syscall_gettimeofday(struct timeval *tv, void *tz);
 
@@ -363,12 +580,34 @@ void syscall_handler(system_stack_t *stack)
 
 void syscall_install()
 {
-	// Sticks head in sand...
+	// Sticks head in the sand...
 #pragma GCC diagnostic ignored "-Wcast-function-type"
 	DECLARE_SYSCALL(DEBUG_PRINT, debug_print);
 	DECLARE_SYSCALL(EXIT, exit);
 	DECLARE_SYSCALL(YIELD, yield);
 	DECLARE_SYSCALL(SLEEP, sleep);
+
+	DECLARE_SYSCALL(OPEN, open);
+	DECLARE_SYSCALL(CLOSE, close);
+	DECLARE_SYSCALL(READ, read);
+	DECLARE_SYSCALL(WRITE, write);
+	DECLARE_SYSCALL(SEEK, seek);
+	DECLARE_SYSCALL(READDIR, readdir);
+	DECLARE_SYSCALL(ACCESS, access);
+	DECLARE_SYSCALL(IOCTL, ioctl);
+	DECLARE_SYSCALL(STATF, statf);
+	DECLARE_SYSCALL(STAT, stat);
+	DECLARE_SYSCALL(MKDIR, mkdir);
+	DECLARE_SYSCALL(UNLINK, unlink);
+	DECLARE_SYSCALL(SYMLINK, symlink);
+	DECLARE_SYSCALL(READLINK, readlink);
+	DECLARE_SYSCALL(LSTAT, lstat);
+
+	DECLARE_SYSCALL(GETPID, getpid);
+	DECLARE_SYSCALL(GETTID, gettid);
+
+	DECLARE_SYSCALL(CHDIR, chdir);
+	DECLARE_SYSCALL(GETCWD, getcwd);
 #pragma GCC diagnostic pop
 
 	set_irq_handler(SYSCALL_INTNO, syscall_handler);

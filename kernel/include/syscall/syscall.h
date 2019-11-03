@@ -70,41 +70,41 @@
 #define SYSCALL_CHDIR 27
 #define SYSCALL_GETCWD 28
 
-int syscall_debug_print(char *str);
-int syscall_exit(int retval);
-int syscall_yield(int reschedule);
-int syscall_sleep(uint64_t ms);
+int syscall_debug_print(char *str); // DONE
+int syscall_exit(int retval);       // DONE
+int syscall_yield(int reschedule);  // DONE
+int syscall_sleep(uint64_t ms);     // DONE
 
 int syscall_fork();
 int syscall_clone();
 int syscall_kill(pid_t process, uint32_t signal);
 
-int syscall_open(const char *file, int flags, int mode);
-int syscall_close(int fd);
-int syscall_read(int fd, char *ptr, uint64_t len);
-int syscall_write(int fd, char *ptr, uint64_t len);
-int syscall_seek(int fd, int offset, int whence);
-int syscall_readdir(int fd, int index, struct dirent *entry);
-int syscall_access(const char *file, int flags);
-int syscall_ioctl(int fd, int request, void *argp);
-int syscall_statf(char *file, uintptr_t st);
-int syscall_stat(int fd, uintptr_t st);
-int syscall_mkdir(char *path, int mode);
-int syscall_unlink(char *file);
-int syscall_symlink(char *target, char *name);
-int syscall_readlink(const char *file, char *ptr, int len);
-int syscall_lstat(char *file, uintptr_t st);
+int syscall_open(const char *file, int flags, int mode);      // DONE
+int syscall_close(int fd);                                    // DONE
+int syscall_read(int fd, char *ptr, uint64_t len);            // DONE
+int syscall_write(int fd, char *ptr, uint64_t len);           // DONE
+int syscall_seek(int fd, int offset, int whence);             // DONE
+int syscall_readdir(int fd, int index, struct dirent *entry); // DONE
+int syscall_access(const char *file, int flags);              // DONE
+int syscall_ioctl(int fd, int request, void *argp);           // DONE
+int syscall_statf(char *file, uintptr_t st);                  // DONE
+int syscall_stat(int fd, uintptr_t st);                       // DONE
+int syscall_mkdir(char *path, int mode);                      // DONE
+int syscall_unlink(char *file);                               // DONE
+int syscall_symlink(char *target, char *name);                // DONE
+int syscall_readlink(const char *file, char *ptr, int len);   // DONE
+int syscall_lstat(char *file, uintptr_t st);                  // DONE
 
 int syscall_chmod(char *file, int mode);
 int syscall_chown(char *file, int uid, int gid);
 
 int syscall_sbrk(uint64_t size);
 
-int syscall_getpid();
-int syscall_gettid();
+int syscall_getpid(); // DONE
+int syscall_gettid(); // DONE
 
-int syscall_chdir(char *newdir);
-int syscall_getcwd(char *buf, size_t size);
+int syscall_chdir(char *newdir);            // DONE
+int syscall_getcwd(char *buf, size_t size); // DONE
 
 void syscall_install();
 
