@@ -2,7 +2,7 @@
 # Cmake file for compiling the OS6 operating system
 #==============================================================================
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.12)
 
 set(CMAKE_ASM_SOURCE_FILE_EXTENSIONS "asm")
 
@@ -137,7 +137,26 @@ add_subdirectory(libsupc++)
 # Apps
 #==============================================================================
 
+define_property(GLOBAL PROPERTY APPS_LIST
+    BRIEF_DOCS "Global list of applications"
+    FULL_DOCS "Global list of applications")
+set_property(GLOBAL PROPERTY APPS_LIST "")
+
+macro(listappend var)
+    set_property(GLOBAL APPEND PROPERTY APPS_LIST "${var}")
+endmacro(listappend)
+
 add_subdirectory(apps)
+
+get_property(ALL_APPS_LIST GLOBAL PROPERTY APPS_LIST)
+
+#message(${ALL_APPS_LIST})
+
+# Copy the list and prepend the output directory
+set(ALL_APPS_LIST_DEST ${ALL_APPS_LIST})
+list(TRANSFORM ALL_APPS_LIST_DEST PREPEND "${CMAKE_SOURCE_DIR}/root/bin/")
+
+#message(${ALL_APPS_LIST_DEST})
 
 #==============================================================================
 # Tests
@@ -152,11 +171,17 @@ add_subdirectory(tests)
 set(ISO_NAME os.iso)
 set(ISO_IMAGE ${ISO_NAME})
 
-add_custom_target(${ISO_IMAGE}
-    DEPENDS kernel/kernel.bin apps/hello_world/hello_world apps/hello_world_cpp/hello_world_cpp
+foreach(app ${ALL_APPS_LIST})
+    add_custom_command(
+        OUTPUT ${CMAKE_SOURCE_DIR}/root/bin/${app}
+        DEPENDS apps/${app}/${app}
+        COMMAND cp -u apps/${app}/${app} ${CMAKE_SOURCE_DIR}/root/bin/${app}
+        COMMENT "Copying executable ${app}")
+endforeach()
+
+add_custom_command(OUTPUT ${ISO_IMAGE}
+    DEPENDS kernel/kernel.bin
     COMMAND cp -u kernel/kernel.bin ${CMAKE_SOURCE_DIR}/mnt/boot
-    COMMAND cp -u apps/hello_world/hello_world ${CMAKE_SOURCE_DIR}/root/bin
-    COMMAND cp -u apps/hello_world_cpp/hello_world_cpp ${CMAKE_SOURCE_DIR}/root/bin
     COMMAND grub-mkrescue -o ${ISO_IMAGE} ${CMAKE_SOURCE_DIR}/mnt
     COMMENT "Creating ISO image"
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -168,7 +193,8 @@ add_custom_target(${ISO_IMAGE}
 set(HDD_NAME disk.img)
 set(HDD_IMAGE ${CMAKE_BINARY_DIR}/${HDD_NAME})
 
-add_custom_target(${HDD_NAME}
+add_custom_command(OUTPUT ${HDD_NAME}
+    DEPENDS ALL_APPS_LIST_DEST
     COMMAND ../create_hdd.sh ${HDD_NAME} 100M
     COMMENT "Creating HDD"
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})

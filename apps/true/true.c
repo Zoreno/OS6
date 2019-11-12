@@ -1,10 +1,10 @@
 /**
- * @file hello_world.c
+ * @file true.c
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-16
  * 
- * @brief Simple program printing hello world and all command line arguments given in userspace
+ * @brief Returns success
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -20,18 +20,7 @@
  * 
  */
 
-#include <stdio.h>
-
 int main(int argc, char **argv)
 {
-    puts("Hello World!\n");
-
-    for (int i = 0; i < argc; ++i)
-    {
-        puts(argv[i]);
-
-        puts("\n");
-    }
-
     return 0;
 }
