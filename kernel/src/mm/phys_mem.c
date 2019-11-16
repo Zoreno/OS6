@@ -266,3 +266,12 @@ size_t phys_mem_get_block_size()
 {
     return PHYS_MEM_BLOCK_SIZE;
 }
+
+void phys_mem_dump_statistics()
+{
+    printf("[PHYSMEM] Used Memory Blocks: %i/%i (%i/%i Bytes)\n",
+           phys_mem_get_used_block_count(),
+           phys_mem_get_block_count(),
+           phys_mem_get_used_block_count() * phys_mem_get_block_size(),
+           phys_mem_get_block_count() * phys_mem_get_block_size());
+}

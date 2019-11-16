@@ -61,6 +61,7 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strlen.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strnlen.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strpbrk.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strtok_r.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strtok.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strspn.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strdup.c)
 
@@ -117,6 +118,10 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/putchar.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/puts.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/sprintf.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/vsprintf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/getc.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/getchar.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/fgetc.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/fgets.c)
 
 # libgen.h header
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/libgen/basename.c)

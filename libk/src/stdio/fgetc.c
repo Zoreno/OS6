@@ -1,8 +1,8 @@
 /**
- * @file _file.h
+ * @file fgetc.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-27
+ * @date 2019-11-13
  * 
  * @brief 
  * 
@@ -20,25 +20,14 @@
  * 
  */
 
-#ifndef _LIBK__FILE_H
-#define _LIBK__FILE_H
+#include <stdio.h>
 
-#include <__libk_common.h>
-
-#include <stdint.h>
-
-typedef char (*read_function)(void);
-typedef void (*write_function)(char);
-
-typedef struct
+char fgetc(FILE *file)
 {
-    char name[32];
-    uint32_t flags;
-    uint32_t fileLength;
-    uint32_t eof;
+    if (!file)
+    {
+        return -1;
+    }
 
-    read_function read;
-    write_function write;
-} FILE;
-
-#endif
+    return file->read();
+}

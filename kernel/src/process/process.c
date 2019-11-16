@@ -17,6 +17,10 @@
 // TODO: This should not be included directly
 #include <arch/x86-64/fpu.h>
 
+#include <errno.h>
+
+#include <util/hexdump.h>
+
 #define DEBUG_SCHED 0
 
 #if DEBUG_SCHED
@@ -93,22 +97,22 @@ void debug_print_process_tree_node(tree_node_t *node, size_t height)
 
 	for (uint32_t i = 0; i < height; ++i)
 	{
-		PRINT("  ");
+		printf("  ");
 	}
 
-	PRINT("%d %s", proc->id, proc->name);
+	printf("%d %s", proc->id, proc->name);
 
 	if (proc->description)
 	{
-		PRINT(" %s", proc->description);
+		printf(" %s", proc->description);
 	}
 
 	if (proc->finished)
 	{
-		PRINT(" [zombie]");
+		printf(" [zombie]");
 	}
 
-	PRINT("\n");
+	printf("\n");
 
 	for (list_node_t *child = node->children->head;
 		 child != NULL;
@@ -222,6 +226,7 @@ process_t *spawn_idle_thread()
 //=============================================================================
 
 extern uint64_t stack_top;
+extern uint64_t stack_bottom;
 
 process_t *spawn_init()
 {
@@ -261,7 +266,7 @@ process_t *spawn_init()
 	init->image.size = 0;
 	init->image.heap = 0;
 	init->image.heap_actual = 0;
-	init->image.stack = (uint64_t)&stack_top;
+	init->image.stack = (uint64_t)&stack_bottom;
 	init->image.start = 0;
 
 	spinlock_init(&init->image.lock);
@@ -296,6 +301,7 @@ process_t *spawn_process(process_t *parent)
 
 	PRINT("Got pid: %d\n", proc->id);
 
+	// Set this name as a placeholder
 	proc->name = strdup("new process");
 	proc->description = NULL;
 	proc->cmdline = parent->cmdline;
@@ -306,11 +312,15 @@ process_t *spawn_process(process_t *parent)
 
 	uint64_t *stack = (uint64_t *)malloc(sizeof(uint64_t) * KERNEL_STACK_SIZE);
 
-	PRINT("Child stack: %#016x-%#016x\n", stack, stack + KERNEL_STACK_SIZE);
+	printf("Child stack: %#016x-%#016x\n", stack, stack + KERNEL_STACK_SIZE);
+	printf("Parent stack: %#016x-%#016x\n", parent->image.stack, parent->image.stack + KERNEL_STACK_SIZE * sizeof(uint64_t));
+	printf("Parent stack: %#016x-%#016x\n", &stack_bottom, &stack_top);
 
 	memcpy(stack, (void *)parent->image.stack, sizeof(uint64_t) * (KERNEL_STACK_SIZE));
 
-	proc->image.stack = (uint64_t)(stack + KERNEL_STACK_SIZE);
+	//hexdump(stack, sizeof(uint64_t) * KERNEL_STACK_SIZE);
+
+	proc->image.stack = (uint64_t)(stack);
 
 	stack[KERNEL_STACK_SIZE - 1] = (uint64_t)parent->thread.rip;
 	proc->thread.rsp = &(stack[KERNEL_STACK_SIZE - 17]);
@@ -382,7 +392,7 @@ pid_t process_fork()
 
 	ASSERT(parent);
 
-	current_process->page_directory = virt_mem_clone_address_space(parent->page_directory);
+	pml4_t *new_page_directory = virt_mem_clone_address_space(parent->page_directory);
 
 	parent->thread.rip = return_addr;
 
@@ -390,16 +400,18 @@ pid_t process_fork()
 
 	ASSERT(new_proc);
 
+	new_proc->page_directory = new_page_directory;
+
 	volatile uintptr_t var = (uintptr_t)(get_rsp_val() + 8);
 	parent->thread.rsp = (uint64_t *)(get_rsp_val() + 8);
-	volatile uintptr_t diff = parent->image.stack - 1 - (var);
+	volatile uintptr_t diff = parent->image.stack + sizeof(uint64_t) * KERNEL_STACK_SIZE - 1 - (var);
 
-	PRINT("Parent thread rsp: %#016x\n", parent->thread.rsp);
-	PRINT("Diff: %#016x\n", diff);
+	printf("Parent thread rsp: %#016x\n", parent->thread.rsp);
+	printf("Diff: %#016x\n", diff);
 
 	new_proc->thread.rsp = (uint64_t *)(((uint64_t)new_proc->thread.rsp) - 8 * ((uint64_t)diff));
 
-	PRINT("New thread rsp: %#016x\n", new_proc->thread.rsp);
+	printf("New thread rsp: %#016x\n", new_proc->thread.rsp);
 
 	while (*(new_proc->thread.rsp) != return_addr)
 	{
@@ -436,6 +448,8 @@ void process_delete(process_t *proc)
 		return;
 	}
 
+	free(proc->image.stack);
+
 	// Check if we are trying to kill init
 	ASSERT((entry != process_tree->root));
 
@@ -469,7 +483,7 @@ void process_cleanup(process_t *proc, int retval)
 
 	if (proc->file_descriptors->refs == 0)
 	{
-		printf("Releasing FDS for process %i\n", process_get_pid());
+		PRINT("Releasing FDS for process %i\n", process_get_pid());
 
 		for (size_t i = 0; i < proc->file_descriptors->capacity; ++i)
 		{
@@ -501,7 +515,7 @@ void process_reap(process_t *proc)
 
 void process_exit(int retval)
 {
-	printf("Task %d exited with code: %d\n", current_process->id, retval);
+	PRINT("Task %d exited with code: %d\n", current_process->id, retval);
 
 	if (current_process->id == 0)
 	{
@@ -755,6 +769,111 @@ size_t process_move_fd(process_t *proc, int src, int dest)
 //=============================================================================
 // waitpid
 //=============================================================================
+
+static int wait_candidate(process_t *parent, int pid, int options, process_t *proc)
+{
+	printf("[WAITPID]: Checking wait candidate\n");
+
+	if (!proc)
+	{
+		return 0;
+	}
+
+	if (pid < -1)
+	{
+		if (proc->id == -pid)
+		{
+			return 1;
+		}
+	}
+	else if (pid > 0)
+	{
+		/* Specific pid */
+		if (proc->id == pid)
+		{
+			return 1;
+		}
+	}
+	else
+	{
+		return 1;
+	}
+
+	return 0;
+}
+
+int waitpid(int pid, int *status, int options)
+{
+	process_t *proc = (process_t *)current_process;
+
+	printf("[WAITPID]: PID: %i, Current process: %i\n", pid, proc->id);
+
+	int child_count = tree_count_children(proc->tree_entry);
+
+	printf("[WAITPID]: Proc child count: %i\n", child_count);
+
+	do
+	{
+		process_t *candidate = NULL;
+		int has_children = 0;
+
+		for (list_node_t *node = proc->tree_entry->children->head;
+			 node != NULL;
+			 node = node->next)
+		{
+			printf("[WAITPID]: Child tree node %#016x\n", node);
+
+			if (!node->payload)
+			{
+				continue;
+			}
+
+			tree_node_t *tree_node = (tree_node_t *)node->payload;
+			process_t *child = tree_node->value;
+
+			if (wait_candidate(proc, pid, options, child))
+			{
+				has_children = 1;
+
+				if (child->finished)
+				{
+					candidate = child;
+					break;
+				}
+			}
+		}
+
+		if (!has_children)
+		{
+			printf("[WAITPID]: No Children matching\n");
+			return -ECHILD;
+		}
+
+		if (candidate)
+		{
+			if (status)
+			{
+				*status = candidate->status;
+			}
+
+			int pid = candidate->id;
+
+			if (candidate->finished)
+			{
+				process_reap(candidate);
+			}
+
+			printf("[WAITPID]: Process finished. Returning...\n");
+
+			return pid;
+		}
+		else
+		{
+			process_sleep(200);
+		}
+
+	} while (1);
+}
 
 //=============================================================================
 // Sleep

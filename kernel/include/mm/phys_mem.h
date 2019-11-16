@@ -46,6 +46,8 @@ size_t phys_mem_get_used_block_count();
 size_t phys_mem_get_free_block_count();
 size_t phys_mem_get_block_size();
 
+void phys_mem_dump_statistics();
+
 #endif
 
 //=============================================================================

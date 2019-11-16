@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <drivers/keyboard_ps2.h>
+
 typedef struct
 {
     uint8_t character;
@@ -80,8 +82,9 @@ void debug_terminal_initialize()
 
     strcpy(file.name, "debug_terminal");
 
-    file.read = NULL;
+    file.read = keyboard_getch;
     file.write = debug_terminal_putch;
+    file.eof = 0;
 
     set_stdout(&file);
 }

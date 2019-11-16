@@ -145,6 +145,11 @@ void serial_init_full()
     scom2_fd = &scom2_file;
     scom3_fd = &scom3_file;
     scom4_fd = &scom4_file;
+
+    scom1_file.eof = 0;
+    scom2_file.eof = 0;
+    scom3_file.eof = 0;
+    scom4_file.eof = 0;
 }
 
 void init_serial(COM_port_t port, serial_baud_rate_t baud_rate, uint8_t data_bits, uint8_t stop_bits, serial_parity_mode_t parity)

@@ -236,8 +236,7 @@ int mkdir_fs(char *name, uint16_t permission)
 
     fs_node_t *parent;
 
-    // TODO: read from current process
-    char *cwd = "/";
+    char *cwd = process_get_current()->wd_path;
 
     char *path = canonicalize_path(cwd, name);
 
@@ -585,7 +584,6 @@ fs_node_t *kopen(char *filename, uint32_t flags)
         return NULL;
     }
 
-    // TODO: This should be read from the current process
     char *cwd = "/";
 
     char *path = canonicalize_path(cwd, filename);
@@ -705,8 +703,7 @@ int unlink_fs(char *name)
 {
     fs_node_t *parent;
 
-    // TODO: Read this from the process
-    char *cwd = "/";
+    char *cwd = process_get_current()->wd_path;
     char *path = canonicalize_path(cwd, name);
 
     char *parent_path = malloc(strlen(path) + 4);
@@ -766,8 +763,7 @@ int symlink_fs(char *target, char *name)
 {
     fs_node_t *parent;
 
-    // TODO: Read this from the process
-    char *cwd = "/";
+    char *cwd = process_get_current()->wd_path;
     char *path = canonicalize_path(cwd, name);
 
     char *parent_path = malloc(strlen(path) + 4);
@@ -1204,7 +1200,7 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
         if (!node_ptr)
         {
 
-            printf("[VFS] kopen_recur: Could not find directory: [%s]\n", path_offset);
+            //printf("[VFS] kopen_recur: Could not find directory: [%s]\n", path_offset);
 
             free((void *)path);
 
@@ -1219,7 +1215,7 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
 
     free((void *)path);
 
-    printf("[VFS] kopen_recur: Could not find file\n");
+    //printf("[VFS] kopen_recur: Could not find file\n");
 
     return NULL;
 }

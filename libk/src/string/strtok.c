@@ -1,8 +1,8 @@
 /**
- * @file _file.h
+ * @file strtok.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-27
+ * @date 2019-06-22
  * 
  * @brief 
  * 
@@ -20,25 +20,16 @@
  * 
  */
 
-#ifndef _LIBK__FILE_H
-#define _LIBK__FILE_H
+#include <string.h>
 
-#include <__libk_common.h>
-
-#include <stdint.h>
-
-typedef char (*read_function)(void);
-typedef void (*write_function)(char);
-
-typedef struct
+char *strtok(char *str, const char *delim)
 {
-    char name[32];
-    uint32_t flags;
-    uint32_t fileLength;
-    uint32_t eof;
+    static char *saveptr = NULL;
 
-    read_function read;
-    write_function write;
-} FILE;
+    if (str)
+    {
+        saveptr = NULL;
+    }
 
-#endif
+    return strtok_r(str, delim, &saveptr);
+}

@@ -194,7 +194,7 @@ set(HDD_NAME disk.img)
 set(HDD_IMAGE ${CMAKE_BINARY_DIR}/${HDD_NAME})
 
 add_custom_command(OUTPUT ${HDD_NAME}
-    DEPENDS ALL_APPS_LIST_DEST
+    DEPENDS ${ALL_APPS_LIST_DEST}
     COMMAND ../create_hdd.sh ${HDD_NAME} 100M
     COMMENT "Creating HDD"
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -266,7 +266,7 @@ add_custom_target(cleandocs
 
 add_custom_target(run-tests
     COMMAND make
-    COMMAND ctest --output-on-failure
+    COMMAND ctest -VV --output-on-failure
 	WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 	
 #==============================================================================

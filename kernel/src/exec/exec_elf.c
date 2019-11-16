@@ -36,7 +36,10 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
 
     Elf64_Ehdr_t header;
 
-    printf("Opening %s\n", path);
+    if (path != NULL)
+    {
+        printf("Opening %s\n", path);
+    }
 
     fs_node_t *file = kopen(path, 0);
 

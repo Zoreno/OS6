@@ -83,6 +83,7 @@ int syscall_open(const char *file, int flags, int mode)
 	if (node && (flags & O_CREAT) && (flags & O_EXCL))
 	{
 		close_fs(node);
+		printf("[SYSCALL] Open failed: C_CREAT and O_EXCL both set.\n");
 		return -EEXIST;
 	}
 
@@ -103,17 +104,19 @@ int syscall_open(const char *file, int flags, int mode)
 	}
 
 	// Check if the user have write rights.
-	if ((flags && O_RDWR) || (flags & O_WRONLY))
+	if ((flags & O_RDWR) || (flags & O_WRONLY))
 	{
 		if (node && !has_permissions(node, 02))
 		{
 			close_fs(node);
+			printf("[SYSCALL] Open failed: Write not permitted\n");
 			return -EACCES;
 		}
 
 		// Cannot write to directory descriptors directly
 		if (node && (node->flags & FS_DIRECTORY))
 		{
+			printf("[SYSCALL] Open failed: Is a directory\n");
 			return -EISDIR;
 		}
 
@@ -146,6 +149,7 @@ int syscall_open(const char *file, int flags, int mode)
 	{
 		if (!(node->flags & FS_DIRECTORY))
 		{
+			printf("[SYSCALL] Open failed: File is not directory\n");
 			return -ENOTDIR;
 		}
 	}
@@ -156,6 +160,7 @@ int syscall_open(const char *file, int flags, int mode)
 		if (!(access_bits & 02))
 		{
 			close_fs(node);
+			printf("[SYSCALL] Open failed: Write not permitted\n");
 			return -EINVAL;
 		}
 
@@ -165,6 +170,7 @@ int syscall_open(const char *file, int flags, int mode)
 	// Could not find the file and the file should not be created. Return error.
 	if (!node)
 	{
+		printf("[SYSCALL] Open failed: File not found\n");
 		return -ENOENT;
 	}
 
@@ -173,6 +179,7 @@ int syscall_open(const char *file, int flags, int mode)
 	{
 		close_fs(node);
 
+		printf("[SYSCALL] Open failed: File is a directory\n");
 		return -EISDIR;
 	}
 
@@ -190,7 +197,7 @@ int syscall_open(const char *file, int flags, int mode)
 		FILE_DESC_OFFSET(fd) = 0;
 	}
 
-	printf("[OPEN] Process %i opened file", process_get_pid());
+	//printf("[OPEN] Process %i opened file", process_get_pid());
 
 	return fd;
 }
@@ -379,6 +386,8 @@ static int stat_node(fs_node_t *node, uintptr_t addr)
 	{
 		flags |= _IFLNK;
 	}
+
+	f->st_mode = node->permissions | flags;
 
 	f->st_nlink = node->nlink;
 	f->st_uid = node->uid;

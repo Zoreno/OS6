@@ -106,6 +106,7 @@ pid_t process_get_pid();
 void process_yield(uint8_t reschedule);
 void process_sleep(uint64_t ms);
 void process_disown(process_t *process);
+int waitpid(int pid, int *status, int options);
 
 size_t process_append_fd(process_t *proc, fs_node_t *node);
 size_t process_move_fd(process_t *proc, int src, int dest);

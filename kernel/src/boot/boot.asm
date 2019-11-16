@@ -62,7 +62,7 @@ header_end:
 ;;=============================================================================
 
 ; Stack size for the kernel
-STACK_SIZE equ 0x20000
+STACK_SIZE equ 0x40000
 
 ; Pointer to the video memory of the debug terminal
 VIDEO_MEM equ 0xb8000
@@ -617,6 +617,7 @@ section .bss
 align 0x1000
 
 global stack_top
+global stack_bottom
 
 p4_table:
     resb 0x1000

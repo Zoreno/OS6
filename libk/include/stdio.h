@@ -33,15 +33,28 @@
 
 extern FILE *stdout;
 
+#define EOF (-1)
+
+#define SEEK_SET 0
+#define SEEK_CUR 1
+#define SEEK_END 2
+
 void set_stdout(FILE *file);
 
 int fputc(char c, FILE *file);
 int fputs(const char *str, FILE *file);
 int putchar(char c);
 int puts(const char *str);
-int fprintf(FILE *file, const char *format, ...);
-int printf(const char *format, ...);
-int sprintf(char *buf, const char *format, ...);
+int fprintf(FILE *file, const char *format, ...); //__attribute__((format(printf, 2, 3)));
+int printf(const char *format, ...);              //__attribute__((format(printf, 1, 2)));
+int sprintf(char *buf, const char *format, ...);  //__attribute__((format(printf, 2, 3)));
 int vsprintf(char *str, const char *format, va_list arg);
+
+char getc();
+char getchar();
+char fgetc(FILE *file);
+char *fgets(char *s, int size, FILE *file);
+
+int feof(FILE *file);
 
 #endif
