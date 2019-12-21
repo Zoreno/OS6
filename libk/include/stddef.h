@@ -1,5 +1,9 @@
+/** \addtogroup libk 
+ *  @{
+ */
+
 /**
- * @file stddef.h
+ * @file libk/include/stddef.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-25
@@ -34,3 +38,9 @@
 #define offsetof(type, member) ((size_t)((char *)&(((type *)0)->member) - (char *)0))
 
 #endif
+
+/** @}*/
+
+//==============================================================================
+// End of file
+//==============================================================================

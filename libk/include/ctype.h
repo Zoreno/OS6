@@ -1,5 +1,9 @@
+/** \addtogroup libk 
+ *  @{
+ */
+
 /**
- * @file ctype.h
+ * @file libk/include/ctype.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-27
@@ -44,6 +48,8 @@ int isascii(char c);
 char toascii(char c);
 
 #endif
+
+/** @}*/
 
 //==============================================================================
 // End of file

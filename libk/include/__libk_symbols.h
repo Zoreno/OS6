@@ -1,5 +1,9 @@
+/** \addtogroup libk 
+ *  @{
+ */
+
 /**
- * @file __libk_symbols.h
+ * @file libk/include/__libk_symbols.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-07-01
@@ -34,6 +38,8 @@
 #endif
 
 #endif
+
+/** @}*/
 
 //==============================================================================
 // End of file

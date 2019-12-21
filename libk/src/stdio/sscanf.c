@@ -1,14 +1,14 @@
-/** \addtogroup libc 
+/** \addtogroup libk 
  *  @{
  */
 
 /**
- * @file libc/include/_size_t.h
+ * @file sscanf.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-25
+ * @date 2019-12-14
  * 
- * @brief Defines a type that can reperent an array size
+ * @brief 
  * 
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -24,28 +24,23 @@
  * 
  */
 
-#ifndef _LIBC__SIZE_T_H
-#define _LIBC__SIZE_T_H
+#include <stdio.h>
 
-#include <_cheader.h>
+int sscanf(const char *str, const char *format, ...)
+{
+    va_list args;
 
-_c_header_begin;
+    va_start(args, format);
 
-// TODO: Check arch. We might compile for 32 bits.
+    int out = vsscanf(str, format, args);
 
-/**
- * @brief The array size type
- * 
- * 
- */
-typedef unsigned long long size_t;
+    va_end(args);
 
-_c_header_end;
-
-#endif
+    return out;
+}
 
 /** @}*/
 
-//=============================================================================
+//==============================================================================
 // End of file
-//=============================================================================
+//==============================================================================

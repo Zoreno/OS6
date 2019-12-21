@@ -1057,6 +1057,8 @@ static void copy_page(void *dst, const void *src)
     memcpy(ADD_PAGE_OFFSET(dst),
            ADD_PAGE_OFFSET(src),
            PAGE_SIZE);
+
+    printf("Copying page %#016x to %#016x\n", src, dst);
 }
 
 static ptable_t *clone_ptable(ptable_t *src)

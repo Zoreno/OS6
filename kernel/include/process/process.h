@@ -22,6 +22,7 @@ typedef long long int status_t;
 typedef struct _thread
 {
     uintptr_t *rsp;
+    uintptr_t rbp;
     uintptr_t rip;
 
     uint8_t fpu_enabled;
@@ -99,6 +100,9 @@ void process_delete(process_t *process);
 void process_cleanup(process_t *process, int retval);
 void process_reap(process_t *proc);
 void process_exit(int retval);
+pid_t create_kernel_thread(void (*task_func)(void *, const char *),
+                           const char *name,
+                           const char *argp);
 pid_t process_fork();
 void process_switch_task(uint8_t reschedule);
 process_t *process_get_current();
@@ -112,6 +116,11 @@ size_t process_append_fd(process_t *proc, fs_node_t *node);
 size_t process_move_fd(process_t *proc, int src, int dest);
 
 void tasking_install();
+
+#define KERNEL_STACK_SIZE 0x8000
+
+#define USER_STACK_BOTTOM 0xAFF00000
+#define USER_STACK_TOP (USER_STACK_BOTTOM + KERNEL_STACK_SIZE * sizeof(uint64_t))
 
 #endif
 

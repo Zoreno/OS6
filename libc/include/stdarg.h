@@ -1,5 +1,9 @@
+/** \addtogroup libc 
+ *  @{
+ */
+
 /**
- * @file stdarg.h
+ * @file libc/include/stdarg.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-27
@@ -64,3 +68,9 @@ _c_header_begin;
 _c_header_end;
 
 #endif
+
+/** @}*/
+
+//=============================================================================
+// End of file
+//=============================================================================

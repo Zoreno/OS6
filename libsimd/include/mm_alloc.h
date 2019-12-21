@@ -1,3 +1,7 @@
+/** \addtogroup libsimd 
+ *  @{
+ */
+
 /**
  * @file mm_alloc.h
  * @author Joakim Bertils
@@ -25,10 +29,27 @@
 
 #include <stdint.h>
 
+/**
+ * @brief Allocates a memory block suitable for SIMD data types.
+ * 
+ * @param __size Minimum block size in bytes
+ * @param __align Alignment of the memory block.
+ * 
+ * @return void* Pointer to address.
+ */
 void *_mm_malloc(size_t __size, size_t __align);
+
+/**
+ * @brief Frees a block of memory allocated with _mm_malloc
+ * 
+ * @param __ptr Pointer to memory block.
+ * 
+ */
 void _mm_free(void *__ptr);
 
 #endif
+
+/** @}*/
 
 //=============================================================================
 // End of file

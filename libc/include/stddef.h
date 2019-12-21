@@ -1,5 +1,9 @@
+/** \addtogroup libc 
+ *  @{
+ */
+
 /**
- * @file stddef.h
+ * @file libc/include/stddef.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-25
@@ -38,3 +42,9 @@ _c_header_begin;
 _c_header_end;
 
 #endif
+
+/** @}*/
+
+//=============================================================================
+// End of file
+//=============================================================================

@@ -1,5 +1,9 @@
+/** \addtogroup libc 
+ *  @{
+ */
+
 /**
- * @file _wint_t.h
+ * @file libc/include/_wint_t.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-25
@@ -37,3 +41,9 @@ typedef unsigned int wint_t;
 _c_header_end;
 
 #endif
+
+/** @}*/
+
+//=============================================================================
+// End of file
+//=============================================================================

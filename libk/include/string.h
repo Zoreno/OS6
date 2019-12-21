@@ -1,5 +1,9 @@
+/** \addtogroup libk 
+ *  @{
+ */
+
 /**
- * @file string.h
+ * @file libk/include/string.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-25
@@ -31,6 +35,16 @@
 void *memchr(const void *str, int c, size_t n);
 
 int memcmp(const void *str1, const void *str2, size_t n);
+
+/**
+ * @brief Copies a block of memory from one location to another.
+ * 
+ * @param str1 Destination addr
+ * @param str2 Source addr
+ * @param n Number of bytes to copy
+ * 
+ * @return void* Pointer to start of destination memory
+ */
 void *memcpy(void *str1, const void *str2, size_t n);
 void *memcpyw(void *str1, const void *str2, size_t n);
 void *memcpyl(void *str1, const void *str2, size_t n);
@@ -82,3 +96,9 @@ int ffsll(long long int i);
 void swab(const void *bfrom, void *bto, size_t n);
 
 #endif
+
+/** @}*/
+
+//==============================================================================
+// End of file
+//==============================================================================

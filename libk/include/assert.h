@@ -1,5 +1,9 @@
+/** \addtogroup libk 
+ *  @{
+ */
+
 /**
- * @file assert.h
+ * @file libk/include/assert.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-25
@@ -48,3 +52,9 @@ extern void cli();
 #endif
 
 #endif
+
+/** @}*/
+
+//==============================================================================
+// End of file
+//==============================================================================

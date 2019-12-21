@@ -1,3 +1,7 @@
+/** \addtogroup libsimd 
+ *  @{
+ */
+
 /**
  * @file immintrin.h
  * @author Joakim Bertils
@@ -39,6 +43,8 @@
 #include <tmmintrin.h>
 
 #endif
+
+/** @}*/
 
 //=============================================================================
 // End of file

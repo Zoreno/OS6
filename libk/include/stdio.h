@@ -1,5 +1,9 @@
+/** \addtogroup libk 
+ *  @{
+ */
+
 /**
- * @file stdio.h
+ * @file libk/include/stdio.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-27
@@ -50,6 +54,12 @@ int printf(const char *format, ...);              //__attribute__((format(printf
 int sprintf(char *buf, const char *format, ...);  //__attribute__((format(printf, 2, 3)));
 int vsprintf(char *str, const char *format, va_list arg);
 
+int vsscanf(const char *str, const char *format, va_list ap);
+int vfscanf(FILE *stream, const char *format, va_list ap);
+int sscanf(const char *str, const char *format, ...) __attribute__((format(scanf, 2, 3)));
+int fscanf(FILE *stream, const char *format, ...) __attribute__((format(scanf, 2, 3)));
+int scanf(const char *format, ...) __attribute__((format(scanf, 1, 2)));
+
 char getc();
 char getchar();
 char fgetc(FILE *file);
@@ -58,3 +68,9 @@ char *fgets(char *s, int size, FILE *file);
 int feof(FILE *file);
 
 #endif
+
+/** @}*/
+
+//==============================================================================
+// End of file
+//==============================================================================

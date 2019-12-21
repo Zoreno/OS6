@@ -1,5 +1,9 @@
+/** \addtogroup libk 
+ *  @{
+ */
+
 /**
- * @file memory.h
+ * @file libk/include/memory.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-27
@@ -23,3 +27,9 @@
 #include <string.h>
 
 #include <__libk_common.h>
+
+/** @}*/
+
+//==============================================================================
+// End of file
+//==============================================================================

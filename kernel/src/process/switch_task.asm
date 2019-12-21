@@ -4,6 +4,7 @@ global set_rsp_arg1
 global get_rsp_val
 global put_in_rax
 global setup_forked_kthread_stack
+global relocate_stack
 
 bits 64
 
@@ -82,4 +83,10 @@ setup_forked_kthread_stack:
     mov [rdi - 104], r14
     mov [rdi - 112], r15
     mov [rdi - 120], rdi
+    ret
+
+relocate_stack:
+    mov rax, rsp
+    add rax, rdi
+    mov rsp, rax
     ret

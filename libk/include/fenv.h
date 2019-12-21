@@ -1,5 +1,9 @@
+/** \addtogroup libk 
+ *  @{
+ */
+
 /**
- * @file fenv.h
+ * @file libk/include/fenv.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-26
@@ -34,3 +38,9 @@ int fegetround(void);
 int fesetround(int mode);
 
 #endif
+
+/** @}*/
+
+//==============================================================================
+// End of file
+//==============================================================================

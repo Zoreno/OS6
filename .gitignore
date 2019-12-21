@@ -4,3 +4,4 @@ build/*
 docs/*
 toolchain/OS6_cross_cc/**
 toolchain/src/**
+root/bin/**

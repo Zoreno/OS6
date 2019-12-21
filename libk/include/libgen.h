@@ -1,5 +1,9 @@
+/** \addtogroup libk 
+ *  @{
+ */
+
 /**
- * @file libgen.h
+ * @file libk/include/libgen.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-25
@@ -29,3 +33,9 @@ char *basename(char *path);
 char *dirname(char *path);
 
 #endif
+
+/** @}*/
+
+//==============================================================================
+// End of file
+//==============================================================================

@@ -1,5 +1,9 @@
+/** \addtogroup libc 
+ *  @{
+ */
+
 /**
- * @file stdint.h
+ * @file libc/include/stdint.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-27
@@ -144,3 +148,9 @@ typedef uint64_t uintmax_t;
 _c_header_end;
 
 #endif
+
+/** @}*/
+
+//=============================================================================
+// End of file
+//=============================================================================

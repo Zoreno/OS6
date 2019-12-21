@@ -99,6 +99,14 @@ const char *get_interrupt_name(uint64_t int_no)
 	}
 }
 
+static inline uint64_t read_cr2(void)
+{
+	uint64_t val;
+	__asm__ volatile("mov %%cr2, %0"
+					 : "=r"(val));
+	return val;
+}
+
 void print_regs(system_stack_t *regs)
 {
 	debug_terminal_set_back_color(VGA_COLOR_BLUE);
@@ -120,8 +128,36 @@ void print_regs(system_stack_t *regs)
 	}
 
 	printf("[IRQ] ==========================================================================\n");
+	printf("[IRQ] Process: %i\n", process_get_current() == NULL ? -1 : process_get_pid());
 	printf("[IRQ] Unhandled Exception %i (Error code: %i) (%s)\n",
 		   regs->int_no, regs->err_code, int_name);
+
+	union {
+		uint64_t err_code;
+		struct
+		{
+			uint64_t res : 59;
+			uint64_t instruction : 1;
+			uint64_t reserved_write : 1;
+			uint64_t user : 1;
+			uint64_t write : 1;
+			uint64_t present : 1;
+		};
+	} _PF_Error;
+
+	// Page fault
+	if (regs->int_no == 14)
+	{
+		_PF_Error.err_code = regs->err_code;
+
+		printf("%s %s %s %s %s at addr: %#016x\n",
+			   _PF_Error.present ? "present" : "non-present",
+			   _PF_Error.write ? "write" : "read",
+			   _PF_Error.user ? "user" : "kernel",
+			   _PF_Error.reserved_write ? "reserved write" : "",
+			   _PF_Error.instruction ? "instruction" : "data",
+			   read_cr2());
+	}
 	printf("[IRQ] Register dump:\n");
 	printf("[IRQ] RAX: %#016x RBX: %#016x RCX: %#016x\n",
 		   regs->rax, regs->rbx, regs->rcx);

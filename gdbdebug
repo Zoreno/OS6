@@ -2,9 +2,7 @@ set architecture i386:x86-64:intel
 
 target remote localhost:1234
 
-symbol-file kernel.bin
-
-break arch_x86_64_isr_1
+symbol-file kernel/kernel.bin
 
 continue
 
@@ -13,3 +11,5 @@ disconnect
 set architecture i386:x86-64
 
 target remote localhost:1234
+
+symbol-file kernel/kernel.bin

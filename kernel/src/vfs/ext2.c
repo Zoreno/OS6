@@ -53,13 +53,36 @@
 // Block cache
 //=============================================================================
 
+/**
+ * @brief Get the current time for the cache and increase the time by one
+ * 
+ * @param this File systems pointer
+ * 
+ * @return uint32_t Current cache time
+ */
 static uint32_t get_cache_time(ext2_fs_t *this);
+
+/**
+ * @brief Flush dirty disk cache entry to disk
+ * 
+ * @param this File system pointer
+ * @param entry Entry index
+ * 
+ * @return int Always returns zero
+ */
 static int cache_flush_dirty(ext2_fs_t *this, uint32_t entry);
 
 //=============================================================================
 // Superblock
 //=============================================================================
 
+/**
+ * @brief Rewrites the superblock to disk
+ * 
+ * @param this File system pointer
+ * 
+ * @return int Always zero
+ */
 static int rewrite_superblock(ext2_fs_t *this);
 
 //=============================================================================
@@ -168,6 +191,7 @@ static int cache_flush_dirty(ext2_fs_t *this, uint32_t entry)
 {
 	//printf("[EXT2] cache_flush_dirty\n");
 
+	// TODO: Check the return code to this call and handle error correctly
 	write_fs(this->block_device,
 			 (DC[entry].block_no) * this->block_size,
 			 this->block_size,
@@ -184,6 +208,7 @@ static int cache_flush_dirty(ext2_fs_t *this, uint32_t entry)
 
 static int rewrite_superblock(ext2_fs_t *this)
 {
+	// TODO: Check the return code from this call and handle error correctly
 	write_fs(this->block_device,
 			 1024,
 			 sizeof(ext2_superblock_t),

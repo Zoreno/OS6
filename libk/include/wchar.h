@@ -1,5 +1,9 @@
+/** \addtogroup libk 
+ *  @{
+ */
+
 /**
- * @file wchar.h
+ * @file libk/include/wchar.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-25
@@ -73,3 +77,9 @@ wchar_t *wcsrchr(const wchar_t *wcs, wchar_t wc);
 wchar_t *wcsncat(wchar_t *dest, const wchar_t *src, size_t n);
 
 #endif
+
+/** @}*/
+
+//==============================================================================
+// End of file
+//==============================================================================

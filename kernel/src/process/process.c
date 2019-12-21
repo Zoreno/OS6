@@ -31,8 +31,6 @@
 #define LOOKUP_SYMBOL(addr)
 #endif
 
-#define KERNEL_STACK_SIZE 0x8000
-
 #define PUSH(stack, type, item) \
 	stack -= sizeof(type);      \
 	*((type *)stack) = item
@@ -78,12 +76,30 @@ void wakeup_sleeping_processes();
 
 void debug_print_process(process_t *process)
 {
-	PRINT("---------------------------------------------------------------------------------\n");
-	PRINT("PID: %d, Name: %s, Description: %s\n", process->id, process->name, process->description);
-	PRINT("Cmdline: %s\n", process->cmdline);
-	PRINT("Image: {.entry = %#016x, .size = %#016x, .stack = %#016x, .start = %#016x}\n", process->image.entry, process->image.size, process->image.stack, process->image.start);
-	PRINT("Status: %#08x, started: %d, finished: %d, running: %d, suspended: %d\n", process->status, process->started, process->finished, process->running, process->suspended);
-	PRINT("---------------------------------------------------------------------------------\n");
+	printf("---------------------------------------------------------------------------------\n");
+	printf("PID: %d, Name: %s, Description: %s\n",
+		   process->id,
+		   process->name,
+		   process->description);
+	printf("Cmdline: %s\n",
+		   process->cmdline);
+	printf("Image: {.entry = %#016x, .size = %#016x, .stack = %#016x, .start = %#016x}\n",
+		   process->image.entry,
+		   process->image.size,
+		   process->image.stack,
+		   process->image.start);
+	printf("Thread: {.rsp = %#016x, .rbp = %#016x, .rip = %#016x}\n",
+		   (uint64_t)process->thread.rsp,
+		   process->thread.rsp,
+		   process->thread.rip);
+	printf("Status: %#08x, started: %d, finished: %d, running: %d, suspended: %d\n",
+		   process->status,
+		   process->started,
+		   process->finished,
+		   process->running,
+		   process->suspended);
+	printf("Working Directory: [%s]\n", process->wd_path);
+	printf("---------------------------------------------------------------------------------\n");
 }
 
 void debug_print_process_tree_node(tree_node_t *node, size_t height)
@@ -210,7 +226,7 @@ process_t *spawn_idle_thread()
 	idle->image.stack = (uint64_t)(stack + KERNEL_STACK_SIZE);
 	stack[KERNEL_STACK_SIZE - 1] = (uint64_t)&kernel_idle;
 	idle->thread.rsp = &(stack[KERNEL_STACK_SIZE - 17]);
-
+	idle->thread.rbp = idle->thread.rsp;
 	idle->thread.rip = (uintptr_t)&kernel_idle;
 
 	idle->started = 1;
@@ -227,6 +243,8 @@ process_t *spawn_idle_thread()
 
 extern uint64_t stack_top;
 extern uint64_t stack_bottom;
+
+extern void relocate_stack(uint64_t offset);
 
 process_t *spawn_init()
 {
@@ -261,13 +279,32 @@ process_t *spawn_init()
 
 	init->thread.rip = 0;
 	init->thread.rsp = 0;
+	init->thread.rbp = 0;
 
 	init->image.entry = 0;
 	init->image.size = 0;
 	init->image.heap = 0;
 	init->image.heap_actual = 0;
-	init->image.stack = (uint64_t)&stack_bottom;
-	init->image.start = 0;
+
+	uint64_t *stack = USER_STACK_BOTTOM;
+
+	// Map the user stack to the already existing stack and set the USER flag to make sure
+	// that the pages are copied and not just mapped to the same address as the other stack.
+	for (uintptr_t offset = 0; offset < KERNEL_STACK_SIZE * sizeof(uint64_t); offset += PAGE_SIZE)
+	{
+		uintptr_t virt = USER_STACK_BOTTOM + offset;
+		uintptr_t phys = ((uintptr_t)&stack_bottom) + offset;
+		virt_mem_map_page((void *)phys, (void *)virt, VIRT_MEM_WRITABLE | VIRT_MEM_USER);
+		printf("[USER STACK] Mapping %#016x to %#016x\n", virt, phys);
+	}
+
+	uint64_t diff = USER_STACK_BOTTOM - (uint64_t)&stack_bottom;
+
+	relocate_stack(diff);
+
+	//memcpy(stack, (void *)&stack_bottom, sizeof(uint64_t) * (KERNEL_STACK_SIZE));
+
+	init->image.stack = (uint64_t)stack;
 
 	spinlock_init(&init->image.lock);
 
@@ -310,29 +347,35 @@ process_t *spawn_process(process_t *parent)
 	//proc->thread.fpu_enabled = 0;
 	//memcpy((void *)proc->thread.fp_regs, (void *)parent->thread.fp_regs, 512);
 
-	uint64_t *stack = (uint64_t *)malloc(sizeof(uint64_t) * KERNEL_STACK_SIZE);
+	uint64_t *stack = USER_STACK_BOTTOM;
 
 	printf("Child stack: %#016x-%#016x\n", stack, stack + KERNEL_STACK_SIZE);
 	printf("Parent stack: %#016x-%#016x\n", parent->image.stack, parent->image.stack + KERNEL_STACK_SIZE * sizeof(uint64_t));
 	printf("Parent stack: %#016x-%#016x\n", &stack_bottom, &stack_top);
 
-	memcpy(stack, (void *)parent->image.stack, sizeof(uint64_t) * (KERNEL_STACK_SIZE));
+	//memcpy(stack, (void *)parent->image.stack, sizeof(uint64_t) * (KERNEL_STACK_SIZE));
 
-	//hexdump(stack, sizeof(uint64_t) * KERNEL_STACK_SIZE);
+	printf("Parent stack pointer: %#016x\n", parent->thread.rsp);
+	//uintptr_t rsp_offset = parent->thread.rsp - &stack_bottom;
+	proc->thread.rsp = parent->thread.rsp;
+	proc->thread.rip = parent->thread.rip;
+	printf("Child stack pointer: %#016x\n", proc->thread.rsp);
 
-	proc->image.stack = (uint64_t)(stack);
-
-	stack[KERNEL_STACK_SIZE - 1] = (uint64_t)parent->thread.rip;
-	proc->thread.rsp = &(stack[KERNEL_STACK_SIZE - 17]);
-	proc->thread.rip = (uintptr_t)parent->thread.rip;
+	//stack[KERNEL_STACK_SIZE - 1] = (uint64_t)parent->thread.rip;
+	//proc->thread.rsp = &(stack[KERNEL_STACK_SIZE - 17]);
+	//proc->thread.rbp = proc->thread.rsp;
+	//proc->thread.rip = (uintptr_t)parent->thread.rip;
 
 	proc->image.entry = parent->image.entry;
 	proc->image.size = parent->image.size;
 	proc->image.heap = parent->image.heap;
 	proc->image.heap_actual = parent->image.heap_actual;
 	proc->image.start = parent->image.start;
+	proc->image.stack = parent->image.stack;
 
 	spinlock_init(&proc->image.lock);
+
+	printf("Setting up file descriptors\n");
 
 	proc->file_descriptors = malloc(sizeof(fd_table_t));
 	proc->file_descriptors->refs = 1;
@@ -378,6 +421,87 @@ process_t *spawn_process(process_t *parent)
 // Fork
 //=============================================================================
 
+#define PUSH(stack, type, item)                              \
+	do                                                       \
+	{                                                        \
+		printf("Pushing item to stack at: %#016x\n", stack); \
+		stack -= sizeof(type);                               \
+		*((type *)stack) = item;                             \
+	} while (0)
+
+pid_t create_kernel_thread(void (*task_func)(void *, const char *),
+						   const char *name,
+						   const char *argp)
+{
+	cli();
+
+	uintptr_t rsp;
+	uintptr_t rbp;
+
+	if (current_process->regs)
+	{
+		current_process->regs->rax = 0;
+	}
+
+	pml4_t *directory = current_process->page_directory;
+
+	process_t *new_proc = spawn_process(current_process);
+
+	printf("Setting page directory\n");
+	new_proc->page_directory = directory;
+
+	if (current_process->regs)
+	{
+		printf("Copying registers\n");
+		system_stack_t r;
+		memcpy(&r, current_process->regs, sizeof(system_stack_t));
+		new_proc->regs = &r;
+	}
+
+	printf("Setting new stack pointer\n");
+	rsp = new_proc->image.stack + KERNEL_STACK_SIZE * sizeof(uint64_t);
+	rbp = rsp;
+
+	if (current_process->regs)
+	{
+		new_proc->regs->rax = 0;
+	}
+
+	printf("Setting name\n");
+
+	new_proc->name = name;
+
+	uintptr_t old_rsp = rsp;
+
+	printf("Pushing to new stack\n");
+	PUSH(rsp, uintptr_t, (uintptr_t)name);
+	PUSH(rsp, uintptr_t, (uintptr_t)argp);
+	PUSH(rsp, uintptr_t, (uintptr_t)&process_exit);
+
+	new_proc->thread.rsp = rsp;
+	new_proc->thread.rbp = rbp;
+
+	new_proc->thread.rip = (uintptr_t)task_func;
+
+	printf("%#016x: ", new_proc->thread.rip);
+	kernel_lookup_symbol(new_proc->thread.rip);
+	printf("\n");
+
+	printf("Before make_process_ready\n");
+
+	setup_forked_kthread_stack(new_proc->thread.rsp);
+	new_proc->thread.rsp -= 15;
+	new_proc->thread.rbp = new_proc->thread.rsp;
+
+	hexdump(new_proc->thread.rsp, old_rsp - (uintptr_t)new_proc->thread.rsp);
+
+	make_process_ready(new_proc);
+
+	sti();
+
+	return new_proc->id;
+}
+
 pid_t process_fork()
 {
 	PRINT("Fork\n");
@@ -390,11 +514,14 @@ pid_t process_fork()
 
 	process_t *parent = (process_t *)current_process;
 
+	debug_print_process(parent);
+
 	ASSERT(parent);
 
 	pml4_t *new_page_directory = virt_mem_clone_address_space(parent->page_directory);
 
 	parent->thread.rip = return_addr;
+	printf("Return address: %#016x\n", return_addr);
 
 	process_t *new_proc = spawn_process(parent);
 
@@ -402,17 +529,20 @@ pid_t process_fork()
 
 	new_proc->page_directory = new_page_directory;
 
-	volatile uintptr_t var = (uintptr_t)(get_rsp_val() + 8);
-	parent->thread.rsp = (uint64_t *)(get_rsp_val() + 8);
-	volatile uintptr_t diff = parent->image.stack + sizeof(uint64_t) * KERNEL_STACK_SIZE - 1 - (var);
+	debug_print_process(new_proc);
 
-	printf("Parent thread rsp: %#016x\n", parent->thread.rsp);
-	printf("Diff: %#016x\n", diff);
+	//volatile uintptr_t var = (uintptr_t)(get_rsp_val() + 8);
+	//parent->thread.rsp = (uint64_t *)(get_rsp_val() + 8);
+	//volatile uintptr_t diff = parent->image.stack + sizeof(uint64_t) * KERNEL_STACK_SIZE - 1 - (var);
 
-	new_proc->thread.rsp = (uint64_t *)(((uint64_t)new_proc->thread.rsp) - 8 * ((uint64_t)diff));
+	//printf("Parent thread rsp: %#016x\n", parent->thread.rsp);
+	//printf("Diff: %#016x\n", diff);
 
-	printf("New thread rsp: %#016x\n", new_proc->thread.rsp);
+	//new_proc->thread.rsp = (uint64_t *)(((uint64_t)new_proc->thread.rsp) - 8 * ((uint64_t)diff));
 
+	//printf("New thread rsp: %#016x\n", new_proc->thread.rsp);
+
+	/* 
 	while (*(new_proc->thread.rsp) != return_addr)
 	{
 		new_proc->thread.rsp++;
@@ -423,7 +553,9 @@ pid_t process_fork()
 	setup_forked_kthread_stack(new_proc->thread.rsp);
 
 	new_proc->thread.rsp -= 15;
+	new_proc->thread.rbp = new_proc->thread.rsp;
 
+*/
 	make_process_ready(new_proc);
 
 	sti();
@@ -515,7 +647,7 @@ void process_reap(process_t *proc)
 
 void process_exit(int retval)
 {
-	PRINT("Task %d exited with code: %d\n", current_process->id, retval);
+	printf("Task %d exited with code: %d (%#016x)\n", current_process->id, retval, retval);
 
 	if (current_process->id == 0)
 	{
@@ -584,14 +716,37 @@ void switch_next(uintptr_t return_addr)
 		switch_next(return_addr);
 	}
 
+	int first_time = current_process->started ? 0 : 1;
+
 	current_process->started = 1;
 	current_process->running = 1;
 
-	PRINT("Old thread rip: %#016x\n", old_thread->rip);
+	cli();
+
+	//printf("Old thread rip: %#016x\n", old_thread->rip);
 	LOOKUP_SYMBOL(old_thread->rip);
 	PRINT("\n");
 
+	//virt_mem_print_dir(current_process->page_directory);
+
+	//for (;;)
+	//	;
+
 	virt_mem_switch_dir(current_process->page_directory);
+
+	if (first_time && current_process->id != 1)
+	{
+		for (;;)
+			;
+	}
+
+	if (first_time && current_process->id != 1)
+	{
+
+		printf("Setting up stack for the first task switch\n");
+		setup_forked_kthread_stack(current_process->thread.rsp);
+		current_process->thread.rsp -= 16;
+	}
 
 	switch_to(&old_thread, (thread_t *)&current_process->thread);
 }
@@ -618,7 +773,7 @@ void process_switch_task(uint8_t reschedule)
 
 	wakeup_sleeping_processes();
 
-	debug_print_process((process_t *)current_process);
+	//debug_print_process((process_t *)current_process);
 
 	if (!current_process->running)
 	{

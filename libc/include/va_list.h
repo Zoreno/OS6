@@ -1,5 +1,9 @@
+/** \addtogroup libc 
+ *  @{
+ */
+
 /**
- * @file va_list.h
+ * @file libc/include/va_list.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-25
@@ -41,3 +45,9 @@ typedef unsigned char *va_list;
 _c_header_end;
 
 #endif
+
+/** @}*/
+
+//=============================================================================
+// End of file
+//=============================================================================

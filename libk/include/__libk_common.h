@@ -1,5 +1,9 @@
+/** \addtogroup libk 
+ *  @{
+ */
+
 /**
- * @file __libk_common.h
+ * @file libk/include/__libk_common.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-07-01
@@ -26,6 +30,8 @@
 #define _LIBK
 
 #endif
+
+/** @}*/
 
 //==============================================================================
 // End of file

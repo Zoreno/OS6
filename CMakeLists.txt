@@ -25,6 +25,8 @@ project(OS6 C CXX ASM_NASM)
 
 set(CAN_USE_ASSEMBLER TRUE)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+
 enable_language(C)
 enable_language(CXX)
 enable_language(ASM_NASM)
@@ -53,6 +55,9 @@ set(CPPFLAGS "${CFLAGS} -std=c++11 -static-libgcc")
 
 # Set C standard
 set(CFLAGS "${CFLAGS} -Wno-pointer-sign -std=c11")
+
+# Code coverage
+set(CFLAGS "${CFLAGS} -g")
 
 set(ASMFLAGS "")
 

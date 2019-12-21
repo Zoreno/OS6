@@ -1,3 +1,7 @@
+/** \addtogroup libsimd 
+ *  @{
+ */
+
 /**
  * @file mmintrin.h
  * @author Joakim Bertils
@@ -724,6 +728,8 @@ __always_inline(__m64) _mm_set1_pi8(char __b)
 }
 
 #endif
+
+/** @}*/
 
 //=============================================================================
 // End of file

@@ -1,5 +1,9 @@
+/** \addtogroup libk 
+ *  @{
+ */
+
 /**
- * @file stdint.h
+ * @file libk/include/stdint.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-27
@@ -137,6 +141,12 @@ typedef uint64_t uintmax_t;
 #define PTRDIFF_MIN INT32_MIN
 #define PTRDIFF_MAX INT32_MAX
 
-#define SIZE_MAX UINT32_MAX
+#define SIZE_MAX UINT64_MAX
 
 #endif
+
+/** @}*/
+
+//==============================================================================
+// End of file
+//==============================================================================

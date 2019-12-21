@@ -1,3 +1,7 @@
+/** \addtogroup libsimd 
+ *  @{
+ */
+
 /**
  * @file xmmintrin.h
  * @author Joakim Bertils
@@ -910,7 +914,8 @@ __always_inline(__m64) _mm_pshufw(__m64 __A, int const __N)
 
 #endif
 
-__always_inline(void) _mm_maskmove_si64(__m64 __A, __m64 __N, char *__P)
+__always_inline(void)
+    _mm_maskmove_si64(__m64 __A, __m64 __N, char *__P)
 {
 #ifdef __LIBSIMD_MMX_WITH_SSE__
 
@@ -1044,6 +1049,8 @@ __always_inline(void) _mm_pause(void)
 }
 
 #endif
+
+/** @}*/
 
 //=============================================================================
 // End of file

@@ -1,3 +1,7 @@
+/** \addtogroup libsimd 
+ *  @{
+ */
+
 /**
  * @file mm_alloc.c
  * @author Joakim Bertils
@@ -22,6 +26,7 @@
 
 #include <mm_alloc.h>
 
+// These are located in the stdlib.h in libc
 extern void *malloc(size_t);
 extern void free(void *);
 
@@ -66,3 +71,9 @@ void _mm_free(void *__ptr)
         free(((void **)__ptr)[-1]);
     }
 }
+
+/** @}*/
+
+//=============================================================================
+// End of file
+//=============================================================================

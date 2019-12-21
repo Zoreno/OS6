@@ -122,6 +122,8 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/getc.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/getchar.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/fgetc.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/fgets.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/vsscanf.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/stdio/sscanf.c)
 
 # libgen.h header
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/libgen/basename.c)

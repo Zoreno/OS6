@@ -938,6 +938,17 @@ void simple_cli_init()
     }
 }
 
+void kernel_thread_test(void *arg, const char *name)
+{
+    while (1)
+    {
+        printf("Testthread\n");
+        process_sleep(1000);
+    }
+}
+
+extern uint64_t get_rsp_val();
+
 int kernel_main(unsigned long long rbx, unsigned long long rax)
 {
     (void)rax;
@@ -946,7 +957,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     debug_terminal_initialize();
 
-    //set_stdout(scom1_fd);
+    set_stdout(scom1_fd);
 
     printf("Initializing kernel...\n");
 
@@ -983,7 +994,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     pciInit();
 
-    //vbe_bochs_set_gfx(800, 600, 4);
+    vbe_bochs_set_gfx(800, 600, 4);
 
     syscall_install();
 
@@ -1044,11 +1055,24 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     printf("|| Launching GUI...                                                           ||\n");
     printf("================================================================================\n");
 
+    long long int int1;
+    long long int int2;
+
+    sscanf("112 112 as 0x1f3", "%*d %lli as %lli", &int1, &int2);
+
+    printf("%i %i\n", int1, int2);
+
     //gui_init();
 
     //terminal_init();
 
-    simple_cli_init();
+    //simple_cli_init();
+
+    //process_fork();
+
+    //printf("Returned from fork\n");
+
+    //debug_print_process_tree();
 
 #if 0
 

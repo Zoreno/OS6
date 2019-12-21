@@ -1,5 +1,9 @@
+/** \addtogroup libk 
+ *  @{
+ */
+
 /**
- * @file stdlib.h
+ * @file libk/include/stdlib.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-27
@@ -102,6 +106,8 @@ void qsort(
     int (*compare)(const void *, const void *));
 
 #endif
+
+/** @}*/
 
 //==============================================================================
 // End of file

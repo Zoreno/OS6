@@ -1,5 +1,9 @@
+/** \addtogroup libc 
+ *  @{
+ */
+
 /**
- * @file limits.h
+ * @file libc/include/limits.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-27
@@ -57,3 +61,9 @@ _c_header_begin;
 _c_header_end;
 
 #endif
+
+/** @}*/
+
+//=============================================================================
+// End of file
+//=============================================================================

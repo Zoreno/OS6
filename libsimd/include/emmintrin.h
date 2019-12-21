@@ -1,3 +1,7 @@
+/** \addtogroup libsimd 
+ *  @{
+ */
+
 /**
  * @file emmintrin.h
  * @author Joakim Bertils
@@ -32,60 +36,191 @@
 // Type definitions
 //=============================================================================
 
+/**
+ * @brief Type containing two double floats
+ * 
+ * 
+ */
 typedef double __v2df __ATTR((__VSIZE(16)));
+
+/**
+ * @brief Type containing two long longs.
+ * 
+ * 
+ */
 typedef long long __v2di __ATTR((__VSIZE(16)));
+
+/**
+ * @brief Type containing two unsigned long longs.
+ * 
+ * 
+ */
 typedef unsigned long long __v2du __ATTR((__VSIZE(16)));
+
+/**
+ * @brief Type containing four ints.
+ * 
+ * 
+ */
 typedef int __v4si __ATTR((__VSIZE(16)));
+
+/**
+ * @brief Type containing four unsigned ints.
+ * 
+ * 
+ */
 typedef unsigned int __v4su __ATTR((__VSIZE(16)));
+
+/**
+ * @brief Type containing eight shorts.
+ * 
+ * 
+ */
 typedef short __v8hi __ATTR((__VSIZE(16)));
+
+/**
+ * @brief Type containing eight unsigned shorts.
+ * 
+ * 
+ */
 typedef unsigned short __v8hu __ATTR((__VSIZE(16)));
+
+/**
+ * @brief Type containing 16 chars.
+ * 
+ * 
+ */
 typedef char __v16qi __ATTR((__VSIZE(16)));
+
+/**
+ * @brief Type containing 16 signed chars.
+ * 
+ * 
+ */
 typedef signed char __v16qs __ATTR((__VSIZE(16)));
+
+/**
+ * @brief Type containing 16 unsigned chars.
+ * 
+ * 
+ */
 typedef unsigned char __v16qu __ATTR((__VSIZE(16)));
 
+/**
+ * @brief Type containing 2 long longs.
+ * 
+ * 
+ */
 typedef long long __m128i __ATTR((__VSIZE(16), __ALIAS));
+
+/**
+ * @brief Type containing 2 doubles.
+ * 
+ * 
+ */
 typedef double __m128d __ATTR((__VSIZE(16), __ALIAS));
 
+/**
+ * @brief Type containing 2 long longs that may be unaligned.
+ * 
+ * 
+ */
 typedef long long __m128i_u __ATTR((__VSIZE(16), __ALIAS, __ALIGN(1)));
+
+/**
+ * @brief Type containing 2 doubles that may be unaligned.
+ * 
+ * 
+ */
 typedef double __m128d_u __ATTR((__VSIZE(16), __ALIAS, __ALIGN(1)));
 
 //=============================================================================
 // Functions
 //=============================================================================
 
+/**
+ * @brief Creates a shuffle mask for two values.
+ * 
+ * @param fp1 Index to place in the second lane.
+ * @param fp0 Index to place in the first lane.
+ * 
+ * @return Shuffle mask for the given order.
+ */
 #define _MM_SHUFFLE2(fp1, fp0) \
     (((fp1) << 1) | (fp0))
 
+/**
+ * @brief Sets the first lane to the given value and the second lane to zero.
+ * 
+ * @param __F Value to assign the first lane
+ * 
+ * @return Result of the operation.
+ */
 __always_inline(__m128d)
     _mm_set_sd(double __F)
 {
     return __extension__(__m128d){__F, 0.0};
 }
 
+/**
+ * @brief Broadcast a value to all lanes.
+ * 
+ * @param __F Value to assign the lanes.
+ * 
+ * @return Result of the operation.
+ */
 __always_inline(__m128d)
     _mm_set1_pd(double __F)
 {
     return __extension__(__m128d){__F, __F};
 }
 
+/**
+ * @brief Broadcast a value to all lanes.
+ * 
+ * @param __F Value to assign the lanes.
+ * 
+ * @return Result of the operation.
+ */
 __always_inline(__m128d)
     _mm_set_pd1(double __F)
 {
     return _mm_set1_pd(__F);
 }
 
+/**
+ * @brief Set the lanes of a packed double with the given values.
+ * 
+ * @param __W Value to assign to the first lane.
+ * @param __X Value to assign to the second lane.
+ * 
+ * @return Result of the operation.
+ */
 __always_inline(__m128d)
     _mm_set_pd(double __W, double __X)
-{
-    return __extension__(__m128d){__X, __W};
-}
-
-__always_inline(__m128d)
-    _mm_setr_pd(double __W, double __X)
 {
     return __extension__(__m128d){__W, __X};
 }
 
+/**
+ * @brief Set the lanes of a packed double with the given values in the reverse order.
+ * 
+ * @param __W Value to assign to the first lane.
+ * @param __X Value to assign to the second lane.
+ * 
+ * @return Result of the operation.
+ */
+__always_inline(__m128d)
+    _mm_setr_pd(double __W, double __X)
+{
+    return __extension__(__m128d){__X, __W};
+}
+
+/**
+ * @brief Return a vector with undefined elements.
+ * 
+ * @return Result of the operation.
+ */
 __always_inline(__m128d)
     _mm_undefined_pd(void)
 {
@@ -93,24 +228,51 @@ __always_inline(__m128d)
     return __Y;
 }
 
+/**
+ * @brief Return a vector with elements containing the value zero.
+ * 
+ * @return Result of the operation.
+ */
 __always_inline(__m128d)
     _mm_setzero_pd(void)
 {
     return __extension__(__m128d){0.0, 0.0};
 }
 
+/**
+ * @brief Move the lower double precision element from b to the lower element in result, and copy the the upper element from a to the upper element in result.
+ * 
+ * @param __A Value to take the upper value from.
+ * @param __B Value to take the lower value from.
+ * 
+ * @return Result of the operation.
+ */
 __always_inline(__m128d)
     _mm_move_sd(__m128d __A, __m128d __B)
 {
     return __extension__(__m128d) __builtin_shuffle((__v2df)__A, (__v2df)__B, (__v2di){2, 1});
 }
 
+/**
+ * @brief Load 128 bits from memory into result.
+ * 
+ * @param __P Pointer to 16 byte aligned memory location.
+ * 
+ * @return Result of the operation.
+ */
 __always_inline(__m128d)
     _mm_load_pd(double const *__P)
 {
     return *(__m128d *)__P;
 }
 
+/**
+ * @brief Load 128 bits from memory into result. The memory address may not be aligned.
+ * 
+ * @param __P Pointer to memory location.
+ * 
+ * @return Result of the operation.
+ */
 __always_inline(__m128d)
     _mm_loadu_pd(double const *__P)
 {
@@ -584,6 +746,28 @@ __always_inline(__m128i)
         __q0, __q1, __q2, __q3, __q4, __q5, __q6, __q7};
 }
 
+/**
+ * @brief Set packed 8-bit integers in dst with the supplied values.
+ * 
+ * @param __q15 Value 15 
+ * @param __q14 Value 14 
+ * @param __q13 Value 13 
+ * @param __q12 Value 12 
+ * @param __q11 Value 11 
+ * @param __q10 Value 10 
+ * @param __q09 Value 9 
+ * @param __q08 Value 8 
+ * @param __q07 Value 7 
+ * @param __q06 Value 6 
+ * @param __q05 Value 5 
+ * @param __q04 Value 4 
+ * @param __q03 Value 3 
+ * @param __q02 Value 2 
+ * @param __q01 Value 1 
+ * @param __q00 Value 0 
+ * 
+ * @return Result of the operation.
+ */
 __always_inline(__m128i)
     _mm_set_epi8(char __q15, char __q14, char __q13, char __q12,
                  char __q11, char __q10, char __q09, char __q08,
@@ -645,6 +829,28 @@ __always_inline(__m128i)
     return _mm_set_epi16(__q7, __q6, __q5, __q4, __q3, __q2, __q1, __q0);
 }
 
+/**
+ * @brief Set packed 8-bit integers in dst with the supplied values in reverse order.
+ * 
+ * @param __q00 Value 0 
+ * @param __q01 Value 1 
+ * @param __q02 Value 2 
+ * @param __q03 Value 3 
+ * @param __q04 Value 4 
+ * @param __q05 Value 5 
+ * @param __q06 Value 6 
+ * @param __q07 Value 7 
+ * @param __q08 Value 8 
+ * @param __q09 Value 9 
+ * @param __q10 Value 10 
+ * @param __q11 Value 11 
+ * @param __q12 Value 12 
+ * @param __q13 Value 13 
+ * @param __q14 Value 14 
+ * @param __q15 Value 15 
+ * 
+ * @return Result of the operation.
+ */
 __always_inline(__m128i)
     _mm_setr_epi8(char __q00, char __q01, char __q02, char __q03,
                   char __q04, char __q05, char __q06, char __q07,
@@ -1529,6 +1735,8 @@ __always_inline(__m128d)
 #pragma GCC pop_options
 
 #endif
+
+/** @}*/
 
 //=============================================================================
 // End of file

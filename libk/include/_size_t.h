@@ -1,5 +1,9 @@
+/** \addtogroup libk 
+ *  @{
+ */
+
 /**
- * @file _size_t.h
+ * @file libk/include/_size_t.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-25
@@ -35,3 +39,9 @@
 typedef unsigned long long size_t;
 
 #endif
+
+/** @}*/
+
+//==============================================================================
+// End of file
+//==============================================================================

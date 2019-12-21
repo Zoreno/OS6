@@ -1,5 +1,9 @@
+/** \addtogroup libk 
+ *  @{
+ */
+
 /**
- * @file _ptrdiff_t.h
+ * @file libk/include/_ptrdiff_t.h
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-25
@@ -33,3 +37,9 @@
 typedef long long ptrdiff_t;
 
 #endif
+
+/** @}*/
+
+//==============================================================================
+// End of file
+//==============================================================================
