@@ -352,7 +352,7 @@ static int stat_node(fs_node_t *node, uintptr_t addr)
 		return -ENOENT;
 	}
 
-	f->st_dev = (uint16_t)(((uint32_t)node->device & 0xFFFF0) >> 8);
+	f->st_dev = (uint16_t)(((uint64_t)node->device & 0xFFFF0) >> 8);
 	f->st_ino = node->inode;
 
 	uint32_t flags = 0;
@@ -485,10 +485,23 @@ int syscall_lstat(char *file, uintptr_t addr)
 	return result;
 }
 
-int syscall_chmod(char *file, int mode);
-int syscall_chown(char *file, int uid, int gid);
+int syscall_chmod(char *file, int mode)
+{
+	// TODO: Implement
+	return -EINVAL;
+}
 
-int syscall_sbrk(uint64_t size);
+int syscall_chown(char *file, int uid, int gid)
+{
+	// TODO: Implement
+	return -EINVAL;
+}
+
+int syscall_sbrk(uint64_t size)
+{
+	// TODO: Implement
+	return -EINVAL;
+}
 
 int syscall_getpid()
 {

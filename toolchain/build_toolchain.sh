@@ -5,26 +5,20 @@
 # Fetch all needed files
 #=========================================================
 
-# Get Binutils 2.28
-wget ftp://ftp.gnu.org/gnu/binutils/binutils-2.32.tar.gz
+# Get Binutils 2.32
+wget -nc ftp://ftp.gnu.org/gnu/binutils/binutils-2.32.tar.gz
 
-# Get GCC 6.4.0
-wget ftp://ftp.gnu.org/gnu/gcc/gcc-8.3.0/gcc-8.3.0.tar.gz
+# Get GCC 8.3.0
+wget -nc ftp://ftp.gnu.org/gnu/gcc/gcc-8.3.0/gcc-8.3.0.tar.gz
 
 # Get Installation Requisites
-sudo apt-get install libgmp3-dev libmpfr-dev libisl-dev libcloog-isl-dev libmpc-dev texinfo
+sudo apt-get install -y texinfo
 
 # Unpack source to src folder
 
 mkdir -p src
 
-tar -xf binutils-2.32.tar.gz -C src
-tar -xf gcc-8.3.0.tar.gz -C src
-
-# Cleanup when done
-
-rm -f binutils-2.32.tar.gz
-rm -f gcc-8.3.0.tar.gz
+for f in *.tar.*; do tar -xf $f -C src; done
 
 #=========================================================
 # Build Binutils
@@ -54,6 +48,10 @@ cd ..
 # Build GCC
 #=========================================================
 
+cd gcc-8.3.0 && contrib/download_prerequisites
+
+cd ..
+
 mkdir -p build-gcc
 cd build-gcc
 
@@ -71,8 +69,6 @@ cd build-gcc
 make -j8 all-gcc
 make -j8 install-gcc
 
-
-
 make -j8 all-target-libgcc
 make -j8 install-target-libgcc
 
@@ -83,3 +79,4 @@ cd ../..
 #=========================================================
 
 rm -rf src
+rm *.tar.*

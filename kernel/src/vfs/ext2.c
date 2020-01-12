@@ -1608,7 +1608,7 @@ static fs_node_t *finddir_ext2(fs_node_t *node, char *name)
 	ext2_dir_t *direntry = NULL;
 	uint8_t block_nr = 0;
 
-	inode_read_block(this, inode, block_nr, block);
+	inode_read_block(this, inode, block_nr, block);	
 
 	uint32_t dir_offset = 0;
 	uint32_t total_offset = 0;

@@ -12,10 +12,11 @@ if(NOT EXISTS "${TOOLCHAIN_DIR}/OS6_cross_cc")
 message(FATAL_ERROR "Did not find cross-compiler directory. Did you run ./build_toolchain.sh from the ${TOOLCHAIN_DIR} directory?")
 endif()
 
-set(OS6_COMPILER_PATH "${TOOLCHAIN_DIR}/OS6_cross_cc/x86_64-elf/bin")
+set(OS6_COMPILER_PATH "${TOOLCHAIN_DIR}/OS6_cross_cc/bin")
+set(OS6_COMPILER_PREFIX "x86_64-elf-")
 
-set(CMAKE_C_COMPILER "${OS6_COMPILER_PATH}/gcc")
-set(CMAKE_CXX_COMPILER "${OS6_COMPILER_PATH}/g++")
+set(CMAKE_C_COMPILER "${OS6_COMPILER_PATH}/${OS6_COMPILER_PREFIX}gcc")
+set(CMAKE_CXX_COMPILER "${OS6_COMPILER_PATH}/${OS6_COMPILER_PREFIX}g++")
 
 set(CMAKE_C_COMPILER_WORKS 1)
 set(CMAKE_CXX_COMPILER_WORKS 1)
@@ -29,6 +30,8 @@ enable_language(C)
 enable_language(CXX)
 enable_language(ASM_NASM)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 #enable_testing()
 
 #==============================================================================
@@ -37,6 +40,9 @@ enable_language(ASM_NASM)
 
 # Debug build
 set(DEBUG_BUILD true)
+
+# Should build the unit tests?
+set(BUILDING_TESTS true)
 
 set(CFLAGS "-m64")
 
@@ -61,6 +67,8 @@ if(${DEBUG_BUILD})
     # Setup dwarf information
     set(CFLAGS "${CFLAGS} -DOS6_DEBUG -gdwarf-4")
     set(ASMFLAGS "${ASMFLAGS} -g -F dwarf")
+    #set(CMAKE_CXX_CPPCHECK "cppcheck")
+    #set(CMAKE_C_CPPCHECK "cppcheck")
 
 else()
 
@@ -162,7 +170,37 @@ list(TRANSFORM ALL_APPS_LIST_DEST PREPEND "${CMAKE_SOURCE_DIR}/root/bin/")
 # Tests
 #==============================================================================
 
-add_subdirectory(tests)
+#add_subdirectory(tests)
+#add_custom_target(testall ALL
+#   COMMAND mkdir -p build_unittest
+#    COMMAND cmake -B build_unittest ${CMAKE_SOURCE_DIR}/unittest
+#    COMMAND make -C build_unittest)
+
+#add_subdirectory(unittest)
+
+if(${BUILDING_TESTS})
+
+include(ExternalProject)
+
+ExternalProject_Add(unittest
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/unittest
+    INSTALL_COMMAND ""
+    BUILD_ALWAYS ON)
+
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "unittest")
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "unittest-prefix")
+
+add_custom_target(tests-run 
+    DEPENDS unittest
+    COMMAND make tests-run
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/unittest-prefix/src/unittest-build)
+
+add_custom_target(coverage 
+    DEPENDS unittest
+    COMMAND make coverage
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/unittest-prefix/src/unittest-build)
+
+endif()
 
 #==============================================================================
 # Build ISO
@@ -264,10 +302,10 @@ add_custom_target(cleandocs
 # Custom testing command
 #==============================================================================
 
-add_custom_target(run-tests
-    COMMAND make
-    COMMAND ctest -VV --output-on-failure
-	WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+#add_custom_target(run-tests
+#    COMMAND make
+#    COMMAND ctest -VV --output-on-failure
+#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 	
 #==============================================================================
 # End of file

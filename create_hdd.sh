@@ -14,4 +14,4 @@ sync
 
 sudo umount mnt/rootfs
 
-rm -rf mnt
+sudo rm -rf mnt

@@ -73,4 +73,7 @@ int pre_main(int argc, char **argv)
 	int ret = main(argc, argv);
 
 	_exit(ret);
+
+	// This code should be unreachable
+	return ret;
 }

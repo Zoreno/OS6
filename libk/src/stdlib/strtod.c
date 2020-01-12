@@ -140,26 +140,16 @@ double libk_strtod(const char *str, char **endptr)
 
             e *= sign;
         }
-        else if (!isdigit(*(a - 1)))
-        {
-            a = str;
-            goto done;
-        }
         else if (*p == 0)
         {
+            a = str;
+            d = 0;
             goto done;
         }
 
         if (d == 2.2250738585072011 && e == -308)
         {
             d = 0.0;
-            a = p;
-            goto done;
-        }
-
-        if (d == 2.2250738585072012 && e <= -308)
-        {
-            d *= 1.0e-308;
             a = p;
             goto done;
         }
@@ -176,7 +166,7 @@ double libk_strtod(const char *str, char **endptr)
     }
     else if (p > str && isdigit(*(p - 1)))
     {
-        a = str;
+        a = p;
     }
 
 done:

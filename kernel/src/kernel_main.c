@@ -870,7 +870,7 @@ int simple_cli_launch(char **args)
     pid_t pid;
     pid_t wpid;
 
-    int status;
+    int status = 0;
 
     printf("Args before fork: %#016x\n", &args);
 
@@ -946,7 +946,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     debug_terminal_initialize();
 
-    //set_stdout(scom1_fd);
+    set_stdout(scom1_fd);
 
     printf("Initializing kernel...\n");
 
@@ -983,13 +983,13 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     pciInit();
 
-    //vbe_bochs_set_gfx(800, 600, 4);
+    vbe_bochs_set_gfx(800, 600, 4);
 
     syscall_install();
 
     tasking_install();
 
-    // exec_elf("bin/hello_world", 0, NULL, NULL, 0);
+    //exec_elf("bin/hello_world", 0, NULL, NULL, 0);
 
     // printf("My pid: %d\n", pid);
 
@@ -997,14 +997,13 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     // switch_task(1);
 
-    /* 
     spinlock_init(&print_lock);
 
-    printf("After switch\n");
+    //printf("After switch\n");
 
     pid_t pid = process_get_pid();
 
-    process_fork();
+    //process_fork();
 
     if (process_get_pid() != pid)
     {
@@ -1013,6 +1012,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
         printf("[ERROR] Exec elf returned\n");
     }
 
+    /*
     pid = process_get_pid();
 
     process_fork();
