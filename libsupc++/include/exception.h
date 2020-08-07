@@ -3,8 +3,6 @@
 
 #pragma GCC system_header
 
-#include <new>
-
 extern "C++"
 {
 	namespace std

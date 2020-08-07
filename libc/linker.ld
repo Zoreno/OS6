@@ -8,6 +8,7 @@ SECTIONS
 	{
 		code = .;
 		*(.text)
+		*(.text*)
 	}
 
 	.rodata BLOCK(4K) : ALIGN(4K)
@@ -21,6 +22,7 @@ SECTIONS
 		__end_dtors = .;
 
 		*(.rodata)
+		*(.rodata*)
 	}
 
 	.data BLOCK(4K) : ALIGN(4K)
@@ -34,14 +36,11 @@ SECTIONS
 		*(.bss)
 	}
 
-	.eh_frame BLOCK(4K) : ALIGN(4K)
-	{
-		__start_eh_frame = .;
-		*(.eh_frame_hdr)
-		*(.eh_frame)
-		*(.gcc_except_table .gcc_except_table.*)
-		__end_eh_frame = .;
-	}
+	.eh_frame_hdr : { *(.eh_frame_hdr) }
+	__start_eh_frame = .;
+	.eh_frame : ONLY_IF_RO { KEEP (*(.eh_frame)) }
+	__end_eh_frame = .;
+	.gcc_except_table : ONLY_IF_RO { *(.gcc_except_table) }
 
 	.init :
 	{
@@ -51,6 +50,13 @@ SECTIONS
 	.fini :
 	{
 		KEEP (*(SORT_NONE(.fini)))
+	}
+
+	.preinit_array :
+	{
+		__preinit_array_start = .;
+		*(.preinit_array)
+		__preinit_array_end = .;
 	}
 
 	.init_array :

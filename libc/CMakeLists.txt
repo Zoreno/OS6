@@ -10,7 +10,7 @@ add_library(${LIBC} "")
 # Flags and compiler configuration
 #==============================================================================
 
-set_target_properties(${LIBC} PROPERTIES COMPILE_FLAGS ${CFLAGS})
+set_target_properties(${LIBC} PROPERTIES COMPILE_FLAGS "${CFLAGS} -fpie")
 set_target_properties(${LIBC} PROPERTIES LINKER_LANGUAGE C)
 set_target_properties(${LIBC} PROPERTIES SKIP_BUILD_RPATH 1)
 
@@ -38,6 +38,8 @@ target_sources(${LIBC} PRIVATE ${LIBC_SRC}/crti.asm)
 target_sources(${LIBC} PRIVATE ${LIBC_SRC}/crtn.asm)
 target_sources(${LIBC} PRIVATE ${LIBC_SRC}/_libc_init.c)
 target_sources(${LIBC} PRIVATE ${LIBC_SRC}/_syscall.c)
+target_sources(${LIBC} PRIVATE ${LIBC_SRC}/fini.c)
+target_sources(${LIBC} PRIVATE ${LIBC_SRC}/init.c)
 
 # ctype.h header
 

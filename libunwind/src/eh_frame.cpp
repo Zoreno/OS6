@@ -420,6 +420,8 @@ fd_entry eh_frame::find_fde(register_state *state)
                 continue;
             }
 
+            LOG("Not CIE\n");
+
             if (fde.is_in_range(state->get_ip()))
             {
                 return fde;

@@ -100,6 +100,9 @@ set(LIBSUPCXX_SRC ${CMAKE_SOURCE_DIR}/libsupc++/src)
 set(LIBUNWIND_INCLUDE ${CMAKE_SOURCE_DIR}/libunwind/include)
 set(LIBUNWIND_SRC ${CMAKE_SOURCE_DIR}/libunwind/src)
 
+set(LIBSTDCXX_INCLUDE ${CMAKE_SOURCE_DIR}/libstdc++/include)
+set(LIBSTDCXX_SRC ${CMAKE_SOURCE_DIR}/libstdc++/src)
+
 
 set(OS6_TESTS ${CMAKE_SOURCE_DIR}/tests)
 
@@ -109,6 +112,7 @@ set(LIBC c)
 set(LIBSUPCXX supc++)
 set(LIBUNWIND unwind)
 set(LIBSIMD simd)
+set(LIBSTDCXX stdc++)
 
 #==============================================================================
 # LIBK kernel C standard library target
@@ -140,6 +144,7 @@ add_subdirectory(libc)
 
 add_subdirectory(libunwind)
 add_subdirectory(libsupc++)
+add_subdirectory(libstdc++)
 
 #==============================================================================
 # Apps

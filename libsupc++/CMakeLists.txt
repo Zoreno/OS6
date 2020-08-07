@@ -38,13 +38,37 @@ target_link_libraries(${LIBSUPCXX} PRIVATE ${LIBUNWIND})
 # Sources
 #==============================================================================
 
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/bad_alloc.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/bad_array_new_length.cpp)
+
 target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/cxxabi.cpp)
 target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/exception.cpp)
 
-target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/delete_op.cpp)
+
 target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/new_op.cpp)
-target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/delete_opv.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/new_opa.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/new_opant.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/new_opnt.cpp)
 target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/new_opv.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/new_opva.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/new_opvant.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/new_opvnt.cpp)
+
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/delete_op.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/delete_opa.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/delete_opant.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/delete_opnt.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/delete_ops.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/delete_opsa.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/delete_opv.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/delete_opva.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/delete_opvant.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/delete_opvnt.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/delete_opvs.cpp)
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/delete_opvsa.cpp)
+
+target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/new_handler.cpp)
+
 target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/pure_virtual.cpp)
 target_sources(${LIBSUPCXX} PRIVATE ${LIBSUPCXX_SRC}/deleted_virtual.cpp)
 

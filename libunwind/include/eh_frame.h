@@ -216,7 +216,9 @@ public:
     fd_entry &operator=(const fd_entry &) = default;
 
     bool is_in_range(uint64_t pc) const
-    {
+    {  
+        printf("is_in_range: pc: %#016x, pc_begin: %#016x, pc_end: %#016x\n", pc, m_pc_begin, m_pc_begin + m_pc_range);
+
         return (pc > m_pc_begin) && (pc <= m_pc_begin + m_pc_range);
     }
 

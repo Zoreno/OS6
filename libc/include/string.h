@@ -59,7 +59,15 @@ int ffs(int i);
 int ffsl(long int i);
 int ffsll(long long int i);
 
+int fls(int i);
+int flsl(long int i);
+int flsll(long long int i);
+
+char *index(const char *s, int c);
+char *rindex(const char *s, int c);
+
 void swab(const void *bfrom, void *bto, size_t n);
+
 _c_header_end;
 
 #endif

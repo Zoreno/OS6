@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+// TODO: Implement a proper heap
 unsigned char mem_area[10 * 1024];
 
 void *malloc(size_t size)

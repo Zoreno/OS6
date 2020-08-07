@@ -26,9 +26,12 @@ set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> \
 
 target_include_directories(${APP_NAME} SYSTEM PRIVATE ${LIBC_INCLUDE})
 target_include_directories(${APP_NAME} SYSTEM PRIVATE ${LIBSUPCXX_INCLUDE})
+target_include_directories(${APP_NAME} SYSTEM PRIVATE ${LIBSTDCXX_INCLUDE})
+target_include_directories(${APP_NAME} SYSTEM PRIVATE ${LIBSTDCXX_INCLUDE}/std)
 
 target_link_libraries(${APP_NAME} PRIVATE ${LIBC})
 target_link_libraries(${APP_NAME} PRIVATE ${LIBSUPCXX})
+target_link_libraries(${APP_NAME} PRIVATE ${LIBSTDCXX})
 
 add_custom_command(TARGET ${APP_NAME} POST_BUILD
     COMMAND sha512sum -b ${APP_NAME} > ${APP_NAME}.hash

@@ -100,6 +100,15 @@ typedef struct
 #define ET_LOPROC 0xFF00
 #define ET_HIPROC 0xFFFF
 
+#define EM_NONE 0
+#define EM_SPARC 2
+#define EM_386 3
+#define EM_SPARC32PLUS 18
+#define EM_SPARCV9 43
+#define EM_AMD64 62
+
+#define EV_CURRENT 1
+
 //=============================================================================
 // Section header
 //=============================================================================
@@ -164,6 +173,9 @@ typedef struct
     Elf64_Xword_t st_size;
 
 } __attribute__((packed)) Elf64_Sym_t;
+
+#define ELF64_ST_BIND(INFO) ((INFO) >> 4)
+#define ELF64_ST_TYPE(INFO) ((INFO)&0x0F)
 
 #define STB_LOCAL 0
 #define STB_GLOBAL 1

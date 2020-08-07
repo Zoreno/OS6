@@ -38,10 +38,8 @@ char **__argv = NULL;
 
 typedef void (*func_t)(void);
 
-extern func_t __init_array_start;
-extern func_t __init_array_end;
-extern func_t __fini_array_start;
-extern func_t __fini_array_end;
+extern void __libc_init_array(void);
+extern void __libc_fini_array(void);
 
 extern char **__get_argv()
 {
@@ -59,6 +57,12 @@ void _exit(int val)
 
 void initialize_standard_library(void)
 {
+	__libc_init_array();
+}
+
+void finalize_standard_library(void)
+{
+	__libc_fini_array();
 }
 
 int pre_main(int argc, char **argv)
@@ -72,8 +76,9 @@ int pre_main(int argc, char **argv)
 
 	int ret = main(argc, argv);
 
+	finalize_standard_library();
+
 	_exit(ret);
 
-	// This code should be unreachable
-	return ret;
+	__builtin_unreachable();
 }

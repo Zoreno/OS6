@@ -23,15 +23,20 @@
 #include <exception>
 #include <stdio.h>
 
+#include <limits>
+#include <type_traits>
+
+#include <__test/__test.hpp>
+
+int array[20] = {0};
+
 int main(int argc, char **argv)
 {
-	try
+	run_tests();
+
+	for (int i = 0; i < 20; ++i)
 	{
-		throw std::exception();
-	}
-	catch (const std::exception &ex)
-	{
-		puts(ex.what());
+		printf("%i\n", array[i]);
 	}
 
 	return 0;

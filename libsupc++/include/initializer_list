@@ -1,41 +1,156 @@
-#ifndef _INITIALIZER_LIST
-#define _INITIALIZER_LIST
+/**
+ * @file initializer_list
+ * @author Joakim Bertils
+ * @version 0.1
+ * @date 2020-07-29
+ * 
+ * @brief Defines a lightweight proxy for access to an array of objects.
+ * 
+ * @copyright Copyright (C) 2019,
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
+ * 
+ */
+
+#ifndef _INITIALIZER_LIST_
+#define _INITIALIZER_LIST_
 
 #pragma GCC system_header
 
 namespace std
 {
 
+/**
+ * @brief Lightweight proxy for array of objects of type const @T
+ * 
+ * @tparam T The type of the objects in the array, without the const.
+ * 
+ */
 template <class T>
 class initializer_list
 {
 public:
+    /**
+     * @brief Type of the value.
+     * 
+     * 
+     */
     typedef T value_type;
-    typedef const E &reference;
-    typedef const E &const_reference;
-    typedef size_t size_type;
-    typedef const E *iterator;
-    typedef const E *const_iterator;
+
+    /**
+     * @brief Type of a reference to a value.
+     * 
+     * 
+     */
+    typedef const T &reference;
+
+    /**
+     * @brief Type of a const reference to a value.
+     * 
+     * 
+     */
+    typedef const T &const_reference;
+
+    /**
+     * @brief Type representing the size of the array.
+     * 
+     * 
+     */
+    typedef unsigned long size_type;
+
+    /**
+     * @brief Type of an iterator to an object.
+     * 
+     * 
+     */
+    typedef const T *iterator;
+
+    /**
+     * @brief Type of a const iterator to an object.
+     * 
+     * 
+     */
+    typedef const T *const_iterator;
 
 public:
+    /**
+     * @brief Constructs an empty initializer list.
+     * 
+     * 
+     */
     constexpr initializer_list() noexcept
-        : _array(0), _len(0) {}
+        : _array(0), _len(0)
+    {
+    }
 
-    constexpr size_type size() const noexcept { return _len; }
-    constexpr const_iterator begin() const noexcept {return _array};
-    constexpr const_iterator end() const noexcept { return begin() + size(); }
+    /**
+     * @brief Returns the number of elements in the initializer list.
+     * 
+     * 
+     * @return The size of the array. 
+     */
+    constexpr size_type size() const noexcept
+    {
+        return _len;
+    }
+
+    /**
+     * @brief Returns a pointer to the first element in the initializer list.
+     * 
+     * 
+     * @return A pointer to the first element in the list.
+     */
+    constexpr const_iterator begin() const noexcept
+    {
+        return _array;
+    }
+
+    /**
+     * @brief Returns a pointer to one past the last element in the initializer list.
+     * 
+     * 
+     * @return A pointer to one past the last element in the list.
+     */
+    constexpr const_iterator end() const noexcept
+    {
+        return begin() + size();
+    }
 
 private:
     iterator _array;
     size_type _len;
 };
 
+/**
+ * @brief Returns a pointer to the first element in the list.
+ * 
+ * @tparam T the type of the values in the array.
+ * @param _list An initializer list.
+ * 
+ * @return Same as initializer_list<T>::begin()
+ */
 template <class T>
 constexpr const T *begin(initializer_list<T> _list) noexcept
 {
     return _list.begin();
 }
 
+/**
+ * @brief Returns a pointer to one past the last element in the list.
+ * 
+ * @tparam T the type of the values in the array.
+ * @param _list An initializer list.
+ * 
+ * @return Same as initializer_list<T>::end()
+ */
 template <class T>
 constexpr const T *end(initializer_list<T> _list) noexcept
 {
@@ -45,3 +160,7 @@ constexpr const T *end(initializer_list<T> _list) noexcept
 } // namespace std
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

@@ -5,7 +5,13 @@
         "*.cu": "cpp",
         "*.h": "c",
         "typeinfo": "cpp",
-        "exception": "cpp"
+        "exception": "cpp",
+        "memset.c": "cpp",
+        "new": "cpp",
+        "limits": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "bit": "cpp"
     },
     "doxdocgen.generic.authorEmail": "",
     "doxdocgen.generic.authorName": "Joakim Bertils",

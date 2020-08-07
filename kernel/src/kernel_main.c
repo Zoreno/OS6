@@ -1003,11 +1003,11 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     pid_t pid = process_get_pid();
 
-    //process_fork();
+    pid_t fork_ret = process_fork();
 
     if (process_get_pid() != pid)
     {
-        exec_elf("bin/hello_world", 0, NULL, NULL, 0);
+        exec_elf("bin/hello_world_cpp", 0, NULL, NULL, 0);
 
         printf("[ERROR] Exec elf returned\n");
     }

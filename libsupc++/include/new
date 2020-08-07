@@ -1,23 +1,204 @@
+/**
+ * @file new
+ * @author Joakim Bertils
+ * @version 0.1
+ * @date 2020-07-28
+ * 
+ * @brief C++ standard library memory allocation functions
+ * 
+ * @copyright Copyright (C) 2020,
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
+ * 
+ */
+
 #ifndef __NEW_
 #define __NEW_
 
 #pragma GCC system_header
 
 #include <exception>
+#include <exception.h>
 #include <stdint.h>
 
-namespace std
+extern "C++"
 {
-typedef unsigned long int size_t;
 
-// std::bad_alloc
-// std::bad_array_new_length
-} // namespace std
+    namespace std
+    {
+    typedef unsigned long size_t;
 
-void *operator new(std::size_t size) __attribute__((__externally_visible__));
-void *operator new[](std::size_t size) __attribute__((__externally_visible__));
+    //=========================================================================
+    // std::bad_alloc
+    //=========================================================================
 
-void operator delete(void *ptr) noexcept __attribute__((__externally_visible__));
-void operator delete[](void *ptr) noexcept __attribute__((__externally_visible__));
+    class bad_alloc : public exception
+    {
+    public:
+        bad_alloc() throw() {}
+
+        bad_alloc(const bad_alloc &) = default;
+        bad_alloc &operator=(const bad_alloc &) = default;
+
+        virtual ~bad_alloc() throw();
+
+        virtual const char *what() const throw();
+    };
+
+    //=========================================================================
+    // std::bad_array_new_length
+    //=========================================================================
+
+    class bad_array_new_length : public bad_alloc
+    {
+    public:
+        bad_array_new_length() throw() {}
+
+        bad_array_new_length(const bad_array_new_length &) = default;
+        bad_array_new_length &operator=(const bad_array_new_length &) = default;
+
+        virtual ~bad_array_new_length() throw();
+
+        virtual const char *what() const throw();
+    };
+
+    //=========================================================================
+    // std::align_val_t
+    //=========================================================================
+
+#if __cpp_aligned_new
+    enum class align_val_t : size_t
+    {
+    };
+#endif
+
+    //=========================================================================
+    // std::nothrow_t
+    //=========================================================================
+
+    struct nothrow_t
+    {
+        explicit nothrow_t() = default;
+    };
+
+    extern const nothrow_t nothrow;
+
+    //=========================================================================
+    // std::new_handler
+    //=========================================================================
+
+    typedef void (*new_handler)();
+
+    new_handler set_new_handler(new_handler) throw();
+    new_handler get_new_handler() noexcept;
+
+    //=========================================================================
+    // Operator new and delete
+    //=========================================================================
+
+    } // namespace std
+
+    void *operator new(std::size_t size) __attribute__((__externally_visible__));
+    void *operator new[](std::size_t size) __attribute__((__externally_visible__));
+
+    void operator delete(void *ptr) noexcept __attribute__((__externally_visible__));
+    void operator delete[](void *ptr) noexcept __attribute__((__externally_visible__));
+
+    // Sized deallocation
+
+#if __cpp_sized_deallocation
+    void operator delete(void *ptr, std::size_t size) noexcept __attribute__((__externally_visible__));
+    void operator delete[](void *ptr, std::size_t size) noexcept __attribute__((__externally_visible__));
+#endif
+
+    // Nothrow
+    void *operator new(std::size_t size, const std::nothrow_t &) noexcept __attribute__((__externally_visible__));
+    void *operator new[](std::size_t size, const std::nothrow_t &) __attribute__((__externally_visible__));
+
+    void operator delete(void *ptr, const std::nothrow_t &)noexcept __attribute__((__externally_visible__));
+    void operator delete[](void *ptr, const std::nothrow_t &) noexcept __attribute__((__externally_visible__));
+
+#if __cpp_aligned_new
+    // Align_val
+    void *operator new(std::size_t size, std::align_val_t) __attribute__((__externally_visible__));
+    void *operator new[](std::size_t size, std::align_val_t) __attribute__((__externally_visible__));
+
+    void operator delete(void *ptr, std::align_val_t) noexcept __attribute__((__externally_visible__));
+    void operator delete[](void *ptr, std::align_val_t) noexcept __attribute__((__externally_visible__));
+
+    // Align_val, nothrow
+    void *operator new(std::size_t size, std::align_val_t, const std::nothrow_t &) noexcept __attribute__((__externally_visible__));
+    void *operator new[](std::size_t size, std::align_val_t, const std::nothrow_t &) noexcept __attribute__((__externally_visible__));
+
+    void operator delete(void *ptr, std::align_val_t, const std::nothrow_t &)noexcept __attribute__((__externally_visible__));
+    void operator delete[](void *ptr, std::align_val_t, const std::nothrow_t &) noexcept __attribute__((__externally_visible__));
+
+#if __cpp_sized_deallocation
+    // Sized deallocation, align_val
+    void operator delete(void *ptr, std::size_t size, std::align_val_t) noexcept __attribute__((__externally_visible__));
+    void operator delete[](void *ptr, std::size_t size, std::align_val_t) noexcept __attribute__((__externally_visible__));
+#endif
+#endif
+
+    //=========================================================================
+    // Placement new and delete
+    //=========================================================================
+
+    // Placement new and delete
+    inline void *operator new(std::size_t, void *__p) noexcept
+    {
+        return __p;
+    }
+
+    inline void *operator new[](std::size_t, void *__p) noexcept
+    {
+        return __p;
+    }
+
+    inline void operator delete(void *, void *)noexcept
+    {
+    }
+
+    inline void operator delete[](void *, void *) noexcept
+    {
+    }
+
+    namespace std
+    {
+
+    //=========================================================================
+    // std::launder
+    //=========================================================================
+
+    template <typename _Tp>
+    [[nodiscard]] constexpr _Tp *launder(_Tp *__p) noexcept
+    {
+        return __builtin_launder(__p);
+    }
+
+    template <typename _Ret, typename... _Args, bool NE>
+    void launder(_Ret (*)(_Args...) noexcept(NE)) = delete;
+    template <typename _Ret, typename... _Args, bool NE>
+    void launder(_Ret (*)(_Args......) noexcept(NE)) = delete;
+
+    void launder(void *) = delete;
+    void launder(const void *) = delete;
+    void launder(volatile void *) = delete;
+    void launder(const volatile void *) = delete;
+
+    } // namespace std
+}
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

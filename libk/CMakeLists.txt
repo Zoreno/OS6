@@ -33,6 +33,21 @@ target_include_directories(${LIBK} SYSTEM PRIVATE ${LIBK_INCLUDE})
 #==============================================================================
 
 # string.h header
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/bcmp.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/bcopy.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/bzero.c)
+
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/ffs.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/ffsl.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/ffsll.c)
+
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/fls.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/flsl.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/flsll.c)
+
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/index.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/rindex.c)
+
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memset.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memchr.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/memcmp.c)
@@ -64,6 +79,7 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strtok_r.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strtok.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strspn.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strdup.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strrchr.c)
 
 # ctype.h header
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/ctype/isalnum.c)

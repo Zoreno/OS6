@@ -36,7 +36,7 @@ declare_test(libk_strlen_test libk/string/strlen_test.cpp)
 #==============================================================================
 
 add_custom_target(tests-run
-    COMMAND ctest --output-on-failure
+    COMMAND ctest --output-on-failure -VV
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
 #==============================================================================

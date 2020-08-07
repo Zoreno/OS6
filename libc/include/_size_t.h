@@ -34,7 +34,7 @@ _c_header_begin;
  * 
  * 
  */
-typedef unsigned long long size_t;
+typedef unsigned long long int size_t;
 
 _c_header_end;
 
