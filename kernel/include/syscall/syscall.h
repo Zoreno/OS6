@@ -23,9 +23,16 @@
 #ifndef _SYSCALL_H
 #define _SYSCALL_H
 
-#include <stdint.h>
-#include <vfs/vfs.h>
+#include <arch/arch.h>
+#include <debug/backtrace.h>
 #include <process/process.h>
+#include <vfs/vfs.h>
+
+#include <stdint.h>
+#include <stdio.h>
+#include <errno.h>
+#include <string.h>
+#include <stdlib.h>
 
 /**
  * @brief The system call interrupt number
@@ -137,6 +144,21 @@ int syscall_chdir(char *newdir);            // DONE
 int syscall_getcwd(char *buf, size_t size); // DONE
 
 void syscall_install();
+
+int64_t do_syscall0(int64_t syscall);
+int64_t do_syscall1(int64_t syscall, int64_t arg1);
+int64_t do_syscall2(int64_t syscall, int64_t arg1, int64_t arg2);
+int64_t do_syscall3(int64_t syscall, int64_t arg1, int64_t arg2, int64_t arg3);
+
+// TODO: Move these to a private header
+
+#define FILE_DESC_IN_RANGE(FILE) ((FILE) < (int)process_get_current()->file_descriptors->length && (FILE) >= 0)
+#define FILE_DESC_ENTRY(FILE) (process_get_current()->file_descriptors->entries[(FILE)])
+#define FILE_DESC_CHECK(FILE) (FILE_DESC_IN_RANGE(FILE) && FILE_DESC_ENTRY(FILE))
+#define FILE_DESC_OFFSET(FILE) (process_get_current()->file_descriptors->offsets[(FILE)])
+#define FILE_DESC_MODE(FILE) (process_get_current()->file_descriptors->modes[(FILE)])
+
+int __stat_node(fs_node_t *node, uintptr_t addr);
 
 #endif
 
