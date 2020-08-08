@@ -64,8 +64,8 @@ unsigned int mouse_img[MOUSE_BUFSZ] = {
 void Desktop_paint_taskbar(Window *taskbar_window);
 void Desktop_taskbar_process_mouse(
     Window *taskbar_window,
-    uint16_t mouse_x,
-    uint16_t mouse_y,
+    int mouse_x,
+    int mouse_y,
     uint8_t mouse_buttons);
 
 void Desktop_taskbar_tick_handler(Window *taskbar_window, int ticks);
@@ -134,8 +134,8 @@ Desktop *Desktop_new(Context *context)
 
 void Desktop_taskbar_process_mouse(
     Window *taskbar_window,
-    uint16_t mouse_x,
-    uint16_t mouse_y,
+    int mouse_x,
+    int mouse_y,
     uint8_t mouse_buttons)
 {
     uint32_t i;

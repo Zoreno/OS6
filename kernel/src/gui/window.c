@@ -33,7 +33,7 @@
 //#include "button.h"
 
 void Window_paint_handler(Window *window);
-void Window_mousedown_handler(Window *window, int x, int y);
+void Window_mousedown_handler(Window *window, int x, int y, uint8_t mouse_buttons);
 void Window_key_handler(Window *window, int key, int mods, int action);
 void Window_tick_handler(Window *window, int ticks);
 
@@ -942,7 +942,7 @@ void Window_process_mouse(
 
     if (window->mousedown_function && mouse_buttons && !window->last_button_state)
     {
-        window->mousedown_function(window, mouse_x, mouse_y);
+        window->mousedown_function(window, mouse_x, mouse_y, mouse_buttons);
     }
 
     window->last_button_state = mouse_buttons;
@@ -990,7 +990,7 @@ void Window_process_tick(Window *window, int ticks)
     }
 }
 
-void Window_mousedown_handler(Window *window, int x, int y)
+void Window_mousedown_handler(Window *window, int x, int y, uint8_t mouse_buttons)
 {
     return;
 }

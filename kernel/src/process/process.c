@@ -448,7 +448,7 @@ void process_delete(process_t *proc)
 		return;
 	}
 
-	free(proc->image.stack);
+	free((void *)proc->image.stack);
 
 	// Check if we are trying to kill init
 	ASSERT((entry != process_tree->root));

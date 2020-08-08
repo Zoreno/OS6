@@ -121,7 +121,7 @@ extern "C++"
 
     // Nothrow
     void *operator new(std::size_t size, const std::nothrow_t &) noexcept __attribute__((__externally_visible__));
-    void *operator new[](std::size_t size, const std::nothrow_t &) __attribute__((__externally_visible__));
+    void *operator new[](std::size_t size, const std::nothrow_t &) noexcept __attribute__((__externally_visible__));
 
     void operator delete(void *ptr, const std::nothrow_t &)noexcept __attribute__((__externally_visible__));
     void operator delete[](void *ptr, const std::nothrow_t &) noexcept __attribute__((__externally_visible__));

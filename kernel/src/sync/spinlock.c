@@ -52,7 +52,8 @@ void spinlock_lock(spinlock_t *lock)
 #else
 	while (1)
 	{
-		if (!xchg_64(&lock->val, 1))
+		// TODO: Look into this. This looks a bit wierd.
+		if (!xchg_64(&lock->val, (void *)1))
 		{
 			return;
 		}
@@ -66,9 +67,9 @@ void spinlock_lock(spinlock_t *lock)
 #endif
 }
 
-void spinlock_trylock(spinlock_t *lock)
+void *spinlock_trylock(spinlock_t *lock)
 {
-	return xchg_64(&lock->val, 1);
+	return xchg_64(&lock->val, (void *)1);
 }
 
 void spinlock_init(spinlock_t *lock)

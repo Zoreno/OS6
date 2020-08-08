@@ -120,10 +120,10 @@ int syscall_ioctl(int fd, int request, void *argp);           // DONE
 int syscall_statf(char *file, uintptr_t st);                  // DONE
 int syscall_stat(int fd, uintptr_t st);                       // DONE
 int syscall_mkdir(char *path, int mode);                      // DONE
-int syscall_unlink(char *file);                               // DONE
+int syscall_unlink(const char *file);                         // DONE
 int syscall_symlink(char *target, char *name);                // DONE
 int syscall_readlink(const char *file, char *ptr, int len);   // DONE
-int syscall_lstat(char *file, uintptr_t st);                  // DONE
+int syscall_lstat(const char *file, uintptr_t st);            // DONE
 
 int syscall_chmod(char *file, int mode);
 int syscall_chown(char *file, int uid, int gid);

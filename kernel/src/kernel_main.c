@@ -431,8 +431,8 @@ const char *simple_cli_get_user_group();
 const char *simple_cli_get_working_directory();
 
 char *simple_cli_read_line();
-char **simple_cli_split_line(char *line);
-int simple_cli_get_token_count(char **tokens);
+const char **simple_cli_split_line(char *line);
+int simple_cli_get_token_count(const char **tokens);
 int simple_cli_run_command(const char *name, int argc, const char **argv);
 int simple_cli_is_command(const char *name);
 int simple_cli_launch(char **args);
@@ -510,7 +510,7 @@ char *simple_cli_read_line()
     }
 }
 
-char **simple_cli_split_line(char *line)
+const char **simple_cli_split_line(char *line)
 {
     const char *strtok_delim = " \t\r\n\a";
     const int max_tokens_increment = 64;
@@ -549,10 +549,10 @@ char **simple_cli_split_line(char *line)
     }
 
     tokens[position] = NULL;
-    return tokens;
+    return (const char **)tokens;
 }
 
-int simple_cli_get_token_count(char **tokens)
+int simple_cli_get_token_count(const char **tokens)
 {
     int i = 0;
     while (tokens[i] != NULL)
@@ -586,7 +586,7 @@ int cd_command(int argc, const char **argv)
         return -1;
     }
 
-    return syscall_chdir(argv[1]);
+    return syscall_chdir((char *)argv[1]);
 }
 
 static void ls_command_format_permissions(uint32_t permissions, char *buffer)
@@ -645,7 +645,7 @@ int ls_command(int argc, const char **argv)
     {
         struct stat _stat;
 
-        syscall_lstat(dirent.name, &_stat);
+        syscall_lstat(dirent.name, (uintptr_t)&_stat);
 
         char mode_char = '-';
 
@@ -703,7 +703,7 @@ int mkdir_command(int argc, const char **argv)
 
     for (int i = 1; i < argc; ++i)
     {
-        int ret = syscall_mkdir(argv[i], 0777);
+        int ret = syscall_mkdir((char *)argv[i], 0777);
 
         if (ret < 0)
         {
@@ -721,13 +721,13 @@ int pwd_command(int argc, const char **argv)
     return 0;
 }
 
-static int rm_command_remove_item(int recursive, char *path);
-static int rm_command_remove_directory(int recursive, char *dir);
+static int rm_command_remove_item(int recursive, const char *path);
+static int rm_command_remove_directory(int recursive, const char *dir);
 
-static int rm_command_remove_item(int recursive, char *path)
+static int rm_command_remove_item(int recursive, const char *path)
 {
     struct stat statbuf;
-    syscall_lstat(path, &statbuf);
+    syscall_lstat(path, (uintptr_t)&statbuf);
 
     if (S_ISDIR(statbuf.st_mode))
     {
@@ -744,7 +744,7 @@ static int rm_command_remove_item(int recursive, char *path)
     return 0;
 }
 
-static int rm_command_remove_directory(int recursive, char *dir)
+static int rm_command_remove_directory(int recursive, const char *dir)
 {
     int fd = syscall_open(dir, O_DIRECTORY, O_RDWR);
 
@@ -915,7 +915,7 @@ void simple_cli_init()
     while (1)
     {
         char *line = simple_cli_read_line();
-        char **args = simple_cli_split_line(line);
+        const char **args = simple_cli_split_line(line);
         //simple_cli_launch(args);
 
         if (simple_cli_is_command(args[0]))

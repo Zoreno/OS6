@@ -284,7 +284,7 @@ static bool elf64_check_supported(Elf64_Ehdr_t *header)
  */
 static Elf64_Shdr_t *elf64_sheader(Elf64_Ehdr_t *header)
 {
-    return (Elf64_Shdr_t *)((int)header + header->e_shoff);
+    return (Elf64_Shdr_t *)((Elf64_Off_t)header + header->e_shoff);
 }
 
 /**
@@ -368,7 +368,7 @@ static void *elf64_lookup_symbol(const char *name)
  * 
  * @return Address of value of symbol or @ELF_RELOC_ERR on error
  */
-static int elf64_get_symval(Elf64_Ehdr_t *header,
+static Elf64_Off_t elf64_get_symval(Elf64_Ehdr_t *header,
                             int table,
                             uint32_t index)
 {
@@ -387,7 +387,7 @@ static int elf64_get_symval(Elf64_Ehdr_t *header,
         return ELF_RELOC_ERR;
     }
 
-    int symaddr = (int)header + symtab->sh_offset;
+    Elf64_Off_t symaddr = (Elf64_Off_t)header + symtab->sh_offset;
     Elf64_Sym_t *symbol = &((Elf64_Sym_t *)symaddr)[index];
 
     if (symbol->st_shndx == SHN_UNDEF)
@@ -412,7 +412,7 @@ static int elf64_get_symval(Elf64_Ehdr_t *header,
         }
         else
         {
-            return (int)target;
+            return (Elf64_Off_t)target;
         }
     }
     else if (symbol->st_shndx == SHN_ABS)
@@ -423,7 +423,7 @@ static int elf64_get_symval(Elf64_Ehdr_t *header,
     {
         Elf64_Shdr_t *target = elf64_section(header, symbol->st_shndx);
 
-        return (int)header + symbol->st_value + target->sh_offset;
+        return (Elf64_Off_t)header + symbol->st_value + target->sh_offset;
     }
 }
 
@@ -435,6 +435,9 @@ static int elf64_load_stage1(Elf64_Ehdr_t *header)
     {
         Elf64_Shdr_t *section = &shdr[i];
     }
+
+    // TODO: Finish this function
+    return 0;
 }
 
 /**

@@ -73,6 +73,13 @@ void scroll()
     }
 }
 
+static char debug_terminal_getch()
+{
+    KEYCODE code = keyboard_getch();
+
+    return (char)code;
+}
+
 void debug_terminal_initialize()
 {
     _text_color = _default_text_color;
@@ -82,7 +89,7 @@ void debug_terminal_initialize()
 
     strcpy(file.name, "debug_terminal");
 
-    file.read = keyboard_getch;
+    file.read = debug_terminal_getch;
     file.write = debug_terminal_putch;
     file.eof = 0;
 

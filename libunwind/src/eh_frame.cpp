@@ -1,3 +1,4 @@
+
 #include <abort.h>
 #include <dwarf4.h>
 #include <eh_frame.h>
@@ -5,7 +6,9 @@
 
 #define MAX_NUM_MODULES 1
 
+#ifndef LOG
 #define LOG(x) puts(x)
+#endif
 
 uint64_t decode_pointer(char **addr, uint64_t encoding)
 {

@@ -297,6 +297,8 @@ extern "C"
     void *__cxa_begin_catch(_Unwind_Exception *exception)
     {
         puts("Begin catch\n");
+
+        return nullptr;
     }
 
     void __cxa_end_catch()

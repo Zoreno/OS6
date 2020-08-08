@@ -443,9 +443,9 @@ int syscall_mkdir(char *path, int mode)
 	return mkdir_fs(path, mode);
 }
 
-int syscall_unlink(char *file)
+int syscall_unlink(const char *file)
 {
-	return unlink_fs(file);
+	return unlink_fs((char *)file);
 }
 
 int syscall_symlink(char *target, char *name)
@@ -469,11 +469,11 @@ int syscall_readlink(const char *file, char *ptr, int len)
 	return rv;
 }
 
-int syscall_lstat(char *file, uintptr_t addr)
+int syscall_lstat(const char *file, uintptr_t addr)
 {
 	int result;
 
-	fs_node_t *node = kopen(file, O_PATH | O_NOFOLLOW);
+	fs_node_t *node = kopen((char *)file, O_PATH | O_NOFOLLOW);
 
 	result = stat_node(node, addr);
 

@@ -1,12 +1,12 @@
 /**
- * @file hello_world.cpp
+ * @file test-type_traits.cpp
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-06-16
+ * @date 2020-08-07
  * 
- * @brief Simple c++ program printing hello world in userspace
+ * @brief Unit test file for the type_traits header
  * 
- * @copyright Copyright (C) 2019,
+ * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,17 +20,14 @@
  * 
  */
 
-#include <exception>
+#include <ctype.h>
 #include <stdio.h>
 
-#include <limits>
 #include <type_traits>
 
-#include <__test/__test.hpp>
+#include <jtest.h>
 
-int main(int argc, char **argv)
+JTEST(type_traits, char)
 {
-	run_tests();
-
-	return 0;
+	ASSERT_EQUAL(1, 1);
 }

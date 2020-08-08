@@ -88,7 +88,7 @@
 struct Window_struct;
 
 typedef void (*WindowPaintHandler)(struct Window_struct *);
-typedef void (*WindowMousedownHandler)(struct Window_struct *, int, int);
+typedef void (*WindowMousedownHandler)(struct Window_struct *, int, int, uint8_t);
 typedef void (*WindowKeyHandler)(struct Window_struct *, int, int, int);
 typedef void (*WindowTickHandler)(struct Window_struct *, int);
 
