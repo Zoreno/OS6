@@ -41,6 +41,8 @@ target_link_libraries(${KERNEL_EXEC} PRIVATE ${LIBSIMD})
 # Sources
 #==============================================================================
 
+# TODO: Sort all of these
+
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/boot/boot.asm)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/debug/debug_terminal.c)
@@ -154,6 +156,14 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/syscall/syscalls/syscall_sym
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/syscall/syscalls/syscall_unlink.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/syscall/syscalls/syscall_write.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/syscall/syscalls/syscall_yield.c)
+
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/simple_cli.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/cd_command.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/ls_command.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/mkdir_command.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/pwd_command.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/rm_command.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/test_command.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
 
