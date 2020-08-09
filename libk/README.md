@@ -11,4 +11,5 @@ This is the c standard library for the kernel, which is statically linked to the
 
 ## Math functions
 
-Math functions are put in the same archive. Most math functions are implemented as simple as possible, so the precision of the functions may wary.
+Math functions are put in the same archive. Most math functions are implemented as simple as possible, so the precision of the functions may wary. Only float versions are
+currently implemented.
