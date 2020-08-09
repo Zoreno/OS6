@@ -48,7 +48,7 @@ header_start:
     dd header_end - header_start
 
     ; Checksum
-    dd - (0xe85250d6 + 0 + (header_end - header_start))
+    dd - (0xe85250d6 + 0 + (header_end - header_start)) & 0xFFFFFFFF
 
     ; End tag
     dw 0
