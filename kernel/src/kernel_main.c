@@ -460,7 +460,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     */
 
-    for (int i = 0; i < 100; ++i)
+    for (int i = 0; i < 1; ++i)
     {
         printf("Launch program %i\n", i);
 

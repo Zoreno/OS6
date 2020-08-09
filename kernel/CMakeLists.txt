@@ -105,6 +105,10 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/sha512.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/vector.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/hashmap.c)
 
+#target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/json/json_number.c)
+#target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/json/json_string.c)
+#target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/json/json_utils.c)
+
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/gui_listnode.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/gui_list.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/rect.c)
