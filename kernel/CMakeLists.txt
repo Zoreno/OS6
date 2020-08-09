@@ -94,6 +94,7 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/exec/exec_elf.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/process/process.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/process/read_ip.asm)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/process/switch_task.asm)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/process/launch_program.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/list.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/util/tree.c)

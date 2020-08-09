@@ -24,30 +24,3 @@ static_assert(ic_minus_one() == -1, "");
 
 static_assert(ic_true() == true, "");
 static_assert(ic_false() == false, "");
-
-TEST_GROUP(integral_constant){
-    public :
-        void setup() override{
-            printf("This is in setup\n");
-}
-
-void teardown() override
-{
-    printf("This is in teardown\n");
-}
-}
-;
-
-TEST(integral_constant, static_init)
-{
-    const bool *p = &std::integral_constant<bool, true>::value;
-
-    return p != nullptr;
-}
-
-TEST(integral_constant, static_init2)
-{
-    const bool *p = &std::integral_constant<bool, true>::value;
-
-    return p != nullptr;
-}

@@ -1034,9 +1034,6 @@ int virt_mem_unmap_page(void *virt)
 {
     (void)virt;
 
-    align_down(0, 0);
-    align_up(0, 0);
-
     // TODO:
 
     return -1;

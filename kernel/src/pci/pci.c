@@ -187,7 +187,9 @@ void pciInit()
         {
         case 0:
             for (int i = 0; i < 6; ++i)
+            {
                 printf("BAR[%i]: %#x\n", i, dev->type0.BaseAddresses[i]);
+            }
 
             printf("CIS: %#x\n", dev->type0.CIS);
             printf("SubVendorID: %#x\n", dev->type0.SubVendorID);

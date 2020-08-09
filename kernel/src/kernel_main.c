@@ -71,6 +71,7 @@
 #include <syscall/syscall.h>
 
 #include <process/process.h>
+#include <process/launch_program.h>
 
 #include <util/json.h>
 
@@ -439,15 +440,33 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     //printf("After switch\n");
 
+    /*
+
     pid_t pid = process_get_pid();
 
     pid_t fork_ret = process_fork();
+
 
     if (process_get_pid() != pid)
     {
         exec_elf("bin/hello_world_cpp", 0, NULL, NULL, 0);
 
         printf("[ERROR] Exec elf returned\n");
+    }
+
+    int status;
+
+    waitpid(fork_ret, &status, 0);
+
+    */
+
+    for (int i = 0; i < 100; ++i)
+    {
+        printf("Launch program %i\n", i);
+
+        phys_mem_dump_statistics();
+
+        launch_program("bin/hello_world");
     }
 
     /*
