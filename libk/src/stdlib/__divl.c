@@ -1,12 +1,12 @@
 /**
- * @file abs.c
+ * @file __divl.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-06-22
+ * @date 2020-08-10
  * 
  * @brief 
  * 
- * @copyright Copyright (C) 2019,
+ * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,7 +22,16 @@
 
 #include <stdlib.h>
 
-int abs(int x)
+uint32_t __divl(uint64_t num, uint64_t den)
 {
-    return x > 0 ? x : -x;
+    uint32_t num_high = num >> 32;
+    uint32_t num_low = num;
+    uint32_t quot;
+    uint32_t rem;
+
+    __asm__("divq %4"
+            : "=d"(rem), "=a"(quot)
+            : "0"(num_high), "1"(num_low), "rm"(den));
+
+    return quot;
 }

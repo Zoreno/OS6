@@ -1,12 +1,12 @@
 /**
- * @file abs.c
+ * @file __nlz.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-06-22
+ * @date 2020-08-10
  * 
  * @brief 
  * 
- * @copyright Copyright (C) 2019,
+ * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,7 +22,32 @@
 
 #include <stdlib.h>
 
-int abs(int x)
+int __nlz(uint32_t x)
 {
-    return x > 0 ? x : -x;
+    int n = 0;
+
+    if (x <= 0x0000FFFF)
+    {
+        n += 16;
+        x <<= 16;
+    }
+
+    if (x <= 0x00FFFFFF)
+    {
+        n += 8;
+        x <<= 8;
+    }
+
+    if (x <= 0x0FFFFFFF)
+    {
+        n += 4;
+        x <<= 4;
+    }
+
+    if (x <= 0x7FFFFFFF)
+    {
+        n++;
+    }
+
+    return n;
 }

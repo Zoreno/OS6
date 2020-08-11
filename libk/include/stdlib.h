@@ -101,6 +101,18 @@ void qsort(
     size_t size,
     int (*compare)(const void *, const void *));
 
+
+uint32_t __divl(uint64_t num, uint64_t den);
+int __nlz(uint32_t x);
+uint64_t __udiv64(uint64_t num, uint64_t den);
+uint64_t __umod64(uint64_t num, uint64_t den);
+int64_t __sdiv64(int64_t num, int64_t den);
+int64_t __smod64(int64_t num, int64_t den);
+long long __divdi3(long long n, long long d);
+long long __moddi3(long long n, long long d);
+unsigned long long __udivdi3(unsigned long long n, unsigned long long d);
+unsigned long long __umoddi3(unsigned long long n, unsigned long long d);
+
 #endif
 
 //==============================================================================

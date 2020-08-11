@@ -1,12 +1,12 @@
 /**
- * @file abs.c
+ * @file __udiv64.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-06-22
+ * @date 2020-08-10
  * 
  * @brief 
  * 
- * @copyright Copyright (C) 2019,
+ * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,7 +22,27 @@
 
 #include <stdlib.h>
 
-int abs(int x)
+uint64_t __udiv64(uint64_t num, uint64_t den)
 {
-    return x > 0 ? x : -x;
+    if ((den >> 32) == 0)
+    {
+        uint64_t b = 1ULL << 32;
+        uint32_t num_high = num >> 32;
+        uint32_t num_low = num;
+
+        return __divl(b * (num_high % den) + num_low, den) + b * num_high / den;
+    }
+
+    if (num < den)
+    {
+        return 0;
+    }
+
+    uint32_t den_high = den >> 32;
+
+    int s = __nlz(den_high);
+
+    uint64_t quot = __divl(num >> 1, (den << s) >> 32) >> (31 - s);
+
+    return num - (quot - 1) * den < den ? quot - 1 : quot;
 }

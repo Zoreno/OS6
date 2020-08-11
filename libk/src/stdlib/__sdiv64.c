@@ -1,12 +1,12 @@
 /**
- * @file abs.c
+ * @file __sdiv64.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-06-22
+ * @date 2020-08-10
  * 
  * @brief 
  * 
- * @copyright Copyright (C) 2019,
+ * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,7 +22,11 @@
 
 #include <stdlib.h>
 
-int abs(int x)
+int64_t __sdiv64(int64_t num, int64_t den)
 {
-    return x > 0 ? x : -x;
+    uint64_t num_abs = (uint64_t)(num >= 0 ? num : -num);
+    uint64_t den_abs = (uint64_t)(den >= 0 ? den : -den);
+    uint64_t quot_abs = __udiv64(num_abs, den_abs);
+
+    return (num < 0) == (den < 0) ? (int64_t)quot_abs : -(int64_t)quot_abs;
 }

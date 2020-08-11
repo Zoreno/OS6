@@ -1,12 +1,12 @@
 /**
- * @file abs.c
+ * @file llabs.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-06-22
+ * @date 2020-08-10
  * 
  * @brief 
  * 
- * @copyright Copyright (C) 2019,
+ * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,7 +22,7 @@
 
 #include <stdlib.h>
 
-int abs(int x)
+long long int llabs(long long int x)
 {
     return x > 0 ? x : -x;
 }
