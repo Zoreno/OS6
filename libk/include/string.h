@@ -75,18 +75,19 @@ size_t strnlen(const char *str, size_t maxlen);              // Done
 char *strpbrk(const char *str1, const char *str2);           // Done
 char *strrchr(const char *str, int c);                       // Done
 size_t strspn(const char *s, const char *accept);            // Done
+char *strstr(const char *str1, const char *str2);            // Done
 char *strtok_r(char *s, const char *delim, char **save_ptr); // Done
 char *strtok(char *str, const char *delim);                  // Done
 
 // Missing functions (Move to above in alphabetical order when implemented)
-char *strstr(const char *str1, const char *str2);
-char *strsep(char **stringp, const char *delim);
-int strcasecmp(const char *s1, const char *s2);
-int strncasecmp(const char *s1, const char *s2, size_t n);
-int strcasestr(const char *haystack_start, const char *needle_start);
-char *strfry(char *string);
-char *strndup(const char *str, size_t n);
-char *strchrnul(const char *str, int c_in);
-void swab(const void *bfrom, void *bto, size_t n);
+
+char *strsep(char **stringp, const char *delim); // TODO
+int strcasecmp(const char *s1, const char *s2); // TODO
+int strncasecmp(const char *s1, const char *s2, size_t n); // TODO
+int strcasestr(const char *haystack_start, const char *needle_start); // TODO
+char *strfry(char *string); // TODO
+char *strndup(const char *str, size_t n); // TODO
+char *strchrnul(const char *str, int c_in); // TODO
+void swab(const void *bfrom, void *bto, size_t n); // TODO
 
 #endif

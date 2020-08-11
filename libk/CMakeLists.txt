@@ -78,6 +78,7 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strpbrk.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strtok_r.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strtok.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strspn.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strstr.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strdup.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/string/strrchr.c)
 
