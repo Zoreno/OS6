@@ -25,6 +25,8 @@
 
 #include <__libk_common.h>
 
+#include <__locale.h>
+
 int isalnum(char c);
 int isalpha(char c);
 int iscntrl(char c);
@@ -42,6 +44,24 @@ char toupper(char c);
 
 int isascii(char c);
 char toascii(char c);
+
+int isalnum_l(char c, locale_t l);
+int isalpha_l(char c, locale_t l);
+int iscntrl_l(char c, locale_t l);
+int isgraph_l(char c, locale_t l);
+int isdigit_l(char c, locale_t l);
+int islower_l(char c, locale_t l);
+int isprint_l(char c, locale_t l);
+int ispunct_l(char c, locale_t l);
+int isspace_l(char c, locale_t l);
+int isupper_l(char c, locale_t l);
+int isxdigit_l(char c, locale_t l);
+
+char tolower_l(char c, locale_t l);
+char toupper_l(char c, locale_t l);
+
+int isascii_l(char c, locale_t l);
+char toascii_l(char c, locale_t l);
 
 #endif
 
