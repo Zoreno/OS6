@@ -27,6 +27,7 @@
 
 #include <_null.h>
 #include <_size_t.h>
+#include <stdint.h>
 
 #define EXIT_SUCCESS (0)
 #define EXIT_SUCCESS (1)
@@ -52,16 +53,21 @@ typedef struct
 } lldiv_t;
 
 double atof(const char *str);
-double strtod(const char *str, char **endptr);
+float atoff(const char *str); // TODO
 
 int atoi(const char *str);
 long int atol(const char *str);
 long long int atoll(const char *str);
 
+float strtof(const char *str, char **endptr); // TODO
+double strtod(const char *str, char **endptr); 
+long double strtold(const char *str, char **endptr); // TODO
 long int strtol(const char *str, char **endptr, int base);
 long long int strtoll(const char *str, char **endptr, int base);
 unsigned long int strtoul(const char *str, char **endptr, int base);
 unsigned long long int strtoull(const char *str, char **endptr, int base);
+intmax_t strtoimax(const char *str, char **endptr, int base); // TODO
+uintmax_t strtoumax(const char *str, char **endptr, int base); // TODO
 
 void itoa(int i, int base, char *buf);
 void ltoa(long int i, int base, char *buf);
@@ -79,10 +85,12 @@ void *realloc(void *ptr, size_t size) __attribute__((malloc));
 int abs(int x);
 long int labs(long int x);
 long long int llabs(long long int x);
+intmax_t imaxabs(intmax_t i); // TODO
 
 div_t div(int num, int den);
 ldiv_t ldiv(long int num, long int den);
 lldiv_t lldiv(long long int num, long long int den);
+intmax_t imaxdiv(intmax_t numer, intmax_t denom); // TODO
 
 int rand();
 int rand_range(int min, int max);
