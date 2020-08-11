@@ -22,6 +22,7 @@
 
 #include <stdlib.h>
 
+// This works because libk is statically linked to the kernel
 extern void *krealloc(void *ptr, size_t size);
 extern void *kmalloc(size_t size);
 
