@@ -1,8 +1,8 @@
 /**
- * @file iswalpha.c
+ * @file iswprint_l.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-10
+ * @date 2020-08-12
  * 
  * @brief 
  * 
@@ -21,9 +21,25 @@
  */
 
 #include <wctype.h>
+#include "__categories.h"
 
-int iswalpha(wint_t c)
+int iswprint_l(wint_t c, locale_t l)
 {
-    return iswalpha_l(c, 0);
-}
+    enum category cat = __category(c);
 
+    if (c == -1)
+    {
+        return 0;
+    }
+
+    switch(cat)
+    {
+    case CAT_Cc:
+    case CAT_Cf:
+    case CAT_Cs:
+        return 0;
+    default:
+        break;
+    }
+    return 1;
+}

@@ -1,8 +1,8 @@
 /**
- * @file iswalpha.c
+ * @file iswcntrl.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-10
+ * @date 2020-08-12
  * 
  * @brief 
  * 
@@ -22,8 +22,7 @@
 
 #include <wctype.h>
 
-int iswalpha(wint_t c)
+int iswcntrl(wint_t c)
 {
-    return iswalpha_l(c, 0);
+    return iswcntrl_l(c, 0);
 }
-

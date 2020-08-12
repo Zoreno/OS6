@@ -1,8 +1,8 @@
 /**
- * @file iswalpha.c
+ * @file iswblank_l.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-10
+ * @date 2020-08-12
  * 
  * @brief 
  * 
@@ -21,9 +21,24 @@
  */
 
 #include <wctype.h>
+#include "__categories.h"
 
-int iswalpha(wint_t c)
+int iswblank_l(wint_t c, locale_t l)
 {
-    return iswalpha_l(c, 0);
-}
+    enum category cat = __category(c);
 
+    switch(cat)
+    {
+    case CAT_Zs:
+        return 1;
+    default:
+        break;
+    }
+
+    if (c == '\t')
+    {
+        return 1;
+    }
+
+    return 0;
+}

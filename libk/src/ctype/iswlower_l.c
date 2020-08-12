@@ -1,8 +1,8 @@
 /**
- * @file iswalpha.c
+ * @file iswlower_l.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-10
+ * @date 2020-08-12
  * 
  * @brief 
  * 
@@ -21,9 +21,12 @@
  */
 
 #include <wctype.h>
+#include "__categories.h"
+#include <ctype.h>
 
-int iswalpha(wint_t c)
+int iswlower_l(wint_t c, locale_t l)
 {
-    return iswalpha_l(c, 0);
-}
+    enum category cat = __category(c);
 
+    return cat == CAT_Ll || (cat == CAT_LC && tolower(c) == c);
+}

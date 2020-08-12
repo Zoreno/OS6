@@ -1,8 +1,8 @@
 /**
- * @file iswalpha.c
+ * @file iswpunct_l.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-10
+ * @date 2020-08-12
  * 
  * @brief 
  * 
@@ -21,9 +21,29 @@
  */
 
 #include <wctype.h>
+#include "__categories.h"
 
-int iswalpha(wint_t c)
+int iswpunct_l(wint_t c, locale_t l)
 {
-    return iswalpha_l(c, 0);
-}
+    enum category cat = __category(c);
 
+    switch(cat)
+    {
+    case CAT_Pc:
+    case CAT_Pd:
+    case CAT_Pe:
+    case CAT_Pf:
+    case CAT_Pi:
+    case CAT_Po:
+    case CAT_Ps:
+    case CAT_Sm:
+    case CAT_Sc:
+    case CAT_Sk:
+    case CAT_So:
+    case CAT_No:
+        return 1;
+    default:
+        break;
+    }
+    return 0;
+}

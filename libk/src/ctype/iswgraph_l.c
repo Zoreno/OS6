@@ -1,8 +1,8 @@
 /**
- * @file iswalpha.c
+ * @file iswgraph_l.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-10
+ * @date 2020-08-12
  * 
  * @brief 
  * 
@@ -21,9 +21,28 @@
  */
 
 #include <wctype.h>
+#include "__categories.h"
 
-int iswalpha(wint_t c)
+int iswgraph_l(wint_t c, locale_t l)
 {
-    return iswalpha_l(c, 0);
-}
+    enum category cat = __category(c);
 
+    if (c == -1)
+    {
+        return 0;
+    }
+
+    switch(cat)
+    {
+    case CAT_Cc:
+    case CAT_Cf:
+    case CAT_Cs:
+    case CAT_Zs:
+    case CAT_Zl:
+    case CAT_Zp:
+        return 0;
+    default:
+        break;
+    }
+    return 1;
+}

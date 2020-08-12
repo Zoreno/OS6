@@ -1,8 +1,8 @@
 /**
- * @file iswalpha.c
+ * @file iswdigit_l.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-10
+ * @date 2020-08-12
  * 
  * @brief 
  * 
@@ -21,9 +21,19 @@
  */
 
 #include <wctype.h>
+#include "__categories.h"
 
-int iswalpha(wint_t c)
+int iswdigit_l(wint_t c, locale_t l)
 {
-    return iswalpha_l(c, 0);
-}
+    if (c > (wint_t) '9')
+    {
+        return 0;
+    }
 
+    if (c < (wint_t) '0')
+    {
+        return 0;
+    }
+
+    return 1;
+}

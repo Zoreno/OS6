@@ -1,8 +1,8 @@
 /**
- * @file iswalpha.c
+ * @file iswxdigit_l.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-10
+ * @date 2020-08-12
  * 
  * @brief 
  * 
@@ -21,9 +21,13 @@
  */
 
 #include <wctype.h>
+#include "__categories.h"
 
-int iswalpha(wint_t c)
+int iswxdigit_l(wint_t c, locale_t l)
 {
-    return iswalpha_l(c, 0);
-}
+    enum category cat = __category(c);
 
+    return ((c >= (wint_t)'0' && c <= (wint_t)'9') ||
+	        (c >= (wint_t)'a' && c <= (wint_t)'f') ||
+	        (c >= (wint_t)'A' && c <= (wint_t)'F'));
+}

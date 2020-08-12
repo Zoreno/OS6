@@ -1,12 +1,12 @@
 /**
- * @file iswalpha.c
+ * @file iswctype.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-10
+ * @date 2019-04-27
  * 
  * @brief 
  * 
- * @copyright Copyright (C) 2020,
+ * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,10 +20,9 @@
  * 
  */
 
-#include <wctype.h>
+#include <ctype.h>
 
-int iswalpha(wint_t c)
+char iswctype(wint_t c, wctype_t type)
 {
-    return iswalpha_l(c, 0);
+    return iswctype_l(c, type, 0);
 }
-
