@@ -11,7 +11,8 @@ project(libstdc++test)
 include(cmake/compiler.cmake)
 include(cmake/utest.cmake)
 
-declare_test(integral_constant type_traits/test_integral_constant.cpp)
+declare_test(type_traits_integral_constant type_traits/test_integral_constant.cpp)
+declare_test(type_traits_is_void type_traits/test_is_void.cpp)
 
 #==============================================================================
 # End of file
