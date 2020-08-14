@@ -43,7 +43,7 @@ namespace OS6STD
 
 // TODO: This should be dynamically determined
 using size_t = unsigned long;
-using ptrdiff_t = signed long long int;
+using ptrdiff_t = signed long int;
 using nullptr_t = decltype(nullptr);
 
 } // namespace OS6STD
