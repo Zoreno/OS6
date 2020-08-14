@@ -1,9 +1,11 @@
+BasedOnStyle: Google
+
 UseTab: Never
 IndentWidth: 4
 BreakBeforeBraces: Allman
 AllowShortIfStatementsOnASingleLine: false
 IndentCaseLabels: false
 ColumnLimit: 0
-NamespaceIndentation: Never
+NamespaceIndentation: None
 AccessModifierOffset: -4
 PointerAlignment: Left
