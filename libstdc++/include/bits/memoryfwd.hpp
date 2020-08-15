@@ -39,7 +39,7 @@ class allocator<void>;
 
 template <typename, typename>
 struct uses_allocator;
-} // namespace OS6STD
+}  // namespace OS6STD
 
 OS6STD_END_SYSTEM_HEADER
 

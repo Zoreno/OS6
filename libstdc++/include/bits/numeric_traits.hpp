@@ -34,7 +34,6 @@ OS6STD_BEGIN_SYSTEM_HEADER
 
 namespace OS6STD
 {
-
 #define __signed(_Tp) ((_Tp)(-1) < 0)
 #define __digits(_Tp) (sizeof(_Tp) * __CHAR_BIT__ - __signed(_Tp))
 #define __min(_Tp) (__signed(_Tp) ? (_Tp)1 << __digits(_Tp) : (_Tp)0)
@@ -116,7 +115,7 @@ struct __numeric_traits
 #undef __digits10
 #undef __max_exponent10
 
-} // namespace OS6STD
+}  // namespace OS6STD
 
 OS6STD_END_SYSTEM_HEADER
 

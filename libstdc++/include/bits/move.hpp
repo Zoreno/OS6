@@ -31,20 +31,18 @@ OS6STD_BEGIN_SYSTEM_HEADER
 
 namespace OS6STD
 {
-
 template <typename _T>
 inline constexpr _T *__addressof(_T &__r) noexcept
 {
     return __builtin_addressof(__r);
 }
 
-} // namespace OS6STD
+}  // namespace OS6STD
 
 #include <type_traits>
 
 namespace OS6STD
 {
-
 template <typename _T>
 constexpr _T &&forward(typename std::remove_reference<_T>::type &__t) noexcept
 {
@@ -106,7 +104,6 @@ swap(_Tp &__a, _Tp &__b) noexcept(__and_<is_nothrow_move_constructible<_Tp>,
                                          is_nothrow_move_assignable<_Tp>>::value)
 
 {
-
     _Tp __tmp = std::move(__a);
     __a = std::move(__b);
     __b = std::move(__tmp);
@@ -121,7 +118,7 @@ inline
         swap(__a[__n], __b[__n]);
 }
 
-} // namespace OS6STD
+}  // namespace OS6STD
 
 OS6STD_END_SYSTEM_HEADER
 

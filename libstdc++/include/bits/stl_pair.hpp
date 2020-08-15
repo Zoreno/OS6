@@ -31,7 +31,6 @@ OS6STD_BEGIN_SYSTEM_HEADER
 
 namespace OS6STD
 {
-
 struct piecewise_construct_t
 {
     explicit piecewise_construct_t() = default;
@@ -177,7 +176,9 @@ struct pair : private __pair_base
                                                 __is_implicitly_default_constructible<_U2>>>>::value,
                                  bool>::type = false>
     explicit constexpr pair()
-        : first(), second() {}
+        : first(), second()
+    {
+    }
 
     using _PCCP = _PCC<true, _T1, _T2>;
 
@@ -185,13 +186,17 @@ struct pair : private __pair_base
               typename _U2 = _T2,
               typename enable_if<_PCCP::template _ConstructiblePair<_U1, _U2>() && _PCCP::template _ImplicitlyConvertiblePair<_U1, _U2>(), bool>::type = true>
     constexpr pair(const _T1 &__a, const _T2 &__b)
-        : first(__a), second(__b) {}
+        : first(__a), second(__b)
+    {
+    }
 
     template <typename _U1 = _T1,
               typename _U2 = _T2,
               typename enable_if<_PCCP::template _ConstructiblePair<_U1, _U2>() && !_PCCP::template _ImplicitlyConvertiblePair<_U1, _U2>(), bool>::type = false>
     explicit constexpr pair(const _T1 &__a, const _T2 &__b)
-        : first(__a), second(__b) {}
+        : first(__a), second(__b)
+    {
+    }
 
     template <typename _U1,
               typename _U2>
@@ -202,13 +207,17 @@ struct pair : private __pair_base
               typename _U2,
               typename enable_if<_PCCFP<_U1, _U2>::template _ConstructiblePair<_U1, _U2>() && _PCCFP<_U1, _U2>::template _ImplicitlyConvertiblePair<_U1, _U2>(), bool>::type = true>
     constexpr pair(const pair<_U1, _U2> &__p)
-        : first(__p.first), second(__p.second) {}
+        : first(__p.first), second(__p.second)
+    {
+    }
 
     template <typename _U1,
               typename _U2,
               typename enable_if<_PCCFP<_U1, _U2>::template _ConstructiblePair<_U1, _U2>() && !_PCCFP<_U1, _U2>::template _ImplicitlyConvertiblePair<_U1, _U2>(), bool>::type = false>
     explicit constexpr pair(const pair<_U1, _U2> &__p)
-        : first(__p.first), second(__p.second) {}
+        : first(__p.first), second(__p.second)
+    {
+    }
 
     constexpr pair(const pair &) = default;
     constexpr pair(pair &&) = default;
@@ -217,51 +226,67 @@ struct pair : private __pair_base
               typename enable_if<_PCCP::template _MoveCopyPair<true, _U1, _T2>(),
                                  bool>::type = true>
     constexpr pair(_U1 &&__x, const _T2 &__y)
-        : first(std::forward<_U1>(__x)), second(__y) {}
+        : first(std::forward<_U1>(__x)), second(__y)
+    {
+    }
 
     template <typename _U1,
               typename enable_if<_PCCP::template _MoveCopyPair<false, _U1, _T2>(),
                                  bool>::type = false>
     explicit constexpr pair(_U1 &&__x, const _T2 &__y)
-        : first(std::forward<_U1>(__x)), second(__y) {}
+        : first(std::forward<_U1>(__x)), second(__y)
+    {
+    }
 
     template <typename _U2,
               typename enable_if<_PCCP::template _CopyMovePair<true, _T1, _U2>(),
                                  bool>::type = true>
     constexpr pair(const _T1 &__x, _U2 &&__y)
-        : first(__x), second(std::forward<_U2>(__y)) {}
+        : first(__x), second(std::forward<_U2>(__y))
+    {
+    }
 
     template <typename _U2,
               typename enable_if<_PCCP::template _CopyMovePair<false, _T1, _U2>(),
                                  bool>::type = false>
     explicit pair(const _T1 &__x, _U2 &&__y)
-        : first(__x), second(std::forward<_U2>(__y)) {}
+        : first(__x), second(std::forward<_U2>(__y))
+    {
+    }
 
     template <typename _U1,
               typename _U2,
               typename enable_if<_PCCP::template _MoveConstructiblePair<_U1, _U2>() && _PCCP::template _ImplicitlyMoveConvertiblePair<_U1, _U2>(), bool>::type = true>
     constexpr pair(_U1 &&__x, _U2 &&__y)
-        : first(std::forward<_U1>(__x)), second(std::forward<_U2>(__y)) {}
+        : first(std::forward<_U1>(__x)), second(std::forward<_U2>(__y))
+    {
+    }
 
     template <typename _U1,
               typename _U2,
               typename enable_if<_PCCP::template _MoveConstructiblePair<_U1, _U2>() && !_PCCP::template _ImplicitlyMoveConvertiblePair<_U1, _U2>(), bool>::type = false>
     explicit constexpr pair(_U1 &&__x, _U2 &&__y)
-        : first(std::forward<_U1>(__x)), second(std::forward<_U2>(__y)) {}
+        : first(std::forward<_U1>(__x)), second(std::forward<_U2>(__y))
+    {
+    }
 
     template <typename _U1,
               typename _U2,
               typename enable_if<_PCCFP<_U1, _U2>::template _MoveConstructiblePair<_U1, _U2>() && _PCCFP<_U1, _U2>::template _ImplicitlyMoveConvertiblePair<_U1, _U2>(), bool>::type = true>
     constexpr pair(pair<_U1, _U2> &&__p)
         : first(std::forward<_U1>(__p.first)),
-          second(std::forward<_U2>(__p.second)) {}
+          second(std::forward<_U2>(__p.second))
+    {
+    }
 
     template <typename _U1,
               typename _U2,
               typename enable_if<_PCCFP<_U1, _U2>::template _MoveConstructiblePair<_U1, _U2>() && !_PCCFP<_U1, _U2>::template _ImplicitlyMoveConvertiblePair<_U1, _U2>(), bool>::type = false>
     explicit constexpr pair(pair<_U1, _U2> &&__p)
         : first(std::forward<_U1>(__p.first)),
-          second(std::forward<_U2>(__p.second)) {}
+          second(std::forward<_U2>(__p.second))
+    {
+    }
 
     template <typename... _Args1,
               typename... _Args2>
@@ -392,7 +417,7 @@ make_pair(_T1 &&__x, _T2 &&__y)
     return __pair_type(std::forward<_T1>(__x), std::forward<_T2>(__y));
 }
 
-} // namespace OS6STD
+}  // namespace OS6STD
 
 OS6STD_END_SYSTEM_HEADER
 

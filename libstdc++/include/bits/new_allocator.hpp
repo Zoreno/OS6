@@ -134,7 +134,7 @@ operator!=(const new_allocator<_T> &, const new_allocator<_T> &)
     return false;
 }
 
-} // namespace OS6STD
+}  // namespace OS6STD
 
 OS6STD_END_SYSTEM_HEADER
 

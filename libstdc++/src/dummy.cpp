@@ -5,6 +5,8 @@
 
 #include <bit>
 
+#include <bits/stl_heap.hpp>
+
 void f()
 {
     int i = 0;

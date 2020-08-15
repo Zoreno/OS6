@@ -34,19 +34,17 @@
 #define OS6STD_BEGIN_SYSTEM_HEADER \
     extern "C++"                   \
     {
-
 #define OS6STD_END_SYSTEM_HEADER \
     }
 
 namespace OS6STD
 {
-
 // TODO: This should be dynamically determined
 using size_t = unsigned long;
 using ptrdiff_t = signed long int;
 using nullptr_t = decltype(nullptr);
 
-} // namespace OS6STD
+}  // namespace OS6STD
 
 #endif
 

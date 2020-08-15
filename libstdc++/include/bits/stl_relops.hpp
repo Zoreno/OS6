@@ -57,8 +57,8 @@ inline bool operator>=(const _T &__x, const _T &__y)
     return !(__x < __y);
 }
 
-} // namespace rel_ops
-} // namespace OS6STD
+}  // namespace rel_ops
+}  // namespace OS6STD
 
 OS6STD_END_SYSTEM_HEADER
 

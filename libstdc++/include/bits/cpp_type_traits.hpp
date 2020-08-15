@@ -31,7 +31,6 @@ OS6STD_BEGIN_SYSTEM_HEADER
 
 namespace OS6STD
 {
-
 struct __true_type
 {
 };
@@ -391,7 +390,7 @@ struct __is_byte<byte>
     };
     typedef __true_type __type;
 };
-#endif // C++17
+#endif  // C++17
 
 template <typename _T>
 struct __is_move_iterator
@@ -409,7 +408,7 @@ inline _Iterator __miter_base(_Iterator __it)
     return __it;
 }
 
-} // namespace OS6STD
+}  // namespace OS6STD
 
 OS6STD_END_SYSTEM_HEADER
 

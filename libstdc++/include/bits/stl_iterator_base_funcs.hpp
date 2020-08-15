@@ -31,8 +31,11 @@ OS6STD_BEGIN_SYSTEM_HEADER
 
 namespace OS6STD
 {
-template <typename> struct _List_iterator;
-template <typename> struct _List_const_iterator;
+template <typename>
+struct _List_iterator;
+
+template <typename>
+struct _List_const_iterator;
 
 //=============================================================================
 // std::distance
@@ -40,9 +43,10 @@ template <typename> struct _List_const_iterator;
 
 template <typename _InputIterator>
 inline constexpr
-typename iterator_traits<_InputIterator>::difference_type
-__distance(_InputIterator __first, __InputIterator __last,
-    input_iterator_tag)
+    typename iterator_traits<_InputIterator>::difference_type
+    __distance(_InputIterator __first,
+               _InputIterator __last,
+               input_iterator_tag)
 {
     typename iterator_traits<_InputIterator>::difference_type __n = 0;
 
@@ -56,10 +60,10 @@ __distance(_InputIterator __first, __InputIterator __last,
 }
 
 template <typename _RandomAccessIterator>
-inline constexpr
-typename iterator_traits<_RandomAccessIterator>::difference_type
-__distance(_RandomAccessIterator __first, __RandomAccessIterator __last,
-    random_access_iterator_tag)
+inline constexpr typename iterator_traits<_RandomAccessIterator>::difference_type
+__distance(_RandomAccessIterator __first,
+           _RandomAccessIterator __last,
+           random_access_iterator_tag)
 {
     typename iterator_traits<_RandomAccessIterator>::difference_type __n = 0;
 
@@ -68,55 +72,58 @@ __distance(_RandomAccessIterator __first, __RandomAccessIterator __last,
     return __n;
 }
 
-template <typename __InputIterator>
-inline
-typename iterator_traits<__InputIterator>::difference_type
-distance(__InputIterator __first, __InputIterator __last)
+template <typename _InputIterator>
+inline typename iterator_traits<_InputIterator>::difference_type
+distance(_InputIterator __first,
+         _InputIterator __last)
 {
     return std::__distance(__first, __last,
-        std::__iterator_category(__first));
+                           std::__iterator_category(__first));
 }
 
 //=============================================================================
 // std::advance
 //=============================================================================
 
-template<typename _InputIterator, typename _Distance>
-inline constexpr void
-__advance(_InputIterator& __i, _Distance __n, 
-    input_iterator_tag)
+template <typename _InputIterator,
+          typename _Distance>
+inline constexpr void _advance(_InputIterator& __i,
+                               _Distance __n,
+                               input_iterator_tag)
 {
     while (__n--)
     {
-	    ++__i;
+        ++__i;
     }
 }
 
-template<typename _BidirectionalIterator, typename _Distance>
-inline constexpr void
-__advance(_BidirectionalIterator& __i, _Distance __n,
-	bidirectional_iterator_tag)
+template <typename _BidirectionalIterator,
+          typename _Distance>
+inline constexpr void __advance(_BidirectionalIterator& __i,
+                                _Distance __n,
+                                bidirectional_iterator_tag)
 {
     if (__n > 0)
     {
         while (__n--)
         {
-	        ++__i;
+            ++__i;
         }
     }
     else
     {
         while (__n++)
         {
-	        --__i;
+            --__i;
         }
     }
 }
 
-template<typename _RandomAccessIterator, typename _Distance>
-inline constexpr void
-__advance(_RandomAccessIterator& __i, _Distance __n,
-    random_access_iterator_tag)
+template <typename _RandomAccessIterator,
+          typename _Distance>
+inline constexpr void __advance(_RandomAccessIterator& __i,
+                                _Distance __n,
+                                random_access_iterator_tag)
 {
     if (__builtin_constant_p(__n) && __n == 1)
     {
@@ -124,22 +131,23 @@ __advance(_RandomAccessIterator& __i, _Distance __n,
     }
     else if (__builtin_constant_p(__n) && __n == -1)
     {
-	    --__i;
+        --__i;
     }
     else
     {
-	    __i += __n;
+        __i += __n;
     }
 }
 
-template<typename _InputIterator, typename _Distance>
-inline void
-advance(_InputIterator& __i, _Distance __n)
+template <typename _InputIterator,
+          typename _Distance>
+inline void advance(_InputIterator& __i,
+                    _Distance __n)
 {
     typename iterator_traits<_InputIterator>::difference_type __d = __n;
 
-    std::__advance(__i, __d, 
-        std::__iterator_category(__i));
+    std::__advance(__i, __d,
+                   std::__iterator_category(__i));
 }
 
 //=============================================================================
@@ -147,9 +155,8 @@ advance(_InputIterator& __i, _Distance __n)
 //=============================================================================
 
 template <typename _InputIterator>
-inline _InputIterator
-next(_InputIterator __x,
-   typename iterator_traits<_InputIterator>::difference_types __n = 1)
+inline _InputIterator next(_InputIterator __x,
+                           typename iterator_traits<_InputIterator>::difference_types __n = 1)
 {
     std::advance(__x, __n);
     return __x;
@@ -160,15 +167,14 @@ next(_InputIterator __x,
 //=============================================================================
 
 template <typename _BidirectionalIterator>
-inline _BidirectionalIterator
-next(_BidirectionalIterator __x,
-   typename iterator_traits<_BidirectionalIterator>::difference_types __n = 1)
+inline _BidirectionalIterator prev(_BidirectionalIterator __x,
+                                   typename iterator_traits<_BidirectionalIterator>::difference_types __n = 1)
 {
     std::advance(__x, -__n);
     return __x;
 }
 
-} // namespace OS6STD
+}  // namespace OS6STD
 
 OS6STD_END_SYSTEM_HEADER
 

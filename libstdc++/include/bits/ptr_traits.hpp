@@ -33,7 +33,6 @@ OS6STD_BEGIN_SYSTEM_HEADER
 
 namespace OS6STD
 {
-
 class __undefined;
 
 template <typename _T>
@@ -143,7 +142,7 @@ __to_address(const _Ptr &__ptr)
     return std::__to_address(__ptr.operator->());
 }
 
-} // namespace OS6STD
+}  // namespace OS6STD
 
 OS6STD_END_SYSTEM_HEADER
 

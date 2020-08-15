@@ -33,7 +33,6 @@ OS6STD_BEGIN_SYSTEM_HEADER
 
 namespace OS6STD
 {
-
 /**
  * @brief Marking for input iterators
  * 
@@ -159,7 +158,7 @@ template <typename _InIter>
 using _RequireInputIter = typename enable_if<is_convertible<typename iterator_traits<_InIter>::iterator_category,
                                                             input_iterator_tag>::value>::type;
 
-} // namespace OS6STD
+}  // namespace OS6STD
 
 OS6STD_END_SYSTEM_HEADER
 

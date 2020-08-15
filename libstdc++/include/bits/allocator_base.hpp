@@ -33,7 +33,7 @@ namespace OS6STD
 {
 template <typename _T>
 using __allocator_base = new_allocator<_T>;
-} // namespace OS6STD
+}  // namespace OS6STD
 
 OS6STD_END_SYSTEM_HEADER
 

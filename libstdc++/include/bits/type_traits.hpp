@@ -31,7 +31,6 @@ OS6STD_BEGIN_SYSTEM_HEADER
 
 namespace OS6STD
 {
-
 template <bool, typename>
 struct __enable_if
 {
@@ -239,7 +238,7 @@ struct __promote_4
     typedef __typeof__(_T2() + _U2() + _V2() + _W2()) __type;
 };
 
-} // namespace OS6STD
+}  // namespace OS6STD
 
 OS6STD_END_SYSTEM_HEADER
 

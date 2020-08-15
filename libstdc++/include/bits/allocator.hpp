@@ -34,7 +34,6 @@ OS6STD_BEGIN_SYSTEM_HEADER
 
 namespace OS6STD
 {
-
 template <>
 class allocator<void>
 {
@@ -139,7 +138,9 @@ class allocator<const _T>
 public:
     typedef _T value_type;
     template <typename _U>
-    allocator(const allocator<_U> &) {}
+    allocator(const allocator<_U> &)
+    {
+    }
 };
 
 template <typename _T>
@@ -148,7 +149,9 @@ class allocator<volatile _T>
 public:
     typedef _T value_type;
     template <typename _U>
-    allocator(const allocator<_U> &) {}
+    allocator(const allocator<_U> &)
+    {
+    }
 };
 
 template <typename _T>
@@ -157,7 +160,9 @@ class allocator<const volatile _T>
 public:
     typedef _T value_type;
     template <typename _U>
-    allocator(const allocator<_U> &) {}
+    allocator(const allocator<_U> &)
+    {
+    }
 };
 
 template <typename _Alloc, bool = __is_empty(_Alloc)>
@@ -214,7 +219,7 @@ struct __shrink_to_fit_aux<_Tp, true>
     }
 };
 
-} // namespace OS6STD
+}  // namespace OS6STD
 
 OS6STD_END_SYSTEM_HEADER
 

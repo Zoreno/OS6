@@ -31,7 +31,6 @@ OS6STD_BEGIN_SYSTEM_HEADER
 
 namespace OS6STD
 {
-
 //=============================================================================
 // Integral constant
 //=============================================================================
@@ -2899,7 +2898,7 @@ struct __do_is_nothrow_swappable_impl
     static false_type __test(...);
 };
 
-} // namespace __swappable_details
+}  // namespace __swappable_details
 
 template <typename _T>
 struct __is_swappable_impl
@@ -2965,15 +2964,14 @@ struct __do_is_nothrow_swappable_with_impl
 {
     template <typename _T, typename _U>
     static __bool_constant<
-        noexcept(swap(std::declval<_T>(), std::declval<_U>())) &&
-        noexcept(swap(std::declval<_U>(), std::declval<_T>()))>
+        noexcept(swap(std::declval<_T>(), std::declval<_U>())) &&noexcept(swap(std::declval<_U>(), std::declval<_T>()))>
     __test(int);
 
     template <typename, typename>
     static false_type __test(...);
 };
 
-} // namespace __swappable_with_details
+}  // namespace __swappable_with_details
 
 template <typename _T, typename _U>
 struct __is_swappable_with_impl
@@ -3393,7 +3391,7 @@ inline constexpr bool is_base_of_v = is_base_of<_Base, _Derived>::value;
 template <typename _From, typename _To>
 inline constexpr bool is_convertible_v = is_convertible<_From, _To>::value;
 
-} // namespace OS6STD
+}  // namespace OS6STD
 
 OS6STD_END_SYSTEM_HEADER
 
