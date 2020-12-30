@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 
-static void ls_command_format_permissions(uint32_t permissions, char *buffer)
+static void ls_command_format_permissions(uint32_t permissions, char* buffer)
 {
     sprintf(buffer, "%c%c%c%c%c%c%c%c%c",
             permissions & S_IRUSR ? 'r' : '-',
@@ -43,7 +43,7 @@ static void ls_command_format_permissions(uint32_t permissions, char *buffer)
             permissions & S_IXOTH ? 'x' : '-');
 }
 
-static void ls_command_format_size(int human_readable, size_t size, char *buffer)
+static void ls_command_format_size(int human_readable, size_t size, char* buffer)
 {
     if (human_readable)
     {
@@ -66,7 +66,7 @@ static void ls_command_format_size(int human_readable, size_t size, char *buffer
     sprintf(buffer, "%d", (int)size);
 }
 
-int ls_command(int argc, const char **argv)
+int ls_command(int argc, const char** argv)
 {
     int fd = syscall_open(simple_cli_get_working_directory(), O_DIRECTORY, O_RDONLY);
 
@@ -131,3 +131,7 @@ int ls_command(int argc, const char **argv)
 
     return 0;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

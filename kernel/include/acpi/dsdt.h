@@ -1,8 +1,8 @@
 /**
- * @file test_command.c
+ * @file dsdt.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-09
+ * @date 2020-12-29
  * 
  * @brief 
  * 
@@ -20,17 +20,31 @@
  * 
  */
 
-#include <simple_cli/commands.h>
+#ifndef _ACPI_DSDT_H
+#define _ACPI_DSDT_H
 
-#include <stdio.h>
+#include <stdint.h>
 
-int test_command(int argc, const char** argv)
+#include "acpi_header.h"
+
+/**
+* Differentiated System Description Table.
+* 
+* Signature must be "DSDT"
+*/
+typedef struct
 {
-    printf("Test command\n");
+    /**
+	* ACPI standard header.
+	*/
+    acpi_header_t header;
 
-    return 0;
-}
+    /**
+	* First byte of definition block.
+	* 
+	* Size can be calculated from length in header.
+	*/
+    uint8_t definition_block[1];
+} __attribute__((packed)) dsdt_t;
 
-//=============================================================================
-// End of file
-//=============================================================================
+#endif

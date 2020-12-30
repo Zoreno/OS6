@@ -20,34 +20,36 @@
  * 
  */
 
+#include <acpi/acpi.h>
+
 #include <debug/debug_terminal.h>
 
 #include <boot/multiboot2.h>
 
 #include <arch/arch.h>
 
-#include <mm/phys_mem.h>
-#include <mm/memory_info.h>
-#include <mm/virt_mem.h>
 #include <mm/kheap.h>
+#include <mm/memory_info.h>
+#include <mm/phys_mem.h>
+#include <mm/virt_mem.h>
 
 #include <serial/serial.h>
 
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <util/list.h>
 #include <util/tree.h>
 
-#include <drivers/ide.h>
 #include <drivers/blockdev.h>
-#include <drivers/vbe.h>
+#include <drivers/ide.h>
 #include <drivers/keyboard_ps2.h>
 #include <drivers/mouse_ps2.h>
+#include <drivers/vbe.h>
 
-#include <vfs/vfs.h>
 #include <vfs/ext2.h>
+#include <vfs/vfs.h>
 
 #include <cmos/cmos_rtc.h>
 
@@ -70,8 +72,8 @@
 
 #include <syscall/syscall.h>
 
-#include <process/process.h>
 #include <process/launch_program.h>
+#include <process/process.h>
 
 #include <util/json.h>
 
@@ -233,14 +235,14 @@ extern void run_unit_tests();
 
 // https://www.gnu.org/software/grub/manual/multiboot2/html_node/kernel_002ec.html
 
-extern void *__kernel_start;
-extern void *__kernel_end;
+extern void* __kernel_start;
+extern void* __kernel_end;
 
 // TODO: Move to separate file
-void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
+void parse_multiboot(unsigned char* mb_ptr, memory_info_t* mem_info)
 {
 
-    struct multiboot_start_tag *start_tag = (struct multiboot_start_tag *)mb_ptr;
+    struct multiboot_start_tag* start_tag = (struct multiboot_start_tag*)mb_ptr;
 
     uint32_t mb_size = start_tag->total_size;
 
@@ -252,33 +254,33 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
 
     while (!end_found)
     {
-        struct multiboot_tag *tag = (struct multiboot_tag *)mb_ptr;
+        struct multiboot_tag* tag = (struct multiboot_tag*)mb_ptr;
 
         switch (tag->type)
         {
         case MULTIBOOT_TAG_TYPE_CMDLINE:
         {
-            struct multiboot_tag_string *cmdline = (struct multiboot_tag_string *)tag;
+            struct multiboot_tag_string* cmdline = (struct multiboot_tag_string*)tag;
             printf("[Command line] \"%s\"\n", cmdline->string);
         }
         break;
 
         case MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME:
         {
-            struct multiboot_tag_string *boot_loader = (struct multiboot_tag_string *)tag;
+            struct multiboot_tag_string* boot_loader = (struct multiboot_tag_string*)tag;
             printf("[Boot loader name] \"%s\"\n", boot_loader->string);
         }
         break;
         case MULTIBOOT_TAG_TYPE_BASIC_MEMINFO:
         {
-            struct multiboot_tag_basic_meminfo *basic_mem =
-                (struct multiboot_tag_basic_meminfo *)tag;
+            struct multiboot_tag_basic_meminfo* basic_mem =
+                (struct multiboot_tag_basic_meminfo*)tag;
             printf("[Basic memory] lower: %i upper: %i\n", basic_mem->mem_lower, basic_mem->mem_upper);
         }
         break;
         case MULTIBOOT_TAG_TYPE_BOOTDEV:
         {
-            struct multiboot_tag_bootdev *bootdev = (struct multiboot_tag_bootdev *)tag;
+            struct multiboot_tag_bootdev* bootdev = (struct multiboot_tag_bootdev*)tag;
 
             printf("[Bootdev] biosdev: %i, partition: %i, sub_partition: %i\n",
                    bootdev->biosdev, bootdev->slice, bootdev->part);
@@ -286,7 +288,7 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
         break;
         case MULTIBOOT_TAG_TYPE_MMAP:
         {
-            struct multiboot_tag_mmap *mmap = (struct multiboot_tag_mmap *)tag;
+            struct multiboot_tag_mmap* mmap = (struct multiboot_tag_mmap*)tag;
 
             int count = mmap->size / mmap->entry_size;
 
@@ -313,7 +315,7 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
         break;
         case MULTIBOOT_TAG_TYPE_LOAD_BASE_ADDR:
         {
-            struct multiboot_tag_load_base_addr *lba = (struct multiboot_tag_load_base_addr *)tag;
+            struct multiboot_tag_load_base_addr* lba = (struct multiboot_tag_load_base_addr*)tag;
 
             printf("[Load Base Address] addr: %#08x\n", lba->load_base_addr);
         }
@@ -325,7 +327,7 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
         break;
         case MULTIBOOT_TAG_TYPE_ELF_SECTIONS:
         {
-            struct multiboot_tag_elf_sections *elf_sections = (struct multiboot_tag_elf_sections *)tag;
+            struct multiboot_tag_elf_sections* elf_sections = (struct multiboot_tag_elf_sections*)tag;
 
             init_kernel_symbol_context(elf_sections, mem_info);
         }
@@ -366,14 +368,12 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
     mem_info->kernel_size = mem_info->kernel_end - mem_info->kernel_load_addr;
 }
 
-
-void mouse_moved_handler(mouse_moved_event_t *event)
+void mouse_moved_handler(mouse_moved_event_t* event)
 {
     static int i = 0;
 
     printf("Mouse moved [%i]: %i, %i\n", i++, (int64_t)event->x, (int64_t)event->y);
 }
-
 
 spinlock_t print_lock;
 
@@ -399,9 +399,11 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     memset(&mem_info, 0, sizeof(mem_info));
 
-    parse_multiboot((unsigned char *)rbx, &mem_info);
+    parse_multiboot((unsigned char*)rbx, &mem_info);
 
     printf("Kernel end: %#016x\n", mem_info.kernel_end);
+
+    acpi_init();
 
     phys_mem_init(&mem_info);
 

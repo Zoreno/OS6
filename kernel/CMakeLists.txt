@@ -42,6 +42,7 @@ target_link_libraries(${KERNEL_EXEC} PRIVATE ${LIBSIMD})
 #==============================================================================
 
 # TODO: Sort all of these
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/acpi/acpi.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/boot/boot.asm)
 
@@ -169,6 +170,7 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/mkdir_co
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/pwd_command.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/rm_command.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/test_command.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/exit_command.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
 

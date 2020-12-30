@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 
-int cd_command(int argc, const char **argv)
+int cd_command(int argc, const char** argv)
 {
     if (argc != 2)
     {
@@ -34,5 +34,9 @@ int cd_command(int argc, const char **argv)
         return -1;
     }
 
-    return syscall_chdir((char *)argv[1]);
+    return syscall_chdir((char*)argv[1]);
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

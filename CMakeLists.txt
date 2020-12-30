@@ -252,6 +252,7 @@ set(QEMU_FLAGS)
 #set(QEMU_FLAGS ${QEMU_FLAGS} --trace events=/tmp/events)
 
 set(QEMU_FLAGS ${QEMU_FLAGS} -cpu Nehalem)
+#set(QEMU_FLAGS ${QEMU_FLAGS} -enable-kvm -cpu host)
 
 # Set memory flags
 set(QEMU_FLAGS ${QEMU_FLAGS} -m 512M)
@@ -273,6 +274,12 @@ set(QEMU_FLAGS ${QEMU_FLAGS} -serial stdio)
 
 # Set display settings
 set(QEMU_FLAGS ${QEMU_FLAGS} -vga std)
+
+# Set ACPI flags
+#set(QEMU_FLAGS ${QEMU_FLAGS} -no-acpi)
+
+# Set bios
+# set(QEMU_FLAGS ${QEMU_FLAGS} -bios ${CMAKE_SOURCE_DIR}/../seabios/out/bios.bin)
 
 #Set storage devices
 set(QEMU_FLAGS ${QEMU_FLAGS} -drive file=${HDD_NAME},format=raw -cdrom ${ISO_IMAGE})

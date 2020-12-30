@@ -1,8 +1,8 @@
 /**
- * @file test_command.c
+ * @file exit_command.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-09
+ * @date 2020-12-30
  * 
  * @brief 
  * 
@@ -22,13 +22,14 @@
 
 #include <simple_cli/commands.h>
 
-#include <stdio.h>
+#include <acpi/acpi.h>
 
-int test_command(int argc, const char** argv)
+int exit_command(int argc, const char** argv)
 {
-    printf("Test command\n");
+    acpi_power_off();
 
-    return 0;
+    // acpi_power_off() should never return.
+    return -1;
 }
 
 //=============================================================================

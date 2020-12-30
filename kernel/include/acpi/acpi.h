@@ -1,8 +1,8 @@
 /**
- * @file test_command.c
+ * @file acpi.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-09
+ * @date 2020-12-29
  * 
  * @brief 
  * 
@@ -20,17 +20,32 @@
  * 
  */
 
-#include <simple_cli/commands.h>
+#ifndef _ACPI_H
+#define _ACPI_H
 
-#include <stdio.h>
+#include <stdint.h>
 
-int test_command(int argc, const char** argv)
-{
-    printf("Test command\n");
+/**
+ * @brief Initiate the ACPI subsystem
+ * 
+ * 
+ * @return 0 if successful
+ */
+int acpi_init();
 
-    return 0;
-}
+/**
+ * @brief Shuts down the computer
+ * 
+ * 
+ */
+void acpi_power_off();
 
-//=============================================================================
-// End of file
-//=============================================================================
+/**
+ * @brief Get the CMOS Century register
+ * 
+ * 
+ * @return CMOS address of the century register.
+ */
+uint8_t acpi_get_century_register();
+
+#endif

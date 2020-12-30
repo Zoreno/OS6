@@ -4,10 +4,10 @@
 
 #include <stdio.h>
 
-static int rm_command_remove_item(int recursive, const char *path);
-static int rm_command_remove_directory(int recursive, const char *dir);
+static int rm_command_remove_item(int recursive, const char* path);
+static int rm_command_remove_directory(int recursive, const char* dir);
 
-static int rm_command_remove_item(int recursive, const char *path)
+static int rm_command_remove_item(int recursive, const char* path)
 {
     struct stat statbuf;
     syscall_lstat(path, (uintptr_t)&statbuf);
@@ -27,7 +27,7 @@ static int rm_command_remove_item(int recursive, const char *path)
     return 0;
 }
 
-static int rm_command_remove_directory(int recursive, const char *dir)
+static int rm_command_remove_directory(int recursive, const char* dir)
 {
     int fd = syscall_open(dir, O_DIRECTORY, O_RDWR);
 
@@ -69,7 +69,7 @@ static int rm_command_remove_directory(int recursive, const char *dir)
     return 0;
 }
 
-int rm_command(int argc, const char **argv)
+int rm_command(int argc, const char** argv)
 {
     int recursive = 0;
 
@@ -90,3 +90,7 @@ int rm_command(int argc, const char **argv)
 
     return 0;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

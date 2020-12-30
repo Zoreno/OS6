@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-int mkdir_command(int argc, const char **argv)
+int mkdir_command(int argc, const char** argv)
 {
     if (argc <= 1)
     {
@@ -13,7 +13,7 @@ int mkdir_command(int argc, const char **argv)
 
     for (int i = 1; i < argc; ++i)
     {
-        int ret = syscall_mkdir((char *)argv[i], 0777);
+        int ret = syscall_mkdir((char*)argv[i], 0777);
 
         if (ret < 0)
         {
@@ -23,3 +23,7 @@ int mkdir_command(int argc, const char **argv)
 
     return 0;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

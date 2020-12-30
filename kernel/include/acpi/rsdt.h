@@ -1,8 +1,8 @@
 /**
- * @file test_command.c
+ * @file rsdt.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-09
+ * @date 2020-12-29
  * 
  * @brief 
  * 
@@ -20,16 +20,36 @@
  * 
  */
 
-#include <simple_cli/commands.h>
+#ifndef _ACPI_RDST_H
+#define _ACPI_RSDT_H
 
-#include <stdio.h>
+#include <stdint.h>
 
-int test_command(int argc, const char** argv)
+#include "acpi_header.h"
+
+/**
+* Root System Description Table
+*
+* Contains pointers to other system description tables.
+*
+* Header signature must be "RSDT"
+*/
+typedef struct
 {
-    printf("Test command\n");
+    /**
+	* Standard ACPI header.
+	*/
+    acpi_header_t header;
 
-    return 0;
-}
+    /**
+	* First table entry.
+	*
+	* Number of entries is determined by size of table.
+	*/
+    uint32_t tables[1];
+} __attribute__((packed)) rsdt_t;
+
+#endif
 
 //=============================================================================
 // End of file

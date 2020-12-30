@@ -25,9 +25,13 @@
 
 #include <stdio.h>
 
-int pwd_command(int argc, const char **argv)
+int pwd_command(int argc, const char** argv)
 {
     printf("%s\n", simple_cli_get_working_directory());
 
     return 0;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================
