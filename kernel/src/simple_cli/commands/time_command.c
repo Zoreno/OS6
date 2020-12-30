@@ -1,10 +1,10 @@
 /**
- * @file commands.h
+ * @file time_command.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-09
+ * @date 2020-12-30
  * 
- * @brief Simple CLI commands
+ * @brief 
  * 
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
@@ -20,16 +20,25 @@
  * 
  */
 
-#ifndef _COMMANDS_H
-#define _COMMANDS_H
+#include <simple_cli/commands.h>
 
-int test_command(int argc, const char** argv);
-int cd_command(int argc, const char** argv);
-int ls_command(int argc, const char** argv);
-int mkdir_command(int argc, const char** argv);
-int pwd_command(int argc, const char** argv);
-int rm_command(int argc, const char** argv);
-int exit_command(int argc, const char** argv);
-int time_command(int argc, const char** argv);
+#include <stdio.h>
 
-#endif
+#include <cmos/cmos_rtc.h>
+
+int time_command(int argc, const char** argv)
+{
+    ktime_t time;
+    char buffer[256];
+
+    RTC_get_time(&time);
+    RTC_time_to_string(buffer, &time);
+
+    printf("%s\n", buffer);
+
+    return 0;
+}
+
+//=============================================================================
+// End of file
+//=============================================================================

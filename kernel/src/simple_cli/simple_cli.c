@@ -139,6 +139,7 @@ simple_cli_command_t _commands[] = {{.name = "test", .command = test_command},
                                     {.name = "pwd", .command = pwd_command},
                                     {.name = "rm", .command = rm_command},
                                     {.name = "exit", .command = exit_command},
+                                    {.name = "time", .command = time_command},
                                     {.name = NULL, .command = NULL}};
 
 int simple_cli_run_command(const char* name, int argc, const char** argv)
