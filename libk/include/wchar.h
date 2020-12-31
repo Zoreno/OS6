@@ -73,3 +73,7 @@ wchar_t *wcsrchr(const wchar_t *wcs, wchar_t wc);
 wchar_t *wcsncat(wchar_t *dest, const wchar_t *src, size_t n);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

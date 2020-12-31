@@ -29,13 +29,13 @@
 
 #include <logging/logging.h>
 
-static size_t read_sleb128(const unsigned char* buf, const unsigned char* buf_end, int64_t* r);
-static size_t read_uleb128(const unsigned char* buf, const unsigned char* buf_end, uint64_t* r);
+static size_t read_sleb128(const unsigned char *buf, const unsigned char *buf_end, int64_t *r);
+static size_t read_uleb128(const unsigned char *buf, const unsigned char *buf_end, uint64_t *r);
 
 // Elf based symbol lookup
-static Elf64_Sym_t* _symbol_section = NULL;
+static Elf64_Sym_t *_symbol_section = NULL;
 static int _symbol_count = 0;
-static const char* _symbol_string_table = NULL;
+static const char *_symbol_string_table = NULL;
 
 // Dwarf based symbol lookup
 static Elf64_Addr_t _dwarf_line_info = 0;
@@ -43,7 +43,7 @@ static Elf64_Xword_t _dwarf_size = 0;
 
 static memory_info_t _mem_info;
 
-unsigned long elf64_hash(const unsigned char* name)
+unsigned long elf64_hash(const unsigned char *name)
 {
     unsigned long h = 0;
     unsigned long g;
@@ -63,20 +63,20 @@ unsigned long elf64_hash(const unsigned char* name)
     return h;
 }
 
-int elf_kernel_lookup_symbol(void* addr)
+int elf_kernel_lookup_symbol(void *addr)
 {
     if (!_symbol_section || !_symbol_string_table)
     {
         return 0;
     }
 
-    if (addr > (void*)_mem_info.kernel_end || addr < (void*)_mem_info.kernel_load_addr)
+    if (addr > (void *)_mem_info.kernel_end || addr < (void *)_mem_info.kernel_load_addr)
     {
         printf("External code");
         return 1;
     }
 
-    Elf64_Sym_t* best_match = NULL;
+    Elf64_Sym_t *best_match = NULL;
 
     // These could be placed in a map for log(N) access. This will do for now.
     for (int i = 0; i < _symbol_count; ++i)
@@ -103,13 +103,13 @@ int elf_kernel_lookup_symbol(void* addr)
     return 0;
 }
 
-void dwarf_kernel_lookup_symbol(void* addr)
+void dwarf_kernel_lookup_symbol(void *addr)
 {
     //printf("DWARF line info: %#016x, size: %i, addr: %#016x\n", _dwarf_line_info, _dwarf_size, addr);
     dwarf_parse_debug_line_section(_dwarf_line_info, _dwarf_size, (uint64_t)addr);
 }
 
-int kernel_lookup_symbol(void* addr)
+int kernel_lookup_symbol(void *addr)
 {
     int external_symbol = 0;
 
@@ -143,29 +143,29 @@ int kernel_lookup_symbol(void* addr)
     return external_symbol;
 }
 
-void init_kernel_symbol_context(struct multiboot_tag_elf_sections* elf_sections, memory_info_t* mem_info)
+void init_kernel_symbol_context(struct multiboot_tag_elf_sections *elf_sections, memory_info_t *mem_info)
 {
     log_debug("Section count: %i", elf_sections->num);
     log_debug("Section entry size: %i", elf_sections->entsize);
     log_debug("Section shndx: %i", elf_sections->shndx);
 
-    Elf64_Shdr_t* sec_header = (Elf64_Shdr_t*)elf_sections->sections;
+    Elf64_Shdr_t *sec_header = (Elf64_Shdr_t *)elf_sections->sections;
 
-    Elf64_Shdr_t* string_header = ((Elf64_Shdr_t*)elf_sections->sections) + elf_sections->shndx;
+    Elf64_Shdr_t *string_header = ((Elf64_Shdr_t *)elf_sections->sections) + elf_sections->shndx;
 
-    const char* string_table = (const char*)string_header->sh_addr;
+    const char *string_table = (const char *)string_header->sh_addr;
 
     for (uint32_t i = 0; i < elf_sections->num; ++i)
     {
         if (strcmp(string_table + sec_header[i].sh_name, ".strtab") == 0)
         {
-            _symbol_string_table = (const char*)sec_header[i].sh_addr;
+            _symbol_string_table = (const char *)sec_header[i].sh_addr;
             log_debug("Found .strtab at: %#016x", _symbol_string_table);
         }
 
         if (strcmp(string_table + sec_header[i].sh_name, ".symtab") == 0)
         {
-            _symbol_section = (Elf64_Sym_t*)sec_header[i].sh_addr;
+            _symbol_section = (Elf64_Sym_t *)sec_header[i].sh_addr;
             _symbol_count = sec_header[i].sh_size / sizeof(Elf64_Sym_t);
             log_debug("Found .symtab at: %#016x. (%i entries)", _symbol_section, _symbol_count);
         }
@@ -193,9 +193,9 @@ void init_kernel_symbol_context(struct multiboot_tag_elf_sections* elf_sections,
     memcpy(&_mem_info, mem_info, sizeof(memory_info_t));
 }
 
-static size_t read_uleb128(const unsigned char* buf, const unsigned char* buf_end, uint64_t* r)
+static size_t read_uleb128(const unsigned char *buf, const unsigned char *buf_end, uint64_t *r)
 {
-    const unsigned char* p = buf;
+    const unsigned char *p = buf;
     unsigned int shift = 0;
     uint64_t result = 0;
     unsigned char byte;
@@ -224,9 +224,9 @@ static size_t read_uleb128(const unsigned char* buf, const unsigned char* buf_en
     return p - buf;
 }
 
-static size_t read_sleb128(const unsigned char* buf, const unsigned char* buf_end, int64_t* r)
+static size_t read_sleb128(const unsigned char *buf, const unsigned char *buf_end, int64_t *r)
 {
-    const unsigned char* p = buf;
+    const unsigned char *p = buf;
     unsigned int shift = 0;
     int64_t result = 0;
     unsigned char byte;
@@ -278,14 +278,14 @@ static size_t read_sleb128(const unsigned char* buf, const unsigned char* buf_en
 #define DW_LNE_define_file 3
 #define DW_LNE_set_discriminator 4
 
-void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t* header, uint64_t* start_addr_p,
-                                    uint64_t* end_addr_p, uint32_t* line_p, uint32_t* file_p, uint64_t target_addr)
+void dwarf_parse_debug_line_program(DwarfDebugLineHeader_t *header, uint64_t *start_addr_p,
+                                    uint64_t *end_addr_p, uint32_t *line_p, uint32_t *file_p, uint64_t target_addr)
 {
-    uint8_t* op = (uint8_t*)header +
+    uint8_t *op = (uint8_t *)header +
                   offsetof(DwarfDebugLineHeader_t, header_length) +
                   sizeof(header->header_length) +
                   header->header_length;
-    uint8_t* end = (uint8_t*)header + header->length + sizeof(header->length);
+    uint8_t *end = (uint8_t *)header + header->length + sizeof(header->length);
 
     // TODO: Move these to a state struct
     uint64_t addr = 0;
@@ -582,11 +582,11 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
     //printf("Section start: %#016x, size: %i\n", section_start, size);
     //printf("=======================================================\n");
 
-    DwarfDebugLineHeader_t* header = (DwarfDebugLineHeader_t*)section_start;
+    DwarfDebugLineHeader_t *header = (DwarfDebugLineHeader_t *)section_start;
 
     int found = 0;
 
-    while (header < (DwarfDebugLineHeader_t*)(section_start + size))
+    while (header < (DwarfDebugLineHeader_t *)(section_start + size))
     {
 
         //printf("Length: %i\n", header->length);
@@ -597,22 +597,22 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
         //printf("Line range: %i\n", header->line_range);
         //printf("Opcode base: %i\n", header->opcode_base);
 
-        uint8_t* end_of_header = (uint8_t*)header + header->header_length;
+        uint8_t *end_of_header = (uint8_t *)header + header->header_length;
 
-        const char* dir_table = ((uint8_t*)header) + sizeof(DwarfDebugLineHeader_t);
+        const char *dir_table = ((uint8_t *)header) + sizeof(DwarfDebugLineHeader_t);
 
         //printf("Directory table:\n");
 
         struct
         {
-            const char* str;
+            const char *str;
         } dir_table_entries[16];
 
         memset(dir_table_entries, 0, sizeof(dir_table_entries));
 
         struct
         {
-            const char* str;
+            const char *str;
             uint32_t dir;
         } file_table_entries[16];
 
@@ -631,7 +631,7 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
             curr_dir++;
         }
 
-        const char* file_table = dir_table + 1;
+        const char *file_table = dir_table + 1;
 
         //printf("File table:\n");
 
@@ -678,7 +678,7 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
         }
 
         // Advance to the next header
-        header = (DwarfDebugLineHeader_t*)(((uint8_t*)header) + header->length + sizeof(header->length));
+        header = (DwarfDebugLineHeader_t *)(((uint8_t *)header) + header->length + sizeof(header->length));
     }
 
     if (!found)
@@ -686,3 +686,7 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
         printf("External code");
     }
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

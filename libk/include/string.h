@@ -25,8 +25,8 @@
 
 #include <__libk_common.h>
 
-#include <_size_t.h>
 #include <_null.h>
+#include <_size_t.h>
 
 int bcmp(const void *s1, const void *s2, size_t n);  // Done
 void bcopy(const void *src, void *dest, size_t len); // Done
@@ -81,13 +81,17 @@ char *strtok(char *str, const char *delim);                  // Done
 
 // Missing functions (Move to above in alphabetical order when implemented)
 
-char *strsep(char **stringp, const char *delim); // TODO
-int strcasecmp(const char *s1, const char *s2); // TODO
-int strncasecmp(const char *s1, const char *s2, size_t n); // TODO
+char *strsep(char **stringp, const char *delim);                      // TODO
+int strcasecmp(const char *s1, const char *s2);                       // TODO
+int strncasecmp(const char *s1, const char *s2, size_t n);            // TODO
 int strcasestr(const char *haystack_start, const char *needle_start); // TODO
-char *strfry(char *string); // TODO
-char *strndup(const char *str, size_t n); // TODO
-char *strchrnul(const char *str, int c_in); // TODO
-void swab(const void *bfrom, void *bto, size_t n); // TODO
+char *strfry(char *string);                                           // TODO
+char *strndup(const char *str, size_t n);                             // TODO
+char *strchrnul(const char *str, int c_in);                           // TODO
+void swab(const void *bfrom, void *bto, size_t n);                    // TODO
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================
