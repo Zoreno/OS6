@@ -6,4 +6,5 @@ IndentCaseLabels: false
 ColumnLimit: 0
 NamespaceIndentation: None
 AccessModifierOffset: -4
-PointerAlignment: Left
+DerivePointerAlignment: false
+PointerAlignment: Right

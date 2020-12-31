@@ -36,12 +36,12 @@
 #include <vfs/nulldev.h>
 #include <vfs/zerodev.h>
 
-fs_node_t* fs_root = 0;
-tree_t* fs_tree = 0;
+fs_node_t *fs_root = 0;
+tree_t *fs_tree = 0;
 
 static spinlock_t tmp_lock = {0, 0};
 
-int has_permissions(fs_node_t* node, int permission_bit)
+int has_permissions(fs_node_t *node, int permission_bit)
 {
     (void)node;
     (void)permission_bit;
@@ -50,7 +50,7 @@ int has_permissions(fs_node_t* node, int permission_bit)
     return 1;
 }
 
-uint32_t read_fs(fs_node_t* node, uint64_t offset, uint32_t size, uint8_t* buffer)
+uint32_t read_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
 {
     if (node && node->read)
     {
@@ -62,7 +62,7 @@ uint32_t read_fs(fs_node_t* node, uint64_t offset, uint32_t size, uint8_t* buffe
     return 0;
 }
 
-uint32_t write_fs(fs_node_t* node, uint64_t offset, uint32_t size, uint8_t* buffer)
+uint32_t write_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
 {
     if (node && node->write)
     {
@@ -73,7 +73,7 @@ uint32_t write_fs(fs_node_t* node, uint64_t offset, uint32_t size, uint8_t* buff
     return 0;
 }
 
-void open_fs(fs_node_t* node, uint32_t flags)
+void open_fs(fs_node_t *node, uint32_t flags)
 {
     if (!node)
     {
@@ -98,7 +98,7 @@ void open_fs(fs_node_t* node, uint32_t flags)
     }
 }
 
-void close_fs(fs_node_t* node)
+void close_fs(fs_node_t *node)
 {
     if (node == fs_root)
     {
@@ -126,18 +126,18 @@ void close_fs(fs_node_t* node)
     spinlock_unlock(&tmp_lock);
 }
 
-struct dirent* readdir_fs(fs_node_t* node, uint32_t index)
+struct dirent *readdir_fs(fs_node_t *node, uint32_t index)
 {
     if (node && (node->flags & FS_DIRECTORY) && node->readdir)
     {
-        struct dirent* ret = node->readdir(node, index);
+        struct dirent *ret = node->readdir(node, index);
         return ret;
     }
 
-    return (struct dirent*)NULL;
+    return (struct dirent *)NULL;
 }
 
-fs_node_t* finddir_fs(fs_node_t* node, char* name)
+fs_node_t *finddir_fs(fs_node_t *node, char *name)
 {
     if (!node)
     {
@@ -146,31 +146,31 @@ fs_node_t* finddir_fs(fs_node_t* node, char* name)
 
     if ((node->flags & FS_DIRECTORY) && node->finddir)
     {
-        fs_node_t* ret = node->finddir(node, name);
+        fs_node_t *ret = node->finddir(node, name);
 
         return ret;
     }
 
-    return (fs_node_t*)NULL;
+    return (fs_node_t *)NULL;
 }
 
-int mkdir_fs(char* name, uint16_t permission)
+int mkdir_fs(char *name, uint16_t permission)
 {
-    fs_node_t* parent;
+    fs_node_t *parent;
 
-    char* cwd = process_get_current()->wd_path;
+    char *cwd = process_get_current()->wd_path;
 
-    char* path = canonicalize_path(cwd, name);
+    char *path = canonicalize_path(cwd, name);
 
     if (!name || !strlen(name))
     {
         return -1;
     }
 
-    char* parent_path = malloc(strlen(path) + 4);
+    char *parent_path = malloc(strlen(path) + 4);
     sprintf(parent_path, "%s/..", path);
 
-    char* f_path = path + strlen(path) - 1;
+    char *f_path = path + strlen(path) - 1;
     while (f_path > path)
     {
         if (*f_path == PATH_SEPARATOR)
@@ -200,7 +200,7 @@ int mkdir_fs(char* name, uint16_t permission)
         return -1;
     }
 
-    fs_node_t* this = kopen(path, 0);
+    fs_node_t *this = kopen(path, 0);
 
     int exists = 0;
 
@@ -235,11 +235,11 @@ int mkdir_fs(char* name, uint16_t permission)
     return ret;
 }
 
-int create_file_fs(char* name, uint16_t permission)
+int create_file_fs(char *name, uint16_t permission)
 {
     int32_t i = strlen(name);
 
-    char* dir_name = malloc(i + 1);
+    char *dir_name = malloc(i + 1);
 
     memcpy(dir_name, name, i);
 
@@ -268,7 +268,7 @@ int create_file_fs(char* name, uint16_t permission)
     }
 
     // get the parent dir node.
-    fs_node_t* node;
+    fs_node_t *node;
     if (i >= 0)
     {
         node = kopen(dir_name, 0);
@@ -304,7 +304,7 @@ int create_file_fs(char* name, uint16_t permission)
     return 0;
 }
 
-fs_node_t* clone_fs(fs_node_t* source)
+fs_node_t *clone_fs(fs_node_t *source)
 {
     if (!source)
     {
@@ -321,22 +321,22 @@ fs_node_t* clone_fs(fs_node_t* source)
     return source;
 }
 
-char* canonicalize_path(char* cwd, char* input)
+char *canonicalize_path(char *cwd, char *input)
 {
-    list_t* out = list_create();
+    list_t *out = list_create();
 
     if (strlen(input) && input[0] != PATH_SEPARATOR)
     {
-        char* path = malloc((strlen(cwd) + 1) * sizeof(char));
+        char *path = malloc((strlen(cwd) + 1) * sizeof(char));
         memcpy(path, cwd, strlen(cwd) + 1);
 
-        char* pch;
-        char* save;
+        char *pch;
+        char *save;
         pch = strtok_r(path, PATH_SEPARATOR_STRING, &save);
 
         while (pch != NULL)
         {
-            char* s = malloc(sizeof(char) * (strlen(pch) + 1));
+            char *s = malloc(sizeof(char) * (strlen(pch) + 1));
             memcpy(s, pch, strlen(pch) + 1);
             list_insert(out, s);
 
@@ -345,11 +345,11 @@ char* canonicalize_path(char* cwd, char* input)
         free(path);
     }
 
-    char* path = malloc((strlen(input) + 1) * sizeof(char));
+    char *path = malloc((strlen(input) + 1) * sizeof(char));
     memcpy(path, input, strlen(input) + 1);
 
-    char* pch;
-    char* save = malloc((strlen(input) + 1) * sizeof(char));
+    char *pch;
+    char *save = malloc((strlen(input) + 1) * sizeof(char));
     pch = strtok_r(path, PATH_SEPARATOR_STRING, &save);
 
     while (pch != NULL)
@@ -358,7 +358,7 @@ char* canonicalize_path(char* cwd, char* input)
         // Remove the .. and the folder before
         if (!strcmp(pch, PATH_UP))
         {
-            list_node_t* n = list_pop(out);
+            list_node_t *n = list_pop(out);
 
             if (n)
             {
@@ -371,7 +371,7 @@ char* canonicalize_path(char* cwd, char* input)
         }
         else
         {
-            char* s = malloc(sizeof(char) * (strlen(pch) + 1));
+            char *s = malloc(sizeof(char) * (strlen(pch) + 1));
             memcpy(s, pch, strlen(pch) + 1);
             list_insert(out, s);
         }
@@ -383,12 +383,12 @@ char* canonicalize_path(char* cwd, char* input)
 
     size_t size = 0;
 
-    for (list_node_t* lnode = out->head; lnode != NULL; lnode = lnode->next)
+    for (list_node_t *lnode = out->head; lnode != NULL; lnode = lnode->next)
     {
         size += strlen(lnode->payload) + 1;
     }
 
-    char* output;
+    char *output;
 
     if (size == 0)
     {
@@ -399,9 +399,9 @@ char* canonicalize_path(char* cwd, char* input)
     else
     {
         output = malloc(sizeof(char) * (size + 1));
-        char* output_offset = output;
+        char *output_offset = output;
 
-        for (list_node_t* lnode = out->head; lnode != NULL; lnode = lnode->next)
+        for (list_node_t *lnode = out->head; lnode != NULL; lnode = lnode->next)
         {
             output_offset[0] = PATH_SEPARATOR;
             output_offset++;
@@ -418,7 +418,7 @@ char* canonicalize_path(char* cwd, char* input)
     return output;
 }
 
-fs_node_t* get_mount_point(char* path, size_t path_depth, char** outpath, uint32_t* outdepth)
+fs_node_t *get_mount_point(char *path, size_t path_depth, char **outpath, uint32_t *outdepth)
 {
     size_t depth;
 
@@ -428,10 +428,10 @@ fs_node_t* get_mount_point(char* path, size_t path_depth, char** outpath, uint32
     }
 
     /* Last available node */
-    fs_node_t* last = fs_root;
-    tree_node_t* node = fs_tree->root;
+    fs_node_t *last = fs_root;
+    tree_node_t *node = fs_tree->root;
 
-    char* at = *outpath;
+    char *at = *outpath;
     int _depth = 1;
     int _tree_depth = 0;
 
@@ -444,11 +444,11 @@ fs_node_t* get_mount_point(char* path, size_t path_depth, char** outpath, uint32
 
         int found = 0;
 
-        for (list_node_t* child = node->children->head; child != NULL; child = child->next)
+        for (list_node_t *child = node->children->head; child != NULL; child = child->next)
         {
-            tree_node_t* tchild = (tree_node_t*)child->payload;
+            tree_node_t *tchild = (tree_node_t *)child->payload;
 
-            vfs_entry_t* ent = (vfs_entry_t*)tchild->value;
+            vfs_entry_t *ent = (vfs_entry_t *)tchild->value;
 
             if (!strcmp(ent->name, at))
             {
@@ -480,7 +480,7 @@ fs_node_t* get_mount_point(char* path, size_t path_depth, char** outpath, uint32
 
     if (last)
     {
-        fs_node_t* last_clone = malloc(sizeof(fs_node_t));
+        fs_node_t *last_clone = malloc(sizeof(fs_node_t));
         memcpy(last_clone, last, sizeof(fs_node_t));
         return last_clone;
     }
@@ -488,7 +488,7 @@ fs_node_t* get_mount_point(char* path, size_t path_depth, char** outpath, uint32
     return last;
 }
 
-int ioctl_fs(fs_node_t* node, int request, void* argp)
+int ioctl_fs(fs_node_t *node, int request, void *argp)
 {
     if (!node)
     {
@@ -503,7 +503,7 @@ int ioctl_fs(fs_node_t* node, int request, void* argp)
     return -1;
 }
 
-int chmod_fs(fs_node_t* node, int mode)
+int chmod_fs(fs_node_t *node, int mode)
 {
     if (!node)
     {
@@ -518,7 +518,7 @@ int chmod_fs(fs_node_t* node, int mode)
     return 0;
 }
 
-int chown_fs(fs_node_t* node, int uid, int gid)
+int chown_fs(fs_node_t *node, int uid, int gid)
 {
     if (!node)
     {
@@ -533,17 +533,17 @@ int chown_fs(fs_node_t* node, int uid, int gid)
     return 0;
 }
 
-int unlink_fs(char* name)
+int unlink_fs(char *name)
 {
-    fs_node_t* parent;
+    fs_node_t *parent;
 
-    char* cwd = process_get_current()->wd_path;
-    char* path = canonicalize_path(cwd, name);
+    char *cwd = process_get_current()->wd_path;
+    char *path = canonicalize_path(cwd, name);
 
-    char* parent_path = malloc(strlen(path) + 4);
+    char *parent_path = malloc(strlen(path) + 4);
     sprintf(parent_path, "%s/..", path);
 
-    char* f_path = path + strlen(path) - 1;
+    char *f_path = path + strlen(path) - 1;
 
     while (f_path > path)
     {
@@ -593,17 +593,17 @@ int unlink_fs(char* name)
     return ret;
 }
 
-int symlink_fs(char* target, char* name)
+int symlink_fs(char *target, char *name)
 {
-    fs_node_t* parent;
+    fs_node_t *parent;
 
-    char* cwd = process_get_current()->wd_path;
-    char* path = canonicalize_path(cwd, name);
+    char *cwd = process_get_current()->wd_path;
+    char *path = canonicalize_path(cwd, name);
 
-    char* parent_path = malloc(strlen(path) + 4);
+    char *parent_path = malloc(strlen(path) + 4);
     sprintf(parent_path, "%s/..", path);
 
-    char* f_path = path + strlen(path) - 1;
+    char *f_path = path + strlen(path) - 1;
 
     while (f_path > path)
     {
@@ -646,7 +646,7 @@ int symlink_fs(char* target, char* name)
     return ret;
 }
 
-int readlink_fs(fs_node_t* node, char* buf, size_t size)
+int readlink_fs(fs_node_t *node, char *buf, size_t size)
 {
     if (!node)
     {
@@ -661,7 +661,7 @@ int readlink_fs(fs_node_t* node, char* buf, size_t size)
     return -1;
 }
 
-int selectcheck_fs(fs_node_t* node)
+int selectcheck_fs(fs_node_t *node)
 {
     if (!node)
     {
@@ -678,7 +678,7 @@ int selectcheck_fs(fs_node_t* node)
     return -1;
 }
 
-int selectwait_fs(fs_node_t* node, void* process)
+int selectwait_fs(fs_node_t *node, void *process)
 {
     if (!node)
     {
@@ -695,7 +695,7 @@ int selectwait_fs(fs_node_t* node, void* process)
     return -1;
 }
 
-void truncate_fs(fs_node_t* node)
+void truncate_fs(fs_node_t *node)
 {
     if (!node)
     {
@@ -714,7 +714,7 @@ void vfs_install(void)
 
     fs_tree = tree_create();
 
-    vfs_entry_t* root = malloc(sizeof(vfs_entry_t));
+    vfs_entry_t *root = malloc(sizeof(vfs_entry_t));
 
     root->name = strdup("[root]");
     root->file = NULL;
@@ -731,7 +731,7 @@ void vfs_install(void)
 
 static spinlock_t vfs_slock = {0, 0};
 
-void* vfs_mount(char* path, fs_node_t* local_root)
+void *vfs_mount(char *path, fs_node_t *local_root)
 {
     log_info("[VFS] Mounting %s to [%s]", local_root->name, path);
 
@@ -749,10 +749,10 @@ void* vfs_mount(char* path, fs_node_t* local_root)
 
     local_root->refcount = -1;
 
-    tree_node_t* ret_val = NULL;
+    tree_node_t *ret_val = NULL;
 
-    char* p = strdup(path);
-    char* i = p;
+    char *p = strdup(path);
+    char *i = p;
 
     int path_len = strlen(p);
 
@@ -769,11 +769,11 @@ void* vfs_mount(char* path, fs_node_t* local_root)
     p[path_len] = '\0';
     i = p + 1;
 
-    tree_node_t* root_node = fs_tree->root;
+    tree_node_t *root_node = fs_tree->root;
 
     if (*i == '\0')
     {
-        vfs_entry_t* root = (vfs_entry_t*)root_node->value;
+        vfs_entry_t *root = (vfs_entry_t *)root_node->value;
 
         if (root->file)
         {
@@ -787,8 +787,8 @@ void* vfs_mount(char* path, fs_node_t* local_root)
     }
     else
     {
-        tree_node_t* node = root_node;
-        char* at = i;
+        tree_node_t *node = root_node;
+        char *at = i;
 
         while (1)
         {
@@ -799,10 +799,10 @@ void* vfs_mount(char* path, fs_node_t* local_root)
 
             int found = 0;
 
-            for (list_node_t* child = node->children->head; child != NULL; child = child->next)
+            for (list_node_t *child = node->children->head; child != NULL; child = child->next)
             {
-                tree_node_t* tchild = (tree_node_t*)child->payload;
-                vfs_entry_t* ent = (vfs_entry_t*)tchild->value;
+                tree_node_t *tchild = (tree_node_t *)child->payload;
+                vfs_entry_t *ent = (vfs_entry_t *)tchild->value;
 
                 if (!strcmp(ent->name, at))
                 {
@@ -815,7 +815,7 @@ void* vfs_mount(char* path, fs_node_t* local_root)
 
             if (!found)
             {
-                vfs_entry_t* ent = malloc(sizeof(vfs_entry_t));
+                vfs_entry_t *ent = malloc(sizeof(vfs_entry_t));
 
                 ent->name = strdup(at);
                 ent->file = NULL;
@@ -827,7 +827,7 @@ void* vfs_mount(char* path, fs_node_t* local_root)
             at = at + strlen(at) + 1;
         }
 
-        vfs_entry_t* ent = (vfs_entry_t*)node->value;
+        vfs_entry_t *ent = (vfs_entry_t *)node->value;
 
         if (ent->file)
         {
@@ -846,7 +846,7 @@ void* vfs_mount(char* path, fs_node_t* local_root)
     return NULL;
 }
 
-void vfs_lock(fs_node_t* node)
+void vfs_lock(fs_node_t *node)
 {
     spinlock_lock(&tmp_lock);
 
@@ -855,8 +855,8 @@ void vfs_lock(fs_node_t* node)
     spinlock_unlock(&tmp_lock);
 }
 
-static fs_node_t* kopen_recur(char* filename, uint32_t flags,
-                              uint32_t symlink_depth, char* relative_to)
+static fs_node_t *kopen_recur(char *filename, uint32_t flags,
+                              uint32_t symlink_depth, char *relative_to)
 {
     if (!filename)
     {
@@ -864,13 +864,13 @@ static fs_node_t* kopen_recur(char* filename, uint32_t flags,
         return NULL;
     }
 
-    char* path = canonicalize_path(relative_to, filename);
+    char *path = canonicalize_path(relative_to, filename);
 
     size_t path_len = strlen(path);
 
     if (path_len == 1)
     {
-        fs_node_t* root_clone = malloc(sizeof(fs_node_t));
+        fs_node_t *root_clone = malloc(sizeof(fs_node_t));
         memcpy(root_clone, fs_root, sizeof(fs_node_t));
 
         free(path);
@@ -880,7 +880,7 @@ static fs_node_t* kopen_recur(char* filename, uint32_t flags,
         return root_clone;
     }
 
-    char* path_offset = path;
+    char *path_offset = path;
 
     uint32_t path_depth = 0;
 
@@ -900,7 +900,7 @@ static fs_node_t* kopen_recur(char* filename, uint32_t flags,
 
     uint32_t depth = 0;
 
-    fs_node_t* node_ptr = get_mount_point(path, path_depth, &path_offset, &depth);
+    fs_node_t *node_ptr = get_mount_point(path, path_depth, &path_offset, &depth);
 
     if (!node_ptr)
     {
@@ -917,7 +917,7 @@ static fs_node_t* kopen_recur(char* filename, uint32_t flags,
 
             if ((flags & O_NOFOLLOW) && depth == path_depth - 1)
             {
-                free((void*)path);
+                free((void *)path);
                 free(node_ptr);
 
                 log_warn("[VFS] kopen_recur: NOFOLLOW symlink set");
@@ -926,19 +926,19 @@ static fs_node_t* kopen_recur(char* filename, uint32_t flags,
 
             if (symlink_depth >= MAX_SYMLINK_DEPTH)
             {
-                free((void*)path);
+                free((void *)path);
                 free(node_ptr);
 
                 log_error("[VFS] kopen_recur: Symlink recursion too deep");
                 return NULL;
             }
 
-            char* symlink_buf = malloc(MAX_SYMLINK_SIZE);
+            char *symlink_buf = malloc(MAX_SYMLINK_SIZE);
             int len = readlink_fs(node_ptr, symlink_buf, MAX_SYMLINK_SIZE);
 
             if (len < 0)
             {
-                free((void*)path);
+                free((void *)path);
                 free(node_ptr);
                 free(symlink_buf);
 
@@ -949,7 +949,7 @@ static fs_node_t* kopen_recur(char* filename, uint32_t flags,
 
             if (symlink_buf[len] != '\0')
             {
-                free((void*)path);
+                free((void *)path);
                 free(node_ptr);
                 free(symlink_buf);
 
@@ -958,10 +958,10 @@ static fs_node_t* kopen_recur(char* filename, uint32_t flags,
                 return NULL;
             }
 
-            fs_node_t* old_node_ptr = node_ptr;
+            fs_node_t *old_node_ptr = node_ptr;
 
-            char* relpath = malloc(path_len + 1);
-            char* ptr = relpath;
+            char *relpath = malloc(path_len + 1);
+            char *ptr = relpath;
 
             memcpy(relpath, path, path_len + 1);
 
@@ -985,7 +985,7 @@ static fs_node_t* kopen_recur(char* filename, uint32_t flags,
 
             if (!node_ptr)
             {
-                free((void*)path);
+                free((void *)path);
             }
         }
 
@@ -1000,12 +1000,12 @@ static fs_node_t* kopen_recur(char* filename, uint32_t flags,
         if (depth == path_depth)
         {
             open_fs(node_ptr, flags);
-            free((void*)path);
+            free((void *)path);
 
             return node_ptr;
         }
 
-        fs_node_t* node_next = finddir_fs(node_ptr, path_offset);
+        fs_node_t *node_next = finddir_fs(node_ptr, path_offset);
 
         free(node_ptr);
 
@@ -1013,7 +1013,7 @@ static fs_node_t* kopen_recur(char* filename, uint32_t flags,
 
         if (!node_ptr)
         {
-            free((void*)path);
+            free((void *)path);
 
             return NULL;
         }
@@ -1022,19 +1022,19 @@ static fs_node_t* kopen_recur(char* filename, uint32_t flags,
         ++depth;
     } while (depth < path_depth + 1);
 
-    free((void*)path);
+    free((void *)path);
 
     return NULL;
 }
 
-fs_node_t* kopen(char* filename, uint32_t flags)
+fs_node_t *kopen(char *filename, uint32_t flags)
 {
-    process_t* current_process = process_get_current();
+    process_t *current_process = process_get_current();
 
     return kopen_recur(filename, flags, 0, current_process->wd_path);
 }
 
-static void print_vfs_tree_node(tree_node_t* node, size_t height)
+static void print_vfs_tree_node(tree_node_t *node, size_t height)
 {
     if (!node)
     {
@@ -1046,7 +1046,7 @@ static void print_vfs_tree_node(tree_node_t* node, size_t height)
         printf("  ");
     }
 
-    vfs_entry_t* fnode = (vfs_entry_t*)node->value;
+    vfs_entry_t *fnode = (vfs_entry_t *)node->value;
 
     if (fnode->file)
     {
@@ -1057,9 +1057,9 @@ static void print_vfs_tree_node(tree_node_t* node, size_t height)
         printf("[%s], (empty)\n", fnode->name);
     }
 
-    for (list_node_t* child = node->children->head; child != NULL; child = child->next)
+    for (list_node_t *child = node->children->head; child != NULL; child = child->next)
     {
-        print_vfs_tree_node((tree_node_t*)child->payload, height + 1);
+        print_vfs_tree_node((tree_node_t *)child->payload, height + 1);
     }
 }
 

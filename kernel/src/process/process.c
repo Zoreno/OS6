@@ -1,3 +1,25 @@
+/**
+ * @file process.c
+ * @author Joakim Bertils
+ * @version 0.1
+ * @date 2020-12-31
+ * 
+ * @brief 
+ * 
+ * @copyright Copyright (C) 2020,
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
+ * 
+ */
+
 #include <process/process.h>
 
 #include <assert.h>
@@ -29,27 +51,27 @@
 
 #define PUSH(stack, type, item) \
     stack -= sizeof(type);      \
-    *((type*)stack) = item
+    *((type *)stack) = item
 
 // ASM functions
 extern uintptr_t read_ip();
-extern void switch_to(thread_t** thread, thread_t* next);
+extern void switch_to(thread_t **thread, thread_t *next);
 extern void set_rsp(uint64_t val);
 extern uint64_t get_rsp_val();
 extern void put_in_rax(uint64_t val);
-extern void setup_forked_kthread_stack(uint64_t* val);
+extern void setup_forked_kthread_stack(uint64_t *val);
 
 //=============================================================================
 // Static variables
 //=============================================================================
 
-static tree_t* process_tree;
-static list_t* process_list;
-static list_t* process_ready_queue;
-static list_t* process_sleeping_list;
+static tree_t *process_tree;
+static list_t *process_list;
+static list_t *process_ready_queue;
+static list_t *process_sleeping_list;
 
-volatile process_t* current_process = NULL;
-process_t* kernel_idle_task = NULL;
+volatile process_t *current_process = NULL;
+process_t *kernel_idle_task = NULL;
 
 static bitset_t pid_set;
 
@@ -61,16 +83,16 @@ static spinlock_t process_sleeping_lock = {0};
 // Forward declarations
 //=============================================================================
 
-process_t* spawn_idle_thread();
-process_t* spawn_init();
-void make_process_ready(process_t* proc);
+process_t *spawn_idle_thread();
+process_t *spawn_init();
+void make_process_ready(process_t *proc);
 void wakeup_sleeping_processes();
 
 //=============================================================================
 // Debug
 //=============================================================================
 
-void debug_print_process(process_t* process)
+void debug_print_process(process_t *process)
 {
     PRINT("---------------------------------------------------------------------------------");
     PRINT("PID: %d, Name: %s, Description: %s", process->id, process->name, process->description);
@@ -80,14 +102,14 @@ void debug_print_process(process_t* process)
     PRINT("---------------------------------------------------------------------------------");
 }
 
-void debug_print_process_tree_node(tree_node_t* node, size_t height)
+void debug_print_process_tree_node(tree_node_t *node, size_t height)
 {
     if (!node)
     {
         return;
     }
 
-    process_t* proc = (process_t*)node->value;
+    process_t *proc = (process_t *)node->value;
 
     for (uint32_t i = 0; i < height; ++i)
     {
@@ -108,7 +130,7 @@ void debug_print_process_tree_node(tree_node_t* node, size_t height)
 
     printf("");
 
-    for (list_node_t* child = node->children->head;
+    for (list_node_t *child = node->children->head;
          child != NULL;
          child = child->next)
     {
@@ -191,17 +213,17 @@ static void kernel_idle(void)
     }
 }
 
-process_t* spawn_idle_thread()
+process_t *spawn_idle_thread()
 {
     log_info("[PROC] Spawning idle thread");
 
-    process_t* idle = malloc(sizeof(process_t));
+    process_t *idle = malloc(sizeof(process_t));
     memset(idle, 0x00, sizeof(process_t));
     idle->id = -1;
     idle->name = strdup("[kernel idle thread]");
 
     // Setup the stack
-    uint64_t* stack = (uint64_t*)malloc(sizeof(uint64_t) * KERNEL_STACK_SIZE);
+    uint64_t *stack = (uint64_t *)malloc(sizeof(uint64_t) * KERNEL_STACK_SIZE);
     memset(stack, 0, sizeof(uint64_t) * (KERNEL_STACK_SIZE));
     idle->image.stack = (uint64_t)(stack + KERNEL_STACK_SIZE);
     stack[KERNEL_STACK_SIZE - 1] = (uint64_t)&kernel_idle;
@@ -224,17 +246,17 @@ process_t* spawn_idle_thread()
 extern uint64_t stack_top;
 extern uint64_t stack_bottom;
 
-process_t* spawn_init()
+process_t *spawn_init()
 {
     log_info("[PROC] Spawning init thread");
 
-    process_t* init = malloc(sizeof(process_t));
+    process_t *init = malloc(sizeof(process_t));
 
     memset(init, 0, sizeof(process_t));
 
-    tree_set_root(process_tree, (void*)init);
+    tree_set_root(process_tree, (void *)init);
 
-    list_insert(process_list, (void*)init);
+    list_insert(process_list, (void *)init);
 
     init->tree_entry = process_tree->root;
     init->id = 1;
@@ -248,7 +270,7 @@ process_t* spawn_init()
     init->file_descriptors->refs = 1;
     init->file_descriptors->length = 0;
     init->file_descriptors->capacity = 4;
-    init->file_descriptors->entries = malloc(sizeof(fs_node_t*) * init->file_descriptors->capacity);
+    init->file_descriptors->entries = malloc(sizeof(fs_node_t *) * init->file_descriptors->capacity);
     init->file_descriptors->modes = malloc(sizeof(int) * init->file_descriptors->capacity);
     init->file_descriptors->offsets = malloc(sizeof(uint64_t) * init->file_descriptors->capacity);
 
@@ -284,13 +306,13 @@ process_t* spawn_init()
 // Spawn new process
 //=============================================================================
 
-process_t* spawn_process(process_t* parent)
+process_t *spawn_process(process_t *parent)
 {
     log_info("[PROC] Spawning new process");
 
     ASSERT(process_tree->root);
 
-    process_t* proc = (process_t*)malloc(sizeof(process_t));
+    process_t *proc = (process_t *)malloc(sizeof(process_t));
     memset(proc, 0, sizeof(process_t));
 
     proc->id = get_next_free_pid();
@@ -306,13 +328,13 @@ process_t* spawn_process(process_t* parent)
     //proc->thread.fpu_enabled = 0;
     //memcpy((void *)proc->thread.fp_regs, (void *)parent->thread.fp_regs, 512);
 
-    uint64_t* stack = (uint64_t*)malloc(sizeof(uint64_t) * KERNEL_STACK_SIZE);
+    uint64_t *stack = (uint64_t *)malloc(sizeof(uint64_t) * KERNEL_STACK_SIZE);
 
     log_debug("Child stack: %#016x-%#016x", stack, stack + KERNEL_STACK_SIZE);
     log_debug("Parent stack: %#016x-%#016x", parent->image.stack, parent->image.stack + KERNEL_STACK_SIZE * sizeof(uint64_t));
     log_debug("Parent stack: %#016x-%#016x", &stack_bottom, &stack_top);
 
-    memcpy(stack, (void*)parent->image.stack, sizeof(uint64_t) * (KERNEL_STACK_SIZE));
+    memcpy(stack, (void *)parent->image.stack, sizeof(uint64_t) * (KERNEL_STACK_SIZE));
 
     //hexdump(stack, sizeof(uint64_t) * KERNEL_STACK_SIZE);
 
@@ -335,7 +357,7 @@ process_t* spawn_process(process_t* parent)
     proc->file_descriptors->length = parent->file_descriptors->length;
     proc->file_descriptors->capacity = parent->file_descriptors->capacity;
 
-    proc->file_descriptors->entries = malloc(sizeof(fs_node_t*) * proc->file_descriptors->capacity);
+    proc->file_descriptors->entries = malloc(sizeof(fs_node_t *) * proc->file_descriptors->capacity);
     proc->file_descriptors->modes = malloc(sizeof(int) * proc->file_descriptors->capacity);
     proc->file_descriptors->offsets = malloc(sizeof(uint64_t) * proc->file_descriptors->capacity);
 
@@ -356,13 +378,13 @@ process_t* spawn_process(process_t* parent)
     proc->running = 0;
     proc->sleeping = 0;
 
-    tree_node_t* entry = tree_node_create(proc);
+    tree_node_t *entry = tree_node_create(proc);
 
     proc->tree_entry = entry;
 
     spinlock_lock(&tree_lock);
     tree_node_insert_child_node(process_tree, parent->tree_entry, entry);
-    list_insert(process_list, (void*)proc);
+    list_insert(process_list, (void *)proc);
     spinlock_unlock(&tree_lock);
 
     proc->sched_node.payload = proc;
@@ -384,28 +406,28 @@ pid_t process_fork()
 
     current_process->regs->rax = 0;
 
-    process_t* parent = (process_t*)current_process;
+    process_t *parent = (process_t *)current_process;
 
     ASSERT(parent);
 
-    pml4_t* new_page_directory = virt_mem_clone_address_space(parent->page_directory);
+    pml4_t *new_page_directory = virt_mem_clone_address_space(parent->page_directory);
 
     parent->thread.rip = return_addr;
 
-    process_t* new_proc = spawn_process(parent);
+    process_t *new_proc = spawn_process(parent);
 
     ASSERT(new_proc);
 
     new_proc->page_directory = new_page_directory;
 
     volatile uintptr_t var = (uintptr_t)(get_rsp_val() + 8);
-    parent->thread.rsp = (uint64_t*)(get_rsp_val() + 8);
+    parent->thread.rsp = (uint64_t *)(get_rsp_val() + 8);
     volatile uintptr_t diff = parent->image.stack + sizeof(uint64_t) * KERNEL_STACK_SIZE - 1 - (var);
 
     log_debug("Parent thread rsp: %#016x", parent->thread.rsp);
     log_debug("Diff: %#016x", diff);
 
-    new_proc->thread.rsp = (uint64_t*)(((uint64_t)new_proc->thread.rsp) - 8 * ((uint64_t)diff));
+    new_proc->thread.rsp = (uint64_t *)(((uint64_t)new_proc->thread.rsp) - 8 * ((uint64_t)diff));
 
     log_debug("New thread rsp: %#016x", new_proc->thread.rsp);
 
@@ -435,16 +457,16 @@ pid_t process_fork()
 // Process cleanup
 //=============================================================================
 
-void process_delete(process_t* proc)
+void process_delete(process_t *proc)
 {
-    tree_node_t* entry = proc->tree_entry;
+    tree_node_t *entry = proc->tree_entry;
 
     if (!entry)
     {
         return;
     }
 
-    free((void*)proc->image.stack);
+    free((void *)proc->image.stack);
 
     // Check if we are trying to kill init
     ASSERT((entry != process_tree->root));
@@ -470,7 +492,7 @@ void process_delete(process_t* proc)
     free(proc);
 }
 
-void process_cleanup(process_t* proc, int retval)
+void process_cleanup(process_t *proc, int retval)
 {
     proc->status = retval;
     proc->finished = 1;
@@ -497,7 +519,7 @@ void process_cleanup(process_t* proc, int retval)
     }
 }
 
-void process_reap(process_t* proc)
+void process_reap(process_t *proc)
 {
     free(proc->name);
 
@@ -535,7 +557,7 @@ uint8_t process_available()
     return process_ready_queue->head != NULL;
 }
 
-process_t* next_ready_process()
+process_t *next_ready_process()
 {
     PRINT("Next ready process");
 
@@ -547,14 +569,14 @@ process_t* next_ready_process()
     }
 
     spinlock_lock(&process_queue_lock);
-    list_node_t* np = list_dequeue(process_ready_queue);
+    list_node_t *np = list_dequeue(process_ready_queue);
     spinlock_unlock(&process_queue_lock);
 
     PRINT("Dequeued from ready list");
 
     ASSERT(np);
 
-    process_t* next = np->payload;
+    process_t *next = np->payload;
 
     PRINT("Returning next");
 
@@ -567,12 +589,12 @@ void switch_next(uintptr_t return_addr)
 
     PRINT("Switch next");
 
-    process_t* old_process = (process_t*)current_process;
-    thread_t* old_thread = &old_process->thread;
+    process_t *old_process = (process_t *)current_process;
+    thread_t *old_thread = &old_process->thread;
 
     current_process = next_ready_process();
 
-    arch_x64_64_restore_fpu((void*)current_process->thread.fp_regs);
+    arch_x64_64_restore_fpu((void *)current_process->thread.fp_regs);
 
     if (current_process->finished)
     {
@@ -589,10 +611,10 @@ void switch_next(uintptr_t return_addr)
 
     virt_mem_switch_dir(current_process->page_directory);
 
-    switch_to(&old_thread, (thread_t*)&current_process->thread);
+    switch_to(&old_thread, (thread_t *)&current_process->thread);
 }
 
-void make_process_ready(process_t* proc)
+void make_process_ready(process_t *proc)
 {
     PRINT("Make process ready");
     spinlock_lock(&process_queue_lock);
@@ -614,7 +636,7 @@ void process_switch_task(uint8_t reschedule)
 
     wakeup_sleeping_processes();
 
-    debug_print_process((process_t*)current_process);
+    debug_print_process((process_t *)current_process);
 
     if (!current_process->running)
     {
@@ -624,11 +646,11 @@ void process_switch_task(uint8_t reschedule)
 
     current_process->running = 0;
 
-    arch_x64_64_save_fpu((void*)current_process->thread.fp_regs);
+    arch_x64_64_save_fpu((void *)current_process->thread.fp_regs);
 
     if (reschedule && current_process != kernel_idle_task)
     {
-        make_process_ready((process_t*)current_process);
+        make_process_ready((process_t *)current_process);
     }
 
     switch_next(return_addr);
@@ -643,9 +665,9 @@ void process_yield(uint8_t reschedule)
 // Process queries
 //=============================================================================
 
-process_t* process_get_current()
+process_t *process_get_current()
 {
-    return (process_t*)current_process;
+    return (process_t *)current_process;
 }
 
 pid_t process_get_pid()
@@ -653,15 +675,15 @@ pid_t process_get_pid()
     return current_process->id;
 }
 
-uint8_t process_compare(void* proc_v, void* pid_v)
+uint8_t process_compare(void *proc_v, void *pid_v)
 {
-    pid_t pid = (*(pid_t*)pid_v);
-    process_t* proc = (process_t*)proc_v;
+    pid_t pid = (*(pid_t *)pid_v);
+    process_t *proc = (process_t *)proc_v;
 
     return (uint8_t)(proc->id == pid);
 }
 
-process_t* process_from_pid(pid_t pid)
+process_t *process_from_pid(pid_t pid)
 {
     if (pid < 0)
     {
@@ -669,23 +691,23 @@ process_t* process_from_pid(pid_t pid)
     }
 
     spinlock_lock(&tree_lock);
-    tree_node_t* entry = tree_find(process_tree, &pid, process_compare);
+    tree_node_t *entry = tree_find(process_tree, &pid, process_compare);
     spinlock_unlock(&tree_lock);
 
     if (entry)
     {
-        return (process_t*)entry->value;
+        return (process_t *)entry->value;
     }
 
     return NULL;
 }
 
-process_t* process_get_parent(process_t* process)
+process_t *process_get_parent(process_t *process)
 {
-    process_t* result = NULL;
+    process_t *result = NULL;
 
     spinlock_lock(&tree_lock);
-    tree_node_t* entry = process->tree_entry;
+    tree_node_t *entry = process->tree_entry;
 
     if (entry->parent)
     {
@@ -697,11 +719,11 @@ process_t* process_get_parent(process_t* process)
     return result;
 }
 
-void process_disown(process_t* proc)
+void process_disown(process_t *proc)
 {
     ASSERT(process_tree->root);
 
-    tree_node_t* entry = proc->tree_entry;
+    tree_node_t *entry = proc->tree_entry;
 
     spinlock_lock(&tree_lock);
     tree_break_off(process_tree, entry);
@@ -713,7 +735,7 @@ void process_disown(process_t* proc)
 // FD
 //=============================================================================
 
-size_t process_append_fd(process_t* proc, fs_node_t* node)
+size_t process_append_fd(process_t *proc, fs_node_t *node)
 {
     for (size_t i = 0; i < proc->file_descriptors->length; ++i)
     {
@@ -729,7 +751,7 @@ size_t process_append_fd(process_t* proc, fs_node_t* node)
     if (proc->file_descriptors->length == proc->file_descriptors->capacity)
     {
         proc->file_descriptors->capacity *= 2;
-        proc->file_descriptors->entries = realloc(proc->file_descriptors->entries, sizeof(fs_node_t*) * proc->file_descriptors->capacity);
+        proc->file_descriptors->entries = realloc(proc->file_descriptors->entries, sizeof(fs_node_t *) * proc->file_descriptors->capacity);
         proc->file_descriptors->modes = realloc(proc->file_descriptors->modes, sizeof(int) * proc->file_descriptors->capacity);
         proc->file_descriptors->offsets = realloc(proc->file_descriptors->offsets, sizeof(uint64_t) * proc->file_descriptors->capacity);
     }
@@ -741,7 +763,7 @@ size_t process_append_fd(process_t* proc, fs_node_t* node)
     return proc->file_descriptors->length - 1;
 }
 
-size_t process_move_fd(process_t* proc, int src, int dest)
+size_t process_move_fd(process_t *proc, int src, int dest)
 {
     if ((size_t)src > proc->file_descriptors->length || (dest != -1 && (size_t)dest > proc->file_descriptors->length))
     {
@@ -766,7 +788,7 @@ size_t process_move_fd(process_t* proc, int src, int dest)
 // waitpid
 //=============================================================================
 
-static int wait_candidate(process_t* parent, int pid, int options, process_t* proc)
+static int wait_candidate(process_t *parent, int pid, int options, process_t *proc)
 {
     log_debug("[WAITPID]: Checking wait candidate");
 
@@ -798,9 +820,9 @@ static int wait_candidate(process_t* parent, int pid, int options, process_t* pr
     return 0;
 }
 
-int waitpid(int pid, int* status, int options)
+int waitpid(int pid, int *status, int options)
 {
-    process_t* proc = (process_t*)current_process;
+    process_t *proc = (process_t *)current_process;
 
     log_debug("[WAITPID]: PID: %i, Current process: %i", pid, proc->id);
 
@@ -810,10 +832,10 @@ int waitpid(int pid, int* status, int options)
 
     do
     {
-        process_t* candidate = NULL;
+        process_t *candidate = NULL;
         int has_children = 0;
 
-        for (list_node_t* node = proc->tree_entry->children->head;
+        for (list_node_t *node = proc->tree_entry->children->head;
              node != NULL;
              node = node->next)
         {
@@ -824,8 +846,8 @@ int waitpid(int pid, int* status, int options)
                 continue;
             }
 
-            tree_node_t* tree_node = (tree_node_t*)node->payload;
-            process_t* child = tree_node->value;
+            tree_node_t *tree_node = (tree_node_t *)node->payload;
+            process_t *child = tree_node->value;
 
             if (wait_candidate(proc, pid, options, child))
             {
@@ -894,7 +916,7 @@ void process_sleep(uint64_t ms)
     current_process->sleeping = 1;
 
     spinlock_lock(&process_sleeping_lock);
-    list_append(process_sleeping_list, (list_node_t*)&current_process->sched_node);
+    list_append(process_sleeping_list, (list_node_t *)&current_process->sched_node);
     spinlock_unlock(&process_sleeping_lock);
 
     //printf("Task %i entered sleep mode for %d ticks", get_pid(), ticks);
@@ -912,12 +934,12 @@ void wakeup_sleeping_processes()
 
     spinlock_lock(&process_sleeping_lock);
 
-    list_node_t* node = process_sleeping_list->head;
-    list_node_t* next_node = node;
+    list_node_t *node = process_sleeping_list->head;
+    list_node_t *next_node = node;
 
     while (next_node != NULL)
     {
-        process_t* process = next_node->payload;
+        process_t *process = next_node->payload;
 
         if (process->sleep_ticks < current_ticks)
         {

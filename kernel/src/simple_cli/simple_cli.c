@@ -1,4 +1,25 @@
-#include <simple_cli/commands.h>
+/**
+ * @file simple_cli.c
+ * @author Joakim Bertils
+ * @version 0.1
+ * @date 2020-12-31
+ * 
+ * @brief 
+ * 
+ * @copyright Copyright (C) 2020,
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
+ * 
+ */
+
 #include <simple_cli/simple_cli.h>
 
 #include <stdio.h>
@@ -6,29 +27,30 @@
 #include <string.h>
 
 #include <process/process.h>
+#include <simple_cli/commands.h>
 
-const char* simple_cli_get_user_name()
+const char *simple_cli_get_user_name()
 {
     return "root";
 }
 
-const char* simple_cli_get_user_group()
+const char *simple_cli_get_user_group()
 {
     return "root";
 }
 
-const char* simple_cli_get_working_directory()
+const char *simple_cli_get_working_directory()
 {
     return process_get_current()->wd_path;
 }
 
-char* simple_cli_read_line()
+char *simple_cli_read_line()
 {
     char c;
 
     const int buffer_size = 1024;
 
-    char* buffer = malloc(buffer_size);
+    char *buffer = malloc(buffer_size);
     int buf_ptr = 0;
 
     if (!buffer)
@@ -79,15 +101,15 @@ char* simple_cli_read_line()
     }
 }
 
-const char** simple_cli_split_line(char* line)
+const char **simple_cli_split_line(char *line)
 {
-    const char* strtok_delim = " \t\r\n\a";
+    const char *strtok_delim = " \t\r\n\a";
     const int max_tokens_increment = 64;
     int max_tokens = max_tokens_increment;
     int position = 0;
 
-    char** tokens = malloc(max_tokens * sizeof(char*));
-    char* token;
+    char **tokens = malloc(max_tokens * sizeof(char *));
+    char *token;
 
     if (!tokens)
     {
@@ -105,7 +127,7 @@ const char** simple_cli_split_line(char* line)
         if (position >= max_tokens)
         {
             max_tokens += max_tokens_increment;
-            tokens = realloc(tokens, max_tokens * sizeof(char*));
+            tokens = realloc(tokens, max_tokens * sizeof(char *));
             if (!tokens)
             {
                 printf("[ERROR] Allocating buffer\n");
@@ -118,10 +140,10 @@ const char** simple_cli_split_line(char* line)
     }
 
     tokens[position] = NULL;
-    return (const char**)tokens;
+    return (const char **)tokens;
 }
 
-int simple_cli_get_token_count(const char** tokens)
+int simple_cli_get_token_count(const char **tokens)
 {
     int i = 0;
     while (tokens[i] != NULL)
@@ -142,7 +164,7 @@ simple_cli_command_t _commands[] = {{.name = "test", .command = test_command},
                                     {.name = "time", .command = time_command},
                                     {.name = NULL, .command = NULL}};
 
-int simple_cli_run_command(const char* name, int argc, const char** argv)
+int simple_cli_run_command(const char *name, int argc, const char **argv)
 {
     if (!simple_cli_is_command(name))
     {
@@ -164,7 +186,7 @@ int simple_cli_run_command(const char* name, int argc, const char** argv)
     return -1;
 }
 
-int simple_cli_is_command(const char* name)
+int simple_cli_is_command(const char *name)
 {
     if (!name)
     {
@@ -191,7 +213,7 @@ int simple_cli_is_command(const char* name)
     return 0;
 }
 
-int simple_cli_launch(char** args)
+int simple_cli_launch(char **args)
 {
     pid_t pid;
     pid_t wpid;
@@ -240,8 +262,8 @@ void simple_cli_init()
 {
     while (1)
     {
-        char* line = simple_cli_read_line();
-        const char** args = simple_cli_split_line(line);
+        char *line = simple_cli_read_line();
+        const char **args = simple_cli_split_line(line);
         //simple_cli_launch(args);
 
         if (simple_cli_is_command(args[0]))

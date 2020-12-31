@@ -1,3 +1,25 @@
+/**
+ * @file typeinfo
+ * @author Joakim Bertils
+ * @version 0.1
+ * @date 2020-12-31
+ * 
+ * @brief 
+ * 
+ * @copyright Copyright (C) 2020,
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
+ * 
+ */
+
 #ifndef _TYPEINFO
 #define _TYPEINFO
 
@@ -21,68 +43,72 @@ using nullptr_t = decltype(nullptr);
 class type_info
 {
 public:
-	virtual ~type_info();
+    virtual ~type_info();
 
-	const char *name() const noexcept
-	{
-		return __name[0] == '*' ? __name + 1 : __name;
-	}
+    const char *name() const noexcept
+    {
+        return __name[0] == '*' ? __name + 1 : __name;
+    }
 
-	bool before(const type_info &__arg) const noexcept
-	{
-		return (__name[0] == '*' && __arg.__name[0] == '*')
-				   ? __name < __arg.__name
-				   : __builtin_strcmp(__name, __arg.__name) < 0;
-	}
+    bool before(const type_info &__arg) const noexcept
+    {
+        return (__name[0] == '*' && __arg.__name[0] == '*')
+                   ? __name < __arg.__name
+                   : __builtin_strcmp(__name, __arg.__name) < 0;
+    }
 
-	bool operator==(const type_info &__arg) const noexcept
-	{
-		return ((__name == __arg.__name) || (__name[0] != '*' &&
-											 __builtin_strcmp(__name, __arg.__name) == 0));
-	}
+    bool operator==(const type_info &__arg) const noexcept
+    {
+        return ((__name == __arg.__name) || (__name[0] != '*' &&
+                                             __builtin_strcmp(__name, __arg.__name) == 0));
+    }
 
-	bool operator!=(const type_info &__arg) const noexcept
-	{
-		return !(*this == __arg);
-	}
+    bool operator!=(const type_info &__arg) const noexcept
+    {
+        return !(*this == __arg);
+    }
 
-	// TODO: Fix hash func
-	// size_t hash_code() const noexcept;
+    // TODO: Fix hash func
+    // size_t hash_code() const noexcept;
 
-	virtual bool __is_pointer_p() const;
-	virtual bool __is_function_p() const;
+    virtual bool __is_pointer_p() const;
+    virtual bool __is_function_p() const;
 
-	virtual bool __do_catch(const type_info *__thr_type, void **__thr_obj,
-							unsigned __outer) const;
-	virtual bool __do_upcast(const __cxxabiv1::__class_type_info *__target,
-							 void **__obj_ptr) const;
+    virtual bool __do_catch(const type_info *__thr_type, void **__thr_obj,
+                            unsigned __outer) const;
+    virtual bool __do_upcast(const __cxxabiv1::__class_type_info *__target,
+                             void **__obj_ptr) const;
 
 protected:
-	const char *__name;
+    const char *__name;
 
-	explicit type_info(const char *__n) : __name(__n) {}
+    explicit type_info(const char *__n) : __name(__n) {}
 
 private:
-	type_info &operator=(const type_info &);
-	type_info(const type_info &);
+    type_info &operator=(const type_info &);
+    type_info(const type_info &);
 };
 
 class bad_cast : public exception
 {
 public:
-	bad_cast() noexcept {}
-	virtual ~bad_cast() noexcept;
-	virtual const char *what() const noexcept;
+    bad_cast() noexcept {}
+    virtual ~bad_cast() noexcept;
+    virtual const char *what() const noexcept;
 };
 
 class bad_typeid : public exception
 {
 public:
-	bad_typeid() noexcept {}
-	virtual ~bad_typeid() noexcept;
-	virtual const char *what() const noexcept;
+    bad_typeid() noexcept {}
+    virtual ~bad_typeid() noexcept;
+    virtual const char *what() const noexcept;
 };
 
 } // namespace std
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

@@ -56,13 +56,13 @@ typedef struct
 // Private variables
 //==============================================================================
 
-static kheap_region_t* regions = 0;
+static kheap_region_t *regions = 0;
 static uint64_t region_count = 0;
 static uint64_t region_max_count = 0;
 static uint64_t first_free_region = 0;
 
-static void* first_free_addr = (void*)KHEAP_BEGIN;
-static const uint8_t* HEAP_START = (const uint8_t*)KHEAP_BEGIN;
+static void *first_free_addr = (void *)KHEAP_BEGIN;
+static const uint8_t *HEAP_START = (const uint8_t *)KHEAP_BEGIN;
 static uint64_t heap_size = 0;
 static const uint64_t HEAP_MIN_GROWTH = 0x10000;
 
@@ -72,11 +72,11 @@ static const uint64_t HEAP_MIN_GROWTH = 0x10000;
 
 static uint64_t align_up(uint64_t val, uint64_t align);
 static uint64_t max(uint64_t v1, uint64_t v2);
-static void* pmalloc(size_t size, uint64_t alignment);
-static int heap_grow(size_t size, uint8_t* heap_end, int cont);
-static void* kmalloc_imp(size_t size, uint64_t alignment);
-static void kfree_imp(void* addr);
-static void* krealloc_imp(void* addr, size_t size);
+static void *pmalloc(size_t size, uint64_t alignment);
+static int heap_grow(size_t size, uint8_t *heap_end, int cont);
+static void *kmalloc_imp(size_t size, uint64_t alignment);
+static void kfree_imp(void *addr);
+static void *krealloc_imp(void *addr, size_t size);
 
 //==============================================================================
 // private Functions
@@ -99,23 +99,23 @@ static uint64_t max(uint64_t v1, uint64_t v2)
     return v1 > v2 ? v1 : v2;
 }
 
-static void* pmalloc(size_t size, uint64_t alignment)
+static void *pmalloc(size_t size, uint64_t alignment)
 {
-    static uint8_t* nextPlacement = (uint8_t*)PLACEMENT_BEGIN;
+    static uint8_t *nextPlacement = (uint8_t *)PLACEMENT_BEGIN;
 
     size = align_up(size, 8);
 
-    uint8_t* currPlacement = (uint8_t*)align_up((uint64_t)nextPlacement, alignment);
+    uint8_t *currPlacement = (uint8_t *)align_up((uint64_t)nextPlacement, alignment);
 
     if (((uint64_t)currPlacement + size) > PLACEMENT_END)
     {
         return 0;
     }
 
-    return (void*)currPlacement;
+    return (void *)currPlacement;
 }
 
-static int heap_grow(size_t size, uint8_t* heap_end, int cont)
+static int heap_grow(size_t size, uint8_t *heap_end, int cont)
 {
     (void)cont;
 
@@ -128,7 +128,7 @@ static int heap_grow(size_t size, uint8_t* heap_end, int cont)
 
     while (offset < size)
     {
-        void* addr = phys_mem_alloc_block();
+        void *addr = phys_mem_alloc_block();
 
         virt_mem_map_page(addr, heap_end + offset, VIRT_MEM_WRITABLE);
 
@@ -153,7 +153,7 @@ static int heap_grow(size_t size, uint8_t* heap_end, int cont)
     return 1;
 }
 
-static void* kmalloc_imp(size_t size, uint64_t alignment)
+static void *kmalloc_imp(size_t size, uint64_t alignment)
 {
     static uint64_t consecutive_number = 0;
 
@@ -182,7 +182,7 @@ static void* kmalloc_imp(size_t size, uint64_t alignment)
 
     int found_free = 0;
 
-    uint8_t* region_address = (uint8_t*)first_free_addr;
+    uint8_t *region_address = (uint8_t *)first_free_addr;
 
     for (uint64_t i = first_free_region; i < region_count; ++i)
     {
@@ -196,7 +196,7 @@ static void* kmalloc_imp(size_t size, uint64_t alignment)
             first_free_addr = region_address;
         }
 
-        uint8_t* aligned_address = (uint8_t*)align_up((uintptr_t)region_address, alignment);
+        uint8_t *aligned_address = (uint8_t *)align_up((uintptr_t)region_address, alignment);
         uintptr_t additional_size = (uintptr_t)aligned_address - (uintptr_t)region_address;
 
         if (!regions[i].res && (regions[i].size >= size + additional_size) && (within - (uintptr_t)region_address % within >= additional_size))
@@ -248,7 +248,7 @@ static void* kmalloc_imp(size_t size, uint64_t alignment)
 
     uint64_t size_to_grow = max(HEAP_MIN_GROWTH, align_up(size * 3 / 2, PAGE_SIZE));
 
-    if (!heap_grow(size_to_grow, (uint8_t*)((uintptr_t)HEAP_START + heap_size), cont))
+    if (!heap_grow(size_to_grow, (uint8_t *)((uintptr_t)HEAP_START + heap_size), cont))
     {
         return 0;
     }
@@ -256,14 +256,14 @@ static void* kmalloc_imp(size_t size, uint64_t alignment)
     return kmalloc_imp(size, alignment);
 }
 
-static void kfree_imp(void* addr)
+static void kfree_imp(void *addr)
 {
     if (!addr)
     {
         return;
     }
 
-    uint8_t* region_address = (uint8_t*)HEAP_START;
+    uint8_t *region_address = (uint8_t *)HEAP_START;
 
     for (uint64_t i = 0; i < region_count; ++i)
     {
@@ -305,14 +305,14 @@ static void kfree_imp(void* addr)
     }
 }
 
-static size_t find_allocated_size(void* addr)
+static size_t find_allocated_size(void *addr)
 {
     if (!addr)
     {
         return 0;
     }
 
-    uint8_t* region_address = (uint8_t*)HEAP_START;
+    uint8_t *region_address = (uint8_t *)HEAP_START;
 
     for (uint64_t i = 0; i < region_count; ++i)
     {
@@ -327,7 +327,7 @@ static size_t find_allocated_size(void* addr)
     return 0;
 }
 
-static void* krealloc_imp(void* addr, size_t size)
+static void *krealloc_imp(void *addr, size_t size)
 {
     size_t old_mem_size = find_allocated_size(addr);
 
@@ -337,7 +337,7 @@ static void* krealloc_imp(void* addr, size_t size)
         return NULL;
     }
 
-    void* new_mem = kmalloc(size);
+    void *new_mem = kmalloc(size);
 
     // Could not allocate new memory
     if (!new_mem)
@@ -358,9 +358,9 @@ static void* krealloc_imp(void* addr, size_t size)
 // Interface functions
 //==============================================================================
 
-void* kheap_get_current_end()
+void *kheap_get_current_end()
 {
-    return (void*)(HEAP_START + heap_size);
+    return (void *)(HEAP_START + heap_size);
 }
 
 void kheap_init()
@@ -373,14 +373,14 @@ void kheap_init()
 
     for (i; i < PLACEMENT_END; i += PAGE_SIZE)
     {
-        void* paddr = phys_mem_alloc_block();
+        void *paddr = phys_mem_alloc_block();
 
-        virt_mem_map_page(paddr, (void*)i, VIRT_MEM_WRITABLE);
+        virt_mem_map_page(paddr, (void *)i, VIRT_MEM_WRITABLE);
 
         //log_debug("Mapping %#016x to %#016x", paddr, i);
     }
 
-    regions = (kheap_region_t*)pmalloc(0, 0);
+    regions = (kheap_region_t *)pmalloc(0, 0);
 
     region_count = 0;
     region_max_count = (PLACEMENT_END - (uint64_t)regions) / sizeof(kheap_region_t);
@@ -388,22 +388,22 @@ void kheap_init()
     log_info("[KHEAP] Done!");
 }
 
-void* kmalloc(size_t size)
+void *kmalloc(size_t size)
 {
     return kmalloc_imp(size, 0);
 }
 
-void* kmalloc_a(size_t size, uint64_t alignment)
+void *kmalloc_a(size_t size, uint64_t alignment)
 {
     return kmalloc_imp(size, alignment);
 }
 
-void kfree(void* addr)
+void kfree(void *addr)
 {
     kfree_imp(addr);
 }
 
-void* krealloc(void* addr, size_t size)
+void *krealloc(void *addr, size_t size)
 {
     return krealloc_imp(addr, size);
 }

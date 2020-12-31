@@ -1,9 +1,31 @@
+/**
+ * @file eh_frame.h
+ * @author Joakim Bertils
+ * @version 0.1
+ * @date 2020-12-31
+ * 
+ * @brief 
+ * 
+ * @copyright Copyright (C) 2020,
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
+ * 
+ */
+
 #ifndef _LIBUNWIND_EH_FRAME_H
 #define _LIBUNWIND_EH_FRAME_H
 
-#include <stdint.h>
-#include <registers_intel_x64.h>
 #include <eh_framelist.h>
+#include <registers_intel_x64.h>
+#include <stdint.h>
 
 class common_entry;
 class ci_entry;
@@ -216,7 +238,7 @@ public:
     fd_entry &operator=(const fd_entry &) = default;
 
     bool is_in_range(uint64_t pc) const
-    {  
+    {
         printf("is_in_range: pc: %#016x, pc_begin: %#016x, pc_end: %#016x\n", pc, m_pc_begin, m_pc_begin + m_pc_range);
 
         return (pc > m_pc_begin) && (pc <= m_pc_begin + m_pc_range);
@@ -261,3 +283,7 @@ private:
 };
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================
