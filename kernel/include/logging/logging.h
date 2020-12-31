@@ -30,6 +30,14 @@
 // Definitions
 //=============================================================================
 
+#define LOG_WARN_FORMAT 0
+
+#if LOG_WARN_FORMAT == 1
+#define LOG_WARN_FORMAT_ATTR __attribute__((format(printf, 4, 5)))
+#else
+#define LOG_WARN_FORMAT_ATTR
+#endif
+
 #define LOG_USE_COLOR 1
 
 typedef enum
@@ -66,8 +74,8 @@ typedef enum
  * @param ... Rest of the function parameters which will be expanded by the formatting string.
  *
  */
-void log_printf(log_level_t level, const char* file, int line, const char* fmt, ...)
-    __attribute__((format(printf, 4, 5)));
+void log_printf(log_level_t level, const char *file, int line, const char *fmt, ...)
+    LOG_WARN_FORMAT_ATTR;
 
 /**
  * @brief Get a string representing the log level represented by level. 
@@ -75,7 +83,7 @@ void log_printf(log_level_t level, const char* file, int line, const char* fmt, 
  * @param level Log level to query.
  * @return Pointer to statically allocated string representing the level.
  */
-const char* log_level_string(log_level_t level);
+const char *log_level_string(log_level_t level);
 
 /**
  * @brief Sets the current logging threshold.

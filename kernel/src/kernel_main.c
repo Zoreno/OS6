@@ -215,13 +215,13 @@ extern void run_unit_tests();
 
 // https://www.gnu.org/software/grub/manual/multiboot2/html_node/kernel_002ec.html
 
-extern void* __kernel_start;
-extern void* __kernel_end;
+extern void *__kernel_start;
+extern void *__kernel_end;
 
 // TODO: Move to separate file
-void parse_multiboot(unsigned char* mb_ptr, memory_info_t* mem_info)
+void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
 {
-    struct multiboot_start_tag* start_tag = (struct multiboot_start_tag*)mb_ptr;
+    struct multiboot_start_tag *start_tag = (struct multiboot_start_tag *)mb_ptr;
 
     uint32_t mb_size = start_tag->total_size;
 
@@ -233,33 +233,33 @@ void parse_multiboot(unsigned char* mb_ptr, memory_info_t* mem_info)
 
     while (!end_found)
     {
-        struct multiboot_tag* tag = (struct multiboot_tag*)mb_ptr;
+        struct multiboot_tag *tag = (struct multiboot_tag *)mb_ptr;
 
         switch (tag->type)
         {
         case MULTIBOOT_TAG_TYPE_CMDLINE:
         {
-            struct multiboot_tag_string* cmdline = (struct multiboot_tag_string*)tag;
+            struct multiboot_tag_string *cmdline = (struct multiboot_tag_string *)tag;
             log_info("[MULTIBOOT] Command line \"%s\"", cmdline->string);
         }
         break;
 
         case MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME:
         {
-            struct multiboot_tag_string* boot_loader = (struct multiboot_tag_string*)tag;
+            struct multiboot_tag_string *boot_loader = (struct multiboot_tag_string *)tag;
             log_info("[MULTIBOOT] Bootloader name \"%s\"", boot_loader->string);
         }
         break;
         case MULTIBOOT_TAG_TYPE_BASIC_MEMINFO:
         {
-            struct multiboot_tag_basic_meminfo* basic_mem =
-                (struct multiboot_tag_basic_meminfo*)tag;
+            struct multiboot_tag_basic_meminfo *basic_mem =
+                (struct multiboot_tag_basic_meminfo *)tag;
             log_info("[MULTIBOOT] Basic memory: lower: %i upper: %i", basic_mem->mem_lower, basic_mem->mem_upper);
         }
         break;
         case MULTIBOOT_TAG_TYPE_BOOTDEV:
         {
-            struct multiboot_tag_bootdev* bootdev = (struct multiboot_tag_bootdev*)tag;
+            struct multiboot_tag_bootdev *bootdev = (struct multiboot_tag_bootdev *)tag;
 
             log_info("[MULTIBOOT] Boot device: biosdev: %i, partition: %i, sub_partition: %i",
                      bootdev->biosdev, bootdev->slice, bootdev->part);
@@ -267,7 +267,7 @@ void parse_multiboot(unsigned char* mb_ptr, memory_info_t* mem_info)
         break;
         case MULTIBOOT_TAG_TYPE_MMAP:
         {
-            struct multiboot_tag_mmap* mmap = (struct multiboot_tag_mmap*)tag;
+            struct multiboot_tag_mmap *mmap = (struct multiboot_tag_mmap *)tag;
 
             int count = mmap->size / mmap->entry_size;
 
@@ -294,7 +294,7 @@ void parse_multiboot(unsigned char* mb_ptr, memory_info_t* mem_info)
         break;
         case MULTIBOOT_TAG_TYPE_LOAD_BASE_ADDR:
         {
-            struct multiboot_tag_load_base_addr* lba = (struct multiboot_tag_load_base_addr*)tag;
+            struct multiboot_tag_load_base_addr *lba = (struct multiboot_tag_load_base_addr *)tag;
 
             log_info("[MULTIBOOT] Load base addr: %#08x", lba->load_base_addr);
         }
@@ -306,7 +306,7 @@ void parse_multiboot(unsigned char* mb_ptr, memory_info_t* mem_info)
         break;
         case MULTIBOOT_TAG_TYPE_ELF_SECTIONS:
         {
-            struct multiboot_tag_elf_sections* elf_sections = (struct multiboot_tag_elf_sections*)tag;
+            struct multiboot_tag_elf_sections *elf_sections = (struct multiboot_tag_elf_sections *)tag;
 
             init_kernel_symbol_context(elf_sections, mem_info);
         }
@@ -347,7 +347,7 @@ void parse_multiboot(unsigned char* mb_ptr, memory_info_t* mem_info)
     mem_info->kernel_size = mem_info->kernel_end - mem_info->kernel_load_addr;
 }
 
-void mouse_moved_handler(mouse_moved_event_t* event)
+void mouse_moved_handler(mouse_moved_event_t *event)
 {
     static int i = 0;
 
@@ -366,21 +366,23 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     set_stdout(scom1_fd);
 
-    printf("Initializing kernel...\n");
+    log_init(LOG_DEBUG);
 
-    run_unit_tests();
-
-    arch_initialize();
+    log_info("Initializing kernel...");
 
     RTC_init();
 
-    log_init(LOG_DEBUG);
+#if 0
+    run_unit_tests();
+#endif
+
+    arch_initialize();
 
     memory_info_t mem_info;
 
     memset(&mem_info, 0, sizeof(mem_info));
 
-    parse_multiboot((unsigned char*)rbx, &mem_info);
+    parse_multiboot((unsigned char *)rbx, &mem_info);
 
     log_debug("Kernel end: %#016x", mem_info.kernel_end);
 

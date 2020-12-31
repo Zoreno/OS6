@@ -28,7 +28,7 @@
 // Local variables
 //=============================================================================
 
-static const char* level_strings[] = {
+static const char *level_strings[] = {
     "TRACE",
     "DEBUG",
     "INFO",
@@ -37,7 +37,7 @@ static const char* level_strings[] = {
     "FATAL"};
 
 #ifdef LOG_USE_COLOR
-static const char* level_colors[] = {
+static const char *level_colors[] = {
     "\x1b[94m",
     "\x1b[36m",
     "\x1b[32m",
@@ -52,7 +52,7 @@ static log_level_t level_threshold;
 // Local functions
 //=============================================================================
 
-static int get_current_time(char* buffer, size_t buffer_size)
+static int get_current_time(char *buffer, size_t buffer_size)
 {
     (void)buffer_size;
 
@@ -69,9 +69,9 @@ static int get_current_time(char* buffer, size_t buffer_size)
 //=============================================================================
 
 void log_printf(log_level_t level,
-                const char* file,
+                const char *file,
                 int line,
-                const char* fmt,
+                const char *fmt,
                 ...)
 {
     if (level < level_threshold)
@@ -99,7 +99,7 @@ void log_printf(log_level_t level,
     printf("%s\n", str_buf);
 }
 
-const char* log_level_string(log_level_t level)
+const char *log_level_string(log_level_t level)
 {
     return level_strings[level];
 }
@@ -117,6 +117,8 @@ log_level_t log_get_threshold()
 void log_init(log_level_t log_level)
 {
     level_threshold = log_level;
+
+    log_info("[LOG] Installed logging driver!");
 }
 
 //=============================================================================

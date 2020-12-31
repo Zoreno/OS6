@@ -22,13 +22,13 @@
 
 #include <arch/x86-64/idt.h>
 
-#include <debug/debug_terminal.h>
 #include <stdio.h>
 #include <string.h>
 
 #include <debug/backtrace.h>
+#include <debug/debug_terminal.h>
 #include <exec/elf64.h>
-
+#include <logging/logging.h>
 #include <process/process.h>
 
 extern void arch_x86_64_idt_flush(uint64_t idtr_ptr);
@@ -42,9 +42,9 @@ typedef struct
 arch_x86_64_idt_descriptor _idt[ARCH_X86_64_IDT_MAX_INTERRUPTS];
 arch_x86_64_idtr _idtr;
 
-void arch_x86_64_default_irq_handler(system_stack_t* regs);
+void arch_x86_64_default_irq_handler(system_stack_t *regs);
 
-const char* get_interrupt_name(uint64_t int_no)
+const char *get_interrupt_name(uint64_t int_no)
 {
     switch (int_no)
     {
@@ -99,14 +99,14 @@ const char* get_interrupt_name(uint64_t int_no)
     }
 }
 
-void print_regs(system_stack_t* regs)
+void print_regs(system_stack_t *regs)
 {
     debug_terminal_set_back_color(VGA_COLOR_BLUE);
     debug_terminal_set_text_color(VGA_COLOR_WHITE);
     debug_terminal_clear();
 
     char buf[32];
-    const char* int_name;
+    const char *int_name;
 
     if (regs->int_no >= 32 && regs->int_no < 48)
     {
@@ -143,18 +143,18 @@ void print_regs(system_stack_t* regs)
            regs->rflags);
     printf("[IRQ] Backtrace: \n");
 
-    kernel_lookup_symbol((void*)regs->rip);
+    kernel_lookup_symbol((void *)regs->rip);
 
     printf("\n");
 
-    print_backtrace((unsigned long long int*)regs->rbp);
+    print_backtrace((unsigned long long int *)regs->rbp);
 
     printf("[IRQ] ==========================================================================\n");
 }
 
 static IRQ_HANDLER _irq_handlers[256] = {0};
 
-void arch_x86_64_default_irq_handler(system_stack_t* regs)
+void arch_x86_64_default_irq_handler(system_stack_t *regs)
 {
     if (regs->int_no >= 32 && regs->int_no < 48)
     {
@@ -195,7 +195,7 @@ void arch_x86_64_default_irq_handler(system_stack_t* regs)
         ;
 }
 
-arch_x86_64_idt_descriptor* arch_x86_64_get_ir(uint32_t i)
+arch_x86_64_idt_descriptor *arch_x86_64_get_ir(uint32_t i)
 {
     if (i > ARCH_X86_64_IDT_MAX_INTERRUPTS)
     {
@@ -287,7 +287,7 @@ extern void arch_x86_64_irq_15(void);
 
 void arch_x86_64_initialize_idt(uint16_t code_sel)
 {
-    printf("[ARCH] Initializing IDT...\n");
+    log_info("[ARCH] Initializing IDT...");
 
     _idtr.limit = (sizeof(arch_x86_64_idt_descriptor)) * ARCH_X86_64_IDT_MAX_INTERRUPTS - 1;
     _idtr.base = (uint64_t)&_idt[0];
@@ -357,7 +357,7 @@ void arch_x86_64_initialize_idt(uint16_t code_sel)
 
     arch_x86_64_idt_flush((uint64_t)&_idtr);
 
-    printf("[ARCH] IDT Initialized!\n");
+    log_info("[ARCH] IDT Initialized!");
 }
 
 //=============================================================================

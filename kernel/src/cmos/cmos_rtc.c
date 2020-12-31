@@ -22,10 +22,10 @@
 
 #include <cmos/cmos_rtc.h>
 
-#include <arch/arch.h>
-
 #include <stdio.h>
 
+#include <arch/arch.h>
+#include <logging/logging.h>
 #include <process/process.h>
 
 //=============================================================================
@@ -463,7 +463,7 @@ static void handle_periodic_irq();
  * @param regs System regs at the time of the interrupt.
  * 
  */
-static void RTC_irq_handler(system_stack_t* regs);
+static void RTC_irq_handler(system_stack_t *regs);
 
 /**
  * @brief Get the frequency of the periodic interrupt represented by @rate
@@ -626,7 +626,7 @@ static void handle_periodic_irq()
     ++subticks;
 }
 
-static void RTC_irq_handler(system_stack_t* regs)
+static void RTC_irq_handler(system_stack_t *regs)
 {
     (void)regs;
 
@@ -661,7 +661,7 @@ static int get_freq(int rate)
 
 void RTC_init()
 {
-    printf("[RTC] Initializing...\n");
+    log_info("[RTC] Initializing...");
 
     rtc_status_reg_a_t status_a;
 
@@ -670,7 +670,7 @@ void RTC_init()
     status_a.divider = 0b010;
     status_a.rate_selection = rate;
 
-    printf("[RTC] Rate of periodic IRQ: %i Hz\n", get_freq(rate));
+    log_info("[RTC] Rate of periodic IRQ: %i Hz", get_freq(rate));
 
     write_status_a(status_a);
 
@@ -697,7 +697,7 @@ void RTC_init()
 
     clear_mask_interrupt(CMOS_RTC_IRQ);
 
-    printf("[RTC] Done!\n");
+    log_info("[RTC] Done!");
 }
 
 static uint8_t bcd_to_dec(uint8_t bcd)
@@ -710,7 +710,7 @@ static uint8_t dec_to_bcd(uint8_t dec)
     return ((dec % 10) & 0x0F) | (((dec / 10) << 4) & 0xF0);
 }
 
-void RTC_get_time(ktime_t* time)
+void RTC_get_time(ktime_t *time)
 {
     // This is quite safe to assume
     uint8_t century = 20;
@@ -789,7 +789,7 @@ void RTC_get_time(ktime_t* time)
     time->year = year;
 }
 
-void RTC_set_time(ktime_t* time)
+void RTC_set_time(ktime_t *time)
 {
     rtc_status_reg_b_t status_b;
 
@@ -875,13 +875,13 @@ void RTC_set_time(ktime_t* time)
 }
 
 // TODO: Implement
-void RTC_set_alarm(ktime_t* time);
-int RTC_get_alarm(ktime_t* time);
+void RTC_set_alarm(ktime_t *time);
+int RTC_get_alarm(ktime_t *time);
 void RTC_abort_alarm();
 
-void RTC_time_to_string(char* str, ktime_t* time)
+void RTC_time_to_string(char *str, ktime_t *time)
 {
-    ktime_t* time_ptr;
+    ktime_t *time_ptr;
     ktime_t time_struct;
 
     if (time == NULL)
@@ -983,7 +983,7 @@ static uint32_t months_to_sec(uint8_t months, uint8_t year)
     return days * secs_per_day;
 }
 
-uint32_t RTC_time_to_int(ktime_t* time)
+uint32_t RTC_time_to_int(ktime_t *time)
 {
     uint32_t time_int = 0;
 
@@ -1008,7 +1008,7 @@ uint32_t RTC_time_to_int(ktime_t* time)
     return time_int;
 }
 
-void RTC_int_to_time(uint32_t time_int, ktime_t* time)
+void RTC_int_to_time(uint32_t time_int, ktime_t *time)
 {
     uint32_t year = 1970;
     uint8_t month = 1;
