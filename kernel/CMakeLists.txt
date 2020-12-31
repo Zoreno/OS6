@@ -124,6 +124,8 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal/terminal_buffer
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal/terminal_context.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal/terminal_color.c)
 
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/logging/logging.c)
+
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_controller.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_descriptors.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_device.c)

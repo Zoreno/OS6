@@ -33,6 +33,7 @@
 #include <acpi/rsdt.h>
 #include <acpi/xsdt.h>
 #include <arch/arch.h>
+#include <logging/logging.h>
 #include <util/hexdump.h>
 
 //=============================================================================
@@ -40,7 +41,7 @@
 //=============================================================================
 
 #ifndef DEBUG_ACPI
-#define DEBUG_ACPI 1
+#define DEBUG_ACPI 0
 #endif
 
 //=============================================================================
@@ -248,7 +249,7 @@ static rsdp_t* acpi_check_rdsp(unsigned int* ptr)
     if (memcmp(signature, rsdp, 8) == 0)
     {
 #if DEBUG_ACPI == 1
-        printf("[ACPI] Found matching signature\n");
+        log_debug("[ACPI] Found matching signature");
         acpi_print_rdsp(rsdp);
 #endif
 
@@ -270,7 +271,7 @@ static rsdp_t* acpi_check_rdsp(unsigned int* ptr)
 #if DEBUG_ACPI == 1
         else
         {
-            printf("[ACPI] Got checksum: %i\n", checksum);
+            log_warn("[ACPI] Got checksum: %i", checksum);
         }
 #endif
     }
@@ -348,7 +349,9 @@ static uint8_t acpi_calculate_checksum(acpi_header_t* header)
 
 static int acpi_parse_fadt(fadt_t* fadt)
 {
-    printf("[ACPI] Found FADT!\n");
+#if DEBUG_ACPI == 1
+    log_debug("[ACPI] Found FADT!");
+#endif
 
     century_register = fadt->century;
     SMI_CMD = fadt->SMI_command_port;
@@ -408,19 +411,19 @@ static int acpi_find_system_state(const char* signature,
             state->valid = 1;
 
 #if DEBUG_ACPI == 1
-            printf("[ACPI] %s SLP_TYPa: %i, SLP_TYPb: %i\n",
-                   signature, state->SLP_TYPa, state->SLP_TYPb);
+            log_trace("[ACPI] %s SLP_TYPa: %i, SLP_TYPb: %i",
+                      signature, state->SLP_TYPa, state->SLP_TYPb);
 #endif
         }
         else
         {
-            printf("[ACPI] S5 parse error\n");
+            log_error("[ACPI] %s parse error", signature);
             return 1;
         }
     }
     else
     {
-        printf("[ACPI] S5 not present\n");
+        log_warn("[ACPI] %s not present", signature);
         return 1;
     }
 
@@ -429,8 +432,10 @@ static int acpi_find_system_state(const char* signature,
 
 static int acpi_parse_dsdt(dsdt_t* dsdt)
 {
-    printf("[ACPI] Found DSDT!\n");
+#if DEBUG_ACPI == 1
+    log_debug("[ACPI] Found DSDT!");
     acpi_print_acpi_header(&dsdt->header);
+#endif
 
     char* dsdt_block = (char*)dsdt->definition_block;
     int dsdt_length = dsdt->header.length - sizeof(acpi_header_t);
@@ -448,18 +453,18 @@ static int acpi_init_xsdt(xsdt_t* xsdt)
 {
     if (!xsdt)
     {
-        printf("[ACPI] XSDT was NULL\n");
+        log_error("[ACPI] XSDT was NULL");
         return 1;
     }
 
     if (acpi_check_header(&xsdt->header, "XSDT") != 0)
     {
-        printf("[ACPI] XSDT header signature invalid\n");
+        log_error("[ACPI] XSDT header signature invalid");
         return 1;
     }
 
 #if DEBUG_ACPI == 1
-    printf("[ACPI] XSDT valid!\n");
+    log_debug("[ACPI] XSDT valid!");
     acpi_print_acpi_header(&xsdt->header);
 #endif
 
@@ -469,7 +474,7 @@ static int acpi_init_xsdt(xsdt_t* xsdt)
     {
         acpi_header_t* header = (acpi_header_t*)(uint64_t)xsdt->tables[i];
 #if DEBUG_ACPI == 1
-        printf("[ACPI] Header %i:\n", i);
+        log_debug("[ACPI] Header %i:", i);
         acpi_print_acpi_header(header);
 #endif
         if (acpi_check_signature(header, "FACP") == 0)
@@ -485,18 +490,18 @@ static int acpi_init_rsdt(rsdt_t* rsdt)
 {
     if (!rsdt)
     {
-        printf("[ACPI] RSDT was NULL\n");
+        log_error("[ACPI] RSDT was NULL");
         return 1;
     }
 
     if (acpi_check_header(&rsdt->header, "RSDT") != 0)
     {
-        printf("[ACPI] RSDT header signature invalid\n");
+        log_error("[ACPI] RSDT header signature invalid");
         return 1;
     }
 
 #if DEBUG_ACPI == 1
-    printf("[ACPI] RSDT valid!\n");
+    log_debug("[ACPI] RSDT valid!");
     acpi_print_acpi_header(&rsdt->header);
 #endif
 
@@ -506,7 +511,7 @@ static int acpi_init_rsdt(rsdt_t* rsdt)
     {
         acpi_header_t* header = (acpi_header_t*)(uint64_t)rsdt->tables[i];
 #if DEBUG_ACPI == 1
-        printf("[ACPI] Header %i:\n", i);
+        log_debug("[ACPI] Header %i:", i);
         acpi_print_acpi_header(header);
 #endif
         if (acpi_check_signature(header, "FACP") == 0)
@@ -547,7 +552,7 @@ static int acpi_enable(void)
     {
         if (SMI_CMD == 0 || SCI_EN == 0)
         {
-            printf("[ACPI] No known way to enable ACPI\n");
+            log_warn("[ACPI] No known way to enable ACPI");
             return 1;
         }
 
@@ -557,18 +562,18 @@ static int acpi_enable(void)
         {
             if (acpi_is_enabled())
             {
-                printf("[ACPI] ACPI enabled!\n");
+                log_info("[ACPI] ACPI enabled!");
                 return 0;
             }
 
             acpi_sleep(10);
         }
 
-        printf("[ACPI] ACPI could not be enabled\n");
+        log_error("[ACPI] ACPI could not be enabled");
         return 1;
     }
 
-    printf("[ACPI] ACPI already enabled\n");
+    log_info("[ACPI] ACPI already enabled");
 
     return 0;
 }
@@ -597,7 +602,7 @@ int acpi_init()
     if (rsdp)
     {
 #if DEBUG_ACPI == 1
-        printf("[ACPI] Found RSDP!\n");
+        log_debug("[ACPI] Found RSDP!");
 #endif
 
         // Always try with the XSDT address first if present, otherwise
@@ -608,24 +613,32 @@ int acpi_init()
 
             if (!ret)
             {
-                return ret;
+                goto done;
             }
         }
 
         if (rsdp->rsdt_address != 0)
         {
-            return acpi_init_rsdt((rsdt_t*)(uint64_t)rsdp->rsdt_address);
+            int ret = acpi_init_rsdt((rsdt_t*)(uint64_t)rsdp->rsdt_address);
+
+            if (!ret)
+            {
+                goto done;
+            }
         }
 
-        printf("[ACPI] Failed to find either XSDT or RSDT\n");
+        log_warn("[ACPI] Failed to find either XSDT or RSDT");
         return 1;
     }
     else
     {
-        printf("[ACPI] Did not find RSDP!\n");
+        log_warn("[ACPI] Did not find RSDP!");
         return 1;
     }
 
+done:
+
+    log_info("[ACPI] ACPI Initialized!");
     return 0;
 }
 
@@ -642,7 +655,7 @@ void acpi_power_off()
     // pulling the power cord.
     acpi_set_state(&S5_state);
 
-    printf("[ACPI] Poweroff failed\n");
+    log_error("[ACPI] Poweroff failed");
 }
 
 uint8_t acpi_get_century_register()

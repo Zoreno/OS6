@@ -24,8 +24,10 @@
 
 #include <mm/mm_bitmap.h>
 
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
+
+#include <logging/logging.h>
 
 #define PHYS_MEM_BLOCKS_PER_BYTE 8
 #define PHYS_MEM_BLOCK_SIZE 4096
@@ -81,14 +83,14 @@ static uint64_t get_addr(uint64_t frame)
     return frame * PHYS_MEM_BLOCK_SIZE;
 }
 
-void phys_mem_init(memory_info_t *mem_info)
+void phys_mem_init(memory_info_t* mem_info)
 {
     _phys_mem.memory_size = mem_info->memory_size;
     _phys_mem.bitmap = (mm_bitmap_t)(align_up(mem_info->kernel_end, PHYS_MEM_BLOCK_SIZE));
     _phys_mem.max_blocks = align_up(mem_info->memory_size, PHYS_MEM_BLOCK_SIZE) / PHYS_MEM_BLOCK_SIZE;
     _phys_mem.used_blocks = _phys_mem.max_blocks;
 
-    printf("[PMM] Bitmap size: %i\n", phys_mem_get_block_count() / PHYS_MEM_BLOCKS_PER_BYTE);
+    log_debug("[PMM] Bitmap size: %i", phys_mem_get_block_count() / PHYS_MEM_BLOCKS_PER_BYTE);
 
     int entries = (phys_mem_get_block_count() + 63) / 64;
 
@@ -111,7 +113,7 @@ void phys_mem_init(memory_info_t *mem_info)
     // Deinit memory used for the bitmap
     phys_mem_deinit_region((phys_addr)_phys_mem.bitmap, phys_mem_get_block_count() / PHYS_MEM_BLOCKS_PER_BYTE);
 
-    printf("[PMM] Initialized! Bitmap address: %#016x, (Entries: %i)\n", _phys_mem.bitmap, entries);
+    log_info("[PMM] Initialized! Bitmap address: %#016x, (Entries: %i)", _phys_mem.bitmap, entries);
 }
 
 void phys_mem_init_region(phys_addr base, size_t size)
@@ -119,7 +121,7 @@ void phys_mem_init_region(phys_addr base, size_t size)
     uint64_t align = base / PHYS_MEM_BLOCK_ALIGN;
     uint64_t blocks = align_up(size, PHYS_MEM_BLOCK_SIZE) / PHYS_MEM_BLOCK_SIZE;
 
-    printf("[PMM] Initing region: %#016x, (%i bytes)(Frame: %i count: %i)\n", base, size, align, blocks);
+    log_debug("[PMM] Initing region: %#016x, (%i bytes)(Frame: %i count: %i)", base, size, align, blocks);
 
     for (uint64_t i = 0; i < blocks; ++i)
     {
@@ -135,7 +137,7 @@ void phys_mem_deinit_region(phys_addr base, size_t size)
     uint64_t align = base / PHYS_MEM_BLOCK_ALIGN;
     uint64_t blocks = align_up(size, PHYS_MEM_BLOCK_SIZE) / PHYS_MEM_BLOCK_SIZE;
 
-    printf("[PMM] Deiniting region: %#016x, (%i bytes)(Frame: %i count: %i)\n", base, size, align, blocks);
+    log_debug("[PMM] Deiniting region: %#016x, (%i bytes)(Frame: %i count: %i)", base, size, align, blocks);
 
     for (uint64_t i = 0; i < blocks; ++i)
     {
@@ -144,11 +146,11 @@ void phys_mem_deinit_region(phys_addr base, size_t size)
     }
 }
 
-void *phys_mem_alloc_block()
+void* phys_mem_alloc_block()
 {
     if (phys_mem_get_block_count() == 0)
     {
-        printf("[PMM] Out of memory\n");
+        log_error("[PMM] Out of memory");
         return 0;
     }
 
@@ -156,7 +158,7 @@ void *phys_mem_alloc_block()
 
     if ((int)frame == -1)
     {
-        printf("[PMM] Out of memory\n");
+        log_error("[PMM] Out of memory");
         return 0;
     }
 
@@ -165,12 +167,12 @@ void *phys_mem_alloc_block()
     phys_addr addr = frame * PHYS_MEM_BLOCK_SIZE;
     ++_phys_mem.used_blocks;
 
-    return (void *)addr;
+    return (void*)addr;
 }
 
-void *phys_mem_alloc_block_z()
+void* phys_mem_alloc_block_z()
 {
-    void *addr = phys_mem_alloc_block();
+    void* addr = phys_mem_alloc_block();
 
     if (addr)
     {
@@ -180,11 +182,11 @@ void *phys_mem_alloc_block_z()
     return addr;
 }
 
-void *phys_mem_alloc_blocks(size_t blocks)
+void* phys_mem_alloc_blocks(size_t blocks)
 {
     if (phys_mem_get_block_count() < blocks)
     {
-        printf("[PMM] Out of memory\n");
+        log_error("[PMM] Out of memory");
         return 0;
     }
 
@@ -192,7 +194,7 @@ void *phys_mem_alloc_blocks(size_t blocks)
 
     if ((int)frame == -1)
     {
-        printf("[PMM] Out of memory\n");
+        log_error("[PMM] Out of memory");
         return 0;
     }
 
@@ -204,12 +206,12 @@ void *phys_mem_alloc_blocks(size_t blocks)
     phys_addr addr = frame * PHYS_MEM_BLOCK_SIZE;
     _phys_mem.used_blocks += blocks;
 
-    return (void *)addr;
+    return (void*)addr;
 }
 
-void *phys_mem_alloc_blocks_z(size_t blocks)
+void* phys_mem_alloc_blocks_z(size_t blocks)
 {
-    void *addr = phys_mem_alloc_blocks(blocks);
+    void* addr = phys_mem_alloc_blocks(blocks);
 
     if (addr)
     {
@@ -219,7 +221,7 @@ void *phys_mem_alloc_blocks_z(size_t blocks)
     return addr;
 }
 
-void phys_mem_free_block(void *base)
+void phys_mem_free_block(void* base)
 {
     phys_addr addr = (phys_addr)base;
     uint64_t frame = addr / PHYS_MEM_BLOCK_SIZE;
@@ -229,7 +231,7 @@ void phys_mem_free_block(void *base)
     --_phys_mem.used_blocks;
 }
 
-void phys_mem_free_blocks(void *base, size_t size)
+void phys_mem_free_blocks(void* base, size_t size)
 {
     phys_addr addr = (phys_addr)base;
     uint64_t frame = addr / PHYS_MEM_BLOCK_SIZE;
@@ -269,9 +271,9 @@ size_t phys_mem_get_block_size()
 
 void phys_mem_dump_statistics()
 {
-    printf("[PHYSMEM] Used Memory Blocks: %i/%i (%i/%i Bytes)\n",
-           phys_mem_get_used_block_count(),
-           phys_mem_get_block_count(),
-           phys_mem_get_used_block_count() * phys_mem_get_block_size(),
-           phys_mem_get_block_count() * phys_mem_get_block_size());
+    log_debug("[PHYSMEM] Used Memory Blocks: %i/%i (%i/%i Bytes)",
+              phys_mem_get_used_block_count(),
+              phys_mem_get_block_count(),
+              phys_mem_get_used_block_count() * phys_mem_get_block_size(),
+              phys_mem_get_block_count() * phys_mem_get_block_size());
 }

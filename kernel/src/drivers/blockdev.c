@@ -22,17 +22,15 @@
 
 #include <drivers/blockdev.h>
 
-#include <arch/arch.h>
-
-#include <util/list.h>
-
-#include <string.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include <vfs/vfs.h>
-
+#include <arch/arch.h>
 #include <debug/backtrace.h>
+#include <logging/logging.h>
+#include <util/list.h>
+#include <vfs/vfs.h>
 
 #define MAX_DESCRIPTION_LENGTH 256
 
@@ -45,12 +43,12 @@ typedef struct _blockdev_class
     blockdev_read_func_t read;
     blockdev_write_func_t write;
 
-    list_t *instance_list;
+    list_t* instance_list;
 } blockdev_class_t;
 
 typedef struct _blockdev_instance
 {
-    blockdev_class_t *class;
+    blockdev_class_t* class;
 
     unsigned int minor;
 
@@ -64,13 +62,13 @@ typedef struct _blockdev_instance
 
 #define NUM_BLOCKDEV_CLASSES 2
 
-static blockdev_class_t *blockdev_classes[NUM_BLOCKDEV_CLASSES] = {NULL};
+static blockdev_class_t* blockdev_classes[NUM_BLOCKDEV_CLASSES] = {NULL};
 
-static blockdev_instance_t *get_blockdev_instance(blockdev_class_t *class, uint32_t minor)
+static blockdev_instance_t* get_blockdev_instance(blockdev_class_t* class, uint32_t minor)
 {
-    for (list_node_t *lnode = class->instance_list->head; lnode != NULL; lnode = lnode->next)
+    for (list_node_t* lnode = class->instance_list->head; lnode != NULL; lnode = lnode->next)
     {
-        blockdev_instance_t *instance = lnode->payload;
+        blockdev_instance_t* instance = lnode->payload;
 
         if (instance->minor == minor)
         {
@@ -83,25 +81,23 @@ static blockdev_instance_t *get_blockdev_instance(blockdev_class_t *class, uint3
     return NULL;
 }
 
-static void release_blockdev_instance(blockdev_instance_t *instance)
+static void release_blockdev_instance(blockdev_instance_t* instance)
 {
     instance->ref_count--;
 }
 
-int reg_blockdev_class(uint64_t major, const char *desc, blockdev_read_func_t read, blockdev_write_func_t write)
+int reg_blockdev_class(uint64_t major, const char* desc, blockdev_read_func_t read, blockdev_write_func_t write)
 {
 
-    blockdev_class_t *class;
+    blockdev_class_t* class;
     if (major > NUM_BLOCKDEV_CLASSES)
     {
-
         // Invalid blockdev class
         return -1;
     }
 
     if (blockdev_classes[major])
     {
-
         // Already registered
         return -1;
     }
@@ -124,46 +120,40 @@ int reg_blockdev_class(uint64_t major, const char *desc, blockdev_read_func_t re
 
     blockdev_classes[major] = class;
 
-    printf("[Blockdev] Class %i registered [%s]\n", major, class->description);
+    log_info("[Blockdev] Class %i registered [%s]", major, class->description);
 
     return 0;
 }
 
-static uint32_t read_blockdev_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
+static uint32_t read_blockdev_fs(fs_node_t* node, uint64_t offset, uint32_t size, uint8_t* buffer)
 {
-    blockdev_instance_t *instance = (blockdev_instance_t *)node->device;
-    blockdev_class_t *class = instance->class;
-
-    //printf("[Blockdev] read_blockdev_fs: M:%i,m:%i, offset:%#016x, size:%#08x\n",
-    //       class->major, instance->minor, offset, size);
+    blockdev_instance_t* instance = (blockdev_instance_t*)node->device;
+    blockdev_class_t* class = instance->class;
 
     return blockdev_read(class->major, instance->minor, offset, size, buffer);
 }
 
-static uint32_t write_blockdev_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
+static uint32_t write_blockdev_fs(fs_node_t* node, uint64_t offset, uint32_t size, uint8_t* buffer)
 {
     (void)node;
 
     return blockdev_write(0, 0, offset, size, buffer);
 }
 
-static void open_blockdev_fs(fs_node_t *node, uint32_t flags)
+static void open_blockdev_fs(fs_node_t* node, uint32_t flags)
 {
-    blockdev_instance_t *instance = (blockdev_instance_t *)node->device;
-    blockdev_class_t *class = instance->class;
-
-    //printf("[Blockdev] open_blockdev_fs: M:%i,m:%i,flags:%#x\n",
-    //       class->major, instance->minor, flags);
+    blockdev_instance_t* instance = (blockdev_instance_t*)node->device;
+    blockdev_class_t* class = instance->class;
 }
 
-int reg_blockdev_instance(uint32_t major, uint32_t minor, const char *desc, size_t block_size, size_t capacity)
+int reg_blockdev_instance(uint32_t major, uint32_t minor, const char* desc, size_t block_size, size_t capacity)
 {
-    blockdev_class_t *class;
-    blockdev_instance_t *instance;
+    blockdev_class_t* class;
+    blockdev_instance_t* instance;
 
     if (major > NUM_BLOCKDEV_CLASSES || !block_size || !capacity)
     {
-        // Invalid argument
+        log_error("[BLOCKDEV] Invalid argument");
         return -1;
     }
 
@@ -171,7 +161,7 @@ int reg_blockdev_instance(uint32_t major, uint32_t minor, const char *desc, size
 
     if (!class)
     {
-        // Class not registered
+        log_error("[BLOCKDEV] Blockdev class not registred");
         return -1;
     }
 
@@ -188,7 +178,7 @@ int reg_blockdev_instance(uint32_t major, uint32_t minor, const char *desc, size
 
     if (!instance)
     {
-        // No memory
+        log_error("[BLOCKDEV] Failed to allocate memory for blockdev instance");
         return -1;
     }
 
@@ -203,9 +193,7 @@ int reg_blockdev_instance(uint32_t major, uint32_t minor, const char *desc, size
 
     list_insert(class->instance_list, instance);
 
-    //printf("[Blockdev] Instance %i of class %i registered [%s]\n", minor, major, instance->description);
-
-    fs_node_t *fnode = malloc(sizeof(fs_node_t));
+    fs_node_t* fnode = malloc(sizeof(fs_node_t));
 
     memset(fnode, 0, sizeof(fs_node_t));
 
@@ -233,12 +221,12 @@ int reg_blockdev_instance(uint32_t major, uint32_t minor, const char *desc, size
 
 int unreg_blockdev_instance(uint32_t major, uint32_t minor)
 {
-    blockdev_class_t *class;
-    blockdev_instance_t *instance;
+    blockdev_class_t* class;
+    blockdev_instance_t* instance;
 
     if (major > NUM_BLOCKDEV_CLASSES)
     {
-        // Invalid class
+        log_error("[BLOCKDEV] Invalid class");
         return -1;
     }
 
@@ -246,7 +234,7 @@ int unreg_blockdev_instance(uint32_t major, uint32_t minor)
 
     if (!class)
     {
-        // Class not registered
+        log_error("[BLOCKDEV] Class not registred");
         return -1;
     }
 
@@ -254,7 +242,7 @@ int unreg_blockdev_instance(uint32_t major, uint32_t minor)
 
     if (!instance)
     {
-        // Invalid instance requested
+        log_error("[BLOCKDEV] Invalid instance");
         return -1;
     }
 
@@ -262,11 +250,11 @@ int unreg_blockdev_instance(uint32_t major, uint32_t minor)
     {
         release_blockdev_instance(instance);
 
-        // Device is busy
+        log_error("[BLOCKDEV] Device is busy");
         return -1;
     }
 
-    list_node_t *list_node = list_find(class->instance_list, instance);
+    list_node_t* list_node = list_find(class->instance_list, instance);
 
     if (list_node)
     {
@@ -274,7 +262,7 @@ int unreg_blockdev_instance(uint32_t major, uint32_t minor)
     }
     else
     {
-        // Consisitency error
+        log_error("[BLOCKDEV] Consistency error");
         return -1;
     }
 
@@ -283,12 +271,10 @@ int unreg_blockdev_instance(uint32_t major, uint32_t minor)
     return 0;
 }
 
-uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, size_t len, void *buffer)
+uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, size_t len, void* buffer)
 {
-    //printf("[Blockdev] blockdev_read: M:%i m:%i Read Off:%i, len:%i, buffer:%#016x\n", major, minor, offset, len, buffer);
-
-    blockdev_class_t *class;
-    blockdev_instance_t *instance;
+    blockdev_class_t* class;
+    blockdev_instance_t* instance;
 
     size_t block_size;
     size_t delta;
@@ -297,32 +283,28 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
     uint32_t block;
     uint32_t nblocks;
 
-    uint8_t *tmp;
-    uint8_t *dest = (uint8_t *)buffer;
+    uint8_t* tmp;
+    uint8_t* dest = (uint8_t*)buffer;
 
     if (major > NUM_BLOCKDEV_CLASSES)
     {
-        printf("[Blockdev] Major class invalid\n");
+        log_error("[BLOCKDEV] Major class invalid");
         return -1;
     }
 
     class = blockdev_classes[major];
 
-    //printf("[Blockdev] Class: %s\n", class->description);
-
     if (!class)
     {
-        printf("[Blockdev] Could not find class\n");
+        log_error("[BLOCKDEV] Could not find class");
         return -1;
     }
 
     instance = get_blockdev_instance(class, minor);
 
-    //printf("[Blockdev] Instance: %s\n", instance->description);
-
     if (!instance)
     {
-        printf("[Blockdev] Could not find instance\n");
+        log_error("[BLOCKDEV] Could not find instance");
         return -1;
     }
 
@@ -337,14 +319,14 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
 
         if (!tmp)
         {
-            printf("[Blockdev] Failed to allocate memory 1\n");
+            log_error("[BLOCKDEV] Failed to allocate memory");
             release_blockdev_instance(instance);
             return -1;
         }
 
         if (!class->read(minor, block, 1, tmp))
         {
-            printf("[Blockdev] Error reading from device 1\n");
+            log_error("[BLOCKDEV] Error reading from device");
 
             free(tmp);
             release_blockdev_instance(instance);
@@ -365,7 +347,7 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
     {
         if (!(n = class->read(minor, block, nblocks, dest)))
         {
-            printf("[Blockdev] Read zero blocks\n");
+            log_error("[BLOCKDEV] Read zero blocks");
 
             release_blockdev_instance(instance);
 
@@ -383,14 +365,14 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
 
         if (!tmp)
         {
-            printf("[Blockdev] Error allocating memory 2\n");
+            log_error("[BLOCKDEV] Error allocating memory");
             release_blockdev_instance(instance);
             return -1;
         }
 
         if (!class->read(minor, block, 1, tmp))
         {
-            printf("[Blockdev] Error reading from device 2\n");
+            log_error("[BLOCKDEV] Error reading from device");
 
             free(tmp);
             release_blockdev_instance(instance);
@@ -407,10 +389,10 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
     return 0;
 }
 
-uint32_t blockdev_write(unsigned int major, unsigned int minor, uint32_t offset, size_t len, void *buffer)
+uint32_t blockdev_write(unsigned int major, unsigned int minor, uint32_t offset, size_t len, void* buffer)
 {
-    blockdev_class_t *class;
-    blockdev_instance_t *instance;
+    blockdev_class_t* class;
+    blockdev_instance_t* instance;
 
     size_t block_size;
     size_t delta;
@@ -419,8 +401,8 @@ uint32_t blockdev_write(unsigned int major, unsigned int minor, uint32_t offset,
     uint32_t block;
     uint32_t nblocks;
 
-    uint8_t *tmp;
-    uint8_t *src = (uint8_t *)buffer;
+    uint8_t* tmp;
+    uint8_t* src = (uint8_t*)buffer;
 
     if (major > NUM_BLOCKDEV_CLASSES)
     {
@@ -452,12 +434,14 @@ uint32_t blockdev_write(unsigned int major, unsigned int minor, uint32_t offset,
 
         if (!tmp)
         {
+            log_error("[BLOCKDEV] Failed to allocate memory");
             release_blockdev_instance(instance);
             return -1;
         }
 
         if (!class->read(minor, block, 1, tmp))
         {
+            log_error("[BLOCKDEV] Failed to read from device");
             free(tmp);
             release_blockdev_instance(instance);
             return -1;
@@ -467,6 +451,7 @@ uint32_t blockdev_write(unsigned int major, unsigned int minor, uint32_t offset,
 
         if (!class->write(minor, block, 1, tmp))
         {
+            log_error("[BLOCKDEV] Failed to write to device");
             free(tmp);
             release_blockdev_instance(instance);
             return -1;
@@ -484,7 +469,7 @@ uint32_t blockdev_write(unsigned int major, unsigned int minor, uint32_t offset,
     {
         if (!(n = class->write(minor, block, nblocks, src)))
         {
-            printf("[IDE] Error: Could not write to blockdev\n");
+            log_error("[BLOCKDEV] Error: Could not write to blockdev");
             backtrace();
 
             release_blockdev_instance(instance);
@@ -503,12 +488,14 @@ uint32_t blockdev_write(unsigned int major, unsigned int minor, uint32_t offset,
 
         if (!tmp)
         {
+            log_error("[BLOCKDEV] Failed to allocate memory");
             release_blockdev_instance(instance);
             return -1;
         }
 
         if (!class->read(minor, block, 1, tmp))
         {
+            log_error("[BLOCKDEV] Failed to read from device");
             free(tmp);
             release_blockdev_instance(instance);
             return -1;
@@ -518,6 +505,7 @@ uint32_t blockdev_write(unsigned int major, unsigned int minor, uint32_t offset,
 
         if (!class->write(minor, block, 1, tmp))
         {
+            log_error("[BLOCKDEV] Failed to write to device");
             free(tmp);
             release_blockdev_instance(instance);
             return -1;

@@ -29,7 +29,7 @@ void arch_x64_64_set_fpu_cw(const uint16_t cw)
     __asm__ volatile("fldcw %0" ::"m"(cw));
 }
 
-void arch_x64_64_get_fpu_cw(uint16_t *cw)
+void arch_x64_64_get_fpu_cw(uint16_t* cw)
 {
     __asm__ volatile("fstcw %0"
                      : "=m"(*cw));
@@ -115,14 +115,14 @@ void arch_x64_64_install_fpu()
 // the memory must be 16 byte aligned to avoid GP faults
 static uint8_t __fxsave_buffer[512] __attribute__((aligned(16)));
 
-void arch_x64_64_restore_fpu(void *buffer)
+void arch_x64_64_restore_fpu(void* buffer)
 {
     memcpy(__fxsave_buffer, buffer, 512);
 
     __asm__ volatile("fxrstor (%0)" ::"r"(__fxsave_buffer));
 }
 
-void arch_x64_64_save_fpu(void *buffer)
+void arch_x64_64_save_fpu(void* buffer)
 {
     __asm__ volatile("fxsave (%0)" ::"r"(__fxsave_buffer));
 

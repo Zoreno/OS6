@@ -20,29 +20,31 @@
  * 
  */
 
-#include <exec/elf64.h>
 #include <exec/elf32.h>
+#include <exec/elf64.h>
 
 #include <stdio.h>
-#include <vfs/vfs.h>
-#include <mm/virt_mem.h>
-#include <string.h>
-#include <process/process.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include <logging/logging.h>
+#include <mm/virt_mem.h>
+#include <process/process.h>
+#include <vfs/vfs.h>
 
 /**
  * @brief Type describing an entry point "main" function.
  * 
  * 
  */
-typedef int (*entry_func_t)(int argc, const char **argv);
+typedef int (*entry_func_t)(int argc, const char** argv);
 
 /**
  * @brief Set this to one to enable output of debug information.
  * 
  * 
  */
-#define ELF_DEBUG 1
+#define ELF_DEBUG 0
 
 #if ELF_DEBUG == 1
 #define ERROR(...) printf(__VA_ARGS__)
@@ -71,7 +73,7 @@ typedef int (*entry_func_t)(int argc, const char **argv);
  * @param header Pointer to header stored in memory.
  * 
  */
-static void elf64_debug_dump_ehdr(Elf64_Ehdr_t *header)
+static void elf64_debug_dump_ehdr(Elf64_Ehdr_t* header)
 {
 #if ELF_DEBUG == 1
 
@@ -192,7 +194,7 @@ static void elf64_debug_dump_ehdr(Elf64_Ehdr_t *header)
  * 
  * @return true if correct
  */
-static bool elf64_check_file(Elf64_Ehdr_t *header)
+static bool elf64_check_file(Elf64_Ehdr_t* header)
 {
     if (!header)
     {
@@ -233,7 +235,7 @@ static bool elf64_check_file(Elf64_Ehdr_t *header)
  * 
  * @return true if supported.
  */
-static bool elf64_check_supported(Elf64_Ehdr_t *header)
+static bool elf64_check_supported(Elf64_Ehdr_t* header)
 {
     if (!elf64_check_file(header))
     {
@@ -282,9 +284,9 @@ static bool elf64_check_supported(Elf64_Ehdr_t *header)
  * 
  * @return Pointer to first section header.
  */
-static Elf64_Shdr_t *elf64_sheader(Elf64_Ehdr_t *header)
+static Elf64_Shdr_t* elf64_sheader(Elf64_Ehdr_t* header)
 {
-    return (Elf64_Shdr_t *)((Elf64_Off_t)header + header->e_shoff);
+    return (Elf64_Shdr_t*)((Elf64_Off_t)header + header->e_shoff);
 }
 
 /**
@@ -295,9 +297,9 @@ static Elf64_Shdr_t *elf64_sheader(Elf64_Ehdr_t *header)
  * 
  * @return Pointer to section header at index @index
  */
-static Elf64_Shdr_t *elf64_section(Elf64_Ehdr_t *header, int index)
+static Elf64_Shdr_t* elf64_section(Elf64_Ehdr_t* header, int index)
 {
-    Elf64_Shdr_t *sheader = elf64_sheader(header);
+    Elf64_Shdr_t* sheader = elf64_sheader(header);
 
     return &sheader[index];
 }
@@ -309,14 +311,14 @@ static Elf64_Shdr_t *elf64_section(Elf64_Ehdr_t *header, int index)
  * 
  * @return Pointer to the beginning of the string table.
  */
-static char *elf64_str_table(Elf64_Ehdr_t *header)
+static char* elf64_str_table(Elf64_Ehdr_t* header)
 {
     if (header->e_shstrndx == SHN_UNDEF)
     {
         return NULL;
     }
 
-    return (char *)header + elf64_section(header, header->e_shstrndx)->sh_offset;
+    return (char*)header + elf64_section(header, header->e_shstrndx)->sh_offset;
 }
 
 /**
@@ -327,9 +329,9 @@ static char *elf64_str_table(Elf64_Ehdr_t *header)
  * 
  * @return String from string table.
  */
-static char *elf64_lookup_string(Elf64_Ehdr_t *header, int offset)
+static char* elf64_lookup_string(Elf64_Ehdr_t* header, int offset)
 {
-    char *strtab = elf64_str_table(header);
+    char* strtab = elf64_str_table(header);
 
     if (!strtab)
     {
@@ -353,7 +355,7 @@ static char *elf64_lookup_string(Elf64_Ehdr_t *header, int offset)
  * 
  * @return Pointer to the symbol
  */
-static void *elf64_lookup_symbol(const char *name)
+static void* elf64_lookup_symbol(const char* name)
 {
     // TODO: Implement
     return NULL;
@@ -368,16 +370,16 @@ static void *elf64_lookup_symbol(const char *name)
  * 
  * @return Address of value of symbol or @ELF_RELOC_ERR on error
  */
-static Elf64_Off_t elf64_get_symval(Elf64_Ehdr_t *header,
-                            int table,
-                            uint32_t index)
+static Elf64_Off_t elf64_get_symval(Elf64_Ehdr_t* header,
+                                    int table,
+                                    uint32_t index)
 {
     if (table == SHN_UNDEF || index == SHN_UNDEF)
     {
         return 0;
     }
 
-    Elf64_Shdr_t *symtab = elf64_section(header, table);
+    Elf64_Shdr_t* symtab = elf64_section(header, table);
 
     uint32_t symtab_entries = symtab->sh_size / symtab->sh_entsize;
 
@@ -388,15 +390,15 @@ static Elf64_Off_t elf64_get_symval(Elf64_Ehdr_t *header,
     }
 
     Elf64_Off_t symaddr = (Elf64_Off_t)header + symtab->sh_offset;
-    Elf64_Sym_t *symbol = &((Elf64_Sym_t *)symaddr)[index];
+    Elf64_Sym_t* symbol = &((Elf64_Sym_t*)symaddr)[index];
 
     if (symbol->st_shndx == SHN_UNDEF)
     {
-        Elf64_Shdr_t *strtab = elf64_section(header, symtab->sh_link);
+        Elf64_Shdr_t* strtab = elf64_section(header, symtab->sh_link);
 
-        const char *name = (const char *)header + strtab->sh_offset + symbol->st_name;
+        const char* name = (const char*)header + strtab->sh_offset + symbol->st_name;
 
-        void *target = elf64_lookup_symbol(name);
+        void* target = elf64_lookup_symbol(name);
 
         if (target == NULL)
         {
@@ -421,19 +423,19 @@ static Elf64_Off_t elf64_get_symval(Elf64_Ehdr_t *header,
     }
     else
     {
-        Elf64_Shdr_t *target = elf64_section(header, symbol->st_shndx);
+        Elf64_Shdr_t* target = elf64_section(header, symbol->st_shndx);
 
         return (Elf64_Off_t)header + symbol->st_value + target->sh_offset;
     }
 }
 
-static int elf64_load_stage1(Elf64_Ehdr_t *header)
+static int elf64_load_stage1(Elf64_Ehdr_t* header)
 {
-    Elf64_Shdr_t *shdr = elf64_sheader(header);
+    Elf64_Shdr_t* shdr = elf64_sheader(header);
 
     for (unsigned int i = 0; i < header->e_shnum; ++i)
     {
-        Elf64_Shdr_t *section = &shdr[i];
+        Elf64_Shdr_t* section = &shdr[i];
     }
 
     // TODO: Finish this function
@@ -447,7 +449,7 @@ static int elf64_load_stage1(Elf64_Ehdr_t *header)
  * 
  * @return zero if error
  */
-static int elf32_check_file(Elf32_Ehdr_t *header)
+static int elf32_check_file(Elf32_Ehdr_t* header)
 {
     if (!header)
     {
@@ -488,7 +490,7 @@ static int elf32_check_file(Elf32_Ehdr_t *header)
  * 
  * @return true if supported.
  */
-static bool elf32_check_supported(Elf32_Ehdr_t *header)
+static bool elf32_check_supported(Elf32_Ehdr_t* header)
 {
     if (!elf32_check_file(header))
     {
@@ -531,32 +533,32 @@ static bool elf32_check_supported(Elf32_Ehdr_t *header)
 }
 
 // TODO: handle 32 bit ELF files too.
-int exec_elf(char *path, int argc, char **argv, char **env, int depth)
+int exec_elf(char* path, int argc, char** argv, char** env, int depth)
 {
-    process_t *current_process = process_get_current();
+    process_t* current_process = process_get_current();
 
     Elf64_Ehdr_t header;
 
     if (path != NULL)
     {
-        printf("Opening %s\n", path);
+        log_debug("Opening %s", path);
     }
 
-    fs_node_t *file = kopen(path, 0);
+    fs_node_t* file = kopen(path, 0);
 
     if (!file)
     {
-        printf("Could not open file: %s\n", path);
+        log_error("Could not open file: %s", path);
         return -1;
     }
 
-    read_fs(file, 0, sizeof(Elf64_Ehdr_t), (uint8_t *)&header);
+    read_fs(file, 0, sizeof(Elf64_Ehdr_t), (uint8_t*)&header);
 
     elf64_debug_dump_ehdr(&header);
 
     if (!elf64_check_supported(&header))
     {
-        printf("\"%s\" is not a valid ELF executable\n", path);
+        log_error("\"%s\" is not a valid ELF executable", path);
         close_fs(file);
         return -1;
     }
@@ -570,7 +572,7 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
         read_fs(file,
                 header.e_shoff + x,
                 sizeof(Elf64_Shdr_t),
-                (uint8_t *)&shdr);
+                (uint8_t*)&shdr);
 
         if (shdr.sh_type == SHT_NOBITS)
         {
@@ -581,7 +583,7 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
 
             if (shdr.sh_flags & SHF_ALLOC)
             {
-                void *mem = malloc(shdr.sh_size);
+                void* mem = malloc(shdr.sh_size);
 
                 if (!mem)
                 {
@@ -593,7 +595,7 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
 
                 //shdr.sh_size = (int)mem - (int)&header;
 
-                printf("Allocated memory for section: %i bytes\n", shdr.sh_size);
+                log_debug("Allocated memory for section: %i bytes", shdr.sh_size);
             }
         }
     }
@@ -609,13 +611,13 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
         read_fs(file,
                 header.e_phoff + x,
                 sizeof(Elf64_Phdr_t),
-                (uint8_t *)&phdr);
+                (uint8_t*)&phdr);
 
         if (phdr.p_type == PT_DYNAMIC)
         {
             close_fs(file);
 
-            printf("Dynamic executable");
+            log_warn("Dynamic executable");
 
             // TODO: Implement with linker
             return -1;
@@ -634,7 +636,7 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
 
         //printf("Found program header: %i\n", phdr.p_type);
 
-        read_fs(file, header.e_phoff + x, sizeof(Elf64_Phdr_t), (uint8_t *)&phdr);
+        read_fs(file, header.e_phoff + x, sizeof(Elf64_Phdr_t), (uint8_t*)&phdr);
 
         if (phdr.p_type == PT_LOAD)
         {
@@ -661,13 +663,13 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
 
         //printf("Found program header: %i\n", phdr.p_type);
 
-        read_fs(file, header.e_phoff + x, sizeof(Elf64_Phdr_t), (uint8_t *)&phdr);
+        read_fs(file, header.e_phoff + x, sizeof(Elf64_Phdr_t), (uint8_t*)&phdr);
 
         if (phdr.p_type == PT_LOAD)
         {
             if (phdr.p_vaddr < 0x400000 || phdr.p_vaddr >= 0x20000000)
             {
-                printf("Invalid load address %#016x\n", phdr.p_vaddr);
+                log_error("Invalid load address %#016x", phdr.p_vaddr);
                 close_fs(file);
                 return -1;
             }
@@ -676,14 +678,14 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
             {
                 // TODO: Check page alignment
 
-                void *paddr = phys_mem_alloc_block();
+                void* paddr = phys_mem_alloc_block();
 
-                virt_mem_map_page(paddr, (void *)i, VIRT_MEM_WRITABLE | VIRT_MEM_USER);
+                virt_mem_map_page(paddr, (void*)i, VIRT_MEM_WRITABLE | VIRT_MEM_USER);
             }
 
-            read_fs(file, phdr.p_offset, phdr.p_filesz, (uint8_t *)phdr.p_vaddr);
+            read_fs(file, phdr.p_offset, phdr.p_filesz, (uint8_t*)phdr.p_vaddr);
 
-            memset((void *)(phdr.p_vaddr + phdr.p_filesz), 0, (size_t)(phdr.p_memsz - phdr.p_filesz));
+            memset((void*)(phdr.p_vaddr + phdr.p_filesz), 0, (size_t)(phdr.p_memsz - phdr.p_filesz));
         }
     }
 
@@ -705,16 +707,16 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
         ++heap;
     }
 
-    void *heap_phys = phys_mem_alloc_block();
-    virt_mem_map_page(heap_phys, (void *)heap, VIRT_MEM_WRITABLE | VIRT_MEM_USER);
+    void* heap_phys = phys_mem_alloc_block();
+    virt_mem_map_page(heap_phys, (void*)heap, VIRT_MEM_WRITABLE | VIRT_MEM_USER);
 
     // Allocate room on heap for argv
-    char **argv_ = (char **)heap;
-    heap += sizeof(char *) * (argc + 1);
+    char** argv_ = (char**)heap;
+    heap += sizeof(char*) * (argc + 1);
 
     // Allocate room on heap for env
-    char **env_ = (char **)heap;
-    heap += sizeof(char *) * (envc + 1);
+    char** env_ = (char**)heap;
+    heap += sizeof(char*) * (envc + 1);
 
     for (int i = 0; i < argc; ++i)
     {
@@ -722,13 +724,13 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
 
         for (uintptr_t x = heap; x < heap + size + PAGE_SIZE; x += PAGE_SIZE)
         {
-            void *mem = phys_mem_alloc_block();
+            void* mem = phys_mem_alloc_block();
 
-            virt_mem_map_page(mem, (void *)x, VIRT_MEM_WRITABLE | VIRT_MEM_USER);
+            virt_mem_map_page(mem, (void*)x, VIRT_MEM_WRITABLE | VIRT_MEM_USER);
         }
 
-        argv_[i] = (char *)heap;
-        memcpy((void *)heap, argv[i], size);
+        argv_[i] = (char*)heap;
+        memcpy((void*)heap, argv[i], size);
         heap += size;
     }
 
@@ -740,13 +742,13 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
 
         for (uintptr_t x = heap; x < heap + size + PAGE_SIZE; x += PAGE_SIZE)
         {
-            void *mem = phys_mem_alloc_block();
+            void* mem = phys_mem_alloc_block();
 
-            virt_mem_map_page(mem, (void *)x, VIRT_MEM_WRITABLE | VIRT_MEM_USER);
+            virt_mem_map_page(mem, (void*)x, VIRT_MEM_WRITABLE | VIRT_MEM_USER);
         }
 
-        env_[i] = (char *)heap;
-        memcpy((void *)heap, env[i], size);
+        env_[i] = (char*)heap;
+        memcpy((void*)heap, env[i], size);
         heap += size;
     }
 
@@ -755,9 +757,9 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
     current_process->image.heap = heap;
     current_process->image.heap_actual = heap + (PAGE_SIZE - heap % PAGE_SIZE);
 
-    void *mem = phys_mem_alloc_block();
+    void* mem = phys_mem_alloc_block();
 
-    virt_mem_map_page(mem, (void *)current_process->image.heap_actual, VIRT_MEM_WRITABLE | VIRT_MEM_USER);
+    virt_mem_map_page(mem, (void*)current_process->image.heap_actual, VIRT_MEM_WRITABLE | VIRT_MEM_USER);
 
     current_process->image.start = entry;
 
@@ -774,7 +776,7 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
 
     //const char *args[2] = {"Test", "Fisk"};
 
-    int ret = entry_func(argc, (const char **)argv_);
+    int ret = entry_func(argc, (const char**)argv_);
 
     __builtin_unreachable();
 }

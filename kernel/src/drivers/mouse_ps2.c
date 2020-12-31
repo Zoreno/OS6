@@ -21,9 +21,11 @@
  */
 
 #include <drivers/mouse_ps2.h>
+
 #include <stdio.h>
 
 #include <arch/arch.h>
+#include <logging/logging.h>
 
 /**
  * Mouse packet from mouse IRQ
@@ -191,7 +193,7 @@ static mouse_moved_event_handler current_moved_handler = 0;
 static mouse_button_event_handler current_button_handler = 0;
 static mouse_scroll_event_handler current_scroll_handler = 0;
 
-void mouse_process_packet(mouse_packet *packet);
+void mouse_process_packet(mouse_packet* packet);
 
 void mouse_wait_data()
 {
@@ -249,7 +251,7 @@ void mouse_write(uint8_t data)
     mouse_wait_for_ack();
 }
 
-void mouse_process_packet(mouse_packet *packet)
+void mouse_process_packet(mouse_packet* packet)
 {
     // printf("Starting to process mouse packet...\n");
 
@@ -533,7 +535,7 @@ void mouse_process_packet(mouse_packet *packet)
     // printf("Processed Mouse Packet!\n");
 }
 
-void mouse_irq_handler(system_stack_t *regs)
+void mouse_irq_handler(system_stack_t* regs)
 {
     uint8_t data = inportb(MOUSE_DATA_PORT);
 
@@ -602,7 +604,7 @@ static int mouse_reset()
         return 0;
     }
 
-    printf("[MOUSE] reset failed\n");
+    log_warn("[MOUSE] reset failed");
 
     return 1;
 }
@@ -650,14 +652,14 @@ void mouse_poll()
 
 void mouse_install()
 {
-    printf("[MOUSE] Initializing...\n");
+    log_info("[MOUSE] Initializing...");
 
     set_irq_handler(12, mouse_irq_handler);
     clear_mask_interrupt(12);
 
     if (mouse_reset())
     {
-        printf("[MOUSE] Failed\n");
+        log_error("[MOUSE] Failed");
         return;
     }
 
@@ -733,7 +735,7 @@ void mouse_install()
 
 #endif
 
-    printf("[MOUSE] Done\n");
+    log_info("[MOUSE] Done");
 }
 
 void mouse_set_sample_freq(uint8_t freq)
@@ -767,7 +769,7 @@ void mouse_set_position(int32_t x, int32_t y)
     mouse_y = y;
 }
 
-void mouse_get_position(int32_t *x, int32_t *y)
+void mouse_get_position(int32_t* x, int32_t* y)
 {
     *x = mouse_x;
     *y = mouse_y;
