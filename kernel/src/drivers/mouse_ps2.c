@@ -193,7 +193,7 @@ static mouse_moved_event_handler current_moved_handler = 0;
 static mouse_button_event_handler current_button_handler = 0;
 static mouse_scroll_event_handler current_scroll_handler = 0;
 
-void mouse_process_packet(mouse_packet* packet);
+void mouse_process_packet(mouse_packet *packet);
 
 void mouse_wait_data()
 {
@@ -251,7 +251,7 @@ void mouse_write(uint8_t data)
     mouse_wait_for_ack();
 }
 
-void mouse_process_packet(mouse_packet* packet)
+void mouse_process_packet(mouse_packet *packet)
 {
     // printf("Starting to process mouse packet...\n");
 
@@ -535,7 +535,7 @@ void mouse_process_packet(mouse_packet* packet)
     // printf("Processed Mouse Packet!\n");
 }
 
-void mouse_irq_handler(system_stack_t* regs)
+void mouse_irq_handler(system_stack_t *regs)
 {
     uint8_t data = inportb(MOUSE_DATA_PORT);
 
@@ -769,7 +769,7 @@ void mouse_set_position(int32_t x, int32_t y)
     mouse_y = y;
 }
 
-void mouse_get_position(int32_t* x, int32_t* y)
+void mouse_get_position(int32_t *x, int32_t *y)
 {
     *x = mouse_x;
     *y = mouse_y;
@@ -794,3 +794,7 @@ void register_mouse_scroll_handler(mouse_scroll_event_handler newHandler)
 {
     current_scroll_handler = newHandler;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

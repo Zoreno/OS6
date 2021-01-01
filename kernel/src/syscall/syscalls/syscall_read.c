@@ -24,21 +24,25 @@
 
 int syscall_read(int fd, char *ptr, uint64_t len)
 {
-	if (!FILE_DESC_CHECK(fd))
-	{
-		return -EBADF;
-	}
+    if (!FILE_DESC_CHECK(fd))
+    {
+        return -EBADF;
+    }
 
-	fs_node_t *node = FILE_DESC_ENTRY(fd);
+    fs_node_t *node = FILE_DESC_ENTRY(fd);
 
-	if (!(FILE_DESC_MODE(fd) & 01))
-	{
-		printf("[SYSCALL] Access denied\n");
-		return -EACCES;
-	}
+    if (!(FILE_DESC_MODE(fd) & 01))
+    {
+        printf("[SYSCALL] Access denied\n");
+        return -EACCES;
+    }
 
-	uint32_t out = read_fs(node, FILE_DESC_OFFSET(fd), len, (uint8_t *)ptr);
-	FILE_DESC_OFFSET(fd) += out;
+    uint32_t out = read_fs(node, FILE_DESC_OFFSET(fd), len, (uint8_t *)ptr);
+    FILE_DESC_OFFSET(fd) += out;
 
-	return (int)out;
+    return (int)out;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

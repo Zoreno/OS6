@@ -22,10 +22,9 @@
 
 #include <arch/x86-64/pit.h>
 
-#include <arch/x86-64/pic.h>
-
 #include <stdio.h>
 
+#include <arch/x86-64/pic.h>
 #include <process/process.h>
 
 #define ARCH_X86_64_PIT_REG_COUNTER0 0x40
@@ -156,3 +155,7 @@ int arch_X86_64_pit_is_initialzed()
 {
     return _is_initialized;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

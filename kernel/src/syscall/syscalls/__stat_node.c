@@ -24,75 +24,79 @@
 
 int __stat_node(fs_node_t *node, uintptr_t addr)
 {
-	struct stat *f = (struct stat *)addr;
+    struct stat *f = (struct stat *)addr;
 
-	// TODO: Validate the pointer
+    // TODO: Validate the pointer
 
-	if (!node)
-	{
-		memset(f, 0, sizeof(struct stat));
+    if (!node)
+    {
+        memset(f, 0, sizeof(struct stat));
 
-		printf("[STAT] Tried to stat a non-existent file\n");
+        printf("[STAT] Tried to stat a non-existent file\n");
 
-		return -ENOENT;
-	}
+        return -ENOENT;
+    }
 
-	f->st_dev = (uint16_t)(((uint64_t)node->device & 0xFFFF0) >> 8);
-	f->st_ino = node->inode;
+    f->st_dev = (uint16_t)(((uint64_t)node->device & 0xFFFF0) >> 8);
+    f->st_ino = node->inode;
 
-	uint32_t flags = 0;
+    uint32_t flags = 0;
 
-	if (node->flags & FS_FILE)
-	{
-		flags |= _IFREG;
-	}
+    if (node->flags & FS_FILE)
+    {
+        flags |= _IFREG;
+    }
 
-	if (node->flags & FS_DIRECTORY)
-	{
-		flags |= _IFDIR;
-	}
+    if (node->flags & FS_DIRECTORY)
+    {
+        flags |= _IFDIR;
+    }
 
-	if (node->flags & FS_CHARDEVICE)
-	{
-		flags |= _IFCHR;
-	}
+    if (node->flags & FS_CHARDEVICE)
+    {
+        flags |= _IFCHR;
+    }
 
-	if (node->flags & FS_BLOCKDEVICE)
-	{
-		flags |= _IFBLK;
-	}
+    if (node->flags & FS_BLOCKDEVICE)
+    {
+        flags |= _IFBLK;
+    }
 
-	if (node->flags & FS_PIPE)
-	{
-		flags |= _IFIFO;
-	}
+    if (node->flags & FS_PIPE)
+    {
+        flags |= _IFIFO;
+    }
 
-	if (node->flags & FS_SYMLINK)
-	{
-		flags |= _IFLNK;
-	}
+    if (node->flags & FS_SYMLINK)
+    {
+        flags |= _IFLNK;
+    }
 
-	f->st_mode = node->permissions | flags;
+    f->st_mode = node->permissions | flags;
 
-	f->st_nlink = node->nlink;
-	f->st_uid = node->uid;
-	f->st_gid = node->gid;
-	f->st_rdev = 0;
+    f->st_nlink = node->nlink;
+    f->st_uid = node->uid;
+    f->st_gid = node->gid;
+    f->st_rdev = 0;
 
-	f->st_atime = node->atime;
-	f->st_mtime = node->mtime;
-	f->st_ctime = node->ctime;
+    f->st_atime = node->atime;
+    f->st_mtime = node->mtime;
+    f->st_ctime = node->ctime;
 
-	f->st_blksize = 512;
+    f->st_blksize = 512;
 
-	if (node->get_size)
-	{
-		f->st_size = node->get_size(node);
-	}
-	else
-	{
-		f->st_size = node->length;
-	}
+    if (node->get_size)
+    {
+        f->st_size = node->get_size(node);
+    }
+    else
+    {
+        f->st_size = node->length;
+    }
 
-	return 0;
+    return 0;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

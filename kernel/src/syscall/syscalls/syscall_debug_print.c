@@ -22,10 +22,37 @@
 
 #include <syscall/syscall.h>
 
+#include <string.h>
+
+#include <logging/logging.h>
+
 int syscall_debug_print(char *str)
 {
-	printf("%s", str);
+    // No string
+    if (!str)
+    {
+        return -1;
+    }
 
-	return 0;
+    // Empty string
+    if (!str[0])
+    {
+        return -1;
+    }
+
+    // Remove trailing newline
+    char *last_char = &str[strlen(str) - 1];
+    if (*last_char == '\n')
+    {
+        *last_char = '\0';
+    }
+
+    // Do the printing
+    log_debug("[APP] %s", str);
+
+    return 0;
 }
 
+//=============================================================================
+// End of file
+//=============================================================================

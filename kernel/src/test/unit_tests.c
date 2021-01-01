@@ -20,11 +20,11 @@
  * 
  */
 
-#include <string.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <ctype.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 static int num_tests = 0;
 static int num_cleared = 0;
@@ -254,3 +254,7 @@ void run_unit_tests()
 
     printf("Tests cleared: %i/%i\n", num_cleared, num_tests);
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

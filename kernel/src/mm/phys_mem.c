@@ -83,7 +83,7 @@ static uint64_t get_addr(uint64_t frame)
     return frame * PHYS_MEM_BLOCK_SIZE;
 }
 
-void phys_mem_init(memory_info_t* mem_info)
+void phys_mem_init(memory_info_t *mem_info)
 {
     _phys_mem.memory_size = mem_info->memory_size;
     _phys_mem.bitmap = (mm_bitmap_t)(align_up(mem_info->kernel_end, PHYS_MEM_BLOCK_SIZE));
@@ -146,7 +146,7 @@ void phys_mem_deinit_region(phys_addr base, size_t size)
     }
 }
 
-void* phys_mem_alloc_block()
+void *phys_mem_alloc_block()
 {
     if (phys_mem_get_block_count() == 0)
     {
@@ -167,12 +167,12 @@ void* phys_mem_alloc_block()
     phys_addr addr = frame * PHYS_MEM_BLOCK_SIZE;
     ++_phys_mem.used_blocks;
 
-    return (void*)addr;
+    return (void *)addr;
 }
 
-void* phys_mem_alloc_block_z()
+void *phys_mem_alloc_block_z()
 {
-    void* addr = phys_mem_alloc_block();
+    void *addr = phys_mem_alloc_block();
 
     if (addr)
     {
@@ -182,7 +182,7 @@ void* phys_mem_alloc_block_z()
     return addr;
 }
 
-void* phys_mem_alloc_blocks(size_t blocks)
+void *phys_mem_alloc_blocks(size_t blocks)
 {
     if (phys_mem_get_block_count() < blocks)
     {
@@ -206,12 +206,12 @@ void* phys_mem_alloc_blocks(size_t blocks)
     phys_addr addr = frame * PHYS_MEM_BLOCK_SIZE;
     _phys_mem.used_blocks += blocks;
 
-    return (void*)addr;
+    return (void *)addr;
 }
 
-void* phys_mem_alloc_blocks_z(size_t blocks)
+void *phys_mem_alloc_blocks_z(size_t blocks)
 {
-    void* addr = phys_mem_alloc_blocks(blocks);
+    void *addr = phys_mem_alloc_blocks(blocks);
 
     if (addr)
     {
@@ -221,7 +221,7 @@ void* phys_mem_alloc_blocks_z(size_t blocks)
     return addr;
 }
 
-void phys_mem_free_block(void* base)
+void phys_mem_free_block(void *base)
 {
     phys_addr addr = (phys_addr)base;
     uint64_t frame = addr / PHYS_MEM_BLOCK_SIZE;
@@ -231,7 +231,7 @@ void phys_mem_free_block(void* base)
     --_phys_mem.used_blocks;
 }
 
-void phys_mem_free_blocks(void* base, size_t size)
+void phys_mem_free_blocks(void *base, size_t size)
 {
     phys_addr addr = (phys_addr)base;
     uint64_t frame = addr / PHYS_MEM_BLOCK_SIZE;
@@ -277,3 +277,7 @@ void phys_mem_dump_statistics()
               phys_mem_get_used_block_count() * phys_mem_get_block_size(),
               phys_mem_get_block_count() * phys_mem_get_block_size());
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

@@ -24,24 +24,28 @@
 
 int syscall_getcwd(char *buf, size_t size)
 {
-	if (!buf)
-	{
-		return -EFAULT;
-	}
+    if (!buf)
+    {
+        return -EFAULT;
+    }
 
-	if (buf && (size == 0))
-	{
-		return -EINVAL;
-	}
+    if (buf && (size == 0))
+    {
+        return -EINVAL;
+    }
 
-	size_t len = strlen(process_get_current()->wd_path) + 1;
+    size_t len = strlen(process_get_current()->wd_path) + 1;
 
-	if (len > size)
-	{
-		return -ERANGE;
-	}
+    if (len > size)
+    {
+        return -ERANGE;
+    }
 
-	memcpy(buf, process_get_current()->wd_path, len);
+    memcpy(buf, process_get_current()->wd_path, len);
 
-	return 0;
+    return 0;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

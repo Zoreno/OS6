@@ -24,14 +24,18 @@
 
 int syscall_access(const char *file, int flags)
 {
-	fs_node_t *node = kopen((char *)file, flags);
+    fs_node_t *node = kopen((char *)file, flags);
 
-	if (!node)
-	{
-		return -ENOENT;
-	}
+    if (!node)
+    {
+        return -ENOENT;
+    }
 
-	close_fs(node);
+    close_fs(node);
 
-	return 0;
+    return 0;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

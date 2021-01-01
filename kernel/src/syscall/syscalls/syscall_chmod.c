@@ -24,6 +24,10 @@
 
 int syscall_chmod(char *file, int mode)
 {
-	// TODO: Implement
-	return -EINVAL;
+    // TODO: Implement
+    return -EINVAL;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

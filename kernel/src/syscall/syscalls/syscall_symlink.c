@@ -24,5 +24,9 @@
 
 int syscall_symlink(char *target, char *name)
 {
-	return symlink_fs(target, name);
+    return symlink_fs(target, name);
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

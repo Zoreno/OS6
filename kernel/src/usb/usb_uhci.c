@@ -22,24 +22,20 @@
 
 #include <usb/usb_uhci.h>
 
-#include <usb/usb_device.h>
-#include <usb/usb_controller.h>
-
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <util/link.h>
-
 #include <arch/arch.h>
-
-#include <pci/pci_device.h>
-#include <pci/pci.h>
-#include <pci/pci_io.h>
-
 #include <debug/backtrace.h>
 #include <mm/virt_mem.h>
+#include <pci/pci.h>
+#include <pci/pci_device.h>
+#include <pci/pci_io.h>
+#include <usb/usb_controller.h>
+#include <usb/usb_device.h>
+#include <util/link.h>
 
 //=============================================================================
 // Limits

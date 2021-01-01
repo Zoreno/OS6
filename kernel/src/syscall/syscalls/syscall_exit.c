@@ -24,7 +24,11 @@
 
 int syscall_exit(int retval)
 {
-	process_exit(retval);
+    process_exit(retval);
 
-	__builtin_unreachable();
+    __builtin_unreachable();
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

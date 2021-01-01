@@ -253,3 +253,7 @@ tree_node_t *tree_find(tree_t *tree, void *value, tree_comparator_t comparator)
 {
     return tree_node_find(tree->root, value, comparator);
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

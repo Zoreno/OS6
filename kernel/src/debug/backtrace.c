@@ -27,7 +27,7 @@
 
 #include <exec/elf64.h>
 
-void print_backtrace(unsigned long long int* reg)
+void print_backtrace(unsigned long long int *reg)
 {
     int depth = 0;
 
@@ -35,7 +35,7 @@ void print_backtrace(unsigned long long int* reg)
     {
         printf("bt [%i]: ", depth);
 
-        int ext = kernel_lookup_symbol((void*)*(reg + 1));
+        int ext = kernel_lookup_symbol((void *)*(reg + 1));
 
         printf("\n");
 
@@ -44,7 +44,7 @@ void print_backtrace(unsigned long long int* reg)
             break;
         }
 
-        reg = (unsigned long long int*)*reg;
+        reg = (unsigned long long int *)*reg;
 
         ++depth;
     }
@@ -58,9 +58,13 @@ void backtrace()
 
 #else
 
-    register unsigned long long int* _rbp __asm__("rbp");
+    register unsigned long long int *_rbp __asm__("rbp");
 
     print_backtrace(_rbp);
 
 #endif
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

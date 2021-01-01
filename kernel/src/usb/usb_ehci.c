@@ -22,27 +22,22 @@
 
 #include <usb/usb_ehci.h>
 
-#include <usb/usb_device.h>
-#include <usb/usb_controller.h>
-
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <util/link.h>
-
 #include <arch/arch.h>
-
-#include <pci/pci_device.h>
-#include <pci/pci.h>
-#include <pci/pci_io.h>
-
 #include <debug/backtrace.h>
-
-#include <mm/virt_mem.h>
-#include <mm/phys_mem.h>
 #include <mm/kheap.h>
+#include <mm/phys_mem.h>
+#include <mm/virt_mem.h>
+#include <pci/pci.h>
+#include <pci/pci_device.h>
+#include <pci/pci_io.h>
+#include <usb/usb_controller.h>
+#include <usb/usb_device.h>
+#include <util/link.h>
 
 #define MAX_QH 8
 #define MAX_TD 32
@@ -995,3 +990,7 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
 
     printf("[USB] EHCI Done\n");
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

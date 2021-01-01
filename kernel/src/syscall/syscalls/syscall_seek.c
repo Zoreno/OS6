@@ -24,33 +24,37 @@
 
 int syscall_seek(int fd, int offset, int whence)
 {
-	if (FILE_DESC_CHECK(fd))
-	{
-		// Cannot seek in stdin, stdout and stderr
-		if (fd < 3)
-		{
-			return 0;
-		}
+    if (FILE_DESC_CHECK(fd))
+    {
+        // Cannot seek in stdin, stdout and stderr
+        if (fd < 3)
+        {
+            return 0;
+        }
 
-		switch (whence)
-		{
-		case 0:
-			FILE_DESC_OFFSET(fd) = offset;
-			break;
-		case 1:
-			FILE_DESC_OFFSET(fd) += offset;
-			break;
-		case 2:
-			FILE_DESC_OFFSET(fd) = FILE_DESC_ENTRY(fd)->length + offset;
-			break;
+        switch (whence)
+        {
+        case 0:
+            FILE_DESC_OFFSET(fd) = offset;
+            break;
+        case 1:
+            FILE_DESC_OFFSET(fd) += offset;
+            break;
+        case 2:
+            FILE_DESC_OFFSET(fd) = FILE_DESC_ENTRY(fd)->length + offset;
+            break;
 
-		default:
+        default:
             return -EINVAL;
-			break;
-		}
+            break;
+        }
 
-		return FILE_DESC_OFFSET(fd);
-	}
+        return FILE_DESC_OFFSET(fd);
+    }
 
-	return -EBADF;
+    return -EBADF;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

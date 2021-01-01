@@ -33,3 +33,7 @@ void usb_set_controller_list(usb_controller_t *new_controller_list)
 {
     _usb_controller_list = new_controller_list;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

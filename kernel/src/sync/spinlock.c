@@ -50,32 +50,32 @@ void spinlock_lock(spinlock_t *lock)
 	}
 
 #else
-	while (1)
-	{
-		// TODO: Look into this. This looks a bit wierd.
-		if (!xchg_64(&lock->val, (void *)1))
-		{
-			return;
-		}
+    while (1)
+    {
+        // TODO: Look into this. This looks a bit wierd.
+        if (!xchg_64(&lock->val, (void *)1))
+        {
+            return;
+        }
 
-		while (lock->val)
-		{
-			process_yield(1);
-		}
-	}
+        while (lock->val)
+        {
+            process_yield(1);
+        }
+    }
 
 #endif
 }
 
 void *spinlock_trylock(spinlock_t *lock)
 {
-	return xchg_64(&lock->val, (void *)1);
+    return xchg_64(&lock->val, (void *)1);
 }
 
 void spinlock_init(spinlock_t *lock)
 {
-	lock->val = 0;
-	lock->waiters = 0;
+    lock->val = 0;
+    lock->waiters = 0;
 }
 
 void spinlock_unlock(spinlock_t *lock)
@@ -95,8 +95,12 @@ void spinlock_unlock(spinlock_t *lock)
 
 #else
 
-	BARRIER;
-	lock->val = 0;
+    BARRIER;
+    lock->val = 0;
 
 #endif
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

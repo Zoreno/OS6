@@ -21,14 +21,13 @@
  */
 
 #include <usb/usb_device.h>
-#include <usb/usb_driver.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <arch/arch.h>
-
 #include <debug/backtrace.h>
+#include <usb/usb_driver.h>
 
 usb_device_t *_usb_device_list;
 

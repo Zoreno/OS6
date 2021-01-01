@@ -43,12 +43,12 @@ typedef struct _blockdev_class
     blockdev_read_func_t read;
     blockdev_write_func_t write;
 
-    list_t* instance_list;
+    list_t *instance_list;
 } blockdev_class_t;
 
 typedef struct _blockdev_instance
 {
-    blockdev_class_t* class;
+    blockdev_class_t *class;
 
     unsigned int minor;
 
@@ -62,13 +62,13 @@ typedef struct _blockdev_instance
 
 #define NUM_BLOCKDEV_CLASSES 2
 
-static blockdev_class_t* blockdev_classes[NUM_BLOCKDEV_CLASSES] = {NULL};
+static blockdev_class_t *blockdev_classes[NUM_BLOCKDEV_CLASSES] = {NULL};
 
-static blockdev_instance_t* get_blockdev_instance(blockdev_class_t* class, uint32_t minor)
+static blockdev_instance_t *get_blockdev_instance(blockdev_class_t *class, uint32_t minor)
 {
-    for (list_node_t* lnode = class->instance_list->head; lnode != NULL; lnode = lnode->next)
+    for (list_node_t *lnode = class->instance_list->head; lnode != NULL; lnode = lnode->next)
     {
-        blockdev_instance_t* instance = lnode->payload;
+        blockdev_instance_t *instance = lnode->payload;
 
         if (instance->minor == minor)
         {
@@ -81,15 +81,15 @@ static blockdev_instance_t* get_blockdev_instance(blockdev_class_t* class, uint3
     return NULL;
 }
 
-static void release_blockdev_instance(blockdev_instance_t* instance)
+static void release_blockdev_instance(blockdev_instance_t *instance)
 {
     instance->ref_count--;
 }
 
-int reg_blockdev_class(uint64_t major, const char* desc, blockdev_read_func_t read, blockdev_write_func_t write)
+int reg_blockdev_class(uint64_t major, const char *desc, blockdev_read_func_t read, blockdev_write_func_t write)
 {
 
-    blockdev_class_t* class;
+    blockdev_class_t *class;
     if (major > NUM_BLOCKDEV_CLASSES)
     {
         // Invalid blockdev class
@@ -125,31 +125,31 @@ int reg_blockdev_class(uint64_t major, const char* desc, blockdev_read_func_t re
     return 0;
 }
 
-static uint32_t read_blockdev_fs(fs_node_t* node, uint64_t offset, uint32_t size, uint8_t* buffer)
+static uint32_t read_blockdev_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
 {
-    blockdev_instance_t* instance = (blockdev_instance_t*)node->device;
-    blockdev_class_t* class = instance->class;
+    blockdev_instance_t *instance = (blockdev_instance_t *)node->device;
+    blockdev_class_t *class = instance->class;
 
     return blockdev_read(class->major, instance->minor, offset, size, buffer);
 }
 
-static uint32_t write_blockdev_fs(fs_node_t* node, uint64_t offset, uint32_t size, uint8_t* buffer)
+static uint32_t write_blockdev_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
 {
     (void)node;
 
     return blockdev_write(0, 0, offset, size, buffer);
 }
 
-static void open_blockdev_fs(fs_node_t* node, uint32_t flags)
+static void open_blockdev_fs(fs_node_t *node, uint32_t flags)
 {
-    blockdev_instance_t* instance = (blockdev_instance_t*)node->device;
-    blockdev_class_t* class = instance->class;
+    blockdev_instance_t *instance = (blockdev_instance_t *)node->device;
+    blockdev_class_t *class = instance->class;
 }
 
-int reg_blockdev_instance(uint32_t major, uint32_t minor, const char* desc, size_t block_size, size_t capacity)
+int reg_blockdev_instance(uint32_t major, uint32_t minor, const char *desc, size_t block_size, size_t capacity)
 {
-    blockdev_class_t* class;
-    blockdev_instance_t* instance;
+    blockdev_class_t *class;
+    blockdev_instance_t *instance;
 
     if (major > NUM_BLOCKDEV_CLASSES || !block_size || !capacity)
     {
@@ -193,7 +193,7 @@ int reg_blockdev_instance(uint32_t major, uint32_t minor, const char* desc, size
 
     list_insert(class->instance_list, instance);
 
-    fs_node_t* fnode = malloc(sizeof(fs_node_t));
+    fs_node_t *fnode = malloc(sizeof(fs_node_t));
 
     memset(fnode, 0, sizeof(fs_node_t));
 
@@ -221,8 +221,8 @@ int reg_blockdev_instance(uint32_t major, uint32_t minor, const char* desc, size
 
 int unreg_blockdev_instance(uint32_t major, uint32_t minor)
 {
-    blockdev_class_t* class;
-    blockdev_instance_t* instance;
+    blockdev_class_t *class;
+    blockdev_instance_t *instance;
 
     if (major > NUM_BLOCKDEV_CLASSES)
     {
@@ -254,7 +254,7 @@ int unreg_blockdev_instance(uint32_t major, uint32_t minor)
         return -1;
     }
 
-    list_node_t* list_node = list_find(class->instance_list, instance);
+    list_node_t *list_node = list_find(class->instance_list, instance);
 
     if (list_node)
     {
@@ -271,10 +271,10 @@ int unreg_blockdev_instance(uint32_t major, uint32_t minor)
     return 0;
 }
 
-uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, size_t len, void* buffer)
+uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, size_t len, void *buffer)
 {
-    blockdev_class_t* class;
-    blockdev_instance_t* instance;
+    blockdev_class_t *class;
+    blockdev_instance_t *instance;
 
     size_t block_size;
     size_t delta;
@@ -283,8 +283,8 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
     uint32_t block;
     uint32_t nblocks;
 
-    uint8_t* tmp;
-    uint8_t* dest = (uint8_t*)buffer;
+    uint8_t *tmp;
+    uint8_t *dest = (uint8_t *)buffer;
 
     if (major > NUM_BLOCKDEV_CLASSES)
     {
@@ -389,10 +389,10 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
     return 0;
 }
 
-uint32_t blockdev_write(unsigned int major, unsigned int minor, uint32_t offset, size_t len, void* buffer)
+uint32_t blockdev_write(unsigned int major, unsigned int minor, uint32_t offset, size_t len, void *buffer)
 {
-    blockdev_class_t* class;
-    blockdev_instance_t* instance;
+    blockdev_class_t *class;
+    blockdev_instance_t *instance;
 
     size_t block_size;
     size_t delta;
@@ -401,8 +401,8 @@ uint32_t blockdev_write(unsigned int major, unsigned int minor, uint32_t offset,
     uint32_t block;
     uint32_t nblocks;
 
-    uint8_t* tmp;
-    uint8_t* src = (uint8_t*)buffer;
+    uint8_t *tmp;
+    uint8_t *src = (uint8_t *)buffer;
 
     if (major > NUM_BLOCKDEV_CLASSES)
     {
@@ -518,3 +518,7 @@ uint32_t blockdev_write(unsigned int major, unsigned int minor, uint32_t offset,
 
     return 0;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

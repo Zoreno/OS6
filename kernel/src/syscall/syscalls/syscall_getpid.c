@@ -24,6 +24,10 @@
 
 int syscall_getpid()
 {
-	// TODO: This should return the group ID if the process is in a group
-	return process_get_current()->id;
+    // TODO: This should return the group ID if the process is in a group
+    return process_get_current()->id;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

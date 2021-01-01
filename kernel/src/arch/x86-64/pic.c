@@ -20,8 +20,8 @@
  * 
  */
 
-#include <arch/x86-64/pic.h>
 #include <arch/arch.h>
+#include <arch/x86-64/pic.h>
 
 #define PIC1_REG_COMMAND 0x20
 #define PIC1_REG_STATUS 0x20
@@ -176,3 +176,7 @@ void arch_x86_64_initialize_pic(uint8_t base0, uint8_t base1)
     // set anyways
     arch_x86_64_pic_clear_mask_interrupt(2);
 }
+
+//=============================================================================
+// End of file
+//=============================================================================
