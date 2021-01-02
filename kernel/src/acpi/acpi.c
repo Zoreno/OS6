@@ -107,21 +107,21 @@ acpi_system_state_t S5_state;
 //=============================================================================
 
 #if DEBUG_ACPI == 1
-static void acpi_print_rdsp(rsdp_t* rsdp);
-static void acpi_print_acpi_header(const acpi_header_t* header);
-static const char* acpi_gas_address_space_to_string(uint8_t as);
-static const char* acpi_gas_access_size_to_string(uint8_t access_size);
-static void acpi_print_gas(const generic_address_structure_t* gas);
+static void acpi_print_rdsp(rsdp_t *rsdp);
+static void acpi_print_acpi_header(const acpi_header_t *header);
+static const char *acpi_gas_address_space_to_string(uint8_t as);
+static const char *acpi_gas_access_size_to_string(uint8_t access_size);
+static void acpi_print_gas(const generic_address_structure_t *gas);
 #endif
 
-static rsdp_t* acpi_check_rdsp(unsigned int* ptr);
-static rsdp_t* acpi_get_rsdp(void);
+static rsdp_t *acpi_check_rdsp(unsigned int *ptr);
+static rsdp_t *acpi_get_rsdp(void);
 
-static int acpi_parse_fadt(fadt_t* fadt);
-static int acpi_parse_dsdt(dsdt_t* dsdt);
+static int acpi_parse_fadt(fadt_t *fadt);
+static int acpi_parse_dsdt(dsdt_t *dsdt);
 
-static int acpi_check_header(acpi_header_t* header, char* signature);
-static uint8_t acpi_calculate_checksum(acpi_header_t* header);
+static int acpi_check_header(acpi_header_t *header, char *signature);
+static uint8_t acpi_calculate_checksum(acpi_header_t *header);
 
 static int acpi_enable(void);
 
@@ -130,7 +130,7 @@ static int acpi_enable(void);
 //=============================================================================
 
 #if DEBUG_ACPI == 1
-static void acpi_print_rdsp(rsdp_t* rsdp)
+static void acpi_print_rdsp(rsdp_t *rsdp)
 {
     char sig[9];
     char oem[7];
@@ -150,7 +150,7 @@ static void acpi_print_rdsp(rsdp_t* rsdp)
     printf("Extended checksum: %i\n", rsdp->extended_checksum);
 }
 
-static void acpi_print_acpi_header(const acpi_header_t* header)
+static void acpi_print_acpi_header(const acpi_header_t *header)
 {
     char sig[5];
     char oem[7];
@@ -171,13 +171,13 @@ static void acpi_print_acpi_header(const acpi_header_t* header)
     printf("Creator revision: %i\n", header->creator_revision);
 }
 
-static const char* acpi_gas_address_space_to_string(uint8_t as)
+static const char *acpi_gas_address_space_to_string(uint8_t as)
 {
     struct
     {
         uint8_t lower_bound; // Inclusive
         uint8_t upper_bound; // Inclusive
-        const char* string;  // Pointer to statically allocated string.
+        const char *string;  // Pointer to statically allocated string.
     } values[] =
         {
             {0, 0, "System Memory"},
@@ -206,7 +206,7 @@ static const char* acpi_gas_address_space_to_string(uint8_t as)
     return "Unknown";
 }
 
-static const char* acpi_gas_access_size_to_string(uint8_t access_size)
+static const char *acpi_gas_access_size_to_string(uint8_t access_size)
 {
     switch (access_size)
     {
@@ -227,7 +227,7 @@ static const char* acpi_gas_access_size_to_string(uint8_t access_size)
     return "Unknown";
 }
 
-static void acpi_print_gas(const generic_address_structure_t* gas)
+static void acpi_print_gas(const generic_address_structure_t *gas)
 {
     printf("Address space: %i (%s)\n", gas->address_space,
            acpi_gas_address_space_to_string(gas->address_space));
@@ -239,11 +239,11 @@ static void acpi_print_gas(const generic_address_structure_t* gas)
 }
 #endif
 
-static rsdp_t* acpi_check_rdsp(unsigned int* ptr)
+static rsdp_t *acpi_check_rdsp(unsigned int *ptr)
 {
-    char* signature = "RSD PTR ";
+    char *signature = "RSD PTR ";
 
-    rsdp_t* rsdp = (rsdp_t*)ptr;
+    rsdp_t *rsdp = (rsdp_t *)ptr;
 
     // Check the signature
     if (memcmp(signature, rsdp, 8) == 0)
@@ -254,7 +254,7 @@ static rsdp_t* acpi_check_rdsp(unsigned int* ptr)
 #endif
 
         // If matching signature, check checksum
-        uint8_t* bptr = (uint8_t*)ptr;
+        uint8_t *bptr = (uint8_t *)ptr;
         uint8_t checksum = 0;
 
         for (int i = 0; i < sizeof(rsdp_t); ++i)
@@ -279,13 +279,13 @@ static rsdp_t* acpi_check_rdsp(unsigned int* ptr)
     return 0;
 }
 
-static rsdp_t* acpi_get_rsdp(void)
+static rsdp_t *acpi_get_rsdp(void)
 {
-    for (unsigned int* addr = (unsigned int*)0x000E0000;
+    for (unsigned int *addr = (unsigned int *)0x000E0000;
          (long long int)addr < 0x00100000;
          addr += 0x10 / sizeof(addr))
     {
-        rsdp_t* rsdp = acpi_check_rdsp(addr);
+        rsdp_t *rsdp = acpi_check_rdsp(addr);
 
         if (rsdp)
         {
@@ -293,15 +293,15 @@ static rsdp_t* acpi_get_rsdp(void)
         }
     }
 
-    long long int ebda = *((short*)0x40E);
+    long long int ebda = *((short *)0x40E);
     ebda = ebda * 0x10 & 0x000FFFFF;
 
-    for (unsigned int* addr = (unsigned int*)ebda;
+    for (unsigned int *addr = (unsigned int *)ebda;
          (long long int)addr < ebda + 1024;
          addr += 0x10 / sizeof(addr))
 
     {
-        rsdp_t* rsdp = acpi_check_rdsp(addr);
+        rsdp_t *rsdp = acpi_check_rdsp(addr);
 
         if (rsdp)
         {
@@ -312,12 +312,12 @@ static rsdp_t* acpi_get_rsdp(void)
     return 0;
 }
 
-static int acpi_check_signature(acpi_header_t* header, char* signature)
+static int acpi_check_signature(acpi_header_t *header, char *signature)
 {
     return memcmp(header->signature, signature, 4);
 }
 
-static int acpi_check_header(acpi_header_t* header, char* signature)
+static int acpi_check_header(acpi_header_t *header, char *signature)
 {
     // Check against the given signature
     if (acpi_check_signature(header, signature) != 0)
@@ -334,9 +334,9 @@ static int acpi_check_header(acpi_header_t* header, char* signature)
     return 0;
 }
 
-static uint8_t acpi_calculate_checksum(acpi_header_t* header)
+static uint8_t acpi_calculate_checksum(acpi_header_t *header)
 {
-    uint8_t* bptr = (uint8_t*)header;
+    uint8_t *bptr = (uint8_t *)header;
     uint8_t sum = 0;
 
     for (int i = 0; i < header->length; ++i)
@@ -347,7 +347,7 @@ static uint8_t acpi_calculate_checksum(acpi_header_t* header)
     return sum;
 }
 
-static int acpi_parse_fadt(fadt_t* fadt)
+static int acpi_parse_fadt(fadt_t *fadt)
 {
 #if DEBUG_ACPI == 1
     log_debug("[ACPI] Found FADT!");
@@ -363,20 +363,20 @@ static int acpi_parse_fadt(fadt_t* fadt)
     SLP_EN = 1 << 13;
     SCI_EN = 1;
 
-    acpi_header_t* dsdt_header = (acpi_header_t*)(uint64_t)fadt->dsdt;
+    acpi_header_t *dsdt_header = (acpi_header_t *)(uint64_t)fadt->dsdt;
 
     if (acpi_check_signature(dsdt_header, "DSDT") == 0)
     {
-        acpi_parse_dsdt((dsdt_t*)dsdt_header);
+        acpi_parse_dsdt((dsdt_t *)dsdt_header);
     }
 
     return 0;
 }
 
-static int acpi_find_system_state(const char* signature,
-                                  char* dsdt_block,
+static int acpi_find_system_state(const char *signature,
+                                  char *dsdt_block,
                                   int dsdt_length,
-                                  acpi_system_state_t* state)
+                                  acpi_system_state_t *state)
 {
     while (0 < dsdt_length--)
     {
@@ -430,14 +430,14 @@ static int acpi_find_system_state(const char* signature,
     return 0;
 }
 
-static int acpi_parse_dsdt(dsdt_t* dsdt)
+static int acpi_parse_dsdt(dsdt_t *dsdt)
 {
 #if DEBUG_ACPI == 1
     log_debug("[ACPI] Found DSDT!");
     acpi_print_acpi_header(&dsdt->header);
 #endif
 
-    char* dsdt_block = (char*)dsdt->definition_block;
+    char *dsdt_block = (char *)dsdt->definition_block;
     int dsdt_length = dsdt->header.length - sizeof(acpi_header_t);
 
 #if DEBUG_ACPI == 1
@@ -449,7 +449,7 @@ static int acpi_parse_dsdt(dsdt_t* dsdt)
     return 0;
 }
 
-static int acpi_init_xsdt(xsdt_t* xsdt)
+static int acpi_init_xsdt(xsdt_t *xsdt)
 {
     if (!xsdt)
     {
@@ -472,21 +472,21 @@ static int acpi_init_xsdt(xsdt_t* xsdt)
 
     for (int i = 0; i < entries; ++i)
     {
-        acpi_header_t* header = (acpi_header_t*)(uint64_t)xsdt->tables[i];
+        acpi_header_t *header = (acpi_header_t *)(uint64_t)xsdt->tables[i];
 #if DEBUG_ACPI == 1
         log_debug("[ACPI] Header %i:", i);
         acpi_print_acpi_header(header);
 #endif
         if (acpi_check_signature(header, "FACP") == 0)
         {
-            acpi_parse_fadt((fadt_t*)header);
+            acpi_parse_fadt((fadt_t *)header);
         }
     }
 
     return 0;
 }
 
-static int acpi_init_rsdt(rsdt_t* rsdt)
+static int acpi_init_rsdt(rsdt_t *rsdt)
 {
     if (!rsdt)
     {
@@ -509,14 +509,14 @@ static int acpi_init_rsdt(rsdt_t* rsdt)
 
     for (int i = 0; i < entries; ++i)
     {
-        acpi_header_t* header = (acpi_header_t*)(uint64_t)rsdt->tables[i];
+        acpi_header_t *header = (acpi_header_t *)(uint64_t)rsdt->tables[i];
 #if DEBUG_ACPI == 1
         log_debug("[ACPI] Header %i:", i);
         acpi_print_acpi_header(header);
 #endif
         if (acpi_check_signature(header, "FACP") == 0)
         {
-            acpi_parse_fadt((fadt_t*)header);
+            acpi_parse_fadt((fadt_t *)header);
         }
     }
 
@@ -534,14 +534,9 @@ static void acpi_set_enabled(int enabled)
     outportb((uint64_t)SMI_CMD, command);
 }
 
-static void acpi_sleep(int amount)
+static void acpi_sleep(int ms)
 {
-    for (int j = 0; j < amount; ++j)
-    {
-        // Poor man's sleep
-        for (volatile int i = 0; i < 10000; ++i)
-            ;
-    }
+    mdelay(ms);
 }
 
 static int acpi_enable(void)
@@ -578,7 +573,7 @@ static int acpi_enable(void)
     return 0;
 }
 
-static void acpi_set_state(acpi_system_state_t* state)
+static void acpi_set_state(acpi_system_state_t *state)
 {
     if (PM1a_CNT != 0)
     {
@@ -597,7 +592,7 @@ static void acpi_set_state(acpi_system_state_t* state)
 
 int acpi_init()
 {
-    rsdp_t* rsdp = acpi_get_rsdp();
+    rsdp_t *rsdp = acpi_get_rsdp();
 
     if (rsdp)
     {
@@ -609,7 +604,7 @@ int acpi_init()
         // use the RSDT address.
         if (rsdp->xsdt_address != 0)
         {
-            int ret = acpi_init_xsdt((xsdt_t*)(uint64_t)rsdp->xsdt_address);
+            int ret = acpi_init_xsdt((xsdt_t *)(uint64_t)rsdp->xsdt_address);
 
             if (!ret)
             {
@@ -619,7 +614,7 @@ int acpi_init()
 
         if (rsdp->rsdt_address != 0)
         {
-            int ret = acpi_init_rsdt((rsdt_t*)(uint64_t)rsdp->rsdt_address);
+            int ret = acpi_init_rsdt((rsdt_t *)(uint64_t)rsdp->rsdt_address);
 
             if (!ret)
             {
@@ -651,9 +646,13 @@ void acpi_power_off()
 
     acpi_enable();
 
+    arch_shutdown();
+
     // S5 is the closest we can get to a complete shutdown without pulling
     // pulling the power cord.
     acpi_set_state(&S5_state);
+
+    mdelay(3000);
 
     log_error("[ACPI] Poweroff failed");
 }

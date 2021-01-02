@@ -22,15 +22,17 @@
 
 #include <gui/terminal_mode.h>
 
-#include <drivers/vbe.h>
-
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <arch/arch.h>
-
+#include <drivers/vbe.h>
 #include <gui/terminal/terminal.h>
+
+//=============================================================================
+// Local variables
+//=============================================================================
 
 //=============================================================================
 // External Interface
@@ -40,7 +42,6 @@ static terminal_t *_terminal;
 
 void terminal_init()
 {
-
     _terminal = terminal_create();
 
     while (1)

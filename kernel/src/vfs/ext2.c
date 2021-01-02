@@ -944,6 +944,18 @@ static uint32_t allocate_inode(ext2_fs_t *this)
 
 static void refresh_inode(ext2_fs_t *this, ext2_inodetable_t *inodet, uint32_t inode)
 {
+	if (this->inodes_per_group == 0)
+	{
+		log_error("[EXT2] Inodes per group zero");
+		return;
+	}
+
+	if (this ->block_size == 0)
+	{
+		log_error("[EXT2] Block size zero");
+		return 0;
+	}
+
 	uint32_t group = inode / this->inodes_per_group;
 
 	if (group > BGDS)
@@ -1756,6 +1768,7 @@ static uint32_t read_ext2(fs_node_t *node, uint64_t offset, uint32_t size,
 
 	if (this->block_size == 0)
 	{
+		free(inode);
 		log_error("[EXT2] Invalid block size");
 		return 0;
 	}

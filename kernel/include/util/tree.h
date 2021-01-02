@@ -23,8 +23,8 @@
 #ifndef _TREE_H
 #define _TREE_H
 
-#include <util/list.h>
 #include <stdint.h>
+#include <util/list.h>
 
 typedef struct tree_node
 {
@@ -42,7 +42,7 @@ typedef struct
 typedef uint8_t (*tree_comparator_t)(void *, void *);
 
 tree_t *tree_create();
-void tree_set_root(tree_t *tree, void *value);
+int tree_set_root(tree_t *tree, void *value);
 void tree_node_destroy(tree_node_t *node);
 void tree_destroy(tree_t *tree);
 void tree_free(tree_t *tree);
@@ -59,3 +59,7 @@ tree_node_t *tree_find(tree_t *tree, void *value, tree_comparator_t comparator);
 void tree_break_off(tree_t *tree, tree_node_t *node);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

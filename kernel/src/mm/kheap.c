@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <arch/arch.h>
 #include <logging/logging.h>
 
 //==============================================================================
@@ -129,6 +130,12 @@ static int heap_grow(size_t size, uint8_t *heap_end, int cont)
     while (offset < size)
     {
         void *addr = phys_mem_alloc_block();
+
+        if (!addr)
+        {
+            log_error("[VMM] Could not allocate physical memory");
+            return 0;
+        }
 
         virt_mem_map_page(addr, heap_end + offset, VIRT_MEM_WRITABLE);
 
@@ -366,6 +373,9 @@ void *kheap_get_current_end()
 void kheap_init()
 {
     log_info("[KHEAP] Initializing heap...");
+    cli();
+
+    virt_mem_print_cur_dir();
 
     uint64_t i = PLACEMENT_BEGIN;
 
@@ -374,6 +384,11 @@ void kheap_init()
     for (i; i < PLACEMENT_END; i += PAGE_SIZE)
     {
         void *paddr = phys_mem_alloc_block();
+
+        if (!paddr)
+        {
+            log_error("[KHEAP] Could not allocate physical memory");
+        }
 
         virt_mem_map_page(paddr, (void *)i, VIRT_MEM_WRITABLE);
 
@@ -385,6 +400,7 @@ void kheap_init()
     region_count = 0;
     region_max_count = (PLACEMENT_END - (uint64_t)regions) / sizeof(kheap_region_t);
 
+    sti();
     log_info("[KHEAP] Done!");
 }
 

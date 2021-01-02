@@ -124,18 +124,23 @@ void outportl(uint16_t port, uint32_t value)
                      : "a"(value), "Nd"(port));
 }
 
+static int int_enabled = 0;
+
+int is_interrupts_enabled()
+{
+    return int_enabled;
+}
+
 void sti()
 {
-    //printf("STI()\n");
-
+    int_enabled = 1;
     __asm__ volatile("sti" ::
                          : "memory");
 }
 
 void cli()
 {
-    //printf("CLI()\n");
-
+    int_enabled = 0;
     __asm__ volatile("cli" ::
                          : "memory");
 }

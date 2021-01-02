@@ -22,10 +22,13 @@
 
 #include <util/list.h>
 
+#include <assert.h>
 #include <stdlib.h>
 
 void list_destroy(list_t *list)
 {
+    ASSERT(list != NULL);
+
     list_node_t *n = list->head;
 
     while (n)
@@ -37,6 +40,8 @@ void list_destroy(list_t *list)
 
 void list_free(list_t *list)
 {
+    ASSERT(list != NULL);
+
     list_node_t *n = list->head;
 
     while (n)
@@ -49,6 +54,9 @@ void list_free(list_t *list)
 
 void list_append(list_t *list, list_node_t *item)
 {
+    ASSERT(list != NULL);
+    ASSERT(item != NULL);
+
     item->next = NULL;
 
     if (!list->tail)
@@ -65,20 +73,32 @@ void list_append(list_t *list, list_node_t *item)
     ++list->length;
 }
 
-void list_insert(list_t *list, void *item)
+int list_insert(list_t *list, void *item)
 {
     list_node_t *node = malloc(sizeof(list_node_t));
+
+    if (!node)
+    {
+        return 0;
+    }
 
     node->payload = item;
     node->next = NULL;
     node->prev = NULL;
 
     list_append(list, node);
+
+    return 1;
 }
 
 list_t *list_create()
 {
     list_t *list = malloc(sizeof(list_t));
+
+    if (!list)
+    {
+        return list;
+    }
 
     list->head = NULL;
     list->tail = NULL;
@@ -89,9 +109,10 @@ list_t *list_create()
 
 list_node_t *list_find(list_t *list, void *value)
 {
+    ASSERT(list != NULL);
+
     for (list_node_t *item = list->head; item != NULL; item = item->next)
     {
-        // TODO: Better comparison
         if (item->payload == value)
         {
             return item;
@@ -103,6 +124,8 @@ list_node_t *list_find(list_t *list, void *value)
 
 void list_remove(list_t *list, size_t index)
 {
+    ASSERT(list != NULL);
+
     if (index > list->length)
     {
         return;
@@ -120,6 +143,9 @@ void list_remove(list_t *list, size_t index)
 
 void list_delete(list_t *list, list_node_t *node)
 {
+    ASSERT(list != NULL);
+    ASSERT(node != NULL);
+
     if (node == list->head)
     {
         list->head = node->next;
@@ -145,6 +171,8 @@ void list_delete(list_t *list, list_node_t *node)
 
 list_node_t *list_pop(list_t *list)
 {
+    ASSERT(list != NULL);
+
     if (!list->tail)
     {
         return NULL;
@@ -159,6 +187,8 @@ list_node_t *list_pop(list_t *list)
 
 list_node_t *list_dequeue(list_t *list)
 {
+    ASSERT(list != NULL);
+
     if (!list->head)
     {
         return NULL;
@@ -173,13 +203,22 @@ list_node_t *list_dequeue(list_t *list)
 
 list_t *list_copy(list_t *list)
 {
+    ASSERT(list != NULL);
+
     list_t *out = list_create();
+
+    if (!out)
+    {
+        return out;
+    }
 
     list_node_t *node = list->head;
 
     while (node)
     {
-        list_insert(out, node->payload);
+        int ret = list_insert(out, node->payload);
+
+        ASSERT(ret != 0);
     }
 
     return out;
@@ -187,6 +226,9 @@ list_t *list_copy(list_t *list)
 
 void list_merge(list_t *dest, list_t *source)
 {
+    ASSERT(dest != NULL);
+    ASSERT(source != NULL);
+
     if (dest->tail)
     {
         dest->tail->next = source->head;

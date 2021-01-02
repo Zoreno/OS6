@@ -711,6 +711,7 @@ void truncate_fs(fs_node_t *node)
 void vfs_install(void)
 {
     log_info("[VFS] Installing VFS...");
+    cli();
 
     fs_tree = tree_create();
 
@@ -726,6 +727,7 @@ void vfs_install(void)
     null_dev_init();
     zero_dev_init();
 
+    sti();
     log_info("[VFS] Installed!");
 }
 
@@ -871,6 +873,14 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
     if (path_len == 1)
     {
         fs_node_t *root_clone = malloc(sizeof(fs_node_t));
+
+        if (!root_clone)
+        {
+            free(path);
+            log_error("[VFS] Could not allocate memory for root clone");
+            return NULL;
+        }
+
         memcpy(root_clone, fs_root, sizeof(fs_node_t));
 
         free(path);
@@ -961,6 +971,18 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
             fs_node_t *old_node_ptr = node_ptr;
 
             char *relpath = malloc(path_len + 1);
+
+            if (!relpath)
+            {
+                free((void *)path);
+                free(node_ptr);
+                free(symlink_buf);
+
+                log_error("[VFS] Could not allocate memory for relpath");
+
+                return NULL;
+            }
+
             char *ptr = relpath;
 
             memcpy(relpath, path, path_len + 1);

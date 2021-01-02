@@ -22,9 +22,9 @@
 
 #include <stdio.h>
 
-#include <stdint.h>
 #include <ctype.h>
 #include <stdarg.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -304,6 +304,7 @@ int parse_command(const char *format, flags_t *flags, uint32_t *length)
 
 int vsprintf(char *str, const char *format, va_list arg)
 {
+    flags_t flags;
 
     if (!str)
     {
@@ -331,16 +332,13 @@ int vsprintf(char *str, const char *format, va_list arg)
 
         if (c == '%')
         {
-            flags_t flags;
             memset(&flags, 0, sizeof(flags_t));
 
             uint32_t length = 0;
 
             if (parse_command(&format[i], &flags, &length))
             {
-                // Error in format
-
-                puts("[vsprintf] Error parsing format!\n");
+                puts("[vsprintf] Error parsing format!");
 
                 return 0;
             }

@@ -20,11 +20,15 @@
  * 
  */
 
-#include <string.h>
+#include <assert.h>
 #include <stdint.h>
+#include <string.h>
 
 void *memmove(void *str1, const void *str2, size_t n)
 {
+    ASSERT(str1 != NULL);
+    ASSERT(str2 != NULL);
+
     uint8_t *destPtr = (uint8_t *)str1;
     const uint8_t *srcPtr = (const uint8_t *)str2;
     size_t bytes = n;

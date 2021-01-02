@@ -32,7 +32,7 @@
 #include <usb/usb_ehci.h>
 #include <usb/usb_uhci.h>
 
-pci_device_list_t* device_list = 0;
+pci_device_list_t *device_list = 0;
 
 #define SERIAL_PCI_OUTPUT 0
 
@@ -54,7 +54,7 @@ void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
         return;
     }
 
-    PciDeviceInfo_t* devInfo = NULL;
+    PciDeviceInfo_t *devInfo = NULL;
 
     // Make sure there is a list
     if (device_list == 0)
@@ -71,7 +71,7 @@ void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
     else
     {
         // get next node
-        pci_device_list_t* cur_node = device_list;
+        pci_device_list_t *cur_node = device_list;
 
         //  Loop to the end
         while (cur_node->next != 0)
@@ -104,7 +104,7 @@ void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
             {0},
         };
 
-    const PciDriver_t* driver = _pci_driver_table;
+    const PciDriver_t *driver = _pci_driver_table;
 
     while (*driver->init)
     {
@@ -115,11 +115,17 @@ void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
 
 uint32_t pci_get_vga_lfb()
 {
-    pci_device_list_t* cur_node = device_list;
+    pci_device_list_t *cur_node = device_list;
 
     while (cur_node != NULL)
     {
-        PciDeviceInfo_t* dev = &cur_node->dev_info;
+        PciDeviceInfo_t *dev = &cur_node->dev_info;
+
+        if (!dev)
+        {
+            log_error("[PCI] Device info was NULL");
+            return 0;
+        }
 
         if (dev->vendorID == 0x1234 && dev->deviceID == 0x1111)
         {
@@ -161,12 +167,12 @@ void pciInit()
     printf("============ PCI Device List =============\n");
     printf("==========================================\n\n");
 
-    pci_device_list_t* cur_node = device_list;
+    pci_device_list_t *cur_node = device_list;
 
     while (cur_node != 0)
     {
 
-        PciDeviceInfo_t* dev = &cur_node->dev_info;
+        PciDeviceInfo_t *dev = &cur_node->dev_info;
 
         printf("Device Name: %s\n", pci_device_name(dev->vendorID, dev->deviceID));
         printf("Class Name: %s\n", pci_class_name(dev->classCode, dev->subClass, dev->progIntf));

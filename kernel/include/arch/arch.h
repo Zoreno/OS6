@@ -77,6 +77,7 @@ static inline void mdelay(uint32_t n)
     }
 }
 
+int is_interrupts_enabled();
 void sti();
 void cli();
 

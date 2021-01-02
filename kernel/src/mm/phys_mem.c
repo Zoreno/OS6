@@ -162,6 +162,12 @@ void *phys_mem_alloc_block()
         return 0;
     }
 
+    if ((int)frame == 0)
+    {
+        log_error("[PMM] Frame zero returned");
+        return 0;
+    }
+
     mm_bitmap_set(_phys_mem.bitmap, frame);
 
     phys_addr addr = frame * PHYS_MEM_BLOCK_SIZE;

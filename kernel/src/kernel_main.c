@@ -445,12 +445,14 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     */
 
+    /*
     for (int i = 0; i < 1; ++i)
     {
         phys_mem_dump_statistics();
 
         launch_program("bin/hello_world");
     }
+    */
 
     /*
     pid = process_get_pid();
@@ -478,7 +480,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     }
     */
 
-    printf("Kernel initailization done!\n");
+    log_info("Kernel initailization done!\n");
 
     printf("================================================================================\n");
     printf("|| Launching GUI...                                                           ||\n");
@@ -488,7 +490,9 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     //terminal_init();
 
-    simple_cli_init();
+    //simple_cli_init();
+
+    acpi_power_off();
 
 #if 0
 

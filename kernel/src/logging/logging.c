@@ -22,6 +22,7 @@
 
 #include <logging/logging.h>
 
+#include <arch/arch.h>
 #include <cmos/cmos_rtc.h>
 
 //=============================================================================
@@ -79,6 +80,10 @@ void log_printf(log_level_t level,
         return;
     }
 
+    int prev_int_status = is_interrupts_enabled();
+
+    cli();
+
     char buf[32];
     char str_buf[1024];
 
@@ -97,6 +102,11 @@ void log_printf(log_level_t level,
     va_end(ap);
 
     printf("%s\n", str_buf);
+
+    if (prev_int_status)
+    {
+        sti();
+    }
 }
 
 const char *log_level_string(log_level_t level)

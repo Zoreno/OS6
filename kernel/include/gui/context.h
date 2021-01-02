@@ -24,10 +24,10 @@
 #define _CONTEXT_H_
 
 #include <stdint.h>
-#include <gui/rect.h>
-#include <gui/gui_list.h>
-
 #include <stdio.h>
+
+#include <gui/gui_list.h>
+#include <gui/rect.h>
 
 typedef struct Context_struct
 {
@@ -132,3 +132,7 @@ void Context_draw_text(
     uint32_t color);
 
 #endif // _CONTEXT_H_
+
+//=============================================================================
+// End of file
+//=============================================================================

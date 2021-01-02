@@ -22,15 +22,13 @@
 
 #include <gui/gui.h>
 
-#include <drivers/vbe.h>
+#include <arch/arch.h>
 #include <drivers/keyboard_ps2.h>
 #include <drivers/mouse_ps2.h>
-
+#include <drivers/vbe.h>
+#include <gui/context.h>
 #include <gui/desktop.h>
 #include <gui/window.h>
-#include <gui/context.h>
-
-#include <arch/arch.h>
 
 Desktop *desktop;
 
@@ -56,13 +54,10 @@ void gui_mouse_button_handler(mouse_button_event_t *ev)
 
 void gui_mouse_moved_handler(mouse_moved_event_t *ev)
 {
-    printf("Mouse pos: %i,%i\n", (int64_t)ev->x, (int64_t)-ev->y);
-    printf("Mouse mov: %i,%i\n", (int64_t)ev->dx, (int64_t)-ev->dy);
-
     mouse_x = ev->x;
     mouse_y = -ev->y;
 
-    //gui_mouse_callback(ev->x, -ev->y, buttons);
+    gui_mouse_callback(ev->x, -ev->y, buttons);
 }
 
 void gui_mouse_callback(uint16_t mouse_x, uint16_t mouse_y, uint8_t buttons)
@@ -137,3 +132,7 @@ void gui_init()
         }
     }
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

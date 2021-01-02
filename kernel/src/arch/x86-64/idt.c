@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <acpi/acpi.h>
 #include <debug/backtrace.h>
 #include <debug/debug_terminal.h>
 #include <exec/elf64.h>
@@ -99,6 +100,8 @@ const char *get_interrupt_name(uint64_t int_no)
     }
 }
 
+extern uint64_t arch_x86_64_read_cr2();
+
 void print_regs(system_stack_t *regs)
 {
     debug_terminal_set_back_color(VGA_COLOR_BLUE);
@@ -122,6 +125,18 @@ void print_regs(system_stack_t *regs)
     printf("[IRQ] ==========================================================================\n");
     printf("[IRQ] Unhandled Exception %i (Error code: %i) (%s)\n",
            regs->int_no, regs->err_code, int_name);
+
+    // Special printout for page faults
+    if (regs->int_no == 14)
+    {
+        printf("[IRQ] %s %s by %s.\n",
+               regs->err_code & (1 << 0) ? "Present" : "Non-present",
+               regs->err_code & (1 << 1) ? "write" : "read",
+               regs->err_code & (1 << 2) ? "user" : "kernel");
+        uint64_t cr2 = arch_x86_64_read_cr2();
+        printf("[IRQ] CR2: 0x%016x\n", cr2);
+    }
+
     printf("[IRQ] Register dump:\n");
     printf("[IRQ] RAX: %#016x RBX: %#016x RCX: %#016x\n",
            regs->rax, regs->rbx, regs->rcx);
@@ -191,8 +206,9 @@ void arch_x86_64_default_irq_handler(system_stack_t *regs)
 
     print_regs(regs);
 
-    for (;;)
-        ;
+    log_error("[IDT] Shutdown due to unhandled exception");
+
+    acpi_power_off();
 }
 
 arch_x86_64_idt_descriptor *arch_x86_64_get_ir(uint32_t i)

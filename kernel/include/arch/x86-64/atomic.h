@@ -29,3 +29,7 @@ void arch_x86_64_atomic_inc(volatile long long int *x);
 void arch_x86_64_atomic_dec(volatile long long int *x);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

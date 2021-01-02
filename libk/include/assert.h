@@ -32,13 +32,17 @@ extern void cli();
 
 #ifdef OS6_DEBUG
 
-#define ASSERT(statement)                            \
-    if (!statement)                                  \
-    {                                                \
-        printf("[ASSERT] Failed: %s\n", #statement); \
-        backtrace();                                 \
-        cli();                                       \
-        __asm__ volatile("hlt");                     \
+#ifndef log_error
+#define log_error printf
+#endif
+
+#define ASSERT(statement)                               \
+    if (!statement)                                     \
+    {                                                   \
+        log_error("[ASSERT] Failed: %s\n", #statement); \
+        backtrace();                                    \
+        cli();                                          \
+        __asm__ volatile("hlt");                        \
     }
 
 #else
