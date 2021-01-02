@@ -27,11 +27,19 @@
 
 #include <arch/arch.h>
 #include <debug/backtrace.h>
+#include <logging/logging.h>
 #include <usb/usb_driver.h>
 
-usb_device_t *_usb_device_list;
+//=============================================================================
+// Local variables
+//=============================================================================
 
+usb_device_t *_usb_device_list;
 static uint32_t _next_usb_addr;
+
+//=============================================================================
+// Interface functions
+//=============================================================================
 
 usb_device_t *usb_get_device_list()
 {
@@ -40,6 +48,8 @@ usb_device_t *usb_get_device_list()
 
 usb_device_t *usb_dev_create()
 {
+    log_debug("[USB_DEVICE] Creating USB device");
+
     usb_device_t *dev = malloc(sizeof(usb_device_t));
 
     if (dev)
@@ -67,6 +77,8 @@ usb_device_t *usb_dev_create()
 
 int usb_dev_init(usb_device_t *dev)
 {
+    log_debug("[USB_DEVICE] Initiating device...");
+
     usb_device_desc_t devDesc;
 
     if (!usb_dev_request(dev,
@@ -77,7 +89,7 @@ int usb_dev_init(usb_device_t *dev)
                          8,
                          &devDesc))
     {
-        backtrace();
+        log_error("[USB_DEVICE] Failed to send dev request");
         return 0;
     }
 
@@ -93,7 +105,7 @@ int usb_dev_init(usb_device_t *dev)
                          0,
                          0))
     {
-        backtrace();
+        log_error("[USB_DEVICE] Failed to send dev request");
         return 0;
     }
 
@@ -109,14 +121,18 @@ int usb_dev_init(usb_device_t *dev)
                          sizeof(usb_device_desc_t),
                          &devDesc))
     {
-        backtrace();
+        log_error("[USB_DEVICE] Failed to send dev request");
         return 0;
     }
 
     usb_print_device_desc(&devDesc);
 
     uint16_t langs[USB_STRING_SIZE];
-    usb_dev_get_langs(dev, langs);
+    if (!usb_dev_get_langs(dev, langs))
+    {
+        log_error("[USB_DEVICE] Failed to get lang ID");
+        return 0;
+    }
 
     uint32_t langID = langs[0];
 
@@ -130,16 +146,18 @@ int usb_dev_init(usb_device_t *dev)
         usb_dev_get_string(dev, vendorString, langID, devDesc.vendorStr);
         usb_dev_get_string(dev, serialString, langID, devDesc.serialStr);
 
-        printf(" Product: %s, vendor: %s, serial: %s\n",
-               productString,
-               vendorString,
-               serialString);
+        log_debug("[USB_DEVICE] Product: %s, vendor: %s, serial: %s",
+                  productString,
+                  vendorString,
+                  serialString);
     }
 
     uint8_t confBuf[256];
     uint32_t pickedConfValue = 0;
     usb_intf_desc_t *pickedIntfDesc = 0;
     usb_endp_desc_t *pickedEndpDesc = 0;
+
+    log_debug("[USB_DEVICE] conf_count: %i", devDesc.confCount);
 
     for (uint32_t confIndex = 0; confIndex < devDesc.confCount; ++confIndex)
     {
@@ -150,6 +168,7 @@ int usb_dev_init(usb_device_t *dev)
                              0,
                              4, confBuf))
         {
+            log_warn("[USB_DEVICE] Failed to send dev request");
             continue;
         }
 
@@ -157,8 +176,8 @@ int usb_dev_init(usb_device_t *dev)
 
         if (confDesc->totalLen > sizeof(confBuf))
         {
-            printf("  Configuration buffer length %i greater than %d bytes\n",
-                   confDesc->totalLen, sizeof(confBuf));
+            log_warn("[USB_DEVICE] Configuration buffer length %i greater than %d bytes",
+                     confDesc->totalLen, sizeof(confBuf));
 
             continue;
         }
@@ -171,6 +190,7 @@ int usb_dev_init(usb_device_t *dev)
                              confDesc->totalLen,
                              confBuf))
         {
+            log_warn("[USB_DEVICE] Failed to send dev request");
             continue;
         }
 
@@ -229,7 +249,7 @@ int usb_dev_init(usb_device_t *dev)
                              0,
                              0))
         {
-            backtrace();
+            log_error("[USB_DEVICE] Failed to send dev request");
             return 0;
         }
 
@@ -249,7 +269,7 @@ int usb_dev_init(usb_device_t *dev)
         }
     }
 
-    backtrace();
+    log_warn("[USB_DEVICE] Could not find driver for USB device");
     return 1;
 }
 
@@ -258,6 +278,8 @@ int usb_dev_request(usb_device_t *dev,
                     uint32_t value, uint32_t index,
                     uint32_t len, void *data)
 {
+    log_debug("[USB_DEVICE] Creating device request");
+
     usb_dev_req_t req;
 
     req.type = type;
@@ -292,9 +314,22 @@ int usb_dev_get_langs(usb_device_t *dev, uint16_t *langs)
                          REQ_GET_DESC,
                          (USB_DESC_STRING << 8) | 0,
                          0,
+                         1,
+                         desc))
+    {
+        log_error("[USB_DEVICE] Failed to send dev request");
+        return 0;
+    }
+
+    if (!usb_dev_request(dev,
+                         RT_DEV_TO_HOST | RT_STANDARD | RT_DEV,
+                         REQ_GET_DESC,
+                         (USB_DESC_STRING << 8) | 0,
+                         0,
                          desc->len,
                          desc))
     {
+        log_error("[USB_DEVICE] Failed to send dev request");
         return 0;
     }
 
@@ -329,6 +364,7 @@ int usb_dev_get_string(usb_device_t *dev, char *str, uint32_t langId, uint32_t s
                          1,
                          desc))
     {
+        log_error("[USB_DEVICE] Failed to send dev request");
         return 0;
     }
 

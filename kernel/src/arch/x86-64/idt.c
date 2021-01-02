@@ -162,7 +162,7 @@ void print_regs(system_stack_t *regs)
 
     printf("\n");
 
-    print_backtrace((unsigned long long int *)regs->rbp);
+    //print_backtrace((unsigned long long int *)regs->rbp);
 
     printf("[IRQ] ==========================================================================\n");
 }

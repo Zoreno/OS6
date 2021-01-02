@@ -3,7 +3,6 @@ bits 64
 extern arch_x86_64_default_irq_handler
 
 %macro pushall 0
-
     push rax
     push rcx
     push rdx
@@ -19,8 +18,6 @@ extern arch_x86_64_default_irq_handler
 	push r13
 	push r14
 	push r15
-
-
 %endmacro
 
 %macro popall 0

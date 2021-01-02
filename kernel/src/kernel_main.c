@@ -368,7 +368,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     log_init(LOG_DEBUG);
 
-    log_info("Initializing kernel...");
+    log_info("[KERNEL] Initializing kernel...");
 
     RTC_init();
 
@@ -480,7 +480,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     }
     */
 
-    log_info("Kernel initailization done!\n");
+    log_info("[KERNEL] Kernel initailization done!\n");
 
     printf("================================================================================\n");
     printf("|| Launching GUI...                                                           ||\n");
