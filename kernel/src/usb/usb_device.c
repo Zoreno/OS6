@@ -267,9 +267,13 @@ int usb_dev_init(usb_device_t *dev)
 
             ++driver;
         }
+
+        if (!driver->init)
+        {
+            log_warn("[USB_DEVICE] Could not find driver for USB device");
+        }
     }
 
-    log_warn("[USB_DEVICE] Could not find driver for USB device");
     return 1;
 }
 

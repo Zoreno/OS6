@@ -52,6 +52,7 @@
 #include <serial/serial.h>
 #include <simple_cli/simple_cli.h>
 #include <syscall/syscall.h>
+#include <usb/usb.h>
 #include <util/hexdump.h>
 #include <util/json.h>
 #include <util/list.h>
@@ -491,6 +492,11 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     //terminal_init();
 
     //simple_cli_init();
+
+    while (1)
+    {
+        usb_poll();
+    }
 
     acpi_power_off();
 

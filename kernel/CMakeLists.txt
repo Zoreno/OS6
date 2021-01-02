@@ -135,6 +135,7 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_hub.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_uhci.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_ehci.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_keyboard.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/syscall/syscall.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/syscall/do_syscall.c)

@@ -512,8 +512,6 @@ static void ehci_process_qh(ehci_controller_t *hc, ehci_qh_t *qh)
     }
     else if (qh->nextLink & PTR_TERMINATE)
     {
-        log_debug("[EHCI] PTR_TERMINATE");
-
         if (~qh->token & TD_TOK_ACTIVE)
         {
             if (qh->token & TD_TOK_DATABUFFER)

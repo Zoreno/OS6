@@ -1,12 +1,12 @@
 /**
- * @file usb_driver.c
+ * @file usb_keyboard.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-20
+ * @date 2021-01-03
  * 
- * @brief USB Driver interface
+ * @brief 
  * 
- * @copyright Copyright (C) 2019,
+ * @copyright Copyright (C) 2021,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,19 +20,14 @@
  * 
  */
 
-#include <usb/usb_driver.h>
-#include <usb/usb_hub.h>
-#include <usb/usb_keyboard.h>
+#ifndef _USB_KEYBOARD_H
+#define _USB_KEYBOARD_H
 
-usb_driver_t _usb_driver_table[] =
-    {{usb_hub_init},
-     {usb_keyboard_init},
-     {0}};
+#include <usb/usb_device.h>
 
-usb_driver_t *usb_get_driver_table()
-{
-    return _usb_driver_table;
-}
+int usb_keyboard_init(usb_device_t *dev);
+
+#endif
 
 //=============================================================================
 // End of file
