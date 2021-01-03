@@ -23,10 +23,11 @@
 #include <drivers/keyboard_ps2.h>
 
 #include <arch/arch.h>
+#include <logging/logging.h>
 
-#include <string.h>
-#include <stdio.h>
 #include <ctype.h>
+#include <stdio.h>
+#include <string.h>
 
 enum KEYBOARD_ENCODER_IO
 {
@@ -280,7 +281,7 @@ void keyboard_enc_send_command(uint8_t cmd)
     outportb(KEYBOARD_ENC_CMD_REG, cmd);
 }
 
-void keyboard_irq_handler(system_stack_t *regs)
+void keyboard_irq_handler(system_stack_t* regs)
 {
     (void)regs;
 
@@ -444,7 +445,6 @@ int keyboard_check_resend()
 
 int keyboard_self_test()
 {
-
     // Send self test command.
     keyboard_ctrl_send_command(KEYBOARD_CTRL_CMD_SELF_TEST);
 
@@ -639,7 +639,7 @@ void keyboard_reset_system()
 
 void keyboard_install()
 {
-    printf("[KEYBOARD] Installing\n");
+    log_info("[KEYBOARD] Installing");
 
     _status.bat_res = 1;
     _scancode = 0;
@@ -657,7 +657,7 @@ void keyboard_install()
     set_irq_handler(1, keyboard_irq_handler);
     clear_mask_interrupt(1);
 
-    printf("[KEYBOARD] Done\n");
+    log_info("[KEYBOARD] Done");
 }
 
 void keyboard_set_autorepeat(uint8_t rate, uint8_t delay)
@@ -685,3 +685,7 @@ KEYCODE keyboard_getch()
 
     return c;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

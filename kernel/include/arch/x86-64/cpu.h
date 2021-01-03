@@ -134,10 +134,21 @@ int arch_x86_64_cpu_identified();
  * 
  * @param feature Feature number
  * 
- * @return int Non-zero if present
+ * @return Non-zero if present
  */
 int arch_x86_64_cpu_query_feature(int feature);
 
+/**
+ * @brief Returns the name of the feature represented by the feature number.
+ * 
+ * @param feature Feature number
+ * 
+ * @return Pointer to statically allocated string.
+ */
 const char *arch_x86_64_cpu_get_feature_name(int feature);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

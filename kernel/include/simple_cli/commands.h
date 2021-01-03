@@ -23,11 +23,17 @@
 #ifndef _COMMANDS_H
 #define _COMMANDS_H
 
-int test_command(int argc, const char **argv);
-int cd_command(int argc, const char **argv);
-int ls_command(int argc, const char **argv);
-int mkdir_command(int argc, const char **argv);
-int pwd_command(int argc, const char **argv);
-int rm_command(int argc, const char **argv);
+int test_command(int argc, const char** argv);
+int cd_command(int argc, const char** argv);
+int ls_command(int argc, const char** argv);
+int mkdir_command(int argc, const char** argv);
+int pwd_command(int argc, const char** argv);
+int rm_command(int argc, const char** argv);
+int exit_command(int argc, const char** argv);
+int time_command(int argc, const char** argv);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

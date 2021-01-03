@@ -24,7 +24,11 @@
 
 int syscall_yield(int reschedule)
 {
-	process_yield(reschedule);
+    process_yield(reschedule);
 
-	return 0;
+    return 0;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

@@ -22,8 +22,8 @@
 
 #include <arch/x86-64/gdt.h>
 
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 extern void arch_x86_64_gdt_flush(uint64_t gdt_ptr);
 
@@ -80,3 +80,7 @@ void arch_x86_64_initialize_gdt()
 
     printf("[ARCH] GDT Done!\n");
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

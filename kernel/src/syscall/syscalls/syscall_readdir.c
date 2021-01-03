@@ -24,19 +24,23 @@
 
 int syscall_readdir(int fd, int index, struct dirent *entry)
 {
-	if (!FILE_DESC_CHECK(fd))
-	{
-		return -EBADF;
-	}
+    if (!FILE_DESC_CHECK(fd))
+    {
+        return -EBADF;
+    }
 
-	struct dirent *dir_entry = readdir_fs(FILE_DESC_ENTRY(fd), (uint32_t)index);
+    struct dirent *dir_entry = readdir_fs(FILE_DESC_ENTRY(fd), (uint32_t)index);
 
-	if (dir_entry)
-	{
-		memcpy(entry, dir_entry, sizeof(*entry));
-		free(dir_entry);
-		return 1;
-	}
+    if (dir_entry)
+    {
+        memcpy(entry, dir_entry, sizeof(*entry));
+        free(dir_entry);
+        return 1;
+    }
 
-	return 0;
+    return 0;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

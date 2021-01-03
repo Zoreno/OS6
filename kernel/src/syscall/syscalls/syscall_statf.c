@@ -24,16 +24,20 @@
 
 int syscall_statf(char *file, uintptr_t addr)
 {
-	int result;
+    int result;
 
-	fs_node_t *node = kopen(file, 0);
+    fs_node_t *node = kopen(file, 0);
 
-	result = __stat_node(node, addr);
+    result = __stat_node(node, addr);
 
-	if (node)
-	{
-		close_fs(node);
-	}
+    if (node)
+    {
+        close_fs(node);
+    }
 
-	return result;
+    return result;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

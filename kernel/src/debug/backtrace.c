@@ -35,9 +35,14 @@ void print_backtrace(unsigned long long int *reg)
     {
         printf("bt [%i]: ", depth);
 
-        kernel_lookup_symbol((void *)*(reg + 1));
+        int ext = kernel_lookup_symbol((void *)*(reg + 1));
 
         printf("\n");
+
+        if (ext)
+        {
+            break;
+        }
 
         reg = (unsigned long long int *)*reg;
 
@@ -59,3 +64,7 @@ void backtrace()
 
 #endif
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

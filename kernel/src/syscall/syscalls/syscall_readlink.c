@@ -24,16 +24,20 @@
 
 int syscall_readlink(const char *file, char *ptr, int len)
 {
-	fs_node_t *node = kopen((char *)file, O_PATH | O_NOFOLLOW);
+    fs_node_t *node = kopen((char *)file, O_PATH | O_NOFOLLOW);
 
-	if (!node)
-	{
-		return -ENOENT;
-	}
+    if (!node)
+    {
+        return -ENOENT;
+    }
 
-	int rv = readlink_fs(node, ptr, len);
+    int rv = readlink_fs(node, ptr, len);
 
-	close_fs(node);
+    close_fs(node);
 
-	return rv;
+    return rv;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

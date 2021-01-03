@@ -21,44 +21,47 @@
  */
 
 #include <arch/arch.h>
+
 #include <stdio.h>
 
+#include <logging/logging.h>
+
 #ifdef ARCH_X86_64
-#include <arch/x86-64/cpu.h>
-#include <arch/x86-64/pic.h>
-#include <arch/x86-64/idt.h>
-#include <arch/x86-64/pit.h>
 #include <arch/x86-64/atomic.h>
+#include <arch/x86-64/cpu.h>
 #include <arch/x86-64/fpu.h>
+#include <arch/x86-64/idt.h>
+#include <arch/x86-64/pic.h>
+#include <arch/x86-64/pit.h>
 #endif
 
 void arch_initialize()
 {
 #ifdef ARCH_X86_64
-    printf("[ARCH] x64-64 initializing\n");
+    log_info("[ARCH] x64-64 initializing");
 
     arch_x86_64_initialize_cpu();
 
-    printf("[ARCH] Initializing PIC\n");
+    log_info("[ARCH] Initializing PIC");
 
     arch_x86_64_initialize_pic(0x20, 0x28);
 
-    printf("[ARCH] PIC Done!\n");
+    log_info("[ARCH] PIC Done!");
 
-    printf("[ARCH] Initializing PIT\n");
+    log_info("[ARCH] Initializing PIT");
 
     arch_x86_64_initialize_pit();
     arch_x86_64_pit_start_counter(TIMER_FREQ, ARCH_X86_64_PIT_OCW_COUNTER_0, ARCH_X86_64_PIT_OCW_MODE_SQUAREWAVEGEN);
 
-    printf("[ARCH] PIT Done!\n");
+    log_info("[ARCH] PIT Done!");
 
-    printf("[ARCH] Initializing FPU\n");
+    log_info("[ARCH] Initializing FPU");
 
     arch_x64_64_install_fpu();
 
-    printf("[ARCH] FPU Done!\n");
+    log_info("[ARCH] FPU Done!");
 
-    printf("[ARCH] x64-64 Done! \n");
+    log_info("[ARCH] x64-64 Done!");
 #endif
 }
 
@@ -121,18 +124,23 @@ void outportl(uint16_t port, uint32_t value)
                      : "a"(value), "Nd"(port));
 }
 
+static int int_enabled = 0;
+
+int is_interrupts_enabled()
+{
+    return int_enabled;
+}
+
 void sti()
 {
-    //printf("STI()\n");
-
+    int_enabled = 1;
     __asm__ volatile("sti" ::
                          : "memory");
 }
 
 void cli()
 {
-    //printf("CLI()\n");
-
+    int_enabled = 0;
     __asm__ volatile("cli" ::
                          : "memory");
 }
@@ -206,3 +214,7 @@ void atomic_dec(volatile long long int *x)
 {
     arch_x86_64_atomic_dec(x);
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

@@ -24,34 +24,38 @@
 
 int syscall_chdir(char *newdir)
 {
-	char *path = canonicalize_path(process_get_current()->wd_path, newdir);
+    char *path = canonicalize_path(process_get_current()->wd_path, newdir);
 
-	fs_node_t *chd = kopen(path, 0);
+    fs_node_t *chd = kopen(path, 0);
 
-	if (chd)
-	{
-		if ((chd->flags & FS_DIRECTORY) == 0)
-		{
-			close_fs(chd);
-			return -ENOTDIR;
-		}
+    if (chd)
+    {
+        if ((chd->flags & FS_DIRECTORY) == 0)
+        {
+            close_fs(chd);
+            return -ENOTDIR;
+        }
 
-		if (!has_permissions(chd, 01))
-		{
-			close_fs(chd);
-			return -EACCES;
-		}
+        if (!has_permissions(chd, 01))
+        {
+            close_fs(chd);
+            return -EACCES;
+        }
 
-		close_fs(chd);
+        close_fs(chd);
 
-		process_t *current_process = process_get_current();
+        process_t *current_process = process_get_current();
 
-		free(current_process->wd_path);
-		current_process->wd_path = malloc(strlen(path) + 1);
-		memcpy(current_process->wd_path, path, strlen(path) + 1);
+        free(current_process->wd_path);
+        current_process->wd_path = malloc(strlen(path) + 1);
+        memcpy(current_process->wd_path, path, strlen(path) + 1);
 
-		return 0;
-	}
+        return 0;
+    }
 
-	return -ENOENT;
+    return -ENOENT;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

@@ -24,13 +24,17 @@
 
 int syscall_close(int fd)
 {
-	if (FILE_DESC_CHECK(fd))
-	{
-		close_fs(FILE_DESC_ENTRY(fd));
-		FILE_DESC_ENTRY(fd) = NULL;
+    if (FILE_DESC_CHECK(fd))
+    {
+        close_fs(FILE_DESC_ENTRY(fd));
+        FILE_DESC_ENTRY(fd) = NULL;
 
-		return 0;
-	}
+        return 0;
+    }
 
-	return -EBADF;
+    return -EBADF;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

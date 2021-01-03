@@ -25,9 +25,9 @@
 
 #include <__libk_common.h>
 
-#include <_size_t.h>
-#include <_null.h>
 #include <_file.h>
+#include <_null.h>
+#include <_size_t.h>
 
 #include <stdarg.h>
 
@@ -58,3 +58,7 @@ char *fgets(char *s, int size, FILE *file);
 int feof(FILE *file);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

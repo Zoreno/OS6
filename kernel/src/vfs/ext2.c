@@ -22,14 +22,14 @@
 
 #include <vfs/ext2.h>
 
-#include <cmos/cmos_rtc.h>
-
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <cmos/cmos_rtc.h>
 #include <debug/backtrace.h>
+#include <logging/logging.h>
 
 #define DEBUG_EXT2 1
 
@@ -166,8 +166,6 @@ static uint32_t get_cache_time(ext2_fs_t *this)
 
 static int cache_flush_dirty(ext2_fs_t *this, uint32_t entry)
 {
-	//printf("[EXT2] cache_flush_dirty\n");
-
 	write_fs(this->block_device,
 			 (DC[entry].block_no) * this->block_size,
 			 this->block_size,
@@ -198,11 +196,8 @@ static int rewrite_superblock(ext2_fs_t *this)
 
 static int read_block(ext2_fs_t *this, uint32_t block_no, uint8_t *buffer)
 {
-	//printf("[EXT2] read_block: block_no: %i, buffer: %#016x\n", block_no, buffer);
-
 	if (!block_no)
 	{
-		//printf("Block_no = 0\n");
 		return -1;
 	}
 
@@ -210,8 +205,6 @@ static int read_block(ext2_fs_t *this, uint32_t block_no, uint8_t *buffer)
 
 	if (!DC)
 	{
-		//printf("[EXT2] No disk cache\n");
-
 		int ret;
 
 		ret = read_fs(this->block_device,
@@ -221,7 +214,7 @@ static int read_block(ext2_fs_t *this, uint32_t block_no, uint8_t *buffer)
 
 		if (ret != 0)
 		{
-			printf("[EXT2] Error reading block from block device\n");
+			log_error("[EXT2] Error reading block from block device");
 		}
 
 		spinlock_unlock(&this->lock);
@@ -283,7 +276,7 @@ static int write_block(ext2_fs_t *this, uint32_t block_no, uint8_t *buffer)
 {
 	if (!block_no)
 	{
-		printf("[EXT2] Error: Invalid block number\n");
+		log_error("[EXT2] Error: Invalid block number");
 		backtrace();
 		return -1;
 	}
@@ -395,7 +388,7 @@ static int set_block_number(ext2_fs_t *this, ext2_inodetable_t *inode,
 
 			if (!block_no)
 			{
-				printf("[EXT2] Error: Invalid block number\n");
+				log_error("[EXT2] Error: Invalid block number");
 				backtrace();
 				return -1;
 			}
@@ -430,11 +423,8 @@ static int set_block_number(ext2_fs_t *this, ext2_inodetable_t *inode,
 	if (iblock < EXT2_DIRECT_BLOCKS + p + p * p)
 	{
 		a = iblock - EXT2_DIRECT_BLOCKS;
-
 		b = a - p;
-
 		c = b / p;
-
 		d = b - c * p;
 
 		if (!inode->block[EXT2_DIRECT_BLOCKS + 1])
@@ -443,7 +433,7 @@ static int set_block_number(ext2_fs_t *this, ext2_inodetable_t *inode,
 
 			if (!block_no)
 			{
-				printf("[EXT2] Error: Invalid block number\n");
+				log_error("[EXT2] Error: Invalid block number");
 				backtrace();
 				return -1;
 			}
@@ -457,7 +447,7 @@ static int set_block_number(ext2_fs_t *this, ext2_inodetable_t *inode,
 
 		if (!tmp)
 		{
-			printf("[EXT2] Error: Could not allocate memory\n");
+			log_error("[EXT2] Error: Could not allocate memory");
 			backtrace();
 			return -1;
 		}
@@ -515,7 +505,7 @@ static int set_block_number(ext2_fs_t *this, ext2_inodetable_t *inode,
 
 			if (!block_no)
 			{
-				printf("[EXT2] Error: Invalid block number\n");
+				log_error("[EXT2] Error: Invalid block number");
 				backtrace();
 				return -1;
 			}
@@ -529,6 +519,7 @@ static int set_block_number(ext2_fs_t *this, ext2_inodetable_t *inode,
 
 		if (!tmp)
 		{
+			log_error("[EXT2] Failed to allocate memory");
 			return -1;
 		}
 
@@ -583,13 +574,13 @@ static int set_block_number(ext2_fs_t *this, ext2_inodetable_t *inode,
 		return 0;
 	}
 
-	debug_printf("[EXT2] Tried to access too high block number\n");
+	log_error("[EXT2] Tried to access too high block number");
 
 	return -1;
 
 no_space_free:
 
-	printf("[EXT2] Error: No free space\n");
+	log_error("[EXT2] Error: No free space");
 	backtrace();
 
 	free(tmp);
@@ -622,7 +613,7 @@ static int get_block_number(ext2_fs_t *this, ext2_inodetable_t *inode,
 
 		if (!tmp)
 		{
-			printf("[EXT2] Error: Could not allocate memory\n");
+			log_error("[EXT2] Error: Could not allocate memory");
 			backtrace();
 			return -1;
 		}
@@ -646,7 +637,7 @@ static int get_block_number(ext2_fs_t *this, ext2_inodetable_t *inode,
 
 		if (!tmp)
 		{
-			printf("[EXT2] Error: Could not allocate memory\n");
+			log_error("[EXT2] Error: Could not allocate memory");
 			backtrace();
 			return -1;
 		}
@@ -677,7 +668,7 @@ static int get_block_number(ext2_fs_t *this, ext2_inodetable_t *inode,
 
 		if (!tmp)
 		{
-			printf("[EXT2] Error: Could not allocate memory\n");
+			log_error("[EXT2] Error: Could not allocate memory");
 			backtrace();
 			return -1;
 		}
@@ -699,7 +690,7 @@ static int get_block_number(ext2_fs_t *this, ext2_inodetable_t *inode,
 		return out;
 	}
 
-	debug_printf("[EXT2] Error: tried to access too high block number\n");
+	log_error("[EXT2] Error: tried to access too high block number");
 	backtrace();
 	return -1;
 }
@@ -733,7 +724,7 @@ static int allocate_block(ext2_fs_t *this)
 
 	if (!block_no)
 	{
-		printf("[EXT2] Error: Invalid block number\n");
+		log_error("[EXT2] Error: Invalid block number");
 		backtrace();
 		free(bg_buffer);
 
@@ -778,6 +769,7 @@ static int write_inode(ext2_fs_t *this, ext2_inodetable_t *inode,
 
 	if (group > BGDS)
 	{
+		log_error("[EXT2] Group too high\n");
 		return -1;
 	}
 
@@ -818,7 +810,7 @@ static int allocate_inode_block(ext2_fs_t *this, ext2_inodetable_t *inode,
 
 	if (!block_no)
 	{
-		printf("[EXT2] Error: Could not allocate block\n");
+		log_error("[EXT2] Error: Could not allocate block");
 		backtrace();
 		return -1;
 	}
@@ -844,14 +836,11 @@ static int allocate_inode_block(ext2_fs_t *this, ext2_inodetable_t *inode,
 static uint32_t inode_read_block(ext2_fs_t *this, ext2_inodetable_t *inode,
 								 uint32_t block, uint8_t *buffer)
 {
-	//printf("inode_read_block: block: %i, inode->blocks: %i, this->block_size: %i\n", block, inode->blocks, this->block_size);
 	if (block >= inode->blocks / (this->block_size / 512))
 	{
 		memset(buffer, 0x00, this->block_size);
 
-		//debug_printf("[EXT2] Error: attempting to read beyond the allocated nodes for this inode\n");
-
-		//backtrace();
+		log_error("[EXT2] Error: attempting to read beyond the allocated nodes for this inode");
 
 		return 0;
 	}
@@ -867,10 +856,9 @@ static uint32_t inode_write_block(ext2_fs_t *this, ext2_inodetable_t *inode,
 								  uint32_t inode_no, uint32_t block,
 								  uint8_t *buffer)
 {
-	//printf("inode_write_block: block: %i, inode->blocks: %i, this->block_size: %i\n", block, inode->blocks, this->block_size);
 	if (block >= inode->blocks / (this->block_size / 512))
 	{
-		//return 0;
+		log_warn("[EXT2] Error: attempting to write beyond the allocated nodes for this inode");
 	}
 
 	char *empty = NULL;
@@ -925,7 +913,7 @@ static uint32_t allocate_inode(ext2_fs_t *this)
 
 	if (!node_no)
 	{
-		printf("[EXT2] Error: Invalid node_no\n");
+		log_error("[EXT2] Error: Invalid node_no");
 		backtrace();
 		return -1;
 	}
@@ -956,14 +944,23 @@ static uint32_t allocate_inode(ext2_fs_t *this)
 
 static void refresh_inode(ext2_fs_t *this, ext2_inodetable_t *inodet, uint32_t inode)
 {
+	if (this->inodes_per_group == 0)
+	{
+		log_error("[EXT2] Inodes per group zero");
+		return;
+	}
+
+	if (this ->block_size == 0)
+	{
+		log_error("[EXT2] Block size zero");
+		return 0;
+	}
 
 	uint32_t group = inode / this->inodes_per_group;
 
-	//printf("Group: %i, inode: %i, inodes per group: %i\n", group, inode, this->inodes_per_group);
-
 	if (group > BGDS)
 	{
-		printf("[EXT2] Error: Invalid group\n");
+		log_error("[EXT2] Error: Invalid group");
 		backtrace();
 		return;
 	}
@@ -979,16 +976,11 @@ static void refresh_inode(ext2_fs_t *this, ext2_inodetable_t *inodet, uint32_t i
 
 	memset(buf, 0, this->block_size);
 
-	//printf("inode_table_block: %#016x\n", inode_table_block);
-
 	read_block(this,
 			   inode_table_block + block_offset,
 			   buf);
 
 	ext2_inodetable_t *inodes = (ext2_inodetable_t *)buf;
-
-	//printf("inodet: %#016x\n", inodet);
-	//printf("Block offset: %i, Offset in block: %i\n", block_offset, offset_in_block);
 
 	memcpy(inodet,
 		   (uint8_t *)((uint64_t)inodes + offset_in_block * this->inode_size),
@@ -999,8 +991,6 @@ static void refresh_inode(ext2_fs_t *this, ext2_inodetable_t *inodet, uint32_t i
 
 static ext2_inodetable_t *read_inode(ext2_fs_t *this, uint32_t inode)
 {
-	//printf("[EXT2] read_inode: inode: %i\n", inode);
-
 	ext2_inodetable_t *inodet = malloc(this->inode_size);
 
 	refresh_inode(this, inodet, inode);
@@ -1141,7 +1131,7 @@ static int create_entry(fs_node_t *parent, char *name, uint32_t inode)
 
 	if (((pinode->mode & EXT2_S_IFDIR) == 0) || (name == NULL))
 	{
-		printf("[EXT2] Error: Invalid name\n");
+		log_error("[EXT2] Error: Invalid name");
 		backtrace();
 		free(pinode);
 		return -1;
@@ -1215,7 +1205,7 @@ static int create_entry(fs_node_t *parent, char *name, uint32_t inode)
 
 	if (!modify_or_replace)
 	{
-		printf("[EXT2] Error: Not modify or replace\n");
+		log_error("[EXT2] Error: Not modify or replace");
 		backtrace();
 		return -1;
 	}
@@ -1224,7 +1214,7 @@ static int create_entry(fs_node_t *parent, char *name, uint32_t inode)
 	{
 		if (dir_offset + rec_len >= this->block_size)
 		{
-			printf("[EXT2] Error: Access outside block size\n");
+			log_error("[EXT2] Error: Access outside block size");
 			backtrace();
 			free(block);
 			return -1;
@@ -1238,6 +1228,7 @@ static int create_entry(fs_node_t *parent, char *name, uint32_t inode)
 	}
 	else if (modify_or_replace == 2)
 	{
+		// TODO: ?
 	}
 
 	ext2_dir_t *d_ent = (ext2_dir_t *)((uintptr_t)block + dir_offset);
@@ -1261,7 +1252,7 @@ static uint32_t node_from_file(fs_node_t *this, ext2_inodetable_t *inode,
 {
 	if (!fnode)
 	{
-		printf("[EXT2] node_from_file: Invalid fnode\n");
+		log_error("[EXT2] node_from_file: Invalid fnode");
 		return 0;
 	}
 
@@ -1464,7 +1455,7 @@ static int create_ext2(fs_node_t *parent, char *name, uint16_t permission)
 {
 	if (!name)
 	{
-		printf("[EXT2] Error: Invalid name\n");
+		log_error("[EXT2] Error: Invalid name");
 		backtrace();
 		return -1;
 	}
@@ -1475,7 +1466,7 @@ static int create_ext2(fs_node_t *parent, char *name, uint16_t permission)
 
 	if (check)
 	{
-		printf("[EXT2] Error: File already created\n");
+		log_error("[EXT2] Error: File already created");
 		backtrace();
 
 		free(check);
@@ -1598,8 +1589,6 @@ static ext2_dir_t *direntry_ext2(ext2_fs_t *this, ext2_inodetable_t *inode,
 
 static fs_node_t *finddir_ext2(fs_node_t *node, char *name)
 {
-	//printf("[EXT2] finddir_ext2: node->name: [%s], name: [%s]\n", node->name, name);
-
 	ext2_fs_t *this = (ext2_fs_t *)node->device;
 
 	ext2_inodetable_t *inode = read_inode(this, node->inode);
@@ -1636,11 +1625,8 @@ static fs_node_t *finddir_ext2(fs_node_t *node, char *name)
 		memcpy(dname, &(d_ent->name), d_ent->name_len);
 		dname[d_ent->name_len] = '\0';
 
-		//printf("[EXT2] finddir_ext2: Comparing [%s], [%s]\n", dname, name);
-
 		if (!strcmp(dname, name))
 		{
-			//printf("[EXT2] Found!\n");
 			free(dname);
 			direntry = malloc(d_ent->rec_len);
 			memcpy(direntry, d_ent, d_ent->rec_len);
@@ -1669,7 +1655,7 @@ static fs_node_t *finddir_ext2(fs_node_t *node, char *name)
 
 	if (!node_from_file((fs_node_t *)this, inode, direntry, outnode))
 	{
-		printf("[EXT2] Could not get node from file\n");
+		log_error("[EXT2] Could not get node from file");
 
 		return 0;
 	}
@@ -1683,7 +1669,6 @@ static fs_node_t *finddir_ext2(fs_node_t *node, char *name)
 
 static int unlink_ext2(fs_node_t *node, char *name)
 {
-
 	ext2_fs_t *this = (ext2_fs_t *)node->device;
 
 	ext2_inodetable_t *inode = read_inode(this, node->inode);
@@ -1779,6 +1764,13 @@ static uint32_t read_ext2(fs_node_t *node, uint64_t offset, uint32_t size,
 	else
 	{
 		end = offset + size;
+	}
+
+	if (this->block_size == 0)
+	{
+		free(inode);
+		log_error("[EXT2] Invalid block size");
+		return 0;
 	}
 
 	uint32_t start_block = offset / this->block_size;
@@ -2039,11 +2031,9 @@ static int readlink_ext2(fs_node_t *node, char *buffer, size_t size)
 static uint32_t ext2_root(ext2_fs_t *this, ext2_inodetable_t *inode,
 						  fs_node_t *fnode)
 {
-	//printf("[EXT2] ext2_root\n");
-
 	if (!fnode)
 	{
-		printf("[EXT2] ext2_root: Invalid fnode\n");
+		log_error("[EXT2] ext2_root: Invalid fnode");
 		return -1;
 	}
 
@@ -2062,13 +2052,13 @@ static uint32_t ext2_root(ext2_fs_t *this, ext2_inodetable_t *inode,
 
 	if ((inode->mode & EXT2_S_IFREG) == EXT2_S_IFREG)
 	{
-		printf("[EXT2] ext2_root: Root is regular fule\n");
+		log_error("[EXT2] ext2_root: Root is regular file");
 		return -1;
 	}
 
 	if (!((inode->mode & EXT2_S_IFDIR) == EXT2_S_IFDIR))
 	{
-		printf("[EXT2] ext2_root: Root is not directory\n");
+		log_error("[EXT2] ext2_root: Root is not directory");
 		return -1;
 	}
 
@@ -2114,8 +2104,6 @@ static uint32_t ext2_root(ext2_fs_t *this, ext2_inodetable_t *inode,
 
 static fs_node_t *mount_ext2(fs_node_t *block_device, int flags)
 {
-	//printf("[EXT2] mount_ext2\n");
-
 	ext2_fs_t *this = malloc(sizeof(ext2_fs_t));
 
 	memset(this, 0x00, sizeof(ext2_fs_t));
@@ -2163,42 +2151,30 @@ static fs_node_t *mount_ext2(fs_node_t *block_device, int flags)
 
 	this->inodes_per_group = SB->inodes_count / BGDS;
 
-	//printf("Block size: %i\n", this->block_size);
-	//printf("Inode size: %i\n", this->inode_size);
-	//printf("Cache entries: %i\n", this->cache_entries);
-
 	if (!(this->flags & EXT2_FLAG_NOCACHE))
 	{
-		printf("[EXT2] Allocating cache!\n");
+		log_info("[EXT2] Allocating cache!");
 		DC = malloc(sizeof(ext2_disk_cache_entry_t) * this->cache_entries);
 
 		if (!DC)
 		{
-			printf("[EXT2] Could not allocate cache\n");
+			log_error("[EXT2] Could not allocate cache");
 
-			for (;;)
-				;
+			for(;;)
+			;
 		}
-
-		//printf("[EXT2] DC: %#016x\n", DC);
 
 		this->cache_data = malloc(this->block_size * this->cache_entries);
 
 		if (!this->cache_data)
 		{
-			printf("[EXT2] Could not allocate cache data\n");
+			log_error("[EXT2] Could not allocate cache data");
 
 			for (;;)
 				;
 		}
 
-		//printf("[EXT2] cache_data: %#016x\n", this->cache_data);
-
-		//printf("[EXT2] Cache size: %i\n", this->block_size * this->cache_entries);
-
 		memset(this->cache_data, 0, this->block_size * this->cache_entries);
-
-		//printf("[EXT2] Memory cleared!\n");
 
 		for (uint32_t i = 0; i < this->cache_entries; ++i)
 		{
@@ -2215,8 +2191,6 @@ static fs_node_t *mount_ext2(fs_node_t *block_device, int flags)
 
 	this->bgd_block_span = sizeof(ext2_bgdescriptor_t) * BGDS / this->block_size + 1;
 
-	//printf("BGD block span: %i\n", this->bgd_block_span);
-
 	BGD = malloc(this->block_size * this->bgd_block_span);
 
 	this->bgd_offset = 2;
@@ -2226,29 +2200,10 @@ static fs_node_t *mount_ext2(fs_node_t *block_device, int flags)
 		this->bgd_offset = 1;
 	}
 
-	//printf("[BGD] bgd: %#016x\n", BGD);
-
 	for (int i = 0; i < this->bgd_block_span; ++i)
 	{
 		read_block(this, this->bgd_offset + i, (uint8_t *)((uint64_t)BGD + this->block_size * i));
 	}
-
-#if 0
-
-    char *bg_buffer = malloc(sizeof(this->block_size));
-
-    for (uint32_t i = 0; i < BGDS; ++i)
-    {
-        printf("[BGD] %i at %i\n", i, this->bgd_offset + i * SB->blocks_per_group);
-
-        printf("[BGD] Block bitmap at %i\n", BGD[i].block_bitmap);
-        printf("[BGD] Inode bitmap at %i\n", BGD[i].inode_bitmap);
-        printf("[BGD] Inode table: %i\n", BGD[i].inode_table);
-        printf("[BGD] Free blocks count: %i\n", BGD[i].free_blocks_count);
-        printf("[BGD] Free inodes count: %i\n", BGD[i].free_inodes_count);
-    }
-
-#endif
 
 	ext2_inodetable_t *root_inode = read_inode(this, 2);
 
@@ -2256,7 +2211,7 @@ static fs_node_t *mount_ext2(fs_node_t *block_device, int flags)
 
 	if (ext2_root(this, root_inode, RN))
 	{
-		printf("[EXT2] mount_ext2: ext2_root returned non-zero\n");
+		log_error("[EXT2] mount_ext2: ext2_root returned non-zero");
 		return NULL;
 	}
 
@@ -2269,12 +2224,13 @@ static fs_node_t *mount_ext2(fs_node_t *block_device, int flags)
 
 int ext2_initialize()
 {
+	log_info("[EXT2] Initializing ext2 driver...");
 
 	fs_node_t *dev = kopen("/dev/hda", 0);
 
 	if (!dev)
 	{
-		printf("[EXT2] Could not open device\n");
+		log_info("[EXT2] Could not open device");
 
 		for (;;)
 			;
@@ -2293,6 +2249,8 @@ int ext2_initialize()
 	}
 
 	vfs_mount("/", fs);
+
+	log_info("[EXT2] Done!");
 
 	return 0;
 }

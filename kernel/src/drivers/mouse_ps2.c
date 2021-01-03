@@ -21,9 +21,11 @@
  */
 
 #include <drivers/mouse_ps2.h>
+
 #include <stdio.h>
 
 #include <arch/arch.h>
+#include <logging/logging.h>
 
 /**
  * Mouse packet from mouse IRQ
@@ -602,7 +604,7 @@ static int mouse_reset()
         return 0;
     }
 
-    printf("[MOUSE] reset failed\n");
+    log_warn("[MOUSE] reset failed");
 
     return 1;
 }
@@ -650,14 +652,14 @@ void mouse_poll()
 
 void mouse_install()
 {
-    printf("[MOUSE] Initializing...\n");
+    log_info("[MOUSE] Initializing...");
 
     set_irq_handler(12, mouse_irq_handler);
     clear_mask_interrupt(12);
 
     if (mouse_reset())
     {
-        printf("[MOUSE] Failed\n");
+        log_error("[MOUSE] Failed");
         return;
     }
 
@@ -733,7 +735,7 @@ void mouse_install()
 
 #endif
 
-    printf("[MOUSE] Done\n");
+    log_info("[MOUSE] Done");
 }
 
 void mouse_set_sample_freq(uint8_t freq)
@@ -792,3 +794,7 @@ void register_mouse_scroll_handler(mouse_scroll_event_handler newHandler)
 {
     current_scroll_handler = newHandler;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

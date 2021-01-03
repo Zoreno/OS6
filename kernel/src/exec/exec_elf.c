@@ -20,15 +20,17 @@
  * 
  */
 
-#include <exec/elf64.h>
 #include <exec/elf32.h>
+#include <exec/elf64.h>
 
 #include <stdio.h>
-#include <vfs/vfs.h>
-#include <mm/virt_mem.h>
-#include <string.h>
-#include <process/process.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include <logging/logging.h>
+#include <mm/virt_mem.h>
+#include <process/process.h>
+#include <vfs/vfs.h>
 
 /**
  * @brief Type describing an entry point "main" function.
@@ -42,7 +44,7 @@ typedef int (*entry_func_t)(int argc, const char **argv);
  * 
  * 
  */
-#define ELF_DEBUG 1
+#define ELF_DEBUG 0
 
 #if ELF_DEBUG == 1
 #define ERROR(...) printf(__VA_ARGS__)
@@ -369,8 +371,8 @@ static void *elf64_lookup_symbol(const char *name)
  * @return Address of value of symbol or @ELF_RELOC_ERR on error
  */
 static Elf64_Off_t elf64_get_symval(Elf64_Ehdr_t *header,
-                            int table,
-                            uint32_t index)
+                                    int table,
+                                    uint32_t index)
 {
     if (table == SHN_UNDEF || index == SHN_UNDEF)
     {
@@ -539,14 +541,14 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
 
     if (path != NULL)
     {
-        printf("Opening %s\n", path);
+        log_debug("Opening %s", path);
     }
 
     fs_node_t *file = kopen(path, 0);
 
     if (!file)
     {
-        printf("Could not open file: %s\n", path);
+        log_error("Could not open file: %s", path);
         return -1;
     }
 
@@ -556,7 +558,7 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
 
     if (!elf64_check_supported(&header))
     {
-        printf("\"%s\" is not a valid ELF executable\n", path);
+        log_error("\"%s\" is not a valid ELF executable", path);
         close_fs(file);
         return -1;
     }
@@ -593,7 +595,7 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
 
                 //shdr.sh_size = (int)mem - (int)&header;
 
-                printf("Allocated memory for section: %i bytes\n", shdr.sh_size);
+                log_debug("Allocated memory for section: %i bytes", shdr.sh_size);
             }
         }
     }
@@ -615,7 +617,7 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
         {
             close_fs(file);
 
-            printf("Dynamic executable");
+            log_warn("Dynamic executable");
 
             // TODO: Implement with linker
             return -1;
@@ -667,7 +669,7 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
         {
             if (phdr.p_vaddr < 0x400000 || phdr.p_vaddr >= 0x20000000)
             {
-                printf("Invalid load address %#016x\n", phdr.p_vaddr);
+                log_error("Invalid load address %#016x", phdr.p_vaddr);
                 close_fs(file);
                 return -1;
             }
@@ -677,6 +679,11 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
                 // TODO: Check page alignment
 
                 void *paddr = phys_mem_alloc_block();
+
+                if (!paddr)
+                {
+                    log_error("[ELF] Could not allocate physical memory");
+                }
 
                 virt_mem_map_page(paddr, (void *)i, VIRT_MEM_WRITABLE | VIRT_MEM_USER);
             }
@@ -706,6 +713,12 @@ int exec_elf(char *path, int argc, char **argv, char **env, int depth)
     }
 
     void *heap_phys = phys_mem_alloc_block();
+
+    if (!heap_phys)
+    {
+        log_error("[ELF] Could not allocate physical memory");
+    }
+
     virt_mem_map_page(heap_phys, (void *)heap, VIRT_MEM_WRITABLE | VIRT_MEM_USER);
 
     // Allocate room on heap for argv

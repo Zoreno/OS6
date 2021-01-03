@@ -23,8 +23,10 @@
 #ifndef _DESKTOP_H_
 #define _DESKTOP_H_
 
-#include <gui/gui_list.h>
+#include <stdint.h>
+
 #include <gui/context.h>
+#include <gui/gui_list.h>
 #include <gui/window.h>
 
 #define MOUSE_WIDTH 11
@@ -71,3 +73,7 @@ void Desktop_remove_window(
     Window *window);
 
 #endif // _DESKTOP_H_
+
+//=============================================================================
+// End of file
+//=============================================================================

@@ -23,14 +23,12 @@
 #include <gui/window.h>
 
 #include <stdint.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <gui/context.h>
-
 #include <gui/desktop.h>
-//#include "button.h"
 
 void Window_paint_handler(Window *window);
 void Window_mousedown_handler(Window *window, int x, int y, uint8_t mouse_buttons);
@@ -1026,25 +1024,25 @@ void Window_insert_child(Window *window, Window *child)
     Window_update_context(child, window->context);
 }
 
-Window *Window_create_window(Window *window, int16_t x, int16_t y,
+Window *Window_create_window(Window *parent, int16_t x, int16_t y,
                              uint16_t width, uint16_t height, uint16_t flags)
 {
     Window *new_window;
 
-    uint32_t new_index = window->children->count;
+    uint32_t new_index = parent->children->count;
 
-    if (!(new_window = Window_new(x, y, width, height, flags, window->context, new_index)))
+    if (!(new_window = Window_new(x, y, width, height, flags, parent->context, new_index)))
     {
         return new_window;
     }
 
-    if (!gui_list_add(window->children, (void *)new_window))
+    if (!gui_list_add(parent->children, (void *)new_window))
     {
         free(new_window);
         return (Window *)0;
     }
 
-    new_window->parent = window;
+    new_window->parent = parent;
 
     Window_raise(new_window, 1);
 
@@ -1664,3 +1662,7 @@ void Window_debug_print(Window *window, int print_depth)
     free(ws);
     free(flag_string);
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

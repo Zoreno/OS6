@@ -22,24 +22,21 @@
 
 #include <usb/usb_uhci.h>
 
-#include <usb/usb_device.h>
-#include <usb/usb_controller.h>
-
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <util/link.h>
-
 #include <arch/arch.h>
-
-#include <pci/pci_device.h>
-#include <pci/pci.h>
-#include <pci/pci_io.h>
-
 #include <debug/backtrace.h>
+#include <logging/logging.h>
 #include <mm/virt_mem.h>
+#include <pci/pci.h>
+#include <pci/pci_device.h>
+#include <pci/pci_io.h>
+#include <usb/usb_controller.h>
+#include <usb/usb_device.h>
+#include <util/link.h>
 
 //=============================================================================
 // Limits
@@ -160,7 +157,7 @@ typedef struct _uhci_td_t
 #define TD_TOK_PID_MASK 0x000000ff     // Packet Identification
 #define TD_TOK_DEVADDR_MASK 0x00007f00 // Device Address
 #define TD_TOK_DEVADDR_SHIFT 8
-#define TD_TOK_ENDP_MASK 00x0078000 // Endpoint
+#define TD_TOK_ENDP_MASK 0x00078000 // Endpoint
 #define TD_TOK_ENDP_SHIFT 15
 #define TD_TOK_D 0x00080000 // Data Toggle
 #define TD_TOK_D_SHIFT 19
@@ -346,34 +343,34 @@ static void uhci_process_qh(uhci_controller_t *controller, uhci_qh_t *qh)
     {
         if (td->cs & TD_CS_NAK)
         {
-            printf("NAK\n");
+            log_error("[UCHI] NAK");
         }
 
         if (td->cs & TD_CS_STALLED)
         {
-            printf("TD is stalled\n");
+            log_error("[UHCI] TD is stalled");
             t->success = 0,
             t->complete = 1;
         }
 
         if (td->cs & TD_CS_DATABUFFER)
         {
-            printf("TD data buffer error\n");
+            log_error("[UHCI] TD data buffer error");
         }
 
         if (td->cs & TD_CS_BABBLE)
         {
-            printf("TD babble error\n");
+            log_error("[UHCI] TD babble error");
         }
 
         if (td->cs & TD_CS_CRC_TIMEOUT)
         {
-            printf("TD timeout error\n");
+            log_error("[UHCI] TD timeout error");
         }
 
         if (td->cs & TD_CS_BITSTUFF)
         {
-            printf("TD bitstuff error\n");
+            log_error("[UHCI] TD bitstuff error");
         }
     }
 
@@ -432,20 +429,20 @@ static uint16_t uhci_reset_port(uhci_controller_t *controller, uint16_t port)
 
         if (~status & PORT_CONNECTION)
         {
-            printf("[UHCI] No device at port %i\n", port);
+            log_warn("[UHCI] No device at port %i", port);
             break;
         }
 
         if (status & (PORT_ENABLE_CHANGE | PORT_CONNECTION_CHANGE))
         {
-            printf("[UHCI] Port change ack %i\n", port);
+            log_warn("[UHCI] Port change ack %i", port);
             uhci_port_clr(controller->ioAddr + reg, PORT_ENABLE_CHANGE | PORT_CONNECTION_CHANGE);
             continue;
         }
 
         if (status & PORT_ENABLE)
         {
-            printf("[UHCI] Enabled port %i\n", port);
+            log_debug("[UHCI] Enabled port %i", port);
             break;
         }
 
@@ -626,7 +623,9 @@ void usb_uhci_init(uint32_t id, PciDeviceInfo_t *devInfo)
         return;
     }
 
-    printf("[USB] Initializing UHCI\n");
+    return;
+
+    log_info("[UHCI] Initializing UHCI");
 
     PciBAR_t *bar = (PciBAR_t *)&devInfo->type0.BaseAddresses[4];
 
@@ -634,11 +633,39 @@ void usb_uhci_init(uint32_t id, PciDeviceInfo_t *devInfo)
 
     uhci_controller_t *hc = malloc(sizeof(uhci_controller_t));
 
+    if (!hc)
+    {
+        log_error("[UHCI] Failed to allocate memory for host controller");
+        return;
+    }
+
     hc->ioAddr = ioAddr;
 
     hc->frameList = malloc(1024 * sizeof(uint32_t));
+
+    log_debug("[UHCI] Framelist: 0x%016x", hc->frameList);
+
+    if (!hc->frameList)
+    {
+        log_error("[UCHI] Failed to allocate memory for framelist");
+        return;
+    }
+
     hc->qhPool = malloc(sizeof(uhci_qh_t) * MAX_QH);
+
+    if (!hc->qhPool)
+    {
+        log_error("[UCHI] Failed to allocate memory for QH pool");
+        return;
+    }
+
     hc->tdPool = malloc(sizeof(uhci_td_t) * MAX_TD);
+
+    if (!hc->tdPool)
+    {
+        log_error("[UCHI] Failed to allocate memory for TD pool");
+        return;
+    }
 
     memset(hc->qhPool, 0, sizeof(uhci_qh_t) * MAX_QH);
     memset(hc->tdPool, 0, sizeof(uhci_td_t) * MAX_TD);
@@ -648,6 +675,12 @@ void usb_uhci_init(uint32_t id, PciDeviceInfo_t *devInfo)
     outportw(hc->ioAddr + REG_CMD, 0);
 
     uhci_qh_t *qh = uhci_alloc_qh(hc);
+
+    if (!qh)
+    {
+        log_error("[UHCI] Failed to allocate memory for QH");
+    }
+
     qh->head = TD_PTR_TERMINATE;
     qh->element = TD_PTR_TERMINATE;
     qh->transfer = 0;
@@ -662,17 +695,12 @@ void usb_uhci_init(uint32_t id, PciDeviceInfo_t *devInfo)
     }
 
     outportw(hc->ioAddr + REG_LEGSUP, 0x8F00);
-
     outportw(hc->ioAddr + REG_INTR, 0);
-
     outportw(hc->ioAddr + REG_FRNUM, 0);
     outportl(hc->ioAddr + REG_FRBASEADD, (uint32_t)((uint64_t)(virt_mem_get_physical_addr(hc->frameList, virt_mem_get_current_dir())) & 0xFFFFFFFF));
     outportw(hc->ioAddr + REG_SOFMOD, 0x40);
-
     outportw(hc->ioAddr + REG_STS, 0xFFFF);
-
     outportw(hc->ioAddr + REG_CMD, CMD_RS | CMD_CF | CMD_MAXP);
-
     outportw(hc->ioAddr + REG_CMD, CMD_RS | CMD_CF | CMD_MAXP | CMD_FGR);
 
     mdelay(20);
@@ -684,13 +712,20 @@ void usb_uhci_init(uint32_t id, PciDeviceInfo_t *devInfo)
     uhci_probe(hc);
 
     usb_controller_t *controller = malloc(sizeof(usb_controller_t));
+
+    if (!controller)
+    {
+        log_error("[UHCI] Failed to allocate memory for USB controller");
+        return;
+    }
+
     controller->next = usb_get_controller_list();
     controller->hc = hc;
     controller->poll = uhci_controller_poll;
 
     usb_set_controller_list(controller);
 
-    printf("[USB] UHCI Done\n");
+    log_info("[UHCI] Done");
 }
 
 //=============================================================================

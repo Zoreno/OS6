@@ -27,17 +27,31 @@
 tree_t *tree_create()
 {
     tree_t *out = malloc(sizeof(tree_t));
+
+    if (!out)
+    {
+        return out;
+    }
+
     out->nodes = 0;
     out->root = NULL;
 
     return out;
 }
 
-void tree_set_root(tree_t *tree, void *value)
+int tree_set_root(tree_t *tree, void *value)
 {
     tree_node_t *root = tree_node_create(value);
+
+    if (!root)
+    {
+        return 0;
+    }
+
     tree->root = root;
     tree->nodes = 1;
+
+    return 1;
 }
 
 void tree_node_destroy(tree_node_t *node)
@@ -82,8 +96,22 @@ void tree_free(tree_t *tree)
 tree_node_t *tree_node_create(void *value)
 {
     tree_node_t *out = malloc(sizeof(tree_node_t));
+
+    if (!out)
+    {
+        return out;
+    }
+
+    list_t *children = list_create();
+
+    if (!children)
+    {
+        free(out);
+        return NULL;
+    }
+
     out->value = value;
-    out->children = list_create();
+    out->children = children;
     out->parent = NULL;
     return out;
 }
@@ -253,3 +281,7 @@ tree_node_t *tree_find(tree_t *tree, void *value, tree_comparator_t comparator)
 {
     return tree_node_find(tree->root, value, comparator);
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

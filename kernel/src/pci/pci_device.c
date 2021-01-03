@@ -286,3 +286,7 @@ const char *pci_class_name(uint32_t classCode, uint32_t subClass, uint32_t progI
     }
     return "Unknown PCI Class";
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

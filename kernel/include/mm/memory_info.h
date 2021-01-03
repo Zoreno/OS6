@@ -23,6 +23,8 @@
 #ifndef _MEMORY_INFO_H
 #define _MEMORY_INFO_H
 
+#include <stdint.h>
+
 typedef struct
 {
     uint64_t addr;
@@ -44,3 +46,7 @@ typedef struct
 } memory_info_t;
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

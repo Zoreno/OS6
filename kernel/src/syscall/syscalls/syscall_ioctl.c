@@ -24,10 +24,14 @@
 
 int syscall_ioctl(int fd, int request, void *argp)
 {
-	if (!FILE_DESC_CHECK(fd))
-	{
-		return -EBADF;
-	}
+    if (!FILE_DESC_CHECK(fd))
+    {
+        return -EBADF;
+    }
 
-	return ioctl_fs(FILE_DESC_ENTRY(fd), request, argp);
+    return ioctl_fs(FILE_DESC_ENTRY(fd), request, argp);
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

@@ -22,27 +22,23 @@
 
 #include <usb/usb_ehci.h>
 
-#include <usb/usb_device.h>
-#include <usb/usb_controller.h>
-
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <util/link.h>
-
 #include <arch/arch.h>
-
-#include <pci/pci_device.h>
-#include <pci/pci.h>
-#include <pci/pci_io.h>
-
 #include <debug/backtrace.h>
-
-#include <mm/virt_mem.h>
-#include <mm/phys_mem.h>
+#include <logging/logging.h>
 #include <mm/kheap.h>
+#include <mm/phys_mem.h>
+#include <mm/virt_mem.h>
+#include <pci/pci.h>
+#include <pci/pci_device.h>
+#include <pci/pci_io.h>
+#include <usb/usb_controller.h>
+#include <usb/usb_device.h>
+#include <util/link.h>
 
 #define MAX_QH 8
 #define MAX_TD 32
@@ -225,7 +221,7 @@ typedef struct _ehci_qh_t
     link_t qhLink;
     uint32_t tdHead;
     uint32_t active;
-    uint8_t pad[20];
+    uint8_t pad[28];
 } __attribute__((packed)) ehci_qh_t;
 
 // Endpoint Characteristics
@@ -318,6 +314,8 @@ static ehci_td_t *ehci_alloc_td(ehci_controller_t *hc)
         }
     }
 
+    log_error("[EHCI] Alloc TD failed");
+
     return NULL;
 }
 
@@ -334,6 +332,8 @@ static ehci_qh_t *ehci_alloc_qh(ehci_controller_t *hc)
         }
     }
 
+    log_error("[EHCI] Alloc QH failed");
+
     return NULL;
 }
 
@@ -349,7 +349,7 @@ static void ehci_free_qh(ehci_qh_t *qh)
 
 static void ehci_insert_async_qh(ehci_qh_t *list, ehci_qh_t *qh)
 {
-    printf("[EHCI] Inserting async QH\n");
+    log_debug("[EHCI] Inserting async QH");
     ehci_qh_t *end = link_data(list->qhLink.prev, ehci_qh_t, qhLink);
 
     qh->qhlp = (uint32_t)(uintptr_t)list | PTR_QH;
@@ -357,13 +357,13 @@ static void ehci_insert_async_qh(ehci_qh_t *list, ehci_qh_t *qh)
 
     link_before(&list->qhLink, &qh->qhLink);
 
-    ehci_print_queue_head(qh);
-    ehci_print_queue_head(end);
+    //ehci_print_queue_head(qh);
+    //ehci_print_queue_head(end);
 }
 
 static void ehci_insert_periodic_qh(ehci_qh_t *list, ehci_qh_t *qh)
 {
-    printf("[EHCI] Inserting periodic QH\n");
+    log_debug("[EHCI] Inserting periodic QH");
 
     ehci_qh_t *end = link_data(list->qhLink.prev, ehci_qh_t, qhLink);
 
@@ -375,7 +375,7 @@ static void ehci_insert_periodic_qh(ehci_qh_t *list, ehci_qh_t *qh)
 
 static void ehci_remove_qh(ehci_qh_t *qh)
 {
-    printf("[EHCI] Removing QH\n");
+    log_debug("[EHCI] Removing QH");
 
     ehci_qh_t *prev = link_data(qh->qhLink.prev, ehci_qh_t, qhLink);
 
@@ -408,7 +408,7 @@ static void ehci_init_td(ehci_td_t *td,
                          uint32_t len,
                          const void *data)
 {
-    printf("[EHCI] Creating Transfer descriptor\n");
+    log_debug("[EHCI] Creating Transfer descriptor");
 
     if (prev)
     {
@@ -450,7 +450,7 @@ static void ehci_init_qh(ehci_qh_t *qh,
                          uint32_t endp,
                          uint32_t maxSize)
 {
-    printf("[EHCI] Creating Queue Head\n");
+    log_debug("[EHCI] Creating Queue Head");
 
     qh->transfer = t;
 
@@ -505,35 +505,33 @@ static void ehci_process_qh(ehci_controller_t *hc, ehci_qh_t *qh)
 
     if (qh->token & TD_TOK_HALTED)
     {
-        printf("[EHCI] TD_TOK_HALTED\n");
+        log_warn("[EHCI] TD_TOK_HALTED");
 
         t->success = 0;
         t->complete = 1;
     }
     else if (qh->nextLink & PTR_TERMINATE)
     {
-        printf("[EHCI] PTR_TERMINATE\n");
-
         if (~qh->token & TD_TOK_ACTIVE)
         {
             if (qh->token & TD_TOK_DATABUFFER)
             {
-                printf("[EHCI] Error: Data buffer\n");
+                log_error("[EHCI] Error: Data buffer");
             }
 
             if (qh->token & TD_TOK_BABBLE)
             {
-                printf("[EHCI] Error: Babble\n");
+                log_error("[EHCI] Error: Babble");
             }
 
             if (qh->token & TD_TOK_XACT)
             {
-                printf("[EHCI] Error: Transaction error\n");
+                log_error("[EHCI] Error: Transaction error");
             }
 
             if (qh->token & TD_TOK_MMF)
             {
-                printf("[EHCI] Error: Missed Micro-frame\n");
+                log_error("[EHCI] Error: Missed Micro-frame");
             }
 
             t->success = 1;
@@ -543,7 +541,7 @@ static void ehci_process_qh(ehci_controller_t *hc, ehci_qh_t *qh)
 
     if (t->complete)
     {
-        printf("[EHCI] Complete\n");
+        log_debug("[EHCI] Complete");
         qh->transfer = 0;
 
         if (t->success && t->endp)
@@ -568,9 +566,7 @@ static void ehci_process_qh(ehci_controller_t *hc, ehci_qh_t *qh)
 
 static void ehci_wait_for_qh(ehci_controller_t *hc, ehci_qh_t *qh)
 {
-    printf("[EHCI] Waiting for QH\n");
-
-    //backtrace();
+    log_debug("[EHCI] Waiting for QH");
 
     usb_transfer_t *t = qh->transfer;
 
@@ -601,20 +597,20 @@ static uint32_t ehci_port_reset(ehci_controller_t *hc, uint32_t port)
 
         if (~status & PORT_CONNECTION)
         {
-            printf("No connection at port %i\n", port);
+            log_info("[EHCI] No connection at port %i", port);
             break;
         }
 
         if (status & (PORT_ENABLE_CHANGE | PORT_CONNECTION_CHANGE))
         {
-            printf("Change ack at port %i\n", port);
+            log_warn("[EHCI] Change ack at port %i", port);
             ehci_port_clr(reg, PORT_ENABLE_CHANGE | PORT_CONNECTION_CHANGE);
             continue;
         }
 
         if (status & PORT_ENABLE)
         {
-            printf("Port %i enabled\n", port);
+            log_debug("[EHCI] Port %i enabled", port);
             break;
         }
     }
@@ -624,7 +620,7 @@ static uint32_t ehci_port_reset(ehci_controller_t *hc, uint32_t port)
 
 static void ehci_dev_control(usb_device_t *dev, usb_transfer_t *t)
 {
-    printf("[EHCI] dev control\n");
+    log_debug("[EHCI] dev control");
 
     ehci_controller_t *hc = (ehci_controller_t *)dev->hc;
 
@@ -640,6 +636,7 @@ static void ehci_dev_control(usb_device_t *dev, usb_transfer_t *t)
 
     if (!td)
     {
+        log_error("[EHCI] Could not allocate TD");
         backtrace();
         return;
     }
@@ -665,6 +662,7 @@ static void ehci_dev_control(usb_device_t *dev, usb_transfer_t *t)
 
         if (!td)
         {
+            log_error("[EHCI] Could not allocate TD");
             backtrace();
             return;
         }
@@ -688,6 +686,7 @@ static void ehci_dev_control(usb_device_t *dev, usb_transfer_t *t)
 
     if (!td)
     {
+        log_error("[EHCI] Could not allocate TD");
         backtrace();
         return;
     }
@@ -709,7 +708,7 @@ static void ehci_dev_control(usb_device_t *dev, usb_transfer_t *t)
 
 static void ehci_dev_intr(usb_device_t *dev, usb_transfer_t *t)
 {
-    backtrace();
+    log_debug("[EHCI] dev intr");
 
     ehci_controller_t *hc = (ehci_controller_t *)dev->hc;
 
@@ -722,6 +721,8 @@ static void ehci_dev_intr(usb_device_t *dev, usb_transfer_t *t)
 
     if (!td)
     {
+        log_error("[EHCI] Could not allocate TD");
+
         t->success = 0;
         t->complete = 1;
 
@@ -755,13 +756,13 @@ static void ehci_probe(ehci_controller_t *hc)
         {
             uint32_t speed = USB_HIGH_SPEED;
 
-            printf("Allocating device for port %i\n", port);
+            log_debug("[EHCI] Allocating device for port %i", port);
 
             usb_device_t *dev = usb_dev_create();
 
             if (dev)
             {
-                printf("USB dev for port %i created\n", port);
+                log_debug("[EHCI] USB dev for port %i created", port);
 
                 dev->parent = 0;
                 dev->hc = hc;
@@ -774,7 +775,7 @@ static void ehci_probe(ehci_controller_t *hc)
 
                 if (!usb_dev_init(dev))
                 {
-                    printf("USB device failed to initiate for %i\n", port);
+                    log_warn("[EHCI] USB device failed to initiate for %i", port);
                 }
             }
         }
@@ -811,7 +812,14 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
         return;
     }
 
-    printf("[USB] Initializing EHCI\n");
+    log_info("[USB] Initializing EHCI");
+
+    if (sizeof(ehci_qh_t) != 128)
+    {
+        log_error("[EHCH] Unexpected QH size: %i", sizeof(ehci_qh_t));
+
+        return;
+    }
 
     PciBAR_t *bar = (PciBAR_t *)&devInfo->type0.BaseAddresses[0];
 
@@ -819,23 +827,50 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
 
     ehci_controller_t *hc = malloc(sizeof(ehci_controller_t));
 
+    if (!hc)
+    {
+        log_error("[EHCI] Failed to allocate memory for HC");
+        return;
+    }
+
     virt_mem_map_page((void *)portAddr, (void *)portAddr, 0);
 
-    printf("[EHCI] Allocating memory\n");
+    log_debug("[EHCI] Allocating memory");
 
     uint64_t frameListBlock = (uint64_t)phys_mem_alloc_block();
+
+    if (!frameListBlock)
+    {
+        log_error("[EHCI] Failed to allocate physical memory");
+        return;
+    }
+
     virt_mem_map_page((void *)frameListBlock, (void *)frameListBlock, 0);
 
     // TODO: This is 8k memory, but only 3k is needed.
     uint64_t qhBlock = (uint64_t)phys_mem_alloc_block();
+
+    if (!qhBlock)
+    {
+        log_error("[EHCI] Failed to allocate physical memory");
+        return;
+    }
+
     virt_mem_map_page((void *)qhBlock, (void *)qhBlock, 0);
 
     uint64_t tdBlock = (uint64_t)phys_mem_alloc_block();
+
+    if (!tdBlock)
+    {
+        log_error("[EHCI] Failed to allocate physical memory");
+        return;
+    }
+
     virt_mem_map_page((void *)tdBlock, (void *)tdBlock, 0);
 
-    printf("[EHCI] Framelist block: %#016x\n", frameListBlock);
-    printf("[EHCI] QH block: %#016x\n", qhBlock);
-    printf("[EHCI] TD block: %#016x\n", tdBlock);
+    log_debug("[EHCI] Framelist block: %#016x", frameListBlock);
+    log_debug("[EHCI] QH block: %#016x", qhBlock);
+    log_debug("[EHCI] TD block: %#016x", tdBlock);
 
     hc->capRegs = (ehci_cap_regs_t *)(uintptr_t)portAddr;
     hc->opRegs = (ehci_op_regs_t *)(uintptr_t)(portAddr + hc->capRegs->capLength);
@@ -845,15 +880,22 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
 
     if (((uint64_t)hc->tdPool & 0x1F) > 0)
     {
-        printf("TD misaligned\n");
+        log_warn("TD misaligned");
     }
 
     memset(hc->qhPool, 0, sizeof(ehci_qh_t) * MAX_QH);
     memset(hc->tdPool, 0, sizeof(ehci_td_t) * MAX_TD);
 
-    printf("[EHCI] Allocating ASYNC QH\n");
+    log_debug("[EHCI] Allocating ASYNC QH");
 
     ehci_qh_t *qh = ehci_alloc_qh(hc);
+
+    if (!qh)
+    {
+        log_error("[EHCI] Failed to allocate ASYNC QH memory");
+        return;
+    }
+
     qh->qhlp = (uint32_t)((uintptr_t)qh | PTR_QH);
     qh->ch = QH_CH_H;
     qh->caps = 0;
@@ -874,11 +916,18 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
 
     hc->asyncQH = qh;
 
-    ehci_print_queue_head(hc->asyncQH);
+    //ehci_print_queue_head(hc->asyncQH);
 
-    printf("[EHCI] Allocating PERIODIC QH\n");
+    log_debug("[EHCI] Allocating PERIODIC QH");
 
     qh = ehci_alloc_qh(hc);
+
+    if (!qh)
+    {
+        log_error("[EHCI] Failed to allocate PERIODIC QH memory");
+        return;
+    }
+
     qh->qhlp = PTR_TERMINATE;
     qh->ch = 0;
     qh->caps = 0;
@@ -899,16 +948,16 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
 
     hc->periodicQH = qh;
 
-    ehci_print_queue_head(hc->periodicQH);
+    //ehci_print_queue_head(hc->periodicQH);
 
-    printf("[EHCI] Creating framelist\n");
+    log_debug("[EHCI] Creating framelist");
 
     for (uint32_t i = 0; i < 1024; ++i)
     {
         hc->frameList[i] = PTR_QH | (uint32_t)(uintptr_t)qh;
     }
 
-    printf("[EHCI] Resetting controller\n");
+    log_debug("[EHCI] Resetting controller");
 
     hc->opRegs->usbCmd &= ~CMD_RS;
 
@@ -920,23 +969,23 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
     while (hc->opRegs->usbCmd & CMD_HCRESET)
         mdelay(10);
 
-    printf("[EHCI] Controller reset\n");
+    log_debug("[EHCI] Controller reset");
 
     hc->capRegs->hccParams |= (HCCPARAMS_64_BIT);
 
-    printf("[EHCI] Disabling legacy support\n");
+    log_debug("[EHCI] Disabling legacy support");
 
     uint32_t eecp = (hc->capRegs->hccParams & HCCPARAMS_EECP_MASK) >> HCCPARAMS_EECP_SHIFT;
 
     if (eecp >= 0x40)
     {
-        printf("[EHCI] eecp >= 0x40\n");
+        log_debug("[EHCI] eecp >= 0x40");
 
         uint32_t legsup = pci_read_l(id, eecp + USBLEGSUP);
 
         if (legsup & USBLEGSUP_HC_BIOS)
         {
-            printf("[EHCI] Disabling BIOS semaphore\n");
+            log_debug("[EHCI] Disabling BIOS semaphore");
 
             pci_write_l(id, eecp + USBLEGSUP, legsup | USBLEGSUP_HC_OS);
 
@@ -946,7 +995,7 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
 
                 if (~legsup & USBLEGSUP_HC_BIOS && legsup & USBLEGSUP_HC_OS)
                 {
-                    printf("[EHCI] OS semaphore set\n");
+                    log_debug("[EHCI] OS semaphore set");
 
                     break;
                 }
@@ -954,7 +1003,7 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
         }
     }
 
-    printf("[EHCI] Setting OPREGS\n");
+    log_debug("[EHCI] Setting OPREGS");
 
     hc->opRegs->usbIntr = 0;
 
@@ -967,7 +1016,7 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
 
     hc->opRegs->usbCmd = (8 << CMD_ITC_SHIFT) | CMD_PSE | CMD_ASE | CMD_RS;
 
-    printf("[EHCI] Enabling Host controller\n");
+    log_debug("[EHCI] Enabling Host controller");
 
     while (hc->opRegs->usbSts & STS_HCHALTED)
         ;
@@ -976,16 +1025,19 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
 
     mdelay(5);
 
-    printf("[EHCI] Probing devices\n");
+    log_debug("[EHCI] Probing devices");
 
     ehci_probe(hc);
 
-    printf("[EHCI] Allocating controller\n");
-
-    for (;;)
-        ;
+    log_debug("[EHCI] Allocating controller");
 
     usb_controller_t *controller = (usb_controller_t *)malloc(sizeof(usb_controller_t));
+
+    if (!controller)
+    {
+        log_error("[EHCI] Failed to allocate memory for usb controller");
+        return;
+    }
 
     controller->next = usb_get_controller_list();
     controller->hc = hc;
@@ -993,5 +1045,9 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
 
     usb_set_controller_list(controller);
 
-    printf("[USB] EHCI Done\n");
+    log_info("[USB] EHCI Done");
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

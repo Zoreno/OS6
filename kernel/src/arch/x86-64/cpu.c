@@ -21,10 +21,13 @@
  */
 
 #include <arch/arch.h>
+
+#include <stdio.h>
+
 #include <arch/x86-64/cpu.h>
 #include <arch/x86-64/gdt.h>
 #include <arch/x86-64/idt.h>
-#include <stdio.h>
+#include <logging/logging.h>
 
 #define DEBUG_CPUID 0
 
@@ -828,7 +831,7 @@ static inline void _cpuid(arch_x86_64_cpuid_regs_t *regs)
 
 void arch_x86_64_initialize_cpu()
 {
-    printf("[ARCH] Initializing CPU...\n");
+    log_info("[ARCH] Initializing CPU...");
     //arch_x86_64_initialize_gdt();
     arch_x86_64_initialize_idt(0x08);
 
@@ -848,7 +851,7 @@ void arch_x86_64_initialize_cpu()
 
     printf("\n");
 
-    printf("[ARCH] CPU Done!\n");
+    log_info("[ARCH] CPU Done!");
 }
 
 void arch_x86_64_shutdown_cpu()
@@ -1146,3 +1149,7 @@ const char *arch_x86_64_cpu_get_feature_name(int feature)
         return 0;
     }
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

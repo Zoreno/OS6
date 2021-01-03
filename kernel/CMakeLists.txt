@@ -42,6 +42,7 @@ target_link_libraries(${KERNEL_EXEC} PRIVATE ${LIBSIMD})
 #==============================================================================
 
 # TODO: Sort all of these
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/acpi/acpi.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/boot/boot.asm)
 
@@ -61,6 +62,7 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/pic.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/pit.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/atomic.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/fpu.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/arch/x86-64/read_cr2.asm)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/phys_mem.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/mm/mm_bitmap.c)
@@ -123,6 +125,8 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal/terminal_buffer
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal/terminal_context.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/gui/terminal/terminal_color.c)
 
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/logging/logging.c)
+
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_controller.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_descriptors.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_device.c)
@@ -131,6 +135,7 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_hub.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_uhci.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_ehci.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/usb/usb_keyboard.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/syscall/syscall.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/syscall/do_syscall.c)
@@ -169,6 +174,8 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/mkdir_co
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/pwd_command.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/rm_command.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/test_command.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/exit_command.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/time_command.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
 

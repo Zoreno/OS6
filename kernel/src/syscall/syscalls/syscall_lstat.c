@@ -24,16 +24,20 @@
 
 int syscall_lstat(const char *file, uintptr_t addr)
 {
-	int result;
+    int result;
 
-	fs_node_t *node = kopen((char *)file, O_PATH | O_NOFOLLOW);
+    fs_node_t *node = kopen((char *)file, O_PATH | O_NOFOLLOW);
 
-	result = __stat_node(node, addr);
+    result = __stat_node(node, addr);
 
-	if (node)
-	{
-		close_fs(node);
-	}
+    if (node)
+    {
+        close_fs(node);
+    }
 
-	return result;
+    return result;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

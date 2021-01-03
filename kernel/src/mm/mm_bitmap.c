@@ -22,25 +22,51 @@
 
 #include <mm/mm_bitmap.h>
 
+#include <logging/logging.h>
+
 #define BITS_PER_ENTRY 64
 
 void mm_bitmap_set(mm_bitmap_t bitmap, uint64_t bit)
 {
+    if (!bitmap)
+    {
+        log_error("[BITMAP] Bitmap was NULL");
+        return;
+    }
+
     bitmap[bit / BITS_PER_ENTRY] |= (1 << (bit % BITS_PER_ENTRY));
 }
 
 void mm_bitmap_clear(mm_bitmap_t bitmap, uint64_t bit)
 {
+    if (!bitmap)
+    {
+        log_error("[BITMAP] Bitmap was NULL");
+        return;
+    }
+
     bitmap[bit / BITS_PER_ENTRY] &= ~(1 << (bit % BITS_PER_ENTRY));
 }
 
 uint64_t mm_bitmap_test(mm_bitmap_t bitmap, uint64_t bit)
 {
+    if (!bitmap)
+    {
+        log_error("[BITMAP] Bitmap was NULL");
+        return 0;
+    }
+
     return bitmap[bit / BITS_PER_ENTRY] & (1 << (bit % BITS_PER_ENTRY));
 }
 
 uint64_t mm_bitmap_first_free(mm_bitmap_t bitmap, size_t bitmap_size)
 {
+    if (!bitmap)
+    {
+        log_error("[BITMAP] Bitmap was NULL");
+        return -1;
+    }
+
     for (uint64_t entry = 0; entry < bitmap_size / BITS_PER_ENTRY; ++entry)
     {
         if (bitmap[entry] == 0xFFFFFFFFFFFFFFFF)
@@ -62,6 +88,12 @@ uint64_t mm_bitmap_first_free(mm_bitmap_t bitmap, size_t bitmap_size)
 
 uint64_t mm_bitmap_first_free_s(mm_bitmap_t bitmap, size_t bitmap_size, size_t n)
 {
+    if (!bitmap)
+    {
+        log_error("[BITMAP] Bitmap was NULL");
+        return -1;
+    }
+
     if (n == 0)
     {
         return -1;
@@ -103,3 +135,7 @@ uint64_t mm_bitmap_first_free_s(mm_bitmap_t bitmap, size_t bitmap_size, size_t n
 
     return -1;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

@@ -23,11 +23,11 @@
 #ifndef _WINDOW_H_
 #define _WINDOW_H_
 
+#include <stdint.h>
+
 #include <gui/context.h>
 #include <gui/gui_list.h>
 #include <gui/rect.h>
-
-#include <stdint.h>
 
 #define COLOR_SET 0
 
@@ -205,7 +205,7 @@ gui_list_t *Window_get_windows_below(
     Window *child);
 
 Window *Window_create_window(
-    Window *window,
+    Window *parent,
     int16_t x,
     int16_t y,
     uint16_t width,
@@ -283,3 +283,7 @@ void Window_unmaximize(
     Window *window);
 
 #endif // _WINDOW_H_
+
+//=============================================================================
+// End of file
+//=============================================================================

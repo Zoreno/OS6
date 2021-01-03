@@ -24,8 +24,11 @@
 #include <mm/phys_mem.h>
 #include <mm/virt_mem.h>
 
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
+
+#include <arch/arch.h>
+#include <logging/logging.h>
 
 //==============================================================================
 // Definitions
@@ -127,6 +130,12 @@ static int heap_grow(size_t size, uint8_t *heap_end, int cont)
     while (offset < size)
     {
         void *addr = phys_mem_alloc_block();
+
+        if (!addr)
+        {
+            log_error("[VMM] Could not allocate physical memory");
+            return 0;
+        }
 
         virt_mem_map_page(addr, heap_end + offset, VIRT_MEM_WRITABLE);
 
@@ -363,7 +372,10 @@ void *kheap_get_current_end()
 
 void kheap_init()
 {
-    printf("[KHEAP] Initializing heap...\n");
+    log_info("[KHEAP] Initializing heap...");
+    cli();
+
+    virt_mem_print_cur_dir();
 
     uint64_t i = PLACEMENT_BEGIN;
 
@@ -373,9 +385,14 @@ void kheap_init()
     {
         void *paddr = phys_mem_alloc_block();
 
+        if (!paddr)
+        {
+            log_error("[KHEAP] Could not allocate physical memory");
+        }
+
         virt_mem_map_page(paddr, (void *)i, VIRT_MEM_WRITABLE);
 
-        //printf("Mapping %#016x to %#016x\n", paddr, i);
+        //log_debug("Mapping %#016x to %#016x", paddr, i);
     }
 
     regions = (kheap_region_t *)pmalloc(0, 0);
@@ -383,7 +400,8 @@ void kheap_init()
     region_count = 0;
     region_max_count = (PLACEMENT_END - (uint64_t)regions) / sizeof(kheap_region_t);
 
-    printf("[KHEAP] Done!\n");
+    sti();
+    log_info("[KHEAP] Done!");
 }
 
 void *kmalloc(size_t size)

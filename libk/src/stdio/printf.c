@@ -22,9 +22,9 @@
 
 #include <stdio.h>
 
-int printf(const char *format, ...)
+int printf(const char* format, ...)
 {
-    char buf[256] = {0};
+    char buf[256] = {0}; // TODO: This needs to be malloc'd if possible
     int ret;
 
     va_list ap;

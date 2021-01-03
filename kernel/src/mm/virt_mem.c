@@ -22,8 +22,10 @@
 
 #include <mm/virt_mem.h>
 
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
+
+#include <logging/logging.h>
 
 // https://github.com/thibault-reigner/userland_slab
 
@@ -322,7 +324,7 @@ static uint64_t align_down(uint64_t val, uint64_t align)
 
 void virt_mem_initialize()
 {
-    printf("[VMM] Initializing Virtual memory manager...\n");
+    log_info("[VMM] Initializing Virtual memory manager...");
 
     // Allocate a page table for the 2MB identity mapping
 
@@ -330,7 +332,7 @@ void virt_mem_initialize()
 
     if (!table)
     {
-        // TODO: This should be a kernel panic
+        log_error("[VMM] Could not allocate physical memory");
         return;
     }
 
@@ -355,7 +357,7 @@ void virt_mem_initialize()
 
     if (!dir)
     {
-        // TODO: This should be a kernel panic
+        log_error("[VMM] Could not allocate physical memory");
         return;
     }
 
@@ -372,7 +374,7 @@ void virt_mem_initialize()
 
     if (!pdp)
     {
-        // TODO: This should be a kernel panic
+        log_error("[VMM] Could not allocate physical memory");
         return;
     }
 
@@ -384,16 +386,15 @@ void virt_mem_initialize()
     pdp_entry_set_frame(entry_pdp, (phys_addr)dir);
 
     // Allocate a PML4
-
     pml4_t *pml4 = (pml4_t *)phys_mem_alloc_block();
-
-    memset(pml4, 0, sizeof(pml4_t));
 
     if (!pml4)
     {
-        // TODO: This should be a kernel panic
+        log_error("[VMM] Could not allocate physical memory");
         return;
     }
+
+    memset(pml4, 0, sizeof(pml4_t));
 
     pml4_entry_t *entry_pml4 = &pml4->entries[0];
     pml4_entry_add_attrib(entry_pml4, PML4E_PRESENT);
@@ -404,6 +405,13 @@ void virt_mem_initialize()
     // 0xFFFF880000000000. By adding this offset to any physical page,
     // the kernel can reach any physical memory (up to 1 GB).
     pdp_t *pdp_high = (pdp_t *)phys_mem_alloc_block();
+
+    if (!pdp_high)
+    {
+        log_error("[VMM] Could not allocate physical memory");
+        return;
+    }
+
     memset(pdp_high, 0, sizeof(pdp_t));
     pdp_entry_t *pdp_high_e = &pdp_high->entries[PDP_INDEX(PAGE_OFFSET)];
     pdp_entry_add_attrib(pdp_high_e, PDPE_PRESENT);
@@ -418,7 +426,9 @@ void virt_mem_initialize()
     // Switch to the newly created page mapping structure
     virt_mem_switch_dir(pml4);
 
-    printf("[VMM] VMM initialized!\n");
+    virt_mem_print_cur_dir();
+
+    log_info("[VMM] VMM initialized!");
 }
 
 int virt_mem_switch_dir(pml4_t *dir)
@@ -554,6 +564,7 @@ pml4_t *virt_mem_create_address_space()
 
     if (!dir)
     {
+        log_error("[VMM] Could not allocate physical memory");
         return dir;
     }
 
@@ -642,10 +653,16 @@ ptable_t *virt_mem_alloc_ptable()
 
     if (!p)
     {
+        log_error("[VMM] Could not allocate physical memory");
+
         return p;
     }
 
-    memset(ADD_PAGE_OFFSET(p), 0, sizeof(ptable_t));
+    log_debug("[VMM] p: 0x%016x", p);
+    void *p2 = ADD_PAGE_OFFSET(p);
+    log_debug("[VMM] p2: 0x%016x", p2);
+
+    memset(p2, 0, sizeof(ptable_t));
 
     return p;
 }
@@ -656,6 +673,7 @@ pdirectory_t *virt_mem_alloc_pdirectory()
 
     if (!p)
     {
+        log_error("[VMM] Could not allocate physical memory");
         return p;
     }
 
@@ -670,6 +688,7 @@ pdp_t *virt_mem_alloc_pdp()
 
     if (!p)
     {
+        log_error("[VMM] Could not allocate physical memory");
         return p;
     }
 
@@ -684,6 +703,7 @@ pml4_t *virt_mem_alloc_pml4()
 
     if (!p)
     {
+        log_error("[VMM] Could not allocate physical memory");
         return p;
     }
 
@@ -1079,6 +1099,12 @@ static ptable_t *clone_ptable(ptable_t *src)
         {
             void *src_block = (void *)pt_entry_pfn(src->entries[i]);
             void *dst_block = phys_mem_alloc_block();
+
+            if (!dst_block)
+            {
+                log_error("[VMM] Could not allocate physical memory");
+                // TODO: Return?
+            }
 
             copy_page(dst_block, src_block);
 

@@ -23,9 +23,9 @@
 #ifndef _ELF64_H
 #define _ELF64_H
 
-#include <stdint.h>
 #include <boot/multiboot2.h>
 #include <mm/memory_info.h>
+#include <stdint.h>
 
 //=============================================================================
 // Primitive types
@@ -306,9 +306,9 @@ typedef struct
 // Functions
 //=============================================================================
 
-unsigned long elf64_hash(const unsigned char *name);
-void kernel_lookup_symbol(void *addr);
-void init_kernel_symbol_context(struct multiboot_tag_elf_sections *elf_sections, memory_info_t *mem_info);
+unsigned long elf64_hash(const unsigned char* name);
+int kernel_lookup_symbol(void* addr);
+void init_kernel_symbol_context(struct multiboot_tag_elf_sections* elf_sections, memory_info_t* mem_info);
 
 //=============================================================================
 // DWARF information
@@ -333,7 +333,7 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start, Elf64_Xword_t si
 // Image execution
 //=============================================================================
 
-int exec_elf(char *path, int argc, char **argv, char **env, int depth);
+int exec_elf(char* path, int argc, char** argv, char** env, int depth);
 
 #endif
 

@@ -24,10 +24,14 @@
 
 int syscall_stat(int fd, uintptr_t addr)
 {
-	if (FILE_DESC_CHECK(fd))
-	{
-		return __stat_node(FILE_DESC_ENTRY(fd), addr);
-	}
+    if (FILE_DESC_CHECK(fd))
+    {
+        return __stat_node(FILE_DESC_ENTRY(fd), addr);
+    }
 
-	return -EBADF;
+    return -EBADF;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

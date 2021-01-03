@@ -23,16 +23,14 @@
 #include <gui/desktop.h>
 
 #include <stdint.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include <gui/rect.h>
-#include <gui/context.h>
-
 #include <cmos/cmos_rtc.h>
-
 #include <debug/backtrace.h>
+#include <gui/context.h>
+#include <gui/rect.h>
 
 #define cX 0xFF000000
 #define cO 0xFFFFFFFF
@@ -501,4 +499,6 @@ void Desktop_remove_window(
     Window_paint(desktop_window, (gui_list_t *)0, 1);
 }
 
-/* "'(file-name-nondirectory (buffer-file-name))'" ends here */
+//=============================================================================
+// End of file
+//=============================================================================

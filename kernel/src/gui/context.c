@@ -479,3 +479,7 @@ void Context_draw_text(Context *context, char *string, int x, int y, uint32_t co
         Context_draw_char(context, *(string++), x, y, color);
     }
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

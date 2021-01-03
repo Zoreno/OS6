@@ -1,11 +1,33 @@
+/**
+ * @file simple_cli.c
+ * @author Joakim Bertils
+ * @version 0.1
+ * @date 2020-12-31
+ * 
+ * @brief 
+ * 
+ * @copyright Copyright (C) 2020,
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
+ * 
+ */
+
 #include <simple_cli/simple_cli.h>
-#include <simple_cli/commands.h>
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <process/process.h>
+#include <simple_cli/commands.h>
 
 const char *simple_cli_get_user_name()
 {
@@ -138,6 +160,8 @@ simple_cli_command_t _commands[] = {{.name = "test", .command = test_command},
                                     {.name = "mkdir", .command = mkdir_command},
                                     {.name = "pwd", .command = pwd_command},
                                     {.name = "rm", .command = rm_command},
+                                    {.name = "exit", .command = exit_command},
+                                    {.name = "time", .command = time_command},
                                     {.name = NULL, .command = NULL}};
 
 int simple_cli_run_command(const char *name, int argc, const char **argv)
@@ -261,3 +285,7 @@ void simple_cli_init()
         free(args);
     }
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

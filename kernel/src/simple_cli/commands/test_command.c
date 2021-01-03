@@ -24,9 +24,13 @@
 
 #include <stdio.h>
 
-int test_command(int argc, const char **argv)
+int test_command(int argc, const char** argv)
 {
     printf("Test command\n");
 
     return 0;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

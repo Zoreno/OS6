@@ -23,34 +23,37 @@
 #include <vfs/nulldev.h>
 
 #include <stdint.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
+#include <logging/logging.h>
 #include <vfs/vfs.h>
 
-static uint32_t read_null(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
+static uint32_t read_null(fs_node_t* node, uint64_t offset, uint32_t size, uint8_t* buffer)
 {
     return 0;
 }
 
-static uint32_t write_null(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
+static uint32_t write_null(fs_node_t* node, uint64_t offset, uint32_t size, uint8_t* buffer)
 {
     return 0;
 }
 
-static void open_null(fs_node_t *node, uint32_t flags)
+static void open_null(fs_node_t* node, uint32_t flags)
 {
     return;
 }
 
-static void close_null(fs_node_t *node)
+static void close_null(fs_node_t* node)
 {
     return;
 }
 
 void null_dev_init()
 {
-    fs_node_t *node = malloc(sizeof(fs_node_t));
+    log_info("[NULLDEV] Installing null device");
+
+    fs_node_t* node = malloc(sizeof(fs_node_t));
 
     if (!node)
     {
@@ -76,4 +79,10 @@ void null_dev_init()
     node->ioctl = NULL;
 
     vfs_mount("/dev/null", node);
+
+    log_info("[NULLDEV] Done");
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

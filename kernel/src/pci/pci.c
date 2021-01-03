@@ -22,19 +22,19 @@
 
 #include <pci/pci.h>
 
-#include <arch/arch.h>
-#include <pci/pci_io.h>
-
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
-#include <usb/usb_uhci.h>
+#include <arch/arch.h>
+#include <logging/logging.h>
+#include <pci/pci_io.h>
 #include <usb/usb_ehci.h>
+#include <usb/usb_uhci.h>
 
 pci_device_list_t *device_list = 0;
 
-#define SERIAL_PCI_OUTPUT 1
+#define SERIAL_PCI_OUTPUT 0
 
 #define PCI_MAKE_ID(bus, dev, func) (((bus) << 16) | ((dev) << 11) | ((func) << 8))
 
@@ -121,6 +121,12 @@ uint32_t pci_get_vga_lfb()
     {
         PciDeviceInfo_t *dev = &cur_node->dev_info;
 
+        if (!dev)
+        {
+            log_error("[PCI] Device info was NULL");
+            return 0;
+        }
+
         if (dev->vendorID == 0x1234 && dev->deviceID == 0x1111)
         {
             // BAR0 contains the physical address of the video memory
@@ -135,6 +141,8 @@ uint32_t pci_get_vga_lfb()
 
 void pciInit()
 {
+    log_info("[PCI] Initializing...");
+
     for (uint32_t bus = 0; bus < 256; ++bus)
     {
         for (uint32_t dev = 0; dev < 32; ++dev)
@@ -216,6 +224,8 @@ void pciInit()
     }
 
 #endif
+
+    log_info("[PCI] Done!");
 }
 
 //=============================================================================

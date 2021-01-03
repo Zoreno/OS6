@@ -55,6 +55,7 @@ set(CFLAGS "${CFLAGS} -ffreestanding")
 # Disable language features
 set(CFLAGS "${CFLAGS} -fno-builtin -finline-functions -fno-stack-protector")
 
+# Cpp flags
 set(CPPFLAGS "${CFLAGS} -std=c++11 -static-libgcc")
 
 # Set C standard
@@ -102,7 +103,6 @@ set(LIBUNWIND_SRC ${CMAKE_SOURCE_DIR}/libunwind/src)
 
 set(LIBSTDCXX_INCLUDE ${CMAKE_SOURCE_DIR}/libstdc++/include)
 set(LIBSTDCXX_SRC ${CMAKE_SOURCE_DIR}/libstdc++/src)
-
 
 set(OS6_TESTS ${CMAKE_SOURCE_DIR}/tests)
 
@@ -251,7 +251,10 @@ set(QEMU_FLAGS)
 
 #set(QEMU_FLAGS ${QEMU_FLAGS} --trace events=/tmp/events)
 
+set(QEMU_FLAGS ${QEMU_FLAGS} -d guest_errors -D qemu.log)
+
 set(QEMU_FLAGS ${QEMU_FLAGS} -cpu Nehalem)
+#set(QEMU_FLAGS ${QEMU_FLAGS} -enable-kvm -cpu host)
 
 # Set memory flags
 set(QEMU_FLAGS ${QEMU_FLAGS} -m 512M)
@@ -263,16 +266,21 @@ set(QEMU_FLAGS ${QEMU_FLAGS} -rtc base=localtime)
 set(QEMU_FLAGS ${QEMU_FLAGS} -boot d)
 
 # Set USB devices
-#set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-ehci,id=ehci -device usb-tablet,bus=ehci.0,port=1 -device usb-kbd,bus=ehci.0,port=2)
-#set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-mouse -device usb-kbd)
-
-#set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-tablet)
+set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-ehci,id=ehci)
+set(QEMU_FLAGS ${QEMU_FLAGS} -device usb-tablet,bus=ehci.0,port=1)
+set(QEMU_FLAGS ${QEMU_FLAGS} -device usb-kbd,bus=ehci.0,port=2)
 
 # Set serial interface
 set(QEMU_FLAGS ${QEMU_FLAGS} -serial stdio)
 
 # Set display settings
 set(QEMU_FLAGS ${QEMU_FLAGS} -vga std)
+
+# Set ACPI flags
+#set(QEMU_FLAGS ${QEMU_FLAGS} -no-acpi)
+
+# Set bios
+# set(QEMU_FLAGS ${QEMU_FLAGS} -bios ${CMAKE_SOURCE_DIR}/../seabios/out/bios.bin)
 
 #Set storage devices
 set(QEMU_FLAGS ${QEMU_FLAGS} -drive file=${HDD_NAME},format=raw -cdrom ${ISO_IMAGE})

@@ -21,10 +21,13 @@
  */
 
 #include <usb/usb_driver.h>
+#include <usb/usb_hub.h>
+#include <usb/usb_keyboard.h>
 
 usb_driver_t _usb_driver_table[] =
-    {
-        {0}};
+    {{usb_hub_init},
+     {usb_keyboard_init},
+     {0}};
 
 usb_driver_t *usb_get_driver_table()
 {
