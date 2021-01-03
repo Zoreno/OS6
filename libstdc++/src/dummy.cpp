@@ -3,20 +3,21 @@
 
 #include <bits/allocator.hpp>
 
-#include <bit>
-
+#include <bits/stl_algobase.hpp>
 #include <bits/stl_heap.hpp>
+#include <iterator>
 
 void f()
 {
-    int i = 0;
-    int j = 1;
+    int a = 0;
+    int b = 2;
 
-    std::swap(i, j);
+    std::min(0, 2);
+    std::max(0, 2);
 
-    int a = 14;
+    int arr[10] = {0};
 
-    int b = std::__rotl(a, 2);
+    auto it = std::begin(arr);
 }
 
 // Remove this file when there are real cpp files to compile

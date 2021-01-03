@@ -1,11 +1,11 @@
 /**
- * @file memoryfwd.hpp
+ * @file test_max.cpp
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-07-28
- *
- * @brief Memory related forward declarations
- *
+ * @date 2020-08-16
+ * 
+ * @brief 
+ * 
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,34 +17,18 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- *
+ * 
  */
 
-#ifndef __MEMORY_FWD_HPP
-#define __MEMORY_FWD_HPP
+#include <utest.h>
 
-#pragma GCC system_header
+#include <algorithm>
 
-#include <bits/c++config.hpp>
-
-OS6STD_BEGIN_SYSTEM_HEADER
-
-namespace OS6STD
+UTEST(algorithm, max)
 {
-template <typename>
-class allocator;
+    ASSERT_TRUE(std::max(1, 2) == 2);
+    ASSERT_TRUE(std::max(-1, 2) == 2);
+    ASSERT_TRUE(std::max(12.f, 2.f) == 12.f);
+}
 
-template <>
-class allocator<void>;
-
-template <typename, typename>
-struct uses_allocator;
-}  // namespace OS6STD
-
-OS6STD_END_SYSTEM_HEADER
-
-#endif
-
-//=============================================================================
-// End of file
-//=============================================================================
+UTEST_MAIN();

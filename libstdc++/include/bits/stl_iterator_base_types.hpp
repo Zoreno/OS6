@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-07-28
- * 
+ *
  * @brief General iterator-related utility types.
- * 
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef __STL_ITERATOR_BASE_TYPES_HPP
@@ -35,8 +35,8 @@ namespace OS6STD
 {
 /**
  * @brief Marking for input iterators
- * 
- * 
+ *
+ *
  */
 struct input_iterator_tag
 {
@@ -44,8 +44,8 @@ struct input_iterator_tag
 
 /**
  * @brief Marking for output iterators
- * 
- * 
+ *
+ *
  */
 struct output_iterator_tag
 {
@@ -53,8 +53,8 @@ struct output_iterator_tag
 
 /**
  * @brief Marking for forward iterators
- * 
- * 
+ *
+ *
  */
 struct forward_iterator_tag : public input_iterator_tag
 {
@@ -62,8 +62,8 @@ struct forward_iterator_tag : public input_iterator_tag
 
 /**
  * @brief Marking for bidirectional iterators
- * 
- * 
+ *
+ *
  */
 struct bidirectional_iterator_tag : public forward_iterator_tag
 {
@@ -71,8 +71,8 @@ struct bidirectional_iterator_tag : public forward_iterator_tag
 
 /**
  * @brief Marking for random access iterators
- * 
- * 
+ *
+ *
  */
 struct random_access_iterator_tag : public bidirectional_iterator_tag
 {
@@ -80,13 +80,13 @@ struct random_access_iterator_tag : public bidirectional_iterator_tag
 
 /**
  * @brief Common iterator class
- * 
+ *
  * @tparam _Category Iterator category
  * @tparam _T The type that the iterator points to.
  * @tparam _Distance Distance between iterators.
  * @tparam _Pointer Pointer type.
  * @tparam _Reference Reference type.
- * 
+ *
  */
 template <typename _Category,
           typename _T,
@@ -155,8 +155,9 @@ __iterator_category(const _Iter &)
 }
 
 template <typename _InIter>
-using _RequireInputIter = typename enable_if<is_convertible<typename iterator_traits<_InIter>::iterator_category,
-                                                            input_iterator_tag>::value>::type;
+using _RequireInputIter = typename enable_if<
+    is_convertible<typename iterator_traits<_InIter>::iterator_category,
+                   input_iterator_tag>::value>::type;
 
 }  // namespace OS6STD
 

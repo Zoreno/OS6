@@ -134,6 +134,21 @@ struct _Val_less_iter
     // TODO
 };
 
+struct _Iter_equal_to_iter
+{
+    template <typename _Iterator1,
+              typename _Iterator2>
+    bool operator()(_Iterator1 __it1, _Iterator2 __it2) const
+    {
+        return *__it1 == *__it2;
+    }
+};
+
+inline _Iter_equal_to_iter __iter_equal_to_iter()
+{
+    return _Iter_equal_to_iter();
+}
+
 struct _Iter_equal_to_val
 {
     // TODO
@@ -277,3 +292,7 @@ struct _Iter_negate
 OS6STD_END_SYSTEM_HEADER
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

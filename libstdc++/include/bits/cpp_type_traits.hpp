@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-07-29
- * 
+ *
  * @brief Simple type traits
- * 
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef __CPP_TYPE_TRAITS_HPP
@@ -315,8 +315,7 @@ struct __is_arithmetic
     : public __traitor<__is_integer<_T>, __is_floating<_T>>{};
 
 template <typename _T>
-struct __is_scalar
-    : public __traitor<__is_arithmetic<_T>, __is_pointer<_T>>{};
+struct __is_scalar : public __traitor<__is_arithmetic<_T>, __is_pointer<_T>>{};
 
 template <typename _T>
 struct __is_char

@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-07-28
- * 
+ *
  * @brief C++ standard library configuration
- * 
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef __CXX_CONFIG_HPP
@@ -34,8 +34,7 @@
 #define OS6STD_BEGIN_SYSTEM_HEADER \
     extern "C++"                   \
     {
-#define OS6STD_END_SYSTEM_HEADER \
-    }
+#define OS6STD_END_SYSTEM_HEADER }
 
 namespace OS6STD
 {

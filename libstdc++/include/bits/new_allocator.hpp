@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-07-29
- * 
+ *
  * @brief Base allocator using new and delete operators.
- * 
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _NEW_ALLOCATOR_HPP
@@ -85,7 +85,8 @@ public:
         return std::__addressof(__x);
     }
 
-    pointer allocate(size_type __n, const void *__p = static_cast<const void *>(0))
+    pointer allocate(size_type __n,
+                     const void *__p = static_cast<const void *>(0))
     {
         if (__n > this->max_size())
         {
@@ -121,15 +122,13 @@ public:
 };
 
 template <typename _T>
-inline bool
-operator==(const new_allocator<_T> &, const new_allocator<_T> &)
+inline bool operator==(const new_allocator<_T> &, const new_allocator<_T> &)
 {
     return true;
 }
 
 template <typename _T>
-inline bool
-operator!=(const new_allocator<_T> &, const new_allocator<_T> &)
+inline bool operator!=(const new_allocator<_T> &, const new_allocator<_T> &)
 {
     return false;
 }

@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-07-29
- * 
+ *
  * @brief Implements the standard allocator interface.
- * 
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef __ALLOCATOR_HPP
@@ -203,11 +203,16 @@ struct __alloc_neq<_Alloc, false>
     }
 };
 
-template <typename _Tp, bool = __or_<is_copy_constructible<typename _Tp::value_type>,
-                                     is_nothrow_move_constructible<typename _Tp::value_type>>::value>
+template <typename _Tp,
+          bool = __or_<
+              is_copy_constructible<typename _Tp::value_type>,
+              is_nothrow_move_constructible<typename _Tp::value_type>>::value>
 struct __shrink_to_fit_aux
 {
-    static bool _S_do_it(_Tp &) noexcept { return false; }
+    static bool _S_do_it(_Tp &) noexcept
+    {
+        return false;
+    }
 };
 
 template <typename _Tp>

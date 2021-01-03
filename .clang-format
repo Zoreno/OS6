@@ -3,9 +3,24 @@ BasedOnStyle: Google
 UseTab: Never
 IndentWidth: 4
 BreakBeforeBraces: Allman
-AllowShortIfStatementsOnASingleLine: false
+MaxEmptyLinesToKeep: 1
+
 IndentCaseLabels: false
-ColumnLimit: 0
+ColumnLimit: 80
 NamespaceIndentation: None
 AccessModifierOffset: -4
-PointerAlignment: Left
+
+DerivePointerAlignment: false
+PointerAlignment: Right
+
+AllowShortBlocksOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+BinPackArguments: false
+BinPackParameters: false
+
+AlwaysBreakTemplateDeclarations: true
+
+AlignAfterOpenBracket: Align

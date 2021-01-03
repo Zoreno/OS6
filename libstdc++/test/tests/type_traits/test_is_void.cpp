@@ -68,3 +68,5 @@ UTEST(type_traits, is_void)
     ASSERT_TRUE(std::is_void<ClassType>::value == false);
     ASSERT_TRUE(std::is_void<IncompleteClassType>::value == false);
 }
+
+UTEST_MAIN();

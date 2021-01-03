@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-07-28
- * 
+ *
  * @brief Numeric traits
- * 
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef __NUMERIC_TRAITS_HPP
@@ -37,7 +37,9 @@ namespace OS6STD
 #define __signed(_Tp) ((_Tp)(-1) < 0)
 #define __digits(_Tp) (sizeof(_Tp) * __CHAR_BIT__ - __signed(_Tp))
 #define __min(_Tp) (__signed(_Tp) ? (_Tp)1 << __digits(_Tp) : (_Tp)0)
-#define __max(_Tp) (__signed(_Tp) ? (((((_Tp)1 << (__digits(_Tp) - 1)) - 1) << 1) + 1) : ~(_Tp)0)
+#define __max(_Tp)                                                      \
+    (__signed(_Tp) ? (((((_Tp)1 << (__digits(_Tp) - 1)) - 1) << 1) + 1) \
+                   : ~(_Tp)0)
 
 template <typename _Value>
 struct __numeric_traits_integer
@@ -65,21 +67,20 @@ const int __numeric_traits_integer<_Value>::__digits;
 #undef __min
 #undef __max
 
-#define __floating(_Tp, _Fval, _Dval, _LDval)     \
-    (std::__are_same<_Tp, float>::__value ? _Fval \
-                                          : std::__are_same<_Tp, double>::__value ? _Dval : _LDval)
+#define __floating(_Tp, _Fval, _Dval, _LDval) \
+    (std::__are_same<_Tp, float>::__value     \
+         ? _Fval                              \
+         : std::__are_same<_Tp, double>::__value ? _Dval : _LDval)
 
-#define __max_digits10(_Tp)                                  \
-    (2 + __floating(_Tp, __FLT_MANT_DIG__, __DBL_MANT_DIG__, \
-                    __LDBL_MANT_DIG__) *                     \
-             643L / 2136)
+#define __max_digits10(_Tp)                                                   \
+    (2 +                                                                      \
+     __floating(_Tp, __FLT_MANT_DIG__, __DBL_MANT_DIG__, __LDBL_MANT_DIG__) * \
+         643L / 2136)
 
-#define __digits10(_Tp) \
-    __floating(_Tp, __FLT_DIG__, __DBL_DIG__, __LDBL_DIG__)
+#define __digits10(_Tp) __floating(_Tp, __FLT_DIG__, __DBL_DIG__, __LDBL_DIG__)
 
-#define __max_exponent10(_Tp)                               \
-    __floating(_Tp, __FLT_MAX_10_EXP__, __DBL_MAX_10_EXP__, \
-               __LDBL_MAX_10_EXP__)
+#define __max_exponent10(_Tp) \
+    __floating(_Tp, __FLT_MAX_10_EXP__, __DBL_MAX_10_EXP__, __LDBL_MAX_10_EXP__)
 
 template <typename _Value>
 struct __numeric_traits_floating

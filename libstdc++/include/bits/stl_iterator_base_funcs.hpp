@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-08-12
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef __STL_ITERATOR_BASE_FUNCS_HPP
@@ -42,11 +42,8 @@ struct _List_const_iterator;
 //=============================================================================
 
 template <typename _InputIterator>
-inline constexpr
-    typename iterator_traits<_InputIterator>::difference_type
-    __distance(_InputIterator __first,
-               _InputIterator __last,
-               input_iterator_tag)
+inline constexpr typename iterator_traits<_InputIterator>::difference_type
+__distance(_InputIterator __first, _InputIterator __last, input_iterator_tag)
 {
     typename iterator_traits<_InputIterator>::difference_type __n = 0;
 
@@ -60,10 +57,11 @@ inline constexpr
 }
 
 template <typename _RandomAccessIterator>
-inline constexpr typename iterator_traits<_RandomAccessIterator>::difference_type
-__distance(_RandomAccessIterator __first,
-           _RandomAccessIterator __last,
-           random_access_iterator_tag)
+inline constexpr
+    typename iterator_traits<_RandomAccessIterator>::difference_type
+    __distance(_RandomAccessIterator __first,
+               _RandomAccessIterator __last,
+               random_access_iterator_tag)
 {
     typename iterator_traits<_RandomAccessIterator>::difference_type __n = 0;
 
@@ -73,21 +71,18 @@ __distance(_RandomAccessIterator __first,
 }
 
 template <typename _InputIterator>
-inline typename iterator_traits<_InputIterator>::difference_type
-distance(_InputIterator __first,
-         _InputIterator __last)
+inline typename iterator_traits<_InputIterator>::difference_type distance(
+    _InputIterator __first, _InputIterator __last)
 {
-    return std::__distance(__first, __last,
-                           std::__iterator_category(__first));
+    return std::__distance(__first, __last, std::__iterator_category(__first));
 }
 
 //=============================================================================
 // std::advance
 //=============================================================================
 
-template <typename _InputIterator,
-          typename _Distance>
-inline constexpr void _advance(_InputIterator& __i,
+template <typename _InputIterator, typename _Distance>
+inline constexpr void _advance(_InputIterator &__i,
                                _Distance __n,
                                input_iterator_tag)
 {
@@ -97,9 +92,8 @@ inline constexpr void _advance(_InputIterator& __i,
     }
 }
 
-template <typename _BidirectionalIterator,
-          typename _Distance>
-inline constexpr void __advance(_BidirectionalIterator& __i,
+template <typename _BidirectionalIterator, typename _Distance>
+inline constexpr void __advance(_BidirectionalIterator &__i,
                                 _Distance __n,
                                 bidirectional_iterator_tag)
 {
@@ -119,9 +113,8 @@ inline constexpr void __advance(_BidirectionalIterator& __i,
     }
 }
 
-template <typename _RandomAccessIterator,
-          typename _Distance>
-inline constexpr void __advance(_RandomAccessIterator& __i,
+template <typename _RandomAccessIterator, typename _Distance>
+inline constexpr void __advance(_RandomAccessIterator &__i,
                                 _Distance __n,
                                 random_access_iterator_tag)
 {
@@ -139,15 +132,12 @@ inline constexpr void __advance(_RandomAccessIterator& __i,
     }
 }
 
-template <typename _InputIterator,
-          typename _Distance>
-inline void advance(_InputIterator& __i,
-                    _Distance __n)
+template <typename _InputIterator, typename _Distance>
+inline void advance(_InputIterator &__i, _Distance __n)
 {
     typename iterator_traits<_InputIterator>::difference_type __d = __n;
 
-    std::__advance(__i, __d,
-                   std::__iterator_category(__i));
+    std::__advance(__i, __d, std::__iterator_category(__i));
 }
 
 //=============================================================================
@@ -155,8 +145,9 @@ inline void advance(_InputIterator& __i,
 //=============================================================================
 
 template <typename _InputIterator>
-inline _InputIterator next(_InputIterator __x,
-                           typename iterator_traits<_InputIterator>::difference_types __n = 1)
+inline _InputIterator next(
+    _InputIterator __x,
+    typename iterator_traits<_InputIterator>::difference_types __n = 1)
 {
     std::advance(__x, __n);
     return __x;
@@ -167,8 +158,9 @@ inline _InputIterator next(_InputIterator __x,
 //=============================================================================
 
 template <typename _BidirectionalIterator>
-inline _BidirectionalIterator prev(_BidirectionalIterator __x,
-                                   typename iterator_traits<_BidirectionalIterator>::difference_types __n = 1)
+inline _BidirectionalIterator prev(
+    _BidirectionalIterator __x,
+    typename iterator_traits<_BidirectionalIterator>::difference_types __n = 1)
 {
     std::advance(__x, -__n);
     return __x;

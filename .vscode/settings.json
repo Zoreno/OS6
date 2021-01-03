@@ -11,7 +11,8 @@
         "limits": "cpp",
         "type_traits": "cpp",
         "utility": "cpp",
-        "bit": "cpp"
+        "bit": "cpp",
+        "initializer_list": "cpp"
     },
     "doxdocgen.generic.authorEmail": "",
     "doxdocgen.generic.authorName": "Joakim Bertils",

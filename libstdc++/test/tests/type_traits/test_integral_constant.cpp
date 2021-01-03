@@ -66,3 +66,5 @@ UTEST(type_traits, integral_constant_values)
     ASSERT_TRUE(true_type::value == true);
     ASSERT_TRUE(false_type::type::value == false);
 }
+
+UTEST_MAIN();
