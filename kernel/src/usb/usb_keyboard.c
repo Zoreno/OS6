@@ -138,6 +138,12 @@ static void *alloc_physmem(size_t size)
 {
     void *p = (void *)phys_mem_alloc_block();
 
+    if (!p)
+    {
+        log_error("[USB_KEYBOARD] Error allocating physical memory");
+        return p;
+    }
+
     virt_mem_map_page(p, p, 0);
 
     return p;
