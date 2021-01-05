@@ -26,21 +26,22 @@
 #include <stdlib.h>
 
 #include <arch/arch.h>
+#include <logging/logging.h>
 #include <usb/usb_registry.h>
 
-#define PORT_CONNECTION (1 << 0)   // Current Connect Status
-#define PORT_ENABLE (1 << 1)       // Port Enabled
-#define PORT_SUSPEND (1 << 2)      // Suspend
-#define PORT_OVER_CURRENT (1 << 3) // Over-current
-#define PORT_RESET (1 << 4)        // Port Reset
-#define PORT_POWER (1 << 8)        // Port Power
-#define PORT_SPEED_MASK (3 << 9)   // Port Speed
+#define PORT_CONNECTION (1 << 0)    // Current Connect Status
+#define PORT_ENABLE (1 << 1)        // Port Enabled
+#define PORT_SUSPEND (1 << 2)       // Suspend
+#define PORT_OVER_CURRENT (1 << 3)  // Over-current
+#define PORT_RESET (1 << 4)         // Port Reset
+#define PORT_POWER (1 << 8)         // Port Power
+#define PORT_SPEED_MASK (3 << 9)    // Port Speed
 #define PORT_SPEED_SHIFT 9
-#define PORT_TEST (1 << 11)                // Port Test Control
-#define PORT_INDICATOR (1 << 12)           // Port Indicator Control
-#define PORT_CONNECTION_CHANGE (1 << 16)   // Connect Status Change
-#define PORT_ENABLE_CHANGE (1 << 17)       // Port Enable Change
-#define PORT_OVER_CURRENT_CHANGE (1 << 19) // Over-current Change
+#define PORT_TEST (1 << 11)                 // Port Test Control
+#define PORT_INDICATOR (1 << 12)            // Port Indicator Control
+#define PORT_CONNECTION_CHANGE (1 << 16)    // Connect Status Change
+#define PORT_ENABLE_CHANGE (1 << 17)        // Port Enable Change
+#define PORT_OVER_CURRENT_CHANGE (1 << 19)  // Over-current Change
 
 typedef struct _usb_hub_t
 {
@@ -60,6 +61,7 @@ static uint32_t usb_hub_reset_port(usb_hub_t *hub, uint32_t port)
                          0,
                          0))
     {
+        log_error("[USB_HUB] Failed to send dev request");
         return 0;
     }
 
@@ -77,6 +79,7 @@ static uint32_t usb_hub_reset_port(usb_hub_t *hub, uint32_t port)
                              sizeof(status),
                              &status))
         {
+            log_error("[USB_HUB] Failed to send dev request");
             return 0;
         }
 
@@ -98,11 +101,11 @@ static void usb_hub_probe(usb_hub_t *hub)
 {
     usb_device_t *dev = hub->dev;
 
-    uint32_t portCount = hub->desc.portCount;
+    uint32_t port_count = hub->desc.port_count;
 
     if ((hub->desc.chars & HUB_POWER_MASK) == HUB_POWER_INDIVIDUAL)
     {
-        for (uint32_t port = 0; port < portCount; ++port)
+        for (uint32_t port = 0; port < port_count; ++port)
         {
             if (!usb_dev_request(dev,
                                  RT_HOST_TO_DEV | RT_CLASS | RT_OTHER,
@@ -112,14 +115,15 @@ static void usb_hub_probe(usb_hub_t *hub)
                                  0,
                                  0))
             {
+                log_error("[USB_HUB] Failed to send dev request");
                 return;
             }
         }
 
-        mdelay(hub->desc.portPowerTime * 2);
+        mdelay(hub->desc.port_power_time * 2);
     }
 
-    for (uint32_t port = 0; port < portCount; ++port)
+    for (uint32_t port = 0; port < port_count; ++port)
     {
         uint32_t status = usb_hub_reset_port(hub, port);
 
@@ -135,13 +139,14 @@ static void usb_hub_probe(usb_hub_t *hub)
                 dev->hc = hub->dev->hc;
                 dev->port = port;
                 dev->speed = speed;
-                dev->maxPacketSize = 8;
+                dev->max_packet_size = 8;
 
-                dev->hcControl = hub->dev->hcControl;
-                dev->hcIntr = hub->dev->hcIntr;
+                dev->hc_control = hub->dev->hc_control;
+                dev->hc_intr = hub->dev->hc_intr;
 
                 if (!usb_dev_init(dev))
                 {
+                    log_error("[USB_HUB] Failed to init usb device");
                 }
             }
         }
@@ -154,7 +159,7 @@ static void usb_hub_poll(usb_device_t *dev)
 
 int usb_hub_init(usb_device_t *dev)
 {
-    if (dev->intfDesc.intfClass == USB_CLASS_HUB)
+    if (dev->intfDesc.intf_class == USB_CLASS_HUB)
     {
         printf("Initializing Hub\n");
 
@@ -168,6 +173,7 @@ int usb_hub_init(usb_device_t *dev)
                              sizeof(usb_hub_desc_t),
                              &desc))
         {
+            log_error("[USB_HUB] Failed to send dev request");
             return 0;
         }
 

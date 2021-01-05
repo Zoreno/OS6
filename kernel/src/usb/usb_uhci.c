@@ -49,62 +49,62 @@
 // UHCI Controller I/O Registers
 //=============================================================================
 
-#define REG_CMD 0x00       // USB Command
-#define REG_STS 0x02       // USB Status
-#define REG_INTR 0x04      // USB Interrupt Enable
-#define REG_FRNUM 0x06     // Frame Number
-#define REG_FRBASEADD 0x08 // Frame List Base Address
-#define REG_SOFMOD 0x0C    // Start of Frame Modify
-#define REG_PORT1 0x10     // Port 1 Status/Control
-#define REG_PORT2 0x12     // Port 2 Status/Control
-#define REG_LEGSUP 0xc0    // Legacy Support
+#define REG_CMD 0x00        // USB Command
+#define REG_STS 0x02        // USB Status
+#define REG_INTR 0x04       // USB Interrupt Enable
+#define REG_FRNUM 0x06      // Frame Number
+#define REG_FRBASEADD 0x08  // Frame List Base Address
+#define REG_SOFMOD 0x0C     // Start of Frame Modify
+#define REG_PORT1 0x10      // Port 1 Status/Control
+#define REG_PORT2 0x12      // Port 2 Status/Control
+#define REG_LEGSUP 0xc0     // Legacy Support
 
 //=============================================================================
 // USB Command Register
 //=============================================================================
 
-#define CMD_RS (1 << 0)      // Run/Stop
-#define CMD_HCRESET (1 << 1) // Host Controller Reset
-#define CMD_GRESET (1 << 2)  // Global Reset
-#define CMD_EGSM (1 << 3)    // Enter Global Suspend Resume
-#define CMD_FGR (1 << 4)     // Force Global Resume
-#define CMD_SWDBG (1 << 5)   // Software Debug
-#define CMD_CF (1 << 6)      // Configure Flag
-#define CMD_MAXP (1 << 7)    // Max Packet (0 = 32, 1 = 64)
+#define CMD_RS (1 << 0)       // Run/Stop
+#define CMD_HCRESET (1 << 1)  // Host Controller Reset
+#define CMD_GRESET (1 << 2)   // Global Reset
+#define CMD_EGSM (1 << 3)     // Enter Global Suspend Resume
+#define CMD_FGR (1 << 4)      // Force Global Resume
+#define CMD_SWDBG (1 << 5)    // Software Debug
+#define CMD_CF (1 << 6)       // Configure Flag
+#define CMD_MAXP (1 << 7)     // Max Packet (0 = 32, 1 = 64)
 
 //=============================================================================
 // USB Status Register
 //=============================================================================
 
-#define STS_USBINT (1 << 0) // USB Interrupt
-#define STS_ERROR (1 << 1)  // USB Error Interrupt
-#define STS_RD (1 << 2)     // Resume Detect
-#define STS_HSE (1 << 3)    // Host System Error
-#define STS_HCPE (1 << 4)   // Host Controller Process Error
-#define STS_HCH (1 << 5)    // HC Halted
+#define STS_USBINT (1 << 0)  // USB Interrupt
+#define STS_ERROR (1 << 1)   // USB Error Interrupt
+#define STS_RD (1 << 2)      // Resume Detect
+#define STS_HSE (1 << 3)     // Host System Error
+#define STS_HCPE (1 << 4)    // Host Controller Process Error
+#define STS_HCH (1 << 5)     // HC Halted
 
 //=============================================================================
 // USB Interrupt Enable Register
 //=============================================================================
 
-#define INTR_TIMEOUT (1 << 0) // Timeout/CRC Interrupt Enable
-#define INTR_RESUME (1 << 1)  // Resume Interrupt Enable
-#define INTR_IOC (1 << 2)     // Interrupt on Complete Enable
-#define INTR_SP (1 << 3)      // Short Packet Interrupt Enable
+#define INTR_TIMEOUT (1 << 0)  // Timeout/CRC Interrupt Enable
+#define INTR_RESUME (1 << 1)   // Resume Interrupt Enable
+#define INTR_IOC (1 << 2)      // Interrupt on Complete Enable
+#define INTR_SP (1 << 3)       // Short Packet Interrupt Enable
 
 //=============================================================================
 // USB Port Status and Control Registers
 //=============================================================================
 
-#define PORT_CONNECTION (1 << 0)        // Current Connect Status
-#define PORT_CONNECTION_CHANGE (1 << 1) // Connect Status Change
-#define PORT_ENABLE (1 << 2)            // Port Enabled
-#define PORT_ENABLE_CHANGE (1 << 3)     // Port Enable Change
-#define PORT_LS (3 << 4)                // Line Status
-#define PORT_RD (1 << 6)                // Resume Detect
-#define PORT_LSDA (1 << 8)              // Low Speed Device Attached
-#define PORT_RESET (1 << 9)             // Port Reset
-#define PORT_SUSP (1 << 12)             // Suspend
+#define PORT_CONNECTION (1 << 0)         // Current Connect Status
+#define PORT_CONNECTION_CHANGE (1 << 1)  // Connect Status Change
+#define PORT_ENABLE (1 << 2)             // Port Enabled
+#define PORT_ENABLE_CHANGE (1 << 3)      // Port Enable Change
+#define PORT_LS (3 << 4)                 // Line Status
+#define PORT_RD (1 << 6)                 // Resume Detect
+#define PORT_LSDA (1 << 8)               // Low Speed Device Attached
+#define PORT_RESET (1 << 9)              // Port Reset
+#define PORT_SUSP (1 << 12)              // Suspend
 #define PORT_RWC (PORT_CONNECTION_CHANGE | PORT_ENABLE_CHANGE)
 
 //=============================================================================
@@ -136,32 +136,32 @@ typedef struct _uhci_td_t
 //=============================================================================
 
 #define TD_CS_ACTLEN 0x000007ff
-#define TD_CS_BITSTUFF (1 << 17)    // Bitstuff Error
-#define TD_CS_CRC_TIMEOUT (1 << 18) // CRC/Time Out Error
-#define TD_CS_NAK (1 << 19)         // NAK Received
-#define TD_CS_BABBLE (1 << 20)      // Babble Detected
-#define TD_CS_DATABUFFER (1 << 21)  // Data Buffer Error
-#define TD_CS_STALLED (1 << 22)     // Stalled
-#define TD_CS_ACTIVE (1 << 23)      // Active
-#define TD_CS_IOC (1 << 24)         // Interrupt on Complete
-#define TD_CS_IOS (1 << 25)         // Isochronous Select
-#define TD_CS_LOW_SPEED (1 << 26)   // Low Speed Device
-#define TD_CS_ERROR_MASK (3 << 27)  // Error counter
+#define TD_CS_BITSTUFF (1 << 17)     // Bitstuff Error
+#define TD_CS_CRC_TIMEOUT (1 << 18)  // CRC/Time Out Error
+#define TD_CS_NAK (1 << 19)          // NAK Received
+#define TD_CS_BABBLE (1 << 20)       // Babble Detected
+#define TD_CS_DATABUFFER (1 << 21)   // Data Buffer Error
+#define TD_CS_STALLED (1 << 22)      // Stalled
+#define TD_CS_ACTIVE (1 << 23)       // Active
+#define TD_CS_IOC (1 << 24)          // Interrupt on Complete
+#define TD_CS_IOS (1 << 25)          // Isochronous Select
+#define TD_CS_LOW_SPEED (1 << 26)    // Low Speed Device
+#define TD_CS_ERROR_MASK (3 << 27)   // Error counter
 #define TD_CS_ERROR_SHIFT 27
-#define TD_CS_SPD (1 << 29) // Short Packet Detect
+#define TD_CS_SPD (1 << 29)  // Short Packet Detect
 
 //=============================================================================
 // TD Token
 //=============================================================================
 
-#define TD_TOK_PID_MASK 0x000000ff     // Packet Identification
-#define TD_TOK_DEVADDR_MASK 0x00007f00 // Device Address
+#define TD_TOK_PID_MASK 0x000000ff      // Packet Identification
+#define TD_TOK_DEVADDR_MASK 0x00007f00  // Device Address
 #define TD_TOK_DEVADDR_SHIFT 8
-#define TD_TOK_ENDP_MASK 0x00078000 // Endpoint
+#define TD_TOK_ENDP_MASK 0x00078000  // Endpoint
 #define TD_TOK_ENDP_SHIFT 15
-#define TD_TOK_D 0x00080000 // Data Toggle
+#define TD_TOK_D 0x00080000  // Data Toggle
 #define TD_TOK_D_SHIFT 19
-#define TD_TOK_MAXLEN_MASK 0xffe00000 // Maximum Length
+#define TD_TOK_MAXLEN_MASK 0xffe00000  // Maximum Length
 #define TD_TOK_MAXLEN_SHIFT 21
 
 //=============================================================================
@@ -182,9 +182,9 @@ typedef struct _uhci_qh_t
     volatile uint32_t element;
 
     usb_transfer_t *transfer;
-    link_t qhLink;
+    link_t qh_link;
 
-    uint32_t tdHead;
+    uint32_t td_head;
     uint32_t active;
 } __attribute__((packed)) uhci_qh_t;
 
@@ -195,10 +195,10 @@ typedef struct _uhci_qh_t
 typedef struct _uhci_controller_t
 {
     uint32_t ioAddr;
-    uint32_t *frameList;
-    uhci_qh_t *qhPool;
-    uhci_td_t *tdPool;
-    uhci_qh_t *asyncQH;
+    uint32_t *frame_list;
+    uhci_qh_t *qh_pool;
+    uhci_td_t *td_pool;
+    uhci_qh_t *async_qh;
 } uhci_controller_t;
 
 //=============================================================================
@@ -207,9 +207,9 @@ typedef struct _uhci_controller_t
 
 static uhci_td_t *uhci_alloc_td(uhci_controller_t *controller)
 {
-    uhci_td_t *end = controller->tdPool + MAX_TD;
+    uhci_td_t *end = controller->td_pool + MAX_TD;
 
-    for (uhci_td_t *td = controller->tdPool; td != end; ++td)
+    for (uhci_td_t *td = controller->td_pool; td != end; ++td)
     {
         if (!td->active)
         {
@@ -223,9 +223,9 @@ static uhci_td_t *uhci_alloc_td(uhci_controller_t *controller)
 
 static uhci_qh_t *uhci_alloc_qh(uhci_controller_t *controller)
 {
-    uhci_qh_t *end = controller->qhPool + MAX_QH;
+    uhci_qh_t *end = controller->qh_pool + MAX_QH;
 
-    for (uhci_qh_t *qh = controller->qhPool; qh != end; ++qh)
+    for (uhci_qh_t *qh = controller->qh_pool; qh != end; ++qh)
     {
         if (!qh->active)
         {
@@ -249,21 +249,21 @@ static void uhci_free_qh(uhci_qh_t *qh)
 
 static void uhci_insert_qh(uhci_controller_t *controller, uhci_qh_t *qh)
 {
-    uhci_qh_t *list = controller->asyncQH;
-    uhci_qh_t *end = link_data(list->qhLink.prev, uhci_qh_t, qhLink);
+    uhci_qh_t *list = controller->async_qh;
+    uhci_qh_t *end = link_data(list->qh_link.prev, uhci_qh_t, qh_link);
 
     qh->head = TD_PTR_TERMINATE;
     end->head = (uint32_t)(uintptr_t)qh | TD_PTR_QH;
 
-    link_before(&list->qhLink, &qh->qhLink);
+    link_before(&list->qh_link, &qh->qh_link);
 }
 
 static void uhci_remove_qh(uhci_qh_t *qh)
 {
-    uhci_qh_t *prev = link_data(qh->qhLink.prev, uhci_qh_t, qhLink);
+    uhci_qh_t *prev = link_data(qh->qh_link.prev, uhci_qh_t, qh_link);
 
     prev->head = qh->head;
-    link_remove(&qh->qhLink);
+    link_remove(&qh->qh_link);
 }
 
 static void uhci_port_set(uint16_t port, uint16_t data)
@@ -324,7 +324,7 @@ static void uhci_init_td(uhci_td_t *td,
 static void uhci_init_qh(uhci_qh_t *qh, usb_transfer_t *t, uhci_td_t *td)
 {
     qh->transfer = t;
-    qh->tdHead = (uint32_t)(uintptr_t)td;
+    qh->td_head = (uint32_t)(uintptr_t)td;
     qh->element = (uint32_t)(uintptr_t)td;
 }
 
@@ -387,7 +387,6 @@ static void uhci_process_qh(uhci_controller_t *controller, uhci_qh_t *qh)
 
         while (td)
         {
-
             uhci_td_t *next = (uhci_td_t *)(uintptr_t)td->td_next;
 
             uhci_free_td(td);
@@ -461,7 +460,7 @@ static void uhci_dev_control(usb_device_t *dev, usb_transfer_t *t)
     uint32_t speed = dev->speed;
     uint32_t addr = dev->addr;
     uint32_t endp = 0;
-    uint32_t maxSize = dev->maxPacketSize;
+    uint32_t maxSize = dev->max_packet_size;
     uint32_t type = req->type;
     uint32_t len = req->len;
 
@@ -567,8 +566,8 @@ static void uhci_dev_intr(usb_device_t *dev, usb_transfer_t *t)
 
 static void uhci_probe(uhci_controller_t *controller)
 {
-    uint16_t portCount = 2;
-    for (uint16_t port = 0; port < portCount; ++port)
+    uint16_t port_count = 2;
+    for (uint16_t port = 0; port < port_count; ++port)
     {
         uint16_t status = uhci_reset_port(controller, port);
 
@@ -584,10 +583,10 @@ static void uhci_probe(uhci_controller_t *controller)
                 dev->hc = controller;
                 dev->port = port;
                 dev->speed = speed;
-                dev->maxPacketSize = 8;
+                dev->max_packet_size = 8;
 
-                dev->hcControl = uhci_dev_control;
-                dev->hcIntr = uhci_dev_intr;
+                dev->hc_control = uhci_dev_control;
+                dev->hc_intr = uhci_dev_intr;
 
                 backtrace();
 
@@ -606,7 +605,7 @@ static void uhci_controller_poll(usb_controller_t *controller)
     uhci_qh_t *qh;
     uhci_qh_t *next;
 
-    list_for_each_safe(qh, next, hc->asyncQH->qhLink, qhLink, uhci_qh_t)
+    list_for_each_safe(qh, next, hc->async_qh->qh_link, qh_link, uhci_qh_t)
     {
         if (qh->transfer)
         {
@@ -641,34 +640,34 @@ void usb_uhci_init(uint32_t id, PciDeviceInfo_t *devInfo)
 
     hc->ioAddr = ioAddr;
 
-    hc->frameList = malloc(1024 * sizeof(uint32_t));
+    hc->frame_list = malloc(1024 * sizeof(uint32_t));
 
-    log_debug("[UHCI] Framelist: 0x%016x", hc->frameList);
+    log_debug("[UHCI] Framelist: 0x%016x", hc->frame_list);
 
-    if (!hc->frameList)
+    if (!hc->frame_list)
     {
         log_error("[UCHI] Failed to allocate memory for framelist");
         return;
     }
 
-    hc->qhPool = malloc(sizeof(uhci_qh_t) * MAX_QH);
+    hc->qh_pool = malloc(sizeof(uhci_qh_t) * MAX_QH);
 
-    if (!hc->qhPool)
+    if (!hc->qh_pool)
     {
         log_error("[UCHI] Failed to allocate memory for QH pool");
         return;
     }
 
-    hc->tdPool = malloc(sizeof(uhci_td_t) * MAX_TD);
+    hc->td_pool = malloc(sizeof(uhci_td_t) * MAX_TD);
 
-    if (!hc->tdPool)
+    if (!hc->td_pool)
     {
         log_error("[UCHI] Failed to allocate memory for TD pool");
         return;
     }
 
-    memset(hc->qhPool, 0, sizeof(uhci_qh_t) * MAX_QH);
-    memset(hc->tdPool, 0, sizeof(uhci_td_t) * MAX_TD);
+    memset(hc->qh_pool, 0, sizeof(uhci_qh_t) * MAX_QH);
+    memset(hc->td_pool, 0, sizeof(uhci_td_t) * MAX_TD);
 
     outportw(hc->ioAddr + REG_CMD, CMD_GRESET);
     mdelay(50);
@@ -684,20 +683,20 @@ void usb_uhci_init(uint32_t id, PciDeviceInfo_t *devInfo)
     qh->head = TD_PTR_TERMINATE;
     qh->element = TD_PTR_TERMINATE;
     qh->transfer = 0;
-    qh->qhLink.prev = &qh->qhLink;
-    qh->qhLink.next = &qh->qhLink;
+    qh->qh_link.prev = &qh->qh_link;
+    qh->qh_link.next = &qh->qh_link;
 
-    hc->asyncQH = qh;
+    hc->async_qh = qh;
 
     for (uint32_t i = 0; i < 1024; ++i)
     {
-        hc->frameList[i] = TD_PTR_QH | (uint32_t)(uintptr_t)qh;
+        hc->frame_list[i] = TD_PTR_QH | (uint32_t)(uintptr_t)qh;
     }
 
     outportw(hc->ioAddr + REG_LEGSUP, 0x8F00);
     outportw(hc->ioAddr + REG_INTR, 0);
     outportw(hc->ioAddr + REG_FRNUM, 0);
-    outportl(hc->ioAddr + REG_FRBASEADD, (uint32_t)((uint64_t)(virt_mem_get_physical_addr(hc->frameList, virt_mem_get_current_dir())) & 0xFFFFFFFF));
+    outportl(hc->ioAddr + REG_FRBASEADD, (uint32_t)((uint64_t)(virt_mem_get_physical_addr(hc->frame_list, virt_mem_get_current_dir())) & 0xFFFFFFFF));
     outportw(hc->ioAddr + REG_SOFMOD, 0x40);
     outportw(hc->ioAddr + REG_STS, 0xFFFF);
     outportw(hc->ioAddr + REG_CMD, CMD_RS | CMD_CF | CMD_MAXP);

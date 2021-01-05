@@ -6,7 +6,7 @@ BreakBeforeBraces: Allman
 MaxEmptyLinesToKeep: 1
 
 IndentCaseLabels: false
-ColumnLimit: 80
+ColumnLimit: 0
 NamespaceIndentation: None
 AccessModifierOffset: -4
 

@@ -127,7 +127,7 @@ static void usb_keyboard_poll(usb_device_t *dev)
         }
 
         t->complete = 0;
-        dev->hcIntr(dev, t);
+        dev->hc_intr(dev, t);
     }
 }
 
@@ -149,9 +149,9 @@ static void *alloc_physmem(size_t size)
 
 int usb_keyboard_init(usb_device_t *dev)
 {
-    if (dev->intfDesc.intfClass == USB_CLASS_HID &&
-        dev->intfDesc.intfSubClass == USB_SUBCLASS_BOOT &&
-        dev->intfDesc.intfProtocol == USB_PROTOCOL_KBD)
+    if (dev->intfDesc.intf_class == USB_CLASS_HID &&
+        dev->intfDesc.intf_sub_class == USB_SUBCLASS_BOOT &&
+        dev->intfDesc.intf_protocol == USB_PROTOCOL_KBD)
     {
         log_info("[USB_KEYBOARD] Initializing");
 
@@ -161,7 +161,7 @@ int usb_keyboard_init(usb_device_t *dev)
         dev->drv = kbd;
         dev->drvPoll = usb_keyboard_poll;
 
-        uint32_t intf_index = dev->intfDesc.intfIndex;
+        uint32_t intf_index = dev->intfDesc.intf_index;
 
         if (!usb_dev_request(dev,
                              RT_HOST_TO_DEV | RT_CLASS | RT_INTF,
@@ -187,7 +187,7 @@ int usb_keyboard_init(usb_device_t *dev)
         t->complete = 0;
         t->success = 0;
 
-        dev->hcIntr(dev, t);
+        dev->hc_intr(dev, t);
 
         return 1;
     }

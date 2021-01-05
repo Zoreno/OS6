@@ -84,14 +84,14 @@ typedef struct _usb_device_t
     uint32_t port;
     uint32_t speed;
     uint32_t addr;
-    uint32_t maxPacketSize;
+    uint32_t max_packet_size;
 
     usb_endpoint_t endp;
 
     usb_intf_desc_t intfDesc;
 
-    void (*hcControl)(struct _usb_device_t *dev, usb_transfer_t *t);
-    void (*hcIntr)(struct _usb_device_t *dev, usb_transfer_t *t);
+    void (*hc_control)(struct _usb_device_t *dev, usb_transfer_t *t);
+    void (*hc_intr)(struct _usb_device_t *dev, usb_transfer_t *t);
 
     void (*drvPoll)(struct _usb_device_t *dev);
 
@@ -108,9 +108,12 @@ usb_device_t *usb_dev_create();
 int usb_dev_init(usb_device_t *dev);
 
 int usb_dev_request(usb_device_t *dev,
-                    uint32_t type, uint32_t request,
-                    uint32_t value, uint32_t index,
-                    uint32_t len, void *data);
+                    uint32_t type,
+                    uint32_t request,
+                    uint32_t value,
+                    uint32_t index,
+                    uint32_t len,
+                    void *data);
 
 int usb_dev_get_langs(usb_device_t *dev, uint16_t *langs);
 

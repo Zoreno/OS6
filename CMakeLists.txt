@@ -53,7 +53,7 @@ set(CFLAGS "${CFLAGS} -Wall -Wextra -Werror=implicit-function-declaration -Wno-u
 set(CFLAGS "${CFLAGS} -ffreestanding")
 
 # Disable language features
-set(CFLAGS "${CFLAGS} -fno-builtin -finline-functions -fno-stack-protector")
+set(CFLAGS "${CFLAGS} -fno-builtin -finline-functions -fno-stack-protector -mno-red-zone")
 
 # Cpp flags
 set(CPPFLAGS "${CFLAGS} -std=c++11 -static-libgcc")

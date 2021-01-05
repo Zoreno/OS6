@@ -62,11 +62,11 @@ usb_device_t *usb_dev_create()
         dev->port = 0;
         dev->speed = 0;
         dev->addr = 0;
-        dev->maxPacketSize = 0;
+        dev->max_packet_size = 0;
         dev->endp.toggle = 0;
 
-        dev->hcControl = 0;
-        dev->hcIntr = 0;
+        dev->hc_control = 0;
+        dev->hc_intr = 0;
         dev->drvPoll = 0;
 
         _usb_device_list = dev;
@@ -79,7 +79,7 @@ int usb_dev_init(usb_device_t *dev)
 {
     log_debug("[USB_DEVICE] Initiating device...");
 
-    usb_device_desc_t devDesc;
+    usb_device_desc_t dev_desc;
 
     if (!usb_dev_request(dev,
                          RT_DEV_TO_HOST | RT_STANDARD | RT_DEV,
@@ -87,13 +87,13 @@ int usb_dev_init(usb_device_t *dev)
                          (USB_DESC_DEVICE << 8) | 0,
                          0,
                          8,
-                         &devDesc))
+                         &dev_desc))
     {
         log_error("[USB_DEVICE] Failed to send dev request");
         return 0;
     }
 
-    dev->maxPacketSize = devDesc.maxPacketSize;
+    dev->max_packet_size = dev_desc.max_packet_size;
 
     uint32_t addr = ++_next_usb_addr;
 
@@ -119,13 +119,13 @@ int usb_dev_init(usb_device_t *dev)
                          (USB_DESC_DEVICE << 8) | 0,
                          0,
                          sizeof(usb_device_desc_t),
-                         &devDesc))
+                         &dev_desc))
     {
         log_error("[USB_DEVICE] Failed to send dev request");
         return 0;
     }
 
-    usb_print_device_desc(&devDesc);
+    usb_print_device_desc(&dev_desc);
 
     uint16_t langs[USB_STRING_SIZE];
     if (!usb_dev_get_langs(dev, langs))
@@ -134,50 +134,52 @@ int usb_dev_init(usb_device_t *dev)
         return 0;
     }
 
-    uint32_t langID = langs[0];
+    uint32_t lang_id = langs[0];
 
-    if (langID)
+    if (lang_id)
     {
-        char productString[USB_STRING_SIZE];
-        char vendorString[USB_STRING_SIZE];
-        char serialString[USB_STRING_SIZE];
+        char product_string[USB_STRING_SIZE];
+        char vendor_string[USB_STRING_SIZE];
+        char serial_string[USB_STRING_SIZE];
 
-        usb_dev_get_string(dev, productString, langID, devDesc.productStr);
-        usb_dev_get_string(dev, vendorString, langID, devDesc.vendorStr);
-        usb_dev_get_string(dev, serialString, langID, devDesc.serialStr);
+        usb_dev_get_string(dev, product_string, lang_id, dev_desc.product_str);
+        usb_dev_get_string(dev, vendor_string, lang_id, dev_desc.vendor_str);
+        usb_dev_get_string(dev, serial_string, lang_id, dev_desc.serial_str);
 
         log_debug("[USB_DEVICE] Product: %s, vendor: %s, serial: %s",
-                  productString,
-                  vendorString,
-                  serialString);
+                  product_string,
+                  vendor_string,
+                  serial_string);
     }
 
-    uint8_t confBuf[256];
-    uint32_t pickedConfValue = 0;
-    usb_intf_desc_t *pickedIntfDesc = 0;
-    usb_endp_desc_t *pickedEndpDesc = 0;
+    uint8_t conf_buf[256];
+    uint32_t picked_conf_value = 0;
+    usb_intf_desc_t *picked_intf_desc = 0;
+    usb_endp_desc_t *picked_endp_desc = 0;
 
-    log_debug("[USB_DEVICE] conf_count: %i", devDesc.confCount);
+    log_debug("[USB_DEVICE] conf_count: %i", dev_desc.conf_count);
 
-    for (uint32_t confIndex = 0; confIndex < devDesc.confCount; ++confIndex)
+    for (uint32_t conf_index = 0; conf_index < dev_desc.conf_count; ++conf_index)
     {
         if (!usb_dev_request(dev,
                              RT_DEV_TO_HOST | RT_STANDARD | RT_DEV,
                              REQ_GET_DESC,
-                             (USB_DESC_CONF << 8) | confIndex,
+                             (USB_DESC_CONF << 8) | conf_index,
                              0,
-                             4, confBuf))
+                             4,
+                             conf_buf))
         {
             log_warn("[USB_DEVICE] Failed to send dev request");
             continue;
         }
 
-        usb_conf_desc_t *confDesc = (usb_conf_desc_t *)confBuf;
+        usb_conf_desc_t *conf_desc = (usb_conf_desc_t *)conf_buf;
 
-        if (confDesc->totalLen > sizeof(confBuf))
+        if (conf_desc->total_len > sizeof(conf_buf))
         {
             log_warn("[USB_DEVICE] Configuration buffer length %i greater than %d bytes",
-                     confDesc->totalLen, sizeof(confBuf));
+                     conf_desc->total_len,
+                     sizeof(conf_buf));
 
             continue;
         }
@@ -185,24 +187,24 @@ int usb_dev_init(usb_device_t *dev)
         if (!usb_dev_request(dev,
                              RT_DEV_TO_HOST | RT_STANDARD | RT_DEV,
                              REQ_GET_DESC,
-                             (USB_DESC_CONF << 8) | confIndex,
+                             (USB_DESC_CONF << 8) | conf_index,
                              0,
-                             confDesc->totalLen,
-                             confBuf))
+                             conf_desc->total_len,
+                             conf_buf))
         {
             log_warn("[USB_DEVICE] Failed to send dev request");
             continue;
         }
 
-        usb_print_conf_desc(confDesc);
+        usb_print_conf_desc(conf_desc);
 
-        if (!pickedConfValue)
+        if (!picked_conf_value)
         {
-            pickedConfValue = confDesc->confValue;
+            picked_conf_value = conf_desc->conf_value;
         }
 
-        uint8_t *data = confBuf + confDesc->len;
-        uint8_t *end = confBuf + confDesc->totalLen;
+        uint8_t *data = conf_buf + conf_desc->len;
+        uint8_t *end = conf_buf + conf_desc->total_len;
 
         while (data < end)
         {
@@ -216,9 +218,9 @@ int usb_dev_init(usb_device_t *dev)
                 usb_intf_desc_t *intf_desc = (usb_intf_desc_t *)data;
                 usb_print_intf_desc(intf_desc);
 
-                if (!pickedIntfDesc)
+                if (!picked_intf_desc)
                 {
-                    pickedIntfDesc = intf_desc;
+                    picked_intf_desc = intf_desc;
                 }
             }
             break;
@@ -227,9 +229,9 @@ int usb_dev_init(usb_device_t *dev)
                 usb_endp_desc_t *endp_desc = (usb_endp_desc_t *)data;
                 usb_print_endp_desc(endp_desc);
 
-                if (!pickedEndpDesc)
+                if (!picked_endp_desc)
                 {
-                    pickedEndpDesc = endp_desc;
+                    picked_endp_desc = endp_desc;
                 }
             }
             break;
@@ -239,12 +241,12 @@ int usb_dev_init(usb_device_t *dev)
         }
     }
 
-    if (pickedConfValue && pickedIntfDesc && pickedEndpDesc)
+    if (picked_conf_value && picked_intf_desc && picked_endp_desc)
     {
         if (!usb_dev_request(dev,
                              RT_HOST_TO_DEV | RT_STANDARD | RT_DEV,
                              REQ_SET_CONF,
-                             pickedConfValue,
+                             picked_conf_value,
                              0,
                              0,
                              0))
@@ -253,8 +255,8 @@ int usb_dev_init(usb_device_t *dev)
             return 0;
         }
 
-        dev->intfDesc = *pickedIntfDesc;
-        dev->endp.desc = *pickedEndpDesc;
+        dev->intfDesc = *picked_intf_desc;
+        dev->endp.desc = *picked_endp_desc;
 
         usb_driver_t *driver = usb_get_driver_table();
 
@@ -278,9 +280,12 @@ int usb_dev_init(usb_device_t *dev)
 }
 
 int usb_dev_request(usb_device_t *dev,
-                    uint32_t type, uint32_t request,
-                    uint32_t value, uint32_t index,
-                    uint32_t len, void *data)
+                    uint32_t type,
+                    uint32_t request,
+                    uint32_t value,
+                    uint32_t index,
+                    uint32_t len,
+                    void *data)
 {
     log_debug("[USB_DEVICE] Creating device request");
 
@@ -300,7 +305,7 @@ int usb_dev_request(usb_device_t *dev,
     t.complete = 0;
     t.success = 0;
 
-    dev->hcControl(dev, &t);
+    dev->hc_control(dev, &t);
 
     return t.success;
 }
@@ -337,21 +342,21 @@ int usb_dev_get_langs(usb_device_t *dev, uint16_t *langs)
         return 0;
     }
 
-    uint8_t langLen = (desc->len - 2) / 2;
+    uint8_t lang_len = (desc->len - 2) / 2;
 
-    for (uint32_t i = 0; i < langLen; ++i)
+    for (uint32_t i = 0; i < lang_len; ++i)
     {
         langs[i] = desc->str[i];
     }
 
-    langs[langLen] = 0;
+    langs[lang_len] = 0;
     return 1;
 }
 
-int usb_dev_get_string(usb_device_t *dev, char *str, uint32_t langId, uint32_t strIndex)
+int usb_dev_get_string(usb_device_t *dev, char *str, uint32_t langId, uint32_t str_index)
 {
     str[0] = '\0';
-    if (!strIndex)
+    if (!str_index)
     {
         return 1;
     }
@@ -363,7 +368,7 @@ int usb_dev_get_string(usb_device_t *dev, char *str, uint32_t langId, uint32_t s
     if (!usb_dev_request(dev,
                          RT_DEV_TO_HOST | RT_STANDARD | RT_DEV,
                          REQ_GET_DESC,
-                         (USB_DESC_STRING << 8) | strIndex,
+                         (USB_DESC_STRING << 8) | str_index,
                          langId,
                          1,
                          desc))
@@ -376,7 +381,7 @@ int usb_dev_get_string(usb_device_t *dev, char *str, uint32_t langId, uint32_t s
     if (!usb_dev_request(dev,
                          RT_DEV_TO_HOST | RT_STANDARD | RT_DEV,
                          REQ_GET_DESC,
-                         (USB_DESC_STRING << 8) | strIndex,
+                         (USB_DESC_STRING << 8) | str_index,
                          langId,
                          desc->len,
                          desc))
@@ -385,14 +390,14 @@ int usb_dev_get_string(usb_device_t *dev, char *str, uint32_t langId, uint32_t s
     }
 
     // Dumb Unicode to ASCII conversion
-    uint32_t strLen = (desc->len - 2) / 2;
+    uint32_t str_len = (desc->len - 2) / 2;
 
-    for (uint32_t i = 0; i < strLen; ++i)
+    for (uint32_t i = 0; i < str_len; ++i)
     {
         str[i] = desc->str[i];
     }
 
-    str[strLen] = '\0';
+    str[str_len] = '\0';
 
     return 1;
 }

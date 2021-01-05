@@ -52,4 +52,9 @@
     ],
     "C_Cpp.errorSquiggles": "Disabled",
     "git.ignoreLimitWarning": true,
+    "cSpell.words": [
+        "ehci",
+        "hcsparams",
+        "mdelay"
+    ],
 }

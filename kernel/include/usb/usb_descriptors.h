@@ -57,18 +57,18 @@ typedef struct _usb_device_desc_t
 {
     uint8_t len;
     uint8_t type;
-    uint16_t usbVer;
-    uint8_t devClass;
-    uint8_t devSubClass;
-    uint8_t devProtocol;
-    uint8_t maxPacketSize;
-    uint16_t vendorId;
-    uint16_t productId;
-    uint16_t deviceVer;
-    uint8_t vendorStr;
-    uint8_t productStr;
-    uint8_t serialStr;
-    uint8_t confCount;
+    uint16_t usb_ver;
+    uint8_t dev_class;
+    uint8_t dev_sub_class;
+    uint8_t dev_protocol;
+    uint8_t max_packet_size;
+    uint16_t vendor_id;
+    uint16_t product_id;
+    uint16_t device_ver;
+    uint8_t vendor_str;
+    uint8_t product_str;
+    uint8_t serial_str;
+    uint8_t conf_count;
 
 } __attribute__((packed)) usb_device_desc_t;
 
@@ -80,12 +80,12 @@ typedef struct _usb_conf_desc_t
 {
     uint8_t len;
     uint8_t type;
-    uint16_t totalLen;
-    uint8_t intfCount;
-    uint8_t confValue;
-    uint8_t confStr;
+    uint16_t total_len;
+    uint8_t intf_count;
+    uint8_t conf_value;
+    uint8_t conf_str;
     uint8_t attributes;
-    uint8_t maxPower;
+    uint8_t max_power;
 
 } __attribute__((packed)) usb_conf_desc_t;
 
@@ -109,13 +109,13 @@ typedef struct _usb_intf_desc_t
 {
     uint8_t len;
     uint8_t type;
-    uint8_t intfIndex;
-    uint8_t altSetting;
-    uint8_t endpCount;
-    uint8_t intfClass;
-    uint8_t intfSubClass;
-    uint8_t intfProtocol;
-    uint8_t intfStr;
+    uint8_t intf_index;
+    uint8_t alt_setting;
+    uint8_t endp_count;
+    uint8_t intf_class;
+    uint8_t intf_sub_class;
+    uint8_t intf_protocol;
+    uint8_t intf_str;
 
 } __attribute__((packed)) usb_intf_desc_t;
 
@@ -129,7 +129,7 @@ typedef struct _usb_endp_desc_t
     uint8_t type;
     uint8_t addr;
     uint8_t attributes;
-    uint16_t maxPacketSize;
+    uint16_t max_packet_size;
     uint8_t interval;
 
 } __attribute__((packed)) usb_endp_desc_t;
@@ -142,11 +142,11 @@ typedef struct _usb_hid_desc_t
 {
     uint8_t len;
     uint8_t type;
-    uint16_t hidVer;
-    uint8_t countryCode;
-    uint8_t descCount;
-    uint8_t descType;
-    uint16_t descLen;
+    uint16_t hid_ver;
+    uint8_t country_code;
+    uint8_t desc_count;
+    uint8_t desc_type;
+    uint16_t desc_len;
 
 } __attribute__((packed)) usb_hid_desc_t;
 
@@ -158,9 +158,9 @@ typedef struct usb_hub_desc_t
 {
     uint8_t len;
     uint8_t type;
-    uint8_t portCount;
+    uint8_t port_count;
     uint16_t chars;
-    uint8_t portPowerTime;
+    uint8_t port_power_time;
     uint8_t current;
 
 } __attribute__((packed)) usb_hub_desc_t;
@@ -169,13 +169,13 @@ typedef struct usb_hub_desc_t
 // Hub characteristics
 //=============================================================================
 
-#define HUB_POWER_MASK 0x03 // Logical Power Switching Mode
+#define HUB_POWER_MASK 0x03  // Logical Power Switching Mode
 #define HUB_POWER_GLOBAL 0x00
 #define HUB_POWER_INDIVIDUAL 0x01
-#define HUB_COMPOUND 0x04        // Part of a Compound Device
-#define HUB_CURRENT_MASK 0x18    // Over-current Protection Mode
-#define HUB_TT_TTI_MASK 0x60     // TT Think Time
-#define HUB_PORT_INDICATORS 0x80 // Port Indicators
+#define HUB_COMPOUND 0x04         // Part of a Compound Device
+#define HUB_CURRENT_MASK 0x18     // Over-current Protection Mode
+#define HUB_TT_TTI_MASK 0x60      // TT Think Time
+#define HUB_PORT_INDICATORS 0x80  // Port Indicators
 
 //=============================================================================
 // Functions

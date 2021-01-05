@@ -27,59 +27,59 @@
 void usb_print_device_desc(usb_device_desc_t *desc)
 {
     printf(" USB: Version: %i.%i, VendorID: %#04x, Product: %#04x, Configs: %i\n",
-           desc->usbVer >> 8,
-           (desc->usbVer >> 4) & 0xF,
-           desc->vendorId,
-           desc->productId,
-           desc->confCount);
+           desc->usb_ver >> 8,
+           (desc->usb_ver >> 4) & 0xF,
+           desc->vendor_id,
+           desc->product_id,
+           desc->conf_count);
 }
 
 void usb_print_conf_desc(usb_conf_desc_t *desc)
 {
-    printf("  Conf: totalLen: %i, intfCount: %i, confValue: %i, confStr: %i\n",
-           desc->totalLen,
-           desc->intfCount,
-           desc->confValue,
-           desc->confStr);
+    printf("  Conf: total_len: %i, intf_count: %i, conf_value: %i, conf_str: %i\n",
+           desc->total_len,
+           desc->intf_count,
+           desc->conf_value,
+           desc->conf_str);
 }
 
 void usb_print_intf_desc(usb_intf_desc_t *desc)
 {
-    printf("  Intf: altSetting: %i, endpCount: %i, class: %i, subclass: %i, protocol: %i, str: %i\n",
-           desc->altSetting,
-           desc->endpCount,
-           desc->intfClass,
-           desc->intfSubClass,
-           desc->intfProtocol,
-           desc->intfStr);
+    printf("  Intf: alt_setting: %i, endp_count: %i, class: %i, subclass: %i, protocol: %i, str: %i\n",
+           desc->alt_setting,
+           desc->endp_count,
+           desc->intf_class,
+           desc->intf_sub_class,
+           desc->intf_protocol,
+           desc->intf_str);
 }
 
 void usb_print_endp_desc(usb_endp_desc_t *desc)
 {
-    printf("  Endp: addr: %#02x, attr: %i, maxPacketSize: %i, interval: %i\n",
+    printf("  Endp: addr: %#02x, attr: %i, max_packet_size: %i, interval: %i\n",
            desc->addr,
            desc->attributes,
-           desc->maxPacketSize,
+           desc->max_packet_size,
            desc->interval);
 }
 
 void usb_print_hid_desc(usb_hid_desc_t *desc)
 {
-    printf("  HID: ver: %i.%i, country: %i, desccount: %i, descType: %i, descLen: %i\n",
-           desc->hidVer >> 8,
-           (desc->hidVer >> 8) & 0xFF,
-           desc->countryCode,
-           desc->descCount,
-           desc->descType,
-           desc->descLen);
+    printf("  HID: ver: %i.%i, country: %i, desccount: %i, desc_type: %i, desc_len: %i\n",
+           desc->hid_ver >> 8,
+           (desc->hid_ver >> 8) & 0xFF,
+           desc->country_code,
+           desc->desc_count,
+           desc->desc_type,
+           desc->desc_len);
 }
 
 void usb_print_hub_desc(usb_hub_desc_t *desc)
 {
-    printf("  Hub: portCount: %i, char: %#x, powerTime: %i, current: %i\n",
-           desc->portCount,
+    printf("  Hub: port_count: %i, char: %#x, powerTime: %i, current: %i\n",
+           desc->port_count,
            desc->chars,
-           desc->portPowerTime,
+           desc->port_power_time,
            desc->current);
 }
 
