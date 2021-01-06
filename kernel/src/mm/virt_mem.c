@@ -27,6 +27,8 @@
 
 #include <logging/logging.h>
 
+// TODO: Most of this file is arch-dependent, so move those parts to kernel/arch
+
 // https://github.com/thibault-reigner/userland_slab
 
 #define PAGE_OFFSET 0xFFFF880000000000
@@ -441,10 +443,10 @@ int virt_mem_switch_dir(pml4_t *dir)
     _cur_dir = dir;
 
     __asm__ volatile("mov %0,%%rax" ::"r"(dir)
-                     : "%rax"); // Move dir to eax
+                     : "%rax");  // Move dir to eax
 
     __asm__ volatile("mov %%rax,%%cr3" ::
-                         : "%rax"); // move eax to cr3
+                         : "%rax");  // move eax to cr3
 
     return 1;
 }
@@ -727,11 +729,11 @@ static void virt_mem_print_pt(ptable_t *pt, uint64_t pml4_entry, uint64_t pdp_en
         {
             printf("PT Entry %#03x: %s%s%s%s%s",
                    i,
-                   pt_entry_is_present(pt->entries[i]) ? "P" : "-",  // Present
-                   pt_entry_is_writable(pt->entries[i]) ? "W" : "-", // Writable
-                   pt_entry_is_user(pt->entries[i]) ? "U" : "-",     // User
-                   pt_entry_is_accessed(pt->entries[i]) ? "A" : "-", // Accessed
-                   pt_entry_is_dirty(pt->entries[i]) ? "D" : "-");   // Dirty
+                   pt_entry_is_present(pt->entries[i]) ? "P" : "-",   // Present
+                   pt_entry_is_writable(pt->entries[i]) ? "W" : "-",  // Writable
+                   pt_entry_is_user(pt->entries[i]) ? "U" : "-",      // User
+                   pt_entry_is_accessed(pt->entries[i]) ? "A" : "-",  // Accessed
+                   pt_entry_is_dirty(pt->entries[i]) ? "D" : "-");    // Dirty
 
             uint64_t virt = (0xFFFFULL << 48) + (pml4_entry << 39) + (pdp_entry << 30) + (pd_entry << 21) + (i << 12);
             uint64_t phys = pt_entry_pfn(pt->entries[i]);
@@ -751,15 +753,15 @@ static void virt_mem_print_pd(pdirectory_t *pd, uint64_t pml4_entry, uint64_t pd
         {
             printf("PD Entry %#03x: %s%s%s%s%s%s%s%s%s",
                    i,
-                   pd_entry_is_present(pd->entries[i]) ? "P" : "-",     // Present
-                   pd_entry_is_writable(pd->entries[i]) ? "W" : "-",    // Writable
-                   pd_entry_is_user(pd->entries[i]) ? "U" : "-",        // User
-                   pd_entry_is_pwt(pd->entries[i]) ? "T" : "-",         // Write through
-                   pd_entry_is_pcd(pd->entries[i]) ? "C" : "-",         // Cache disable
-                   pd_entry_is_accessed(pd->entries[i]) ? "A" : "-",    // Accessed
-                   pd_entry_is_huge(pd->entries[i]) ? "H" : "-",        // Huge
-                   pd_entry_is_cpu_global(pd->entries[i]) ? "G" : "-",  // CPU Global
-                   pd_entry_is_lv4_global(pd->entries[i]) ? "L" : "-"); // LV4 Global
+                   pd_entry_is_present(pd->entries[i]) ? "P" : "-",      // Present
+                   pd_entry_is_writable(pd->entries[i]) ? "W" : "-",     // Writable
+                   pd_entry_is_user(pd->entries[i]) ? "U" : "-",         // User
+                   pd_entry_is_pwt(pd->entries[i]) ? "T" : "-",          // Write through
+                   pd_entry_is_pcd(pd->entries[i]) ? "C" : "-",          // Cache disable
+                   pd_entry_is_accessed(pd->entries[i]) ? "A" : "-",     // Accessed
+                   pd_entry_is_huge(pd->entries[i]) ? "H" : "-",         // Huge
+                   pd_entry_is_cpu_global(pd->entries[i]) ? "G" : "-",   // CPU Global
+                   pd_entry_is_lv4_global(pd->entries[i]) ? "L" : "-");  // LV4 Global
 
             if (pd_entry_is_huge(pd->entries[i]))
             {
@@ -793,13 +795,13 @@ static void virt_mem_print_pdp(pdp_t *pdp, uint64_t pml4_entry)
         {
             printf("PDP Entry %#03x: %s%s%s%s%s%s%s",
                    i,
-                   pdp_entry_is_present(pdp->entries[i]) ? "P" : "-",  // Present
-                   pdp_entry_is_writable(pdp->entries[i]) ? "W" : "-", // Writable
-                   pdp_entry_is_user(pdp->entries[i]) ? "U" : "-",     // User
-                   pdp_entry_is_pwt(pdp->entries[i]) ? "T" : "-",      // Write through
-                   pdp_entry_is_pcd(pdp->entries[i]) ? "C" : "-",      // Cache disable
-                   pdp_entry_is_accessed(pdp->entries[i]) ? "A" : "-", // Accessed
-                   pdp_entry_is_huge(pdp->entries[i]) ? "H" : "-");    // Huge
+                   pdp_entry_is_present(pdp->entries[i]) ? "P" : "-",   // Present
+                   pdp_entry_is_writable(pdp->entries[i]) ? "W" : "-",  // Writable
+                   pdp_entry_is_user(pdp->entries[i]) ? "U" : "-",      // User
+                   pdp_entry_is_pwt(pdp->entries[i]) ? "T" : "-",       // Write through
+                   pdp_entry_is_pcd(pdp->entries[i]) ? "C" : "-",       // Cache disable
+                   pdp_entry_is_accessed(pdp->entries[i]) ? "A" : "-",  // Accessed
+                   pdp_entry_is_huge(pdp->entries[i]) ? "H" : "-");     // Huge
 
             if (pdp_entry_is_huge(pdp->entries[i]))
             {
@@ -829,12 +831,12 @@ void virt_mem_print_dir(pml4_t *dir)
         {
             printf("PML4 Entry %#03x: %s%s%s%s%s%s",
                    i,
-                   pml4_entry_is_present(dir->entries[i]) ? "P" : "-",   // Present
-                   pml4_entry_is_writable(dir->entries[i]) ? "W" : "-",  // Writable
-                   pml4_entry_is_user(dir->entries[i]) ? "U" : "-",      // User
-                   pml4_entry_is_pwt(dir->entries[i]) ? "T" : "-",       // Write through
-                   pml4_entry_is_pcd(dir->entries[i]) ? "C" : "-",       // Cache disable
-                   pml4_entry_is_accessed(dir->entries[i]) ? "A" : "-"); // Accessed
+                   pml4_entry_is_present(dir->entries[i]) ? "P" : "-",    // Present
+                   pml4_entry_is_writable(dir->entries[i]) ? "W" : "-",   // Writable
+                   pml4_entry_is_user(dir->entries[i]) ? "U" : "-",       // User
+                   pml4_entry_is_pwt(dir->entries[i]) ? "T" : "-",        // Write through
+                   pml4_entry_is_pcd(dir->entries[i]) ? "C" : "-",        // Cache disable
+                   pml4_entry_is_accessed(dir->entries[i]) ? "A" : "-");  // Accessed
 
             printf("\n");
 

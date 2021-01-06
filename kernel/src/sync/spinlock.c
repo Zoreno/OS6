@@ -28,7 +28,6 @@
 
 void spinlock_lock(spinlock_t *lock)
 {
-
 #if 0
 
 	while (atomic_swap(&lock->val, 1))
@@ -52,7 +51,7 @@ void spinlock_lock(spinlock_t *lock)
 #else
     while (1)
     {
-        // TODO: Look into this. This looks a bit wierd.
+        // TODO: Look into this. This looks a bit weird.
         if (!xchg_64(&lock->val, (void *)1))
         {
             return;

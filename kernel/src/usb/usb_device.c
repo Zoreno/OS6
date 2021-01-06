@@ -52,25 +52,29 @@ usb_device_t *usb_dev_create()
 
     usb_device_t *dev = malloc(sizeof(usb_device_t));
 
-    if (dev)
+    if (!dev)
     {
-        dev->parent = 0;
-        dev->next = _usb_device_list;
-        dev->hc = 0;
-        dev->drv = 0;
+        log_error("[USB_DEVICE] Failed to allocate memory for USB device");
 
-        dev->port = 0;
-        dev->speed = 0;
-        dev->addr = 0;
-        dev->max_packet_size = 0;
-        dev->endp.toggle = 0;
-
-        dev->hc_control = 0;
-        dev->hc_intr = 0;
-        dev->drvPoll = 0;
-
-        _usb_device_list = dev;
+        return NULL;
     }
+
+    dev->parent = 0;
+    dev->next = _usb_device_list;
+    dev->hc = 0;
+    dev->drv = 0;
+
+    dev->port = 0;
+    dev->speed = 0;
+    dev->addr = 0;
+    dev->max_packet_size = 0;
+    dev->endp.toggle = 0;
+
+    dev->hc_control = 0;
+    dev->hc_intr = 0;
+    dev->drvPoll = 0;
+
+    _usb_device_list = dev;
 
     return dev;
 }

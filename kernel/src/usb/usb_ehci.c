@@ -1539,6 +1539,10 @@ static void ehci_disable_legacy_support(uint32_t id, ehci_controller_t *hc)
     }
 }
 
+#define WAIT_FOR_NOT_SET(reg, bit) \
+    while (reg & bit)              \
+        ;
+
 static void ehci_controller_init_op_regs(ehci_controller_t *hc)
 {
     hc->op_regs->usb_intr = 0;
@@ -1551,8 +1555,7 @@ static void ehci_controller_init_op_regs(ehci_controller_t *hc)
     hc->op_regs->ctrl_ds_segment = 0;
     hc->op_regs->usb_status = 0x3F;
     hc->op_regs->usb_cmd = (8 << CMD_ITC_SHIFT) | CMD_PSE | CMD_ASE | CMD_RS;
-    while (hc->op_regs->usb_status & STS_HCHALTED)
-        ;
+    WAIT_FOR_NOT_SET(hc->op_regs->usb_status, STS_HCHALTED);
     hc->op_regs->config_flag = 1;
 }
 
@@ -1637,10 +1640,10 @@ static ehci_controller_t *ehci_init_hc(uint32_t id, uint64_t port_addr)
 // Interface functions
 //==============================================================================
 
-void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
+void usb_ehci_init(uint32_t id, PciDeviceInfo_t *dev_info)
 {
-    if (!((((devInfo->classCode << 8) | devInfo->subClass) == PCI_SERIAL_USB) &&
-          (devInfo->progIntf == PCI_SERIAL_USB_EHCI)))
+    if (!((((dev_info->classCode << 8) | dev_info->subClass) == PCI_SERIAL_USB) &&
+          (dev_info->progIntf == PCI_SERIAL_USB_EHCI)))
     {
         return;
     }
@@ -1654,7 +1657,7 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *devInfo)
         return;
     }
 
-    uint64_t port_addr = ehci_get_port_address(devInfo);
+    uint64_t port_addr = ehci_get_port_address(dev_info);
 
     ehci_controller_t *hc = ehci_init_hc(id, port_addr);
 

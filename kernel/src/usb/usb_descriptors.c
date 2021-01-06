@@ -76,7 +76,7 @@ void usb_print_hid_desc(usb_hid_desc_t *desc)
 
 void usb_print_hub_desc(usb_hub_desc_t *desc)
 {
-    printf("  Hub: port_count: %i, char: %#x, powerTime: %i, current: %i\n",
+    printf("  Hub: port_count: %i, char: %#x, port_power_time: %i, current: %i\n",
            desc->port_count,
            desc->chars,
            desc->port_power_time,

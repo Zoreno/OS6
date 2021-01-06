@@ -24,14 +24,22 @@
 #include <usb/usb_hub.h>
 #include <usb/usb_keyboard.h>
 
-usb_driver_t _usb_driver_table[] =
+//=============================================================================
+// Local variables
+//=============================================================================
+
+static usb_driver_t usb_driver_table[] =
     {{usb_hub_init},
      {usb_keyboard_init},
      {0}};
 
+//=============================================================================
+// Interface functions
+//=============================================================================
+
 usb_driver_t *usb_get_driver_table()
 {
-    return _usb_driver_table;
+    return usb_driver_table;
 }
 
 //=============================================================================

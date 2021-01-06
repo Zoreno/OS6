@@ -1,9 +1,7 @@
 ---
 Checks:          '-*,google-readability-*,modernize-*,readability-identifier-naming'
-WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
-FormatStyle:     none
 User:            zoreno
 CheckOptions:    
   - key:             google-readability-braces-around-statements.ShortStatementLines
@@ -26,7 +24,6 @@ CheckOptions:
     value:           llvm
   - key:             modernize-use-nullptr.NullMacros
     value:           'NULL'
-
   - key: readability-identifier-naming.FunctionCase
     value: lower_case
   - key: readability-identifier-naming.ParameterCase
