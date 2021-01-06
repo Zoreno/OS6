@@ -176,6 +176,7 @@ target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/rm_comma
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/test_command.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/exit_command.c)
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/time_command.c)
+target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/simple_cli/commands/launch_command.c)
 
 target_sources(${KERNEL_EXEC} PRIVATE ${KERNEL_SRC}/kernel_main.c)
 

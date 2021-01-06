@@ -1,12 +1,12 @@
 /**
- * @file commands.h
+ * @file launch_command.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-09
+ * @date 2021-01-06
  * 
- * @brief Simple CLI commands
+ * @brief 
  * 
- * @copyright Copyright (C) 2020,
+ * @copyright Copyright (C) 2021,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,20 +20,23 @@
  * 
  */
 
-#ifndef _COMMANDS_H
-#define _COMMANDS_H
+#include <simple_cli/commands.h>
 
-int test_command(int argc, const char **argv);
-int cd_command(int argc, const char **argv);
-int ls_command(int argc, const char **argv);
-int mkdir_command(int argc, const char **argv);
-int pwd_command(int argc, const char **argv);
-int rm_command(int argc, const char **argv);
-int exit_command(int argc, const char **argv);
-int time_command(int argc, const char **argv);
-int launch_command(int argc, const char **argv);
+#include <stdio.h>
 
-#endif
+#include <process/launch_program.h>
+
+int launch_command(int argc, const char **argv)
+{
+    if (argc != 2)
+    {
+        return -1;
+    }
+
+    launch_program(argv[1]);
+
+    return 0;
+}
 
 //=============================================================================
 // End of file

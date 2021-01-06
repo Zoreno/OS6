@@ -263,7 +263,9 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
             struct multiboot_tag_bootdev *bootdev = (struct multiboot_tag_bootdev *)tag;
 
             log_info("[MULTIBOOT] Boot device: biosdev: %i, partition: %i, sub_partition: %i",
-                     bootdev->biosdev, bootdev->slice, bootdev->part);
+                     bootdev->biosdev,
+                     bootdev->slice,
+                     bootdev->part);
         }
         break;
         case MULTIBOOT_TAG_TYPE_MMAP:
@@ -281,7 +283,9 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
                 struct multiboot_mmap_entry mmap_entry = mmap->entries[i];
 
                 log_info("[MULTIBOOT] mmap: addr: %#016x len: %#016x type: %i",
-                         mmap_entry.addr, mmap_entry.len, mmap_entry.type);
+                         mmap_entry.addr,
+                         mmap_entry.len,
+                         mmap_entry.type);
 
                 if (mmap_entry.type == MULTIBOOT_MEMORY_AVAILABLE)
                 {
@@ -491,7 +495,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     //terminal_init();
 
-    //simple_cli_init();
+    simple_cli_init();
 
     while (1)
     {

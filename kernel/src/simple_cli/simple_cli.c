@@ -63,9 +63,7 @@ char *simple_cli_read_line()
     memset(buffer, 0, buffer_size);
 
     char line_start[256] = {0};
-    sprintf(line_start, "%s@%s:%s$ ", simple_cli_get_user_name(),
-            simple_cli_get_user_group(),
-            simple_cli_get_working_directory());
+    sprintf(line_start, "%s@%s:%s$ ", simple_cli_get_user_name(), simple_cli_get_user_group(), simple_cli_get_working_directory());
 
     printf("%s", line_start);
 
@@ -162,6 +160,7 @@ simple_cli_command_t _commands[] = {{.name = "test", .command = test_command},
                                     {.name = "rm", .command = rm_command},
                                     {.name = "exit", .command = exit_command},
                                     {.name = "time", .command = time_command},
+                                    {.name = "launch", .command = launch_command},
                                     {.name = NULL, .command = NULL}};
 
 int simple_cli_run_command(const char *name, int argc, const char **argv)
