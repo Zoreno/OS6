@@ -4,80 +4,18 @@
 
 cmake_minimum_required(VERSION 3.12)
 
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
 set(CMAKE_ASM_SOURCE_FILE_EXTENSIONS "asm")
 
-set(TOOLCHAIN_DIR "${CMAKE_SOURCE_DIR}/toolchain")
-
-if(NOT EXISTS "${TOOLCHAIN_DIR}/OS6_cross_cc")
-message(FATAL_ERROR "Did not find cross-compiler directory. Did you run ./build_toolchain.sh from the ${TOOLCHAIN_DIR} directory?")
-endif()
-
-set(OS6_COMPILER_PATH "${TOOLCHAIN_DIR}/OS6_cross_cc/bin")
-set(OS6_COMPILER_PREFIX "x86_64-elf-")
-
-set(CMAKE_C_COMPILER "${OS6_COMPILER_PATH}/${OS6_COMPILER_PREFIX}gcc")
-set(CMAKE_CXX_COMPILER "${OS6_COMPILER_PATH}/${OS6_COMPILER_PREFIX}g++")
-
-set(CMAKE_C_COMPILER_WORKS 1)
-set(CMAKE_CXX_COMPILER_WORKS 1)
-set(CMAKE_CROSSCOMPILING 1)
+include(toolchain)
 
 project(OS6 C CXX ASM_NASM)
 
 set(CAN_USE_ASSEMBLER TRUE)
-
-enable_language(C)
-enable_language(CXX)
-enable_language(ASM_NASM)
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-#enable_testing()
-
-#==============================================================================
-# Flags and compiler configuration
-#==============================================================================
-
-# Debug build
-set(DEBUG_BUILD true)
-
-# Should build the unit tests?
-set(BUILDING_TESTS false)
-
-set(CFLAGS "-m64")
-
-# Set warnings and error conditions
-set(CFLAGS "${CFLAGS} -Wall -Wextra -Werror=implicit-function-declaration -Wno-unused -Wno-sign-compare")
-
-# Disable standard library
-set(CFLAGS "${CFLAGS} -ffreestanding")
-
-# Disable language features
-set(CFLAGS "${CFLAGS} -fno-builtin -finline-functions -fno-stack-protector -mno-red-zone")
-
-# Cpp flags
-set(CPPFLAGS "${CFLAGS} -std=c++11 -static-libgcc")
-
-# Set C standard
-set(CFLAGS "${CFLAGS} -Wno-pointer-sign -std=c11")
-
-set(ASMFLAGS "")
-
-if(${DEBUG_BUILD})
-
-    # Setup dwarf information
-    set(CFLAGS "${CFLAGS} -DOS6_DEBUG -gdwarf-4")
-    set(ASMFLAGS "${ASMFLAGS} -g -F dwarf")
-    #set(CMAKE_CXX_CPPCHECK "cppcheck")
-    #set(CMAKE_C_CPPCHECK "cppcheck")
-
-else()
-
-    # Set full optimization 
-    set(CFLAGS "${CFLAGS} -DOS6_RELEASE -O3")
-    set(ASMFLAGS "${ASMFLAGS} -Ox")
-
-endif()
+include(cflags)
 
 #==============================================================================
 # Path macros
@@ -146,180 +84,13 @@ add_subdirectory(libunwind)
 add_subdirectory(libsupc++)
 add_subdirectory(libstdc++)
 
-#==============================================================================
-# Apps
-#==============================================================================
+include(tests)
+include(applications)
+include(iso)
+include(hdd)
+include(qemu)
+include(documentation)
 
-define_property(GLOBAL PROPERTY APPS_LIST
-    BRIEF_DOCS "Global list of applications"
-    FULL_DOCS "Global list of applications")
-set_property(GLOBAL PROPERTY APPS_LIST "")
-
-macro(listappend var)
-    set_property(GLOBAL APPEND PROPERTY APPS_LIST "${var}")
-endmacro(listappend)
-
-add_subdirectory(apps)
-
-get_property(ALL_APPS_LIST GLOBAL PROPERTY APPS_LIST)
-
-#message(${ALL_APPS_LIST})
-
-# Copy the list and prepend the output directory
-set(ALL_APPS_LIST_DEST ${ALL_APPS_LIST})
-list(TRANSFORM ALL_APPS_LIST_DEST PREPEND "${CMAKE_SOURCE_DIR}/root/bin/")
-
-#message(${ALL_APPS_LIST_DEST})
-
-#==============================================================================
-# Tests
-#==============================================================================
-
-#add_subdirectory(tests)
-#add_custom_target(testall ALL
-#   COMMAND mkdir -p build_unittest
-#    COMMAND cmake -B build_unittest ${CMAKE_SOURCE_DIR}/unittest
-#    COMMAND make -C build_unittest)
-
-#add_subdirectory(unittest)
-
-if(${BUILDING_TESTS})
-
-include(ExternalProject)
-
-ExternalProject_Add(unittest
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/unittest
-    INSTALL_COMMAND ""
-    BUILD_ALWAYS ON)
-
-set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "unittest")
-set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "unittest-prefix")
-
-add_custom_target(tests-run 
-    DEPENDS unittest
-    COMMAND make tests-run
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/unittest-prefix/src/unittest-build)
-
-add_custom_target(coverage 
-    DEPENDS unittest
-    COMMAND make coverage
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/unittest-prefix/src/unittest-build)
-
-endif()
-
-#==============================================================================
-# Build ISO
-#==============================================================================
-
-set(ISO_NAME os.iso)
-set(ISO_IMAGE ${ISO_NAME})
-
-foreach(app ${ALL_APPS_LIST})
-    add_custom_command(
-        OUTPUT ${CMAKE_SOURCE_DIR}/root/bin/${app}
-        DEPENDS apps/${app}/${app}
-        COMMAND cp -u apps/${app}/${app} ${CMAKE_SOURCE_DIR}/root/bin/${app}
-        COMMENT "Copying executable ${app}")
-endforeach()
-
-add_custom_command(OUTPUT ${ISO_IMAGE}
-    DEPENDS kernel/kernel.bin
-    COMMAND cp -u kernel/kernel.bin ${CMAKE_SOURCE_DIR}/mnt/boot
-    COMMAND grub-mkrescue -o ${ISO_IMAGE} ${CMAKE_SOURCE_DIR}/mnt
-    COMMENT "Creating ISO image"
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-
-#==============================================================================
-# Build HDD
-#==============================================================================
-
-set(HDD_NAME disk.img)
-set(HDD_IMAGE ${CMAKE_BINARY_DIR}/${HDD_NAME})
-
-add_custom_command(OUTPUT ${HDD_NAME}
-    DEPENDS ${ALL_APPS_LIST_DEST}
-    COMMAND ../create_hdd.sh ${HDD_NAME} 100M
-    COMMENT "Creating HDD"
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-
-#==============================================================================
-# Custom targets for running QEMU
-#==============================================================================
-
-# Clear flags
-set(QEMU_FLAGS)
-
-#set(QEMU_FLAGS ${QEMU_FLAGS} --trace events=/tmp/events)
-
-set(QEMU_FLAGS ${QEMU_FLAGS} -d guest_errors -D qemu.log)
-
-set(QEMU_FLAGS ${QEMU_FLAGS} -cpu Nehalem)
-#set(QEMU_FLAGS ${QEMU_FLAGS} -enable-kvm -cpu host)
-
-# Set memory flags
-set(QEMU_FLAGS ${QEMU_FLAGS} -m 512M)
-
-# Set RTC flags
-set(QEMU_FLAGS ${QEMU_FLAGS} -rtc base=localtime)
-
-# Set boot deivce
-set(QEMU_FLAGS ${QEMU_FLAGS} -boot d)
-
-# Set USB devices
-set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-ehci,id=ehci)
-set(QEMU_FLAGS ${QEMU_FLAGS} -device usb-tablet,bus=ehci.0,port=1)
-set(QEMU_FLAGS ${QEMU_FLAGS} -device usb-kbd,bus=ehci.0,port=2)
-
-# Set serial interface
-set(QEMU_FLAGS ${QEMU_FLAGS} -serial stdio)
-
-# Set display settings
-set(QEMU_FLAGS ${QEMU_FLAGS} -vga std)
-
-# Set ACPI flags
-#set(QEMU_FLAGS ${QEMU_FLAGS} -no-acpi)
-
-# Set bios
-# set(QEMU_FLAGS ${QEMU_FLAGS} -bios ${CMAKE_SOURCE_DIR}/../seabios/out/bios.bin)
-
-#Set storage devices
-set(QEMU_FLAGS ${QEMU_FLAGS} -drive file=${HDD_NAME},format=raw -cdrom ${ISO_IMAGE})
-
-add_custom_target(run
-    COMMAND export SDL_VIDEO_X11_DGAMOUSE=0
-    COMMAND qemu-system-x86_64 ${QEMU_FLAGS}
-    DEPENDS ${ISO_IMAGE} ${HDD_NAME}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-
-add_custom_target(debug
-    COMMAND export SDL_VIDEO_X11_DGAMOUSE=0
-    COMMAND qemu-system-x86_64 -s -S ${QEMU_FLAGS} &
-    COMMAND sudo ddd --gdb -command=${CMAKE_SOURCE_DIR}/gdbdebug 2> /dev/null
-    DEPENDS ${ISO_IMAGE} ${HDD_NAME}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-
-#==============================================================================
-# Documentation
-#==============================================================================
-
-add_custom_target(docs
-    COMMAND doxygen
-    COMMAND gvfs-open docs/html/index.html 2> /dev/null &
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-
-add_custom_target(cleandocs
-    COMMAND rm -r docs/*
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-
-#==============================================================================
-# Custom testing command
-#==============================================================================
-
-#add_custom_target(run-tests
-#    COMMAND make
-#    COMMAND ctest -VV --output-on-failure
-#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-	
 #==============================================================================
 # End of file
 #==============================================================================

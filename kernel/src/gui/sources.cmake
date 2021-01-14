@@ -1,0 +1,10 @@
+kernel_source(context.c)
+kernel_source(desktop.c)
+kernel_source(gui_list.c)
+kernel_source(gui_listnode.c)
+kernel_source(gui.c)
+kernel_source(rect.c)
+kernel_source(terminal_mode.c)
+kernel_source(window.c)
+
+kernel_subdirectory(terminal)

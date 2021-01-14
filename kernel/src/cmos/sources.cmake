@@ -1,0 +1,1 @@
+kernel_source(cmos_rtc.c)

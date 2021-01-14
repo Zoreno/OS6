@@ -1,0 +1,16 @@
+set(TOOLCHAIN_DIR "${CMAKE_SOURCE_DIR}/toolchain")
+
+if(NOT EXISTS "${TOOLCHAIN_DIR}/OS6_cross_cc")
+message(FATAL_ERROR "Did not find cross-compiler directory. Did you run ./build_toolchain.sh from the ${TOOLCHAIN_DIR} directory?")
+endif()
+
+set(OS6_COMPILER_PATH "${TOOLCHAIN_DIR}/OS6_cross_cc/bin")
+set(OS6_COMPILER_PREFIX "x86_64-elf-")
+
+set(CMAKE_C_COMPILER "${OS6_COMPILER_PATH}/${OS6_COMPILER_PREFIX}gcc")
+set(CMAKE_CXX_COMPILER "${OS6_COMPILER_PATH}/${OS6_COMPILER_PREFIX}g++")
+set(OS6_LINKER "${OS6_COMPILER_PATH}/${OS6_COMPILER_PREFIX}ld")
+
+set(CMAKE_C_COMPILER_WORKS 1)
+set(CMAKE_CXX_COMPILER_WORKS 1)
+set(CMAKE_CROSSCOMPILING 1)

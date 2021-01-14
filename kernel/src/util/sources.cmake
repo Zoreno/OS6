@@ -1,0 +1,8 @@
+kernel_source(bitset.c)
+kernel_source(hashmap.c)
+kernel_source(hexdump.c)
+kernel_source(link.c)
+kernel_source(list.c)
+kernel_source(sha512.c)
+kernel_source(tree.c)
+kernel_source(vector.c)

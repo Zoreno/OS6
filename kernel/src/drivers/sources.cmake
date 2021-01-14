@@ -1,0 +1,5 @@
+kernel_source(blockdev.c)
+kernel_source(ide.c)
+kernel_source(keyboard_ps2.c)
+kernel_source(mouse_ps2.c)
+kernel_source(vbe.c)
