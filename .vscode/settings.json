@@ -12,7 +12,8 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "bit": "cpp",
-        "initializer_list": "cpp"
+        "initializer_list": "cpp",
+        "complex": "cpp"
     },
     "doxdocgen.generic.authorEmail": "",
     "doxdocgen.generic.authorName": "Joakim Bertils",

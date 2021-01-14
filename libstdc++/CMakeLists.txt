@@ -42,6 +42,19 @@ target_link_libraries(${LIBSTDCXX} PRIVATE ${LIBSUPCXX})
 
 target_sources(${LIBSTDCXX} PRIVATE ${LIBSTDCXX_SRC}/dummy.cpp)
 
+target_sources(${LIBSTDCXX} PRIVATE ${LIBSTDCXX_SRC}/cmath/abs.cpp)
+target_sources(${LIBSTDCXX} PRIVATE ${LIBSTDCXX_SRC}/cmath/absf.cpp)
+target_sources(${LIBSTDCXX} PRIVATE ${LIBSTDCXX_SRC}/cmath/absl.cpp)
+target_sources(${LIBSTDCXX} PRIVATE ${LIBSTDCXX_SRC}/cmath/acos.cpp)
+target_sources(${LIBSTDCXX} PRIVATE ${LIBSTDCXX_SRC}/cmath/acosf.cpp)
+target_sources(${LIBSTDCXX} PRIVATE ${LIBSTDCXX_SRC}/cmath/acosl.cpp)
+target_sources(${LIBSTDCXX} PRIVATE ${LIBSTDCXX_SRC}/cmath/asin.cpp)
+target_sources(${LIBSTDCXX} PRIVATE ${LIBSTDCXX_SRC}/cmath/asinf.cpp)
+target_sources(${LIBSTDCXX} PRIVATE ${LIBSTDCXX_SRC}/cmath/asinl.cpp)
+target_sources(${LIBSTDCXX} PRIVATE ${LIBSTDCXX_SRC}/cmath/atan.cpp)
+target_sources(${LIBSTDCXX} PRIVATE ${LIBSTDCXX_SRC}/cmath/atanf.cpp)
+target_sources(${LIBSTDCXX} PRIVATE ${LIBSTDCXX_SRC}/cmath/atanl.cpp)
+
 #==============================================================================
 # Tests
 #==============================================================================
