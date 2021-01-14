@@ -1,12 +1,12 @@
 /**
- * @file iterator
+ * @file wchar.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-16
+ * @date 2021-01-10
  * 
  * @brief 
  * 
- * @copyright Copyright (C) 2020,
+ * @copyright Copyright (C) 2021,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,19 +20,20 @@
  * 
  */
 
-#ifndef __ITERATOR_
-#define __ITERATOR_
+#ifndef _LIBC_WCHAR_H
+#define _LIBC_WCHAR_H
 
-#pragma GCC system_header
+#include <_cheader.h>
+#include <_mbstate_t.h>
+#include <_wint_t.h>
 
-#include <bits/c++config.hpp>
-#include <bits/stl_iterator_base_types.hpp>
-#include <bits/stl_iterator_base_funcs.hpp>
-#include <bits/stl_iterator.hpp>
-//#include <iosfwd>
-//#include <bits/stream_iterator.hpp>
-//#include <bits/streambuf_iterator.hpp>
-#include <bits/range_access.hpp>
+_c_header_begin;
+
+typedef _mbstate_t mbstate_t;
+
+#define WEOF ((wint_t)-1)
+
+_c_header_end;
 
 #endif
 

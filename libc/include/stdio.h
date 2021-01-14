@@ -29,6 +29,8 @@ _c_header_begin;
 
 #include <stdarg.h>
 
+#define EOF (-1)
+
 // TODO: Implement with syscall
 int puts(const char *s);
 

@@ -42,7 +42,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(DEBUG_BUILD true)
 
 # Should build the unit tests?
-set(BUILDING_TESTS true)
+set(BUILDING_TESTS false)
 
 set(CFLAGS "-m64")
 

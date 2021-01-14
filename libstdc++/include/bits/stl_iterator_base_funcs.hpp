@@ -63,11 +63,7 @@ inline constexpr
                _RandomAccessIterator __last,
                random_access_iterator_tag)
 {
-    typename iterator_traits<_RandomAccessIterator>::difference_type __n = 0;
-
-    __n = __last - __first;
-
-    return __n;
+    return static_cast<typename iterator_traits<_RandomAccessIterator>::difference_type>(__last - __first);
 }
 
 template <typename _InputIterator>

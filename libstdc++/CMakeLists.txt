@@ -30,6 +30,7 @@ set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> \
 target_include_directories(${LIBSTDCXX} SYSTEM PRIVATE ${LIBC_INCLUDE})
 target_include_directories(${LIBSTDCXX} SYSTEM PRIVATE ${LIBSTDCXX_INCLUDE})
 target_include_directories(${LIBSTDCXX} SYSTEM PRIVATE ${LIBSTDCXX_INCLUDE}/std)
+target_include_directories(${LIBSTDCXX} SYSTEM PRIVATE ${LIBSTDCXX_INCLUDE}/c)
 target_include_directories(${LIBSTDCXX} SYSTEM PRIVATE ${LIBSUPCXX_INCLUDE})
 
 target_link_libraries(${LIBSTDCXX} PRIVATE ${LIBC})

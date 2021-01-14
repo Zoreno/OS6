@@ -1,12 +1,12 @@
 /**
- * @file iterator
+ * @file _mbstate_t.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-16
+ * @date 2021-01-10
  * 
  * @brief 
  * 
- * @copyright Copyright (C) 2020,
+ * @copyright Copyright (C) 2021,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,19 +20,30 @@
  * 
  */
 
-#ifndef __ITERATOR_
-#define __ITERATOR_
+#ifndef _LIBC__MBSTATE_T_H
+#define _LIBC__MBSTATE_T_H
 
-#pragma GCC system_header
+#include <_cheader.h>
+#include <_wint_t.h>
 
-#include <bits/c++config.hpp>
-#include <bits/stl_iterator_base_types.hpp>
-#include <bits/stl_iterator_base_funcs.hpp>
-#include <bits/stl_iterator.hpp>
-//#include <iosfwd>
-//#include <bits/stream_iterator.hpp>
-//#include <bits/streambuf_iterator.hpp>
-#include <bits/range_access.hpp>
+_c_header_begin;
+
+/**
+ * @brief Type representing the multichar conversion state
+ * 
+ * 
+ */
+typedef struct
+{
+    int __count;
+    union
+    {
+        wint_t __wch;
+        unsigned char __wchb[4];
+    } __value;
+} _mbstate_t;
+
+_c_header_end;
 
 #endif
 

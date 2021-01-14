@@ -1,10 +1,10 @@
 /**
- * @file iterator
+ * @file string
  * @author Joakim Bertils
  * @version 0.1
- * @date 2020-08-16
+ * @date 2021-01-06
  * 
- * @brief 
+ * @brief String standard STL header.
  * 
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
@@ -20,20 +20,34 @@
  * 
  */
 
-#ifndef __ITERATOR_
-#define __ITERATOR_
+#ifndef __STRING_
+#define __STRING_
 
 #pragma GCC system_header
 
 #include <bits/c++config.hpp>
+#include <bits/allocator.hpp>
+#include <bits/char_traits.hpp>
+#include <bits/cpp_type_traits.hpp>
 #include <bits/stl_iterator_base_types.hpp>
 #include <bits/stl_iterator_base_funcs.hpp>
 #include <bits/stl_iterator.hpp>
-//#include <iosfwd>
-//#include <bits/stream_iterator.hpp>
-//#include <bits/streambuf_iterator.hpp>
-#include <bits/range_access.hpp>
+#include <bits/stl_function.hpp>
+#include <bits/numeric_traits.hpp>
+#include <bits/stl_algobase.hpp>
+#include <bits/basic_string.hpp>
 
+OS6STD_BEGIN_SYSTEM_HEADER
+
+namespace OS6STD
+{
+template <typename _T>
+using t_string = basic_string<_T, char_traits<_T>, std::allocator<_T>>;
+
+using string = t_string<char>;
+}  // namespace OS6STD
+
+OS6STD_END_SYSTEM_HEADER
 #endif
 
 //=============================================================================
