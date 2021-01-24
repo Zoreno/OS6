@@ -747,11 +747,13 @@ void *vfs_mount(char *path, fs_node_t *local_root)
 
     if (!fs_tree)
     {
+        log_error("[VFS] FS tree not initialized");
         return NULL;
     }
 
     if (!path || path[0] != PATH_SEPARATOR)
     {
+        log_error("[VFS] No path or relative path was provided");
         return NULL;
     }
 
@@ -762,6 +764,13 @@ void *vfs_mount(char *path, fs_node_t *local_root)
     tree_node_t *ret_val = NULL;
 
     char *p = strdup(path);
+
+    if (!p)
+    {
+        log_error("[VFS] Failed to allocate memory for path");
+        return NULL;
+    }
+
     char *i = p;
 
     int path_len = strlen(p);
@@ -827,6 +836,12 @@ void *vfs_mount(char *path, fs_node_t *local_root)
             if (!found)
             {
                 vfs_entry_t *ent = malloc(sizeof(vfs_entry_t));
+
+                if (!ent)
+                {
+                    log_error("Failed to allocate memory for vfs_entry");
+                    return NULL;
+                }
 
                 ent->name = strdup(at);
                 ent->file = NULL;
