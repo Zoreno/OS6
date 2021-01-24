@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-12-31
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <simple_cli/simple_cli.h>
@@ -63,7 +63,11 @@ char *simple_cli_read_line()
     memset(buffer, 0, buffer_size);
 
     char line_start[256] = {0};
-    sprintf(line_start, "%s@%s:%s$ ", simple_cli_get_user_name(), simple_cli_get_user_group(), simple_cli_get_working_directory());
+    sprintf(line_start,
+            "%s@%s:%s$ ",
+            simple_cli_get_user_name(),
+            simple_cli_get_user_group(),
+            simple_cli_get_working_directory());
 
     printf("%s", line_start);
 
@@ -152,16 +156,17 @@ int simple_cli_get_token_count(const char **tokens)
     return i;
 }
 
-simple_cli_command_t _commands[] = {{.name = "test", .command = test_command},
-                                    {.name = "cd", .command = cd_command},
-                                    {.name = "ls", .command = ls_command},
-                                    {.name = "mkdir", .command = mkdir_command},
-                                    {.name = "pwd", .command = pwd_command},
-                                    {.name = "rm", .command = rm_command},
-                                    {.name = "exit", .command = exit_command},
-                                    {.name = "time", .command = time_command},
-                                    {.name = "launch", .command = launch_command},
-                                    {.name = NULL, .command = NULL}};
+simple_cli_command_t _commands[] = {
+    {.name = "test", .command = test_command},
+    {.name = "cd", .command = cd_command},
+    {.name = "ls", .command = ls_command},
+    {.name = "mkdir", .command = mkdir_command},
+    {.name = "pwd", .command = pwd_command},
+    {.name = "rm", .command = rm_command},
+    {.name = "exit", .command = exit_command},
+    {.name = "time", .command = time_command},
+    {.name = "launch", .command = launch_command},
+    {.name = NULL, .command = NULL}};
 
 int simple_cli_run_command(const char *name, int argc, const char **argv)
 {
@@ -226,13 +231,13 @@ int simple_cli_launch(char **args)
 
     pid = process_fork();
 
-    //debug_print_process_tree();
+    // debug_print_process_tree();
 
     if (pid == 0)
     {
         printf("Args after fork(child): %#016x\n", &args);
         printf("Child Process: %i\n", process_get_pid());
-        //exec_elf(args[0], simple_cli_get_token_count(args), args, NULL, 0);
+        // exec_elf(args[0], simple_cli_get_token_count(args), args, NULL, 0);
 
         // exec_elf should not return
 
@@ -263,13 +268,12 @@ void simple_cli_init()
     {
         char *line = simple_cli_read_line();
         const char **args = simple_cli_split_line(line);
-        //simple_cli_launch(args);
+        // simple_cli_launch(args);
 
         if (simple_cli_is_command(args[0]))
         {
-            long long int return_code = simple_cli_run_command(args[0],
-                                                               simple_cli_get_token_count(args),
-                                                               args);
+            long long int return_code = simple_cli_run_command(
+                args[0], simple_cli_get_token_count(args), args);
 
             if (return_code)
             {

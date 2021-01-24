@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <vfs/nulldev.h>
@@ -29,31 +29,45 @@
 #include <logging/logging.h>
 #include <vfs/vfs.h>
 
-static uint32_t read_null(fs_node_t* node, uint64_t offset, uint32_t size, uint8_t* buffer)
+//=============================================================================
+// Private functions
+//=============================================================================
+
+static uint32_t read_null(fs_node_t *node,
+                          uint64_t offset,
+                          uint32_t size,
+                          uint8_t *buffer)
 {
     return 0;
 }
 
-static uint32_t write_null(fs_node_t* node, uint64_t offset, uint32_t size, uint8_t* buffer)
+static uint32_t write_null(fs_node_t *node,
+                           uint64_t offset,
+                           uint32_t size,
+                           uint8_t *buffer)
 {
     return 0;
 }
 
-static void open_null(fs_node_t* node, uint32_t flags)
+static void open_null(fs_node_t *node, uint32_t flags)
 {
     return;
 }
 
-static void close_null(fs_node_t* node)
+static void close_null(fs_node_t *node)
 {
     return;
 }
+
+//=============================================================================
+// Interface functions
+//=============================================================================
 
 void null_dev_init()
 {
     log_info("[NULLDEV] Installing null device");
 
-    fs_node_t* node = malloc(sizeof(fs_node_t));
+    fs_node_t *node = malloc(sizeof(fs_node_t));
 
     if (!node)
     {

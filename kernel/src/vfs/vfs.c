@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-07
- * 
+ *
  * @brief Virtual file system implementation
- * 
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <vfs/vfs.h>
@@ -50,7 +50,10 @@ int has_permissions(fs_node_t *node, int permission_bit)
     return 1;
 }
 
-uint32_t read_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
+uint32_t read_fs(fs_node_t *node,
+                 uint64_t offset,
+                 uint32_t size,
+                 uint8_t *buffer)
 {
     if (node && node->read)
     {
@@ -62,7 +65,10 @@ uint32_t read_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffe
     return 0;
 }
 
-uint32_t write_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
+uint32_t write_fs(fs_node_t *node,
+                  uint64_t offset,
+                  uint32_t size,
+                  uint8_t *buffer)
 {
     if (node && node->write)
     {
@@ -116,7 +122,6 @@ void close_fs(fs_node_t *node)
 
     if (node->refcount == 0)
     {
-
         if (node->close)
         {
             node->close(node);
@@ -418,7 +423,10 @@ char *canonicalize_path(char *cwd, char *input)
     return output;
 }
 
-fs_node_t *get_mount_point(char *path, size_t path_depth, char **outpath, uint32_t *outdepth)
+fs_node_t *get_mount_point(char *path,
+                           size_t path_depth,
+                           char **outpath,
+                           uint32_t *outdepth)
 {
     size_t depth;
 
@@ -444,7 +452,8 @@ fs_node_t *get_mount_point(char *path, size_t path_depth, char **outpath, uint32
 
         int found = 0;
 
-        for (list_node_t *child = node->children->head; child != NULL; child = child->next)
+        for (list_node_t *child = node->children->head; child != NULL;
+             child = child->next)
         {
             tree_node_t *tchild = (tree_node_t *)child->payload;
 
@@ -458,7 +467,6 @@ fs_node_t *get_mount_point(char *path, size_t path_depth, char **outpath, uint32
 
                 if (ent->file)
                 {
-
                     _tree_depth = _depth;
                     last = ent->file;
                     *outpath = at;
@@ -801,7 +809,8 @@ void *vfs_mount(char *path, fs_node_t *local_root)
 
             int found = 0;
 
-            for (list_node_t *child = node->children->head; child != NULL; child = child->next)
+            for (list_node_t *child = node->children->head; child != NULL;
+                 child = child->next)
             {
                 tree_node_t *tchild = (tree_node_t *)child->payload;
                 vfs_entry_t *ent = (vfs_entry_t *)tchild->value;
@@ -857,8 +866,10 @@ void vfs_lock(fs_node_t *node)
     spinlock_unlock(&tmp_lock);
 }
 
-static fs_node_t *kopen_recur(char *filename, uint32_t flags,
-                              uint32_t symlink_depth, char *relative_to)
+static fs_node_t *kopen_recur(char *filename,
+                              uint32_t flags,
+                              uint32_t symlink_depth,
+                              char *relative_to)
 {
     if (!filename)
     {
@@ -910,7 +921,8 @@ static fs_node_t *kopen_recur(char *filename, uint32_t flags,
 
     uint32_t depth = 0;
 
-    fs_node_t *node_ptr = get_mount_point(path, path_depth, &path_offset, &depth);
+    fs_node_t *node_ptr =
+        get_mount_point(path, path_depth, &path_offset, &depth);
 
     if (!node_ptr)
     {
@@ -1079,7 +1091,8 @@ static void print_vfs_tree_node(tree_node_t *node, size_t height)
         printf("[%s], (empty)\n", fnode->name);
     }
 
-    for (list_node_t *child = node->children->head; child != NULL; child = child->next)
+    for (list_node_t *child = node->children->head; child != NULL;
+         child = child->next)
     {
         print_vfs_tree_node((tree_node_t *)child->payload, height + 1);
     }

@@ -6,7 +6,7 @@ BreakBeforeBraces: Allman
 MaxEmptyLinesToKeep: 1
 
 IndentCaseLabels: false
-ColumnLimit: 0
+ColumnLimit: 80
 NamespaceIndentation: None
 AccessModifierOffset: -4
 
@@ -24,3 +24,5 @@ BinPackParameters: false
 AlwaysBreakTemplateDeclarations: true
 
 AlignAfterOpenBracket: Align
+
+IncludeBlocks: Preserve
