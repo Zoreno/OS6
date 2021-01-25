@@ -28,6 +28,11 @@
 
 #include <process/process.h>
 #include <simple_cli/commands.h>
+#include <simple_cli/vt_100.h>
+
+#define BUFFER_SIZE 1024
+
+char *last_command = NULL;
 
 const char *simple_cli_get_user_name()
 {
@@ -44,13 +49,34 @@ const char *simple_cli_get_working_directory()
     return process_get_current()->wd_path;
 }
 
+void simple_cli_redraw_line(char *buffer)
+{
+    char line_start[BUFFER_SIZE] = {0};
+    sprintf(line_start,
+            "%s@%s:%s$ ",
+            simple_cli_get_user_name(),
+            simple_cli_get_user_group(),
+            simple_cli_get_working_directory());
+
+    vt_100_erase_line();
+
+    int line;
+    vt_100_get_cursor_location(&line, NULL);
+    vt_100_set_cursor_location(line, 0);
+
+    printf("%s", line_start);
+    printf("%s", buffer);
+}
+
+#define KEY_BACKSPACE 127
+#define KEY_ENTER 13
+#define KEY_ESCAPE VT_100_ESCAPE
+
 char *simple_cli_read_line()
 {
     char c;
 
-    const int buffer_size = 1024;
-
-    char *buffer = malloc(buffer_size);
+    char *buffer = malloc(BUFFER_SIZE);
     int buf_ptr = 0;
 
     if (!buffer)
@@ -60,46 +86,49 @@ char *simple_cli_read_line()
             ;
     }
 
-    memset(buffer, 0, buffer_size);
+    memset(buffer, 0, BUFFER_SIZE);
 
-    char line_start[256] = {0};
-    sprintf(line_start,
-            "%s@%s:%s$ ",
-            simple_cli_get_user_name(),
-            simple_cli_get_user_group(),
-            simple_cli_get_working_directory());
-
-    printf("%s", line_start);
+    simple_cli_redraw_line(buffer);
 
     while (1)
     {
         c = getc();
 
-        if (c == 13)
+        switch (c)
+        {
+        case KEY_ENTER:
         {
             putchar('\n');
             buffer[buf_ptr] = 0;
             return buffer;
         }
-        else if (c == 127)
+        case KEY_BACKSPACE:
         {
             if (buf_ptr > 0)
             {
                 buf_ptr--;
-                putchar(13);
-                printf("%s", line_start);
                 buffer[buf_ptr] = 0;
-                printf("%s ", buffer);
-                putchar(13);
-                printf("%s", line_start);
-                printf("%s", buffer);
             }
         }
-        else
+        break;
+        case KEY_ESCAPE:
         {
-            putchar(c);
-            buffer[buf_ptr++] = c;
+            int command = vt_100_handle_command();
+
+            if (command == VT_100_UP)
+            {
+                memcpy(buffer, last_command, BUFFER_SIZE);
+                buf_ptr = strlen(last_command);
+            }
         }
+        break;
+        default:
+
+            buffer[buf_ptr++] = c;
+            break;
+        }
+
+        simple_cli_redraw_line(buffer);
     }
 }
 
@@ -237,7 +266,8 @@ int simple_cli_launch(char **args)
     {
         printf("Args after fork(child): %#016x\n", &args);
         printf("Child Process: %i\n", process_get_pid());
-        // exec_elf(args[0], simple_cli_get_token_count(args), args, NULL, 0);
+        // exec_elf(args[0], simple_cli_get_token_count(args), args, NULL,
+        // 0);
 
         // exec_elf should not return
 
@@ -264,11 +294,18 @@ int simple_cli_launch(char **args)
 
 void simple_cli_init()
 {
+    last_command = malloc(BUFFER_SIZE);
+
     while (1)
     {
         char *line = simple_cli_read_line();
+
+        if (line)
+        {
+            memcpy(last_command, line, BUFFER_SIZE);
+        }
+
         const char **args = simple_cli_split_line(line);
-        // simple_cli_launch(args);
 
         if (simple_cli_is_command(args[0]))
         {
