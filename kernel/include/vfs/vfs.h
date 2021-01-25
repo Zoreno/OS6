@@ -612,6 +612,20 @@ extern fs_node_t *fs_root;
 
 int has_permissions(fs_node_t *node, int permission_bit);
 
+//=============================================================================
+// VFS operations
+//=============================================================================
+
+/**
+ * @brief Reads some selected number of bytes from the VFS.
+ *
+ * @param node Node describing where to read from. See @ref kopen.
+ * @param offset Offset to start reading from.
+ * @param size Number of bytes to read.
+ * @param buffer Buffer to place the read bytes.
+ *
+ * @return Number of bytes read.
+ */
 uint32_t read_fs(fs_node_t *node,
                  uint64_t offset,
                  uint32_t size,
@@ -626,8 +640,6 @@ struct dirent *readdir_fs(fs_node_t *node, uint32_t index);
 fs_node_t *finddir_fs(fs_node_t *node, char *name);
 int mkdir_fs(char *name, uint16_t permission);
 int create_file_fs(char *name, uint16_t permission);
-fs_node_t *kopen(char *filename, uint32_t flags);
-char *canonicalize_path(char *cwd, char *input);
 fs_node_t *clone_fs(fs_node_t *source);
 
 int ioctl_fs(fs_node_t *node, int request, void *argp);
@@ -640,6 +652,10 @@ int selectcheck_fs(fs_node_t *node);
 int selectwait_fs(fs_node_t *node, void *process);
 void truncate_fs(fs_node_t *node);
 
+//=============================================================================
+// VFS interface
+//=============================================================================
+
 void vfs_install(void);
 void *vfs_mount(char *path, fs_node_t *local_root);
 int vfs_register(char *name,
@@ -647,7 +663,39 @@ int vfs_register(char *name,
                                                   char *mount_point));
 int vfs_mount_type(char *type, char *arg, char *mountpoint);
 void vfs_lock(fs_node_t *node);
+int vfs_is_root(const fs_node_t *node);
+fs_node_t *vfs_get_root(void);
 
+/**
+ * @brief Opens the file at @a path.
+ *
+ * @param filename Path to the file. Can be given as absolute value or relative
+ * to the current work directory.
+ * @param flags Open flags. See macros prefixed with O_.
+ *
+ * @return Pointer to heap-allocated node. Remember to free!
+ */
+fs_node_t *kopen(char *filename, uint32_t flags);
+
+/**
+ * @brief Expands a path.
+ *
+ * Relative paths will be prepended with the current working directory.
+ * Instances of "/./" will be replaced with "/". Instances of "/<any dir>/../"
+ * will be replaced with "/".
+ *
+ * @param cwd Current working directory, usually the process wd.
+ * @param input The path to expand.
+ *
+ * @return Pointer to heap-allocated string with the expanded path.
+ */
+char *canonicalize_path(char *cwd, char *input);
+
+/**
+ * @brief Prints the tree to stdout. Mainly used for debug.
+ *
+ *
+ */
 void print_vfs_tree(void);
 
 #endif

@@ -106,7 +106,7 @@ void open_fs(fs_node_t *node, uint32_t flags)
 
 void close_fs(fs_node_t *node)
 {
-    if (node == fs_root)
+    if (vfs_is_root(node))
     {
         return;
     }
@@ -167,8 +167,14 @@ int mkdir_fs(char *name, uint16_t permission)
 
     char *path = canonicalize_path(cwd, name);
 
+    if (!path)
+    {
+        return -1;
+    }
+
     if (!name || !strlen(name))
     {
+        free(path);
         return -1;
     }
 
@@ -202,6 +208,7 @@ int mkdir_fs(char *name, uint16_t permission)
 
     if (!f_path || !strlen(f_path))
     {
+        free(path);
         return -1;
     }
 
@@ -436,7 +443,7 @@ fs_node_t *get_mount_point(char *path,
     }
 
     /* Last available node */
-    fs_node_t *last = fs_root;
+    fs_node_t *last = vfs_get_root();
     tree_node_t *node = fs_tree->root;
 
     char *at = *outpath;
@@ -489,6 +496,14 @@ fs_node_t *get_mount_point(char *path,
     if (last)
     {
         fs_node_t *last_clone = malloc(sizeof(fs_node_t));
+
+        if (!last_clone)
+        {
+            log_error("[VFS Failed to allocate memory");
+
+            return NULL;
+        }
+
         memcpy(last_clone, last, sizeof(fs_node_t));
         return last_clone;
     }
@@ -879,6 +894,16 @@ void vfs_lock(fs_node_t *node)
     node->refcount = -1;
 
     spinlock_unlock(&tmp_lock);
+}
+
+int vfs_is_root(const fs_node_t *node)
+{
+    return vfs_get_root() == node;
+}
+
+fs_node_t *vfs_get_root(void)
+{
+    return fs_root;
 }
 
 static fs_node_t *kopen_recur(char *filename,
