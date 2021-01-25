@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <mm/virt_mem.h>
@@ -36,8 +36,14 @@
 #define SAFE_PAGE_OFFSET 1
 
 #if SAFE_PAGE_OFFSET == 1
-#define ADD_PAGE_OFFSET(addr) ((void *)((((void *)addr) >= (void *)PAGE_OFFSET) ? ((uint8_t *)addr) : (((uint8_t *)addr) + PAGE_OFFSET)))
-#define REMOVE_PAGE_OFFSET(addr) ((void *)((((void *)addr) < (void *)PAGE_OFFSET) ? ((uint8_t *)addr) : (((uint8_t *)addr) - PAGE_OFFSET)))
+#define ADD_PAGE_OFFSET(addr)                         \
+    ((void *)((((void *)addr) >= (void *)PAGE_OFFSET) \
+                  ? ((uint8_t *)addr)                 \
+                  : (((uint8_t *)addr) + PAGE_OFFSET)))
+#define REMOVE_PAGE_OFFSET(addr)                     \
+    ((void *)((((void *)addr) < (void *)PAGE_OFFSET) \
+                  ? ((uint8_t *)addr)                \
+                  : (((uint8_t *)addr) - PAGE_OFFSET)))
 #else
 #define ADD_PAGE_OFFSET(addr) ((void *)(((uint8_t *)addr) + PAGE_OFFSET))
 #define REMOVE_PAGE_OFFSET(addr) ((void *)(((uint8_t *)addr) - PAGE_OFFSET))
@@ -328,17 +334,19 @@ void virt_mem_initialize()
 {
     log_info("[VMM] Initializing Virtual memory manager...");
 
-    // Allocate a page table for the 2MB identity mapping
+    // Allocate a page table for the 4MB identity mapping
 
     ptable_t *table = (ptable_t *)phys_mem_alloc_block();
+    ptable_t *table2 = (ptable_t *)phys_mem_alloc_block();
 
-    if (!table)
+    if (!table || !table2)
     {
         log_error("[VMM] Could not allocate physical memory");
         return;
     }
 
     memset(table, 0, sizeof(ptable_t));
+    memset(table2, 0, sizeof(ptable_t));
 
     uint64_t frame = 0;
     uint64_t virt = 0;
@@ -351,6 +359,16 @@ void virt_mem_initialize()
         pt_entry_set_frame(&entry, (phys_addr)frame);
 
         table->entries[PT_INDEX(virt)] = entry;
+    }
+
+    for (uint64_t i = 0; i < PT_ENTRIES; ++i, frame += 0x1000, virt += 0x1000)
+    {
+        pt_entry_t entry = 0;
+        pt_entry_add_attrib(&entry, PTE_PRESENT);
+        pt_entry_add_attrib(&entry, PTE_WRITABLE);
+        pt_entry_set_frame(&entry, (phys_addr)frame);
+
+        table2->entries[PT_INDEX(virt)] = entry;
     }
 
     // Allocate a page directory
@@ -369,6 +387,11 @@ void virt_mem_initialize()
     pd_entry_add_attrib(entry_pd, PDE_PRESENT);
     pd_entry_add_attrib(entry_pd, PDE_WRITABLE);
     pd_entry_set_frame(entry_pd, (phys_addr)table);
+
+    pd_entry_t *entry_pd2 = &dir->entries[1];
+    pd_entry_add_attrib(entry_pd2, PDE_PRESENT);
+    pd_entry_add_attrib(entry_pd2, PDE_WRITABLE);
+    pd_entry_set_frame(entry_pd2, (phys_addr)table2);
 
     // Allocate a PDP
 
@@ -442,11 +465,9 @@ int virt_mem_switch_dir(pml4_t *dir)
 
     _cur_dir = dir;
 
-    __asm__ volatile("mov %0,%%rax" ::"r"(dir)
-                     : "%rax");  // Move dir to eax
+    __asm__ volatile("mov %0,%%rax" ::"r"(dir) : "%rax");  // Move dir to eax
 
-    __asm__ volatile("mov %%rax,%%cr3" ::
-                         : "%rax");  // move eax to cr3
+    __asm__ volatile("mov %%rax,%%cr3" ::: "%rax");  // move eax to cr3
 
     return 1;
 }
@@ -459,8 +480,7 @@ pml4_t *virt_mem_get_current_dir()
 void virt_mem_flush_tlb(virt_addr addr)
 {
     __asm__ volatile("cli");
-    __asm__ volatile("invlpg (%0)" ::"b"(addr)
-                     : "memory");
+    __asm__ volatile("invlpg (%0)" ::"b"(addr) : "memory");
     __asm__ volatile("sti");
 }
 
@@ -719,7 +739,10 @@ void virt_mem_print_cur_dir()
     virt_mem_print_dir(_cur_dir);
 }
 
-static void virt_mem_print_pt(ptable_t *pt, uint64_t pml4_entry, uint64_t pdp_entry, uint64_t pd_entry)
+static void virt_mem_print_pt(ptable_t *pt,
+                              uint64_t pml4_entry,
+                              uint64_t pdp_entry,
+                              uint64_t pd_entry)
 {
     pt = ADD_PAGE_OFFSET(pt);
 
@@ -727,23 +750,30 @@ static void virt_mem_print_pt(ptable_t *pt, uint64_t pml4_entry, uint64_t pdp_en
     {
         if (pt->entries[i])
         {
-            printf("PT Entry %#03x: %s%s%s%s%s",
-                   i,
-                   pt_entry_is_present(pt->entries[i]) ? "P" : "-",   // Present
-                   pt_entry_is_writable(pt->entries[i]) ? "W" : "-",  // Writable
-                   pt_entry_is_user(pt->entries[i]) ? "U" : "-",      // User
-                   pt_entry_is_accessed(pt->entries[i]) ? "A" : "-",  // Accessed
-                   pt_entry_is_dirty(pt->entries[i]) ? "D" : "-");    // Dirty
+            printf(
+                "PT Entry %#03x: %s%s%s%s%s",
+                i,
+                pt_entry_is_present(pt->entries[i]) ? "P" : "-",   // Present
+                pt_entry_is_writable(pt->entries[i]) ? "W" : "-",  // Writable
+                pt_entry_is_user(pt->entries[i]) ? "U" : "-",      // User
+                pt_entry_is_accessed(pt->entries[i]) ? "A" : "-",  // Accessed
+                pt_entry_is_dirty(pt->entries[i]) ? "D" : "-");    // Dirty
 
-            uint64_t virt = (0xFFFFULL << 48) + (pml4_entry << 39) + (pdp_entry << 30) + (pd_entry << 21) + (i << 12);
+            uint64_t virt = (0xFFFFULL << 48) + (pml4_entry << 39) +
+                            (pdp_entry << 30) + (pd_entry << 21) + (i << 12);
             uint64_t phys = pt_entry_pfn(pt->entries[i]);
 
-            printf(" %#016x mapped to %#016x (%#016x bytes)\n", virt, phys, 1 << 12);
+            printf(" %#016x mapped to %#016x (%#016x bytes)\n",
+                   virt,
+                   phys,
+                   1 << 12);
         }
     }
 }
 
-static void virt_mem_print_pd(pdirectory_t *pd, uint64_t pml4_entry, uint64_t pdp_entry)
+static void virt_mem_print_pd(pdirectory_t *pd,
+                              uint64_t pml4_entry,
+                              uint64_t pdp_entry)
 {
     pd = ADD_PAGE_OFFSET(pd);
 
@@ -751,24 +781,31 @@ static void virt_mem_print_pd(pdirectory_t *pd, uint64_t pml4_entry, uint64_t pd
     {
         if (pd->entries[i])
         {
-            printf("PD Entry %#03x: %s%s%s%s%s%s%s%s%s",
-                   i,
-                   pd_entry_is_present(pd->entries[i]) ? "P" : "-",      // Present
-                   pd_entry_is_writable(pd->entries[i]) ? "W" : "-",     // Writable
-                   pd_entry_is_user(pd->entries[i]) ? "U" : "-",         // User
-                   pd_entry_is_pwt(pd->entries[i]) ? "T" : "-",          // Write through
-                   pd_entry_is_pcd(pd->entries[i]) ? "C" : "-",          // Cache disable
-                   pd_entry_is_accessed(pd->entries[i]) ? "A" : "-",     // Accessed
-                   pd_entry_is_huge(pd->entries[i]) ? "H" : "-",         // Huge
-                   pd_entry_is_cpu_global(pd->entries[i]) ? "G" : "-",   // CPU Global
-                   pd_entry_is_lv4_global(pd->entries[i]) ? "L" : "-");  // LV4 Global
+            printf(
+                "PD Entry %#03x: %s%s%s%s%s%s%s%s%s",
+                i,
+                pd_entry_is_present(pd->entries[i]) ? "P" : "-",   // Present
+                pd_entry_is_writable(pd->entries[i]) ? "W" : "-",  // Writable
+                pd_entry_is_user(pd->entries[i]) ? "U" : "-",      // User
+                pd_entry_is_pwt(pd->entries[i]) ? "T" : "-",  // Write through
+                pd_entry_is_pcd(pd->entries[i]) ? "C" : "-",  // Cache disable
+                pd_entry_is_accessed(pd->entries[i]) ? "A" : "-",  // Accessed
+                pd_entry_is_huge(pd->entries[i]) ? "H" : "-",      // Huge
+                pd_entry_is_cpu_global(pd->entries[i]) ? "G"
+                                                       : "-",  // CPU Global
+                pd_entry_is_lv4_global(pd->entries[i]) ? "L"
+                                                       : "-");  // LV4 Global
 
             if (pd_entry_is_huge(pd->entries[i]))
             {
-                uint64_t virt = (0xFFFFULL << 48) + (pml4_entry << 39) + (pdp_entry << 30) + (i << 21);
+                uint64_t virt = (0xFFFFULL << 48) + (pml4_entry << 39) +
+                                (pdp_entry << 30) + (i << 21);
                 uint64_t phys = pd_entry_pfn(pd->entries[i]);
 
-                printf(" %#016x mapped to %#016x (%#016x bytes)\n", virt, phys, 1 << 21);
+                printf(" %#016x mapped to %#016x (%#016x bytes)\n",
+                       virt,
+                       phys,
+                       1 << 21);
             }
             else
             {
@@ -793,27 +830,33 @@ static void virt_mem_print_pdp(pdp_t *pdp, uint64_t pml4_entry)
     {
         if (pdp->entries[i])
         {
-            printf("PDP Entry %#03x: %s%s%s%s%s%s%s",
-                   i,
-                   pdp_entry_is_present(pdp->entries[i]) ? "P" : "-",   // Present
-                   pdp_entry_is_writable(pdp->entries[i]) ? "W" : "-",  // Writable
-                   pdp_entry_is_user(pdp->entries[i]) ? "U" : "-",      // User
-                   pdp_entry_is_pwt(pdp->entries[i]) ? "T" : "-",       // Write through
-                   pdp_entry_is_pcd(pdp->entries[i]) ? "C" : "-",       // Cache disable
-                   pdp_entry_is_accessed(pdp->entries[i]) ? "A" : "-",  // Accessed
-                   pdp_entry_is_huge(pdp->entries[i]) ? "H" : "-");     // Huge
+            printf(
+                "PDP Entry %#03x: %s%s%s%s%s%s%s",
+                i,
+                pdp_entry_is_present(pdp->entries[i]) ? "P" : "-",   // Present
+                pdp_entry_is_writable(pdp->entries[i]) ? "W" : "-",  // Writable
+                pdp_entry_is_user(pdp->entries[i]) ? "U" : "-",      // User
+                pdp_entry_is_pwt(pdp->entries[i]) ? "T" : "-",  // Write through
+                pdp_entry_is_pcd(pdp->entries[i]) ? "C" : "-",  // Cache disable
+                pdp_entry_is_accessed(pdp->entries[i]) ? "A" : "-",  // Accessed
+                pdp_entry_is_huge(pdp->entries[i]) ? "H" : "-");     // Huge
 
             if (pdp_entry_is_huge(pdp->entries[i]))
             {
-                uint64_t virt = (0xFFFFULL << 48) + (pml4_entry << 39) + (i << 30);
+                uint64_t virt =
+                    (0xFFFFULL << 48) + (pml4_entry << 39) + (i << 30);
                 uint64_t phys = pdp_entry_pfn(pdp->entries[i]);
 
-                printf(" %#016x mapped to %#016x (%#016x bytes)\n", virt, phys, 1 << 30);
+                printf(" %#016x mapped to %#016x (%#016x bytes)\n",
+                       virt,
+                       phys,
+                       1 << 30);
             }
             else
             {
                 printf("\n");
-                pdirectory_t *pd = (pdirectory_t *)pdp_entry_pfn(pdp->entries[i]);
+                pdirectory_t *pd =
+                    (pdirectory_t *)pdp_entry_pfn(pdp->entries[i]);
 
                 virt_mem_print_pd(pd, pml4_entry, i);
             }
@@ -829,14 +872,19 @@ void virt_mem_print_dir(pml4_t *dir)
     {
         if (dir->entries[i])
         {
-            printf("PML4 Entry %#03x: %s%s%s%s%s%s",
-                   i,
-                   pml4_entry_is_present(dir->entries[i]) ? "P" : "-",    // Present
-                   pml4_entry_is_writable(dir->entries[i]) ? "W" : "-",   // Writable
-                   pml4_entry_is_user(dir->entries[i]) ? "U" : "-",       // User
-                   pml4_entry_is_pwt(dir->entries[i]) ? "T" : "-",        // Write through
-                   pml4_entry_is_pcd(dir->entries[i]) ? "C" : "-",        // Cache disable
-                   pml4_entry_is_accessed(dir->entries[i]) ? "A" : "-");  // Accessed
+            printf(
+                "PML4 Entry %#03x: %s%s%s%s%s%s",
+                i,
+                pml4_entry_is_present(dir->entries[i]) ? "P" : "-",  // Present
+                pml4_entry_is_writable(dir->entries[i]) ? "W"
+                                                        : "-",    // Writable
+                pml4_entry_is_user(dir->entries[i]) ? "U" : "-",  // User
+                pml4_entry_is_pwt(dir->entries[i]) ? "T"
+                                                   : "-",  // Write through
+                pml4_entry_is_pcd(dir->entries[i]) ? "C"
+                                                   : "-",  // Cache disable
+                pml4_entry_is_accessed(dir->entries[i]) ? "A"
+                                                        : "-");  // Accessed
 
             printf("\n");
 
@@ -1002,7 +1050,8 @@ int virt_mem_map_page_p(void *phys, void *virt, uint64_t flags, pml4_t *pml4)
     pt_entry_t *pt_entry = &ptable->entries[PT_INDEX(vaddr)];
 
     // TODO: Handle remap. If there is already a mapped page, let the flags
-    // determine if this page should be overwritten or if an error should be raised.
+    // determine if this page should be overwritten or if an error should be
+    // raised.
     memset(pt_entry, 0, sizeof(pt_entry_t));
 
     pt_entry_add_attrib(pt_entry, PTE_PRESENT);
@@ -1026,7 +1075,8 @@ int virt_mem_map_page(void *phys, void *virt, uint64_t flags)
     return virt_mem_map_page_p(phys, virt, flags, _cur_dir);
 }
 
-int virt_mem_map_pages_p(void *phys, void *virt, size_t n_pages, uint64_t flags, pml4_t *dir)
+int virt_mem_map_pages_p(
+    void *phys, void *virt, size_t n_pages, uint64_t flags, pml4_t *dir)
 {
     uint64_t paddr = (uint64_t)phys;
     uint64_t vaddr = (uint64_t)virt;
@@ -1073,9 +1123,7 @@ int virt_mem_unmap_pages(void *virt, size_t n_pages)
 
 static void copy_page(void *dst, const void *src)
 {
-    memcpy(ADD_PAGE_OFFSET(dst),
-           ADD_PAGE_OFFSET(src),
-           PAGE_SIZE);
+    memcpy(ADD_PAGE_OFFSET(dst), ADD_PAGE_OFFSET(src), PAGE_SIZE);
 }
 
 static ptable_t *clone_ptable(ptable_t *src)
@@ -1094,7 +1142,8 @@ static ptable_t *clone_ptable(ptable_t *src)
 
         if (!pt_entry_is_user(src->entries[i]))
         {
-            // TODO: Lookup. This will copy accessed and dirty flag. This may not be desireable.
+            // TODO: Lookup. This will copy accessed and dirty flag. This may
+            // not be desireable.
             table->entries[i] = src->entries[i];
         }
         else
@@ -1138,7 +1187,8 @@ static pdirectory_t *clone_pdirectory(pdirectory_t *src)
 
         if (!pd_entry_is_user(src->entries[i]))
         {
-            // TODO: Lookup. This will copy accessed and dirty flag. This may not be desireable.
+            // TODO: Lookup. This will copy accessed and dirty flag. This may
+            // not be desireable.
             dir->entries[i] = src->entries[i];
         }
         else
@@ -1173,12 +1223,14 @@ static pdp_t *clone_pdp(pdp_t *src)
 
         if (!pdp_entry_is_user(src->entries[i]))
         {
-            // TODO: Lookup. This will copy accessed and dirty flag. This may not be desireable.
+            // TODO: Lookup. This will copy accessed and dirty flag. This may
+            // not be desireable.
             dir->entries[i] = src->entries[i];
         }
         else
         {
-            pdirectory_t *src_table = (pdirectory_t *)pdp_entry_pfn(src->entries[i]);
+            pdirectory_t *src_table =
+                (pdirectory_t *)pdp_entry_pfn(src->entries[i]);
             pdirectory_t *new_table = clone_pdirectory(src_table);
 
             pdp_entry_set_frame(&dir->entries[i], (phys_addr)new_table);
