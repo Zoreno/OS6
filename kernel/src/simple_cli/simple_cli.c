@@ -30,9 +30,112 @@
 #include <simple_cli/commands.h>
 #include <simple_cli/vt_100.h>
 
+//=============================================================================
+// Definitions
+//=============================================================================
+
 #define BUFFER_SIZE 1024
 
-char *last_command = NULL;
+#define KEY_BACKSPACE 127
+#define KEY_ENTER 13
+#define KEY_ESCAPE VT_100_ESCAPE
+
+//=============================================================================
+// Local variables
+//=============================================================================
+
+simple_cli_command_t _commands[] = {
+    {.name = "test", .command = test_command},
+    {.name = "cd", .command = cd_command},
+    {.name = "ls", .command = ls_command},
+    {.name = "mkdir", .command = mkdir_command},
+    {.name = "pwd", .command = pwd_command},
+    {.name = "rm", .command = rm_command},
+    {.name = "exit", .command = exit_command},
+    {.name = "time", .command = time_command},
+    {.name = "launch", .command = launch_command},
+    {.name = NULL, .command = NULL}};
+
+//=============================================================================
+// Private forward declarations
+//=============================================================================
+
+static int compare_string(void *a, void *b);
+static int clamp(int val, int min, int max);
+static void get_history_at(simple_cli_t *cli, int index, char *buffer);
+static void insert_char(char *buffer, int buf_ptr, int buffer_size, char c);
+static void erase_char(char *buffer, int buf_ptr, int buffer_size);
+
+//=============================================================================
+// Private functions
+//=============================================================================
+
+static int compare_string(void *a, void *b)
+{
+    const char *str1 = (const char *)a;
+    const char *str2 = (const char *)b;
+
+    return strcmp(str1, str2) == 0;
+}
+
+static int clamp(int val, int min, int max)
+{
+    if (val > max)
+    {
+        return max;
+    }
+
+    if (val < min)
+    {
+        return min;
+    }
+
+    return val;
+}
+
+static void get_history_at(simple_cli_t *cli, int index, char *buffer)
+{
+    if (!cli || !cli->history)
+    {
+        return;
+    }
+
+    list_node_t *node = cli->history->tail;
+
+    if (!node)
+    {
+        return;
+    }
+
+    for (int i = 0; i < cli->history_index; ++i)
+    {
+        node = node->prev;
+    }
+
+    memcpy(buffer, node->payload, BUFFER_SIZE);
+}
+
+static void insert_char(char *buffer, int buf_ptr, int buffer_size, char c)
+{
+    // Move everything after the pointer one step
+    memmove(&buffer[buf_ptr + 1], &buffer[buf_ptr], buffer_size - buf_ptr - 1);
+
+    // Insert char at pointer
+    buffer[buf_ptr] = c;
+}
+
+static void erase_char(char *buffer, int buf_ptr, int buffer_size)
+{
+    // Move everything after the pointer one step
+    memmove(&buffer[buf_ptr], &buffer[buf_ptr + 1], buffer_size - buf_ptr - 1);
+
+    // Clear the last element
+    buffer[buffer_size] = 0;
+}
+
+//=============================================================================
+// Interface functions
+//=============================================================================
 
 const char *simple_cli_get_user_name()
 {
@@ -49,7 +152,51 @@ const char *simple_cli_get_working_directory()
     return process_get_current()->wd_path;
 }
 
-void simple_cli_redraw_line(char *buffer)
+void simple_cli_append_to_history(simple_cli_t *cli, const char *line)
+{
+    list_node_t *prev_node =
+        list_find_comp(cli->history, (char *)line, compare_string);
+
+    if (prev_node != NULL)
+    {
+        list_delete(cli->history, prev_node);
+        free(prev_node->payload);
+        free(prev_node);
+    }
+
+    size_t length = strlen(line) + 1;
+
+    char *new_line = malloc(length);
+
+    memcpy(new_line, line, length);
+
+    list_insert(cli->history, new_line);
+
+    cli->history_index = -1;
+}
+
+int simple_cli_history_size(simple_cli_t *cli)
+{
+    return cli->history->length;
+}
+
+void simple_cli_next_history(simple_cli_t *cli, char *buffer)
+{
+    cli->history_index =
+        clamp(cli->history_index + 1, 0, simple_cli_history_size(cli) - 1);
+
+    get_history_at(cli, cli->history_index, buffer);
+}
+
+void simple_cli_prev_history(simple_cli_t *cli, char *buffer)
+{
+    cli->history_index =
+        clamp(cli->history_index - 1, 0, simple_cli_history_size(cli) - 1);
+
+    get_history_at(cli, cli->history_index, buffer);
+}
+
+void simple_cli_redraw_line(char *buffer, int buf_ptr)
 {
     char line_start[BUFFER_SIZE] = {0};
     sprintf(line_start,
@@ -66,13 +213,11 @@ void simple_cli_redraw_line(char *buffer)
 
     printf("%s", line_start);
     printf("%s", buffer);
+
+    vt_100_set_cursor_location(line, strlen(line_start) + buf_ptr + 1);
 }
 
-#define KEY_BACKSPACE 127
-#define KEY_ENTER 13
-#define KEY_ESCAPE VT_100_ESCAPE
-
-char *simple_cli_read_line()
+char *simple_cli_read_line(simple_cli_t *cli)
 {
     char c;
 
@@ -88,7 +233,7 @@ char *simple_cli_read_line()
 
     memset(buffer, 0, BUFFER_SIZE);
 
-    simple_cli_redraw_line(buffer);
+    simple_cli_redraw_line(buffer, buf_ptr);
 
     while (1)
     {
@@ -99,15 +244,15 @@ char *simple_cli_read_line()
         case KEY_ENTER:
         {
             putchar('\n');
-            buffer[buf_ptr] = 0;
             return buffer;
         }
+        case 8:
         case KEY_BACKSPACE:
         {
             if (buf_ptr > 0)
             {
                 buf_ptr--;
-                buffer[buf_ptr] = 0;
+                erase_char(buffer, buf_ptr, BUFFER_SIZE);
             }
         }
         break;
@@ -115,20 +260,42 @@ char *simple_cli_read_line()
         {
             int command = vt_100_handle_command();
 
-            if (command == VT_100_UP)
+            switch (command)
             {
-                memcpy(buffer, last_command, BUFFER_SIZE);
-                buf_ptr = strlen(last_command);
+            case VT_100_UP:
+                simple_cli_next_history(cli, buffer);
+                buf_ptr = strlen(buffer);
+                break;
+            case VT_100_DOWN:
+                simple_cli_prev_history(cli, buffer);
+                buf_ptr = strlen(buffer);
+                break;
+            case VT_100_LEFT:
+                if (buf_ptr > 0)
+                {
+                    buf_ptr--;
+                }
+                break;
+            case VT_100_RIGHT:
+                if (buf_ptr < strlen(buffer) && buf_ptr < BUFFER_SIZE - 1)
+                {
+                    buf_ptr++;
+                }
+            default:
+                break;
             }
         }
         break;
         default:
-
-            buffer[buf_ptr++] = c;
+            if (buf_ptr < BUFFER_SIZE - 1)
+            {
+                insert_char(buffer, buf_ptr, BUFFER_SIZE, c);
+                buf_ptr++;
+            }
             break;
         }
 
-        simple_cli_redraw_line(buffer);
+        simple_cli_redraw_line(buffer, buf_ptr);
     }
 }
 
@@ -184,18 +351,6 @@ int simple_cli_get_token_count(const char **tokens)
 
     return i;
 }
-
-simple_cli_command_t _commands[] = {
-    {.name = "test", .command = test_command},
-    {.name = "cd", .command = cd_command},
-    {.name = "ls", .command = ls_command},
-    {.name = "mkdir", .command = mkdir_command},
-    {.name = "pwd", .command = pwd_command},
-    {.name = "rm", .command = rm_command},
-    {.name = "exit", .command = exit_command},
-    {.name = "time", .command = time_command},
-    {.name = "launch", .command = launch_command},
-    {.name = NULL, .command = NULL}};
 
 int simple_cli_run_command(const char *name, int argc, const char **argv)
 {
@@ -294,15 +449,18 @@ int simple_cli_launch(char **args)
 
 void simple_cli_init()
 {
-    last_command = malloc(BUFFER_SIZE);
+    simple_cli_t cli;
+
+    cli.history = list_create();
+    cli.history_index = -1;
 
     while (1)
     {
-        char *line = simple_cli_read_line();
+        char *line = simple_cli_read_line(&cli);
 
         if (line)
         {
-            memcpy(last_command, line, BUFFER_SIZE);
+            simple_cli_append_to_history(&cli, line);
         }
 
         const char **args = simple_cli_split_line(line);
