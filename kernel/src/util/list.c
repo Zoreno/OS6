@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <util/list.h>
@@ -114,6 +114,21 @@ list_node_t *list_find(list_t *list, void *value)
     for (list_node_t *item = list->head; item != NULL; item = item->next)
     {
         if (item->payload == value)
+        {
+            return item;
+        }
+    }
+
+    return NULL;
+}
+
+list_node_t *list_find_comp(list_t *list, void *value, list_comp_t func)
+{
+    ASSERT(list != NULL);
+
+    for (list_node_t *item = list->head; item != NULL; item = item->next)
+    {
+        if (func(item->payload, value))
         {
             return item;
         }

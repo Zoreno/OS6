@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _LIST_H
@@ -39,12 +39,15 @@ typedef struct
     size_t length;
 } list_t;
 
+typedef int(list_comp_t)(void *a, void *b);
+
 void list_destroy(list_t *list);
 void list_free(list_t *list);
 void list_append(list_t *list, list_node_t *item);
 int list_insert(list_t *list, void *item);
 list_t *list_create();
 list_node_t *list_find(list_t *list, void *value);
+list_node_t *list_find_comp(list_t *list, void *value, list_comp_t func);
 void list_remove(list_t *list, size_t index);
 void list_delete(list_t *list, list_node_t *node);
 list_node_t *list_pop(list_t *list);
@@ -53,3 +56,7 @@ list_t *list_copy(list_t *list);
 void list_merge(list_t *dest, list_t *source);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================
