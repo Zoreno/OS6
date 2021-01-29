@@ -958,7 +958,7 @@ static void refresh_inode(ext2_fs_t *this,
     if (this->block_size == 0)
     {
         log_error("[EXT2] Block size zero");
-        return 0;
+        return;
     }
 
     uint32_t group = inode / this->inodes_per_group;
@@ -1055,6 +1055,7 @@ static uint32_t write_inode_buffer(ext2_fs_t *this,
                        this->block_size - (offset % this->block_size));
 
                 inode_write_block(this, inode, inode_number, block_offset, buf);
+
                 if (!b)
                 {
                     refresh_inode(this, inode, inode_number);

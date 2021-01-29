@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <pci/pci_device.h>
@@ -48,9 +48,9 @@ void pci_read_device_info(uint32_t id, PciDeviceInfo_t *info)
     info->BIST = pci_read_b(id, PCI_CONFIG_BIST);
 
     // TODO: Fill out with all information from PCI
-    switch (info->headerType & 0x7F) // Filter 7 lowest bits
+    switch (info->headerType & 0x7F)  // Filter 7 lowest bits
     {
-    case 0: // PCI Device
+    case 0:  // PCI Device
         info->type0.BaseAddresses[0] = pci_read_l(id, PCI_TYPE0_CONFIG_BAR0);
         info->type0.BaseAddresses[1] = pci_read_l(id, PCI_TYPE0_CONFIG_BAR1);
         info->type0.BaseAddresses[2] = pci_read_l(id, PCI_TYPE0_CONFIG_BAR2);
@@ -59,22 +59,29 @@ void pci_read_device_info(uint32_t id, PciDeviceInfo_t *info)
         info->type0.BaseAddresses[5] = pci_read_l(id, PCI_TYPE0_CONFIG_BAR5);
 
         info->type0.CIS = pci_read_l(id, PCI_TYPE0_CONFIG_CARDBUS_CIS);
-        info->type0.SubVendorID = pci_read_w(id, PCI_TYPE0_CONFIG_SUBSYSTEM_VENDOR_ID);
-        info->type0.SubSystemID = pci_read_w(id, PCI_TYPE0_CONFIG_SUBSYSTEM_DEVICE_ID);
-        info->type0.ROMBaseAddress = pci_read_l(id, PCI_TYPE0_CONFIG_EXPANSION_ROM);
-        info->type0.CapabilitiesPtr = pci_read_b(id, PCI_TYPE0_CONFIG_CAPABILITIES);
-        info->type0.InterruptLine = pci_read_b(id, PCI_TYPE0_CONFIG_INTERRUPT_LINE);
-        info->type0.InterruptPin = pci_read_b(id, PCI_TYPE0_CONFIG_INTERRUPT_PIN);
+        info->type0.SubVendorID =
+            pci_read_w(id, PCI_TYPE0_CONFIG_SUBSYSTEM_VENDOR_ID);
+        info->type0.SubSystemID =
+            pci_read_w(id, PCI_TYPE0_CONFIG_SUBSYSTEM_DEVICE_ID);
+        info->type0.ROMBaseAddress =
+            pci_read_l(id, PCI_TYPE0_CONFIG_EXPANSION_ROM);
+        info->type0.CapabilitiesPtr =
+            pci_read_b(id, PCI_TYPE0_CONFIG_CAPABILITIES);
+        info->type0.InterruptLine =
+            pci_read_b(id, PCI_TYPE0_CONFIG_INTERRUPT_LINE);
+        info->type0.InterruptPin =
+            pci_read_b(id, PCI_TYPE0_CONFIG_INTERRUPT_PIN);
         info->type0.MinimumGrant = pci_read_b(id, PCI_TYPE0_CONFIG_MIN_GRANT);
-        info->type0.MaximumLatency = pci_read_b(id, PCI_TYPE0_CONFIG_MAX_LATENCY);
+        info->type0.MaximumLatency =
+            pci_read_b(id, PCI_TYPE0_CONFIG_MAX_LATENCY);
         break;
-    case 1: // PCI-to-PCI bridge
+    case 1:  // PCI-to-PCI bridge
 
         break;
-    case 2: // PCI-to-CardBus bridge
+    case 2:  // PCI-to-CardBus bridge
 
         break;
-    default: // Invalid PCI device
+    default:  // Invalid PCI device
         break;
     }
 }
@@ -88,7 +95,9 @@ const char *pci_device_name(uint32_t vendorID, uint32_t deviceID)
     return "Unknown Device";
 }
 
-const char *pci_class_name(uint32_t classCode, uint32_t subClass, uint32_t progIntf)
+const char *pci_class_name(uint32_t classCode,
+                           uint32_t subClass,
+                           uint32_t progIntf)
 {
     switch ((classCode << 8) | subClass)
     {
