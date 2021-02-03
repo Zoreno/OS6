@@ -29,6 +29,7 @@
 #include <acpi/acpi_header.h>
 #include <acpi/dsdt.h>
 #include <acpi/fadt.h>
+#include <acpi/madt.h>
 #include <acpi/rsdp.h>
 #include <acpi/rsdt.h>
 #include <acpi/xsdt.h>
@@ -447,6 +448,55 @@ static int acpi_parse_dsdt(dsdt_t *dsdt)
     return 0;
 }
 
+static int acpi_parse_madt(madt_t *madt)
+{
+    if (!madt)
+    {
+        log_error("[ACPI] MADT was NULL");
+        return 1;
+    }
+
+    if (acpi_check_header(&madt->header, "APIC") != 0)
+    {
+        log_error("[ACPI] MADT header signature was invalid");
+        return 1;
+    }
+
+#if DEBUG_ACPI == 1
+    log_debug("[ACPI] Found valid MADT");
+#endif
+
+    log_debug("[ACPI] Local ACPI addr: %#08x", madt->local_apic_addr);
+    log_debug("[ACPI] Flags: %#08x", madt->flags);
+
+    uint8_t *p = (uint8_t *)madt;
+    p += sizeof(madt_t);
+    uint8_t *p_end = (uint8_t *)madt;
+    p_end += madt->header.length;
+
+    while (p < p_end)
+    {
+        madt_entry_header_t* entry = (madt_entry_header_t *)p;
+        switch(entry->entry_type)
+        {
+            case APIC_TYPE_LOCAL_APIC:
+            {
+                madt_entry_lapic_t* lapic = (madt_entry_lapic_t *)p;
+                log_info("LAPIC processor ID: %i", lapic->acpi_processor_id);
+                log_info("LAPIC APIC ID: %i", lapic->apic_id);
+                log_info("LAPIC flags: %#08x", lapic->flags);
+            }
+            break;
+        default:
+            log_warn("[ACPI] Invalid madt entry type");
+            break;
+        }
+        p += entry->record_length;
+    }
+
+    return 0;
+}
+
 static int acpi_init_xsdt(xsdt_t *xsdt)
 {
     if (!xsdt)
@@ -478,6 +528,11 @@ static int acpi_init_xsdt(xsdt_t *xsdt)
         if (acpi_check_signature(header, "FACP") == 0)
         {
             acpi_parse_fadt((fadt_t *)header);
+        }
+
+        if (acpi_check_signature(header, "APIC") == 0)
+        {
+            acpi_parse_madt((madt_t *)header);
         }
     }
 
@@ -515,6 +570,11 @@ static int acpi_init_rsdt(rsdt_t *rsdt)
         if (acpi_check_signature(header, "FACP") == 0)
         {
             acpi_parse_fadt((fadt_t *)header);
+        }
+
+        if (acpi_check_signature(header, "APIC") == 0)
+        {
+            acpi_parse_madt((madt_t *)header);
         }
     }
 

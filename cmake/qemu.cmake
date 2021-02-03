@@ -9,7 +9,7 @@ set(QEMU_FLAGS)
 
 set(QEMU_FLAGS ${QEMU_FLAGS} -d guest_errors -D qemu.log)
 
-set(QEMU_FLAGS ${QEMU_FLAGS} -cpu Nehalem)
+set(QEMU_FLAGS ${QEMU_FLAGS} -cpu Nehalem -smp 2)
 #set(QEMU_FLAGS ${QEMU_FLAGS} -enable-kvm -cpu host)
 
 # Set memory flags
