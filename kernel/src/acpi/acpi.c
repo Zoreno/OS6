@@ -114,7 +114,7 @@ static const char *acpi_gas_access_size_to_string(uint8_t access_size);
 static void acpi_print_gas(const generic_address_structure_t *gas);
 #endif
 
-static rsdp_t *acpi_check_rdsp(unsigned int *ptr);
+static rsdp_t *acpi_check_rsdp(unsigned int *ptr);
 static rsdp_t *acpi_get_rsdp(void);
 
 static int acpi_parse_fadt(fadt_t *fadt);
@@ -239,7 +239,7 @@ static void acpi_print_gas(const generic_address_structure_t *gas)
 }
 #endif
 
-static rsdp_t *acpi_check_rdsp(unsigned int *ptr)
+static rsdp_t *acpi_check_rsdp(unsigned int *ptr)
 {
     char *signature = "RSD PTR ";
 
@@ -257,11 +257,9 @@ static rsdp_t *acpi_check_rdsp(unsigned int *ptr)
         uint8_t *bptr = (uint8_t *)ptr;
         uint8_t checksum = 0;
 
-        for (int i = 0; i < sizeof(rsdp_t); ++i)
+        for (int i = 0; i < 24; ++i)
         {
-            uint8_t term = *bptr;
-            checksum += term;
-            bptr++;
+            checksum += *(bptr++);
         }
 
         if (checksum == 0)
