@@ -5,11 +5,14 @@
 # Fetch all needed files
 #=========================================================
 
+BINUTILS_VERSION=2.35
+GCC_VERSION=10.2.0
+
 # Get Binutils 2.32
-wget -nc ftp://ftp.gnu.org/gnu/binutils/binutils-2.32.tar.gz
+wget -nc ftp://ftp.gnu.org/gnu/binutils/binutils-$BINUTILS_VERSION.tar.gz
 
 # Get GCC 8.3.0
-wget -nc ftp://ftp.gnu.org/gnu/gcc/gcc-8.3.0/gcc-8.3.0.tar.gz
+wget -nc ftp://ftp.gnu.org/gnu/gcc/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.gz
 
 # Get Installation Requisites
 sudo apt-get install -y texinfo
@@ -37,7 +40,7 @@ cd src
 mkdir -p build-binutils
 cd build-binutils
 
-../binutils-2.32/configure --target=$TARGET --prefix="$PREFIX" --with-sysroot --disable-nls --disable-werror
+../binutils-$BINUTILS_VERSION/configure --target=$TARGET --prefix="$PREFIX" --with-sysroot --disable-nls --disable-werror
 
 make -j8
 make -j8 install
@@ -48,14 +51,14 @@ cd ..
 # Build GCC
 #=========================================================
 
-cd gcc-8.3.0 && contrib/download_prerequisites
+cd gcc-$GCC_VERSION && contrib/download_prerequisites
 
 cd ..
 
 mkdir -p build-gcc
 cd build-gcc
 
-../gcc-8.3.0/configure \
+../gcc-$GCC_VERSION/configure \
     --target=$TARGET \
     --prefix="$PREFIX" \
     --disable-nls \
