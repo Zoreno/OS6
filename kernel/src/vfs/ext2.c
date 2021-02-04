@@ -958,7 +958,7 @@ static void refresh_inode(ext2_fs_t *this,
     if (this->block_size == 0)
     {
         log_error("[EXT2] Block size zero");
-        return 0;
+        return;
     }
 
     uint32_t group = inode / this->inodes_per_group;
@@ -1989,6 +1989,13 @@ static uint32_t ext2_root(ext2_fs_t *this,
         log_error("[EXT2] ext2_root: Invalid fnode");
         return -1;
     }
+
+    if (!inode)
+    {
+        log_error("[EXT2] ext2_root: Invalid inode");
+        return -1;
+    }
+
 
     fnode->device = (void *)this;
     fnode->inode = 2;

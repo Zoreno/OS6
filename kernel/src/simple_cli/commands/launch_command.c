@@ -33,7 +33,7 @@ int launch_command(int argc, const char **argv)
         return -1;
     }
 
-    launch_program(argv[1]);
+    launch_program((char *)argv[1]);
 
     return 0;
 }

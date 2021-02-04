@@ -21,6 +21,7 @@
  */
 
 #include <util/hashmap.h>
+#include <logging/logging.h>
 
 //=============================================================================
 // Static functions
@@ -79,6 +80,12 @@ hashmap_t *hashmap_create(int size)
 {
     hashmap_t *map = malloc(sizeof(hashmap_t));
 
+    if (!map)
+    {
+        log_error("[HASHMAP] Failed to allocate memory for hashmap");
+        return NULL;
+    }
+
     map->hash_func = &hashmap_string_hash;
     map->hash_comp = &hashmap_string_comp;
     map->hash_key_dup = &hashmap_string_dupe;
@@ -87,6 +94,14 @@ hashmap_t *hashmap_create(int size)
 
     map->size = size;
     map->entries = malloc(sizeof(hashmap_entry_t *) * size);
+
+    if (!map->entries)
+    {
+        log_error("[HASHMAP] Failed to allocate memory for hashmap");
+        free(map);
+        return NULL;
+    }
+
     memset(map->entries, 0x00, sizeof(hashmap_entry_t *) * size);
 
     return map;
@@ -96,6 +111,12 @@ hashmap_t *hashmap_create_int(int size)
 {
     hashmap_t *map = malloc(sizeof(hashmap_t));
 
+    if (!map)
+    {
+        log_error("[HASHMAP] Failed to allocate memory for hashmap");
+        return NULL;
+    }
+
     map->hash_func = &hashmap_int_hash;
     map->hash_comp = &hashmap_int_comp;
     map->hash_key_dup = &hashmap_int_dupe;
@@ -104,6 +125,14 @@ hashmap_t *hashmap_create_int(int size)
 
     map->size = size;
     map->entries = malloc(sizeof(hashmap_entry_t *) * size);
+
+    if (!map->entries)
+    {
+        log_error("[HASHMAP] Failed to allocate memory for hashmap");
+        free(map);
+        return NULL;
+    }
+
     memset(map->entries, 0x00, sizeof(hashmap_entry_t *) * size);
 
     return map;
@@ -118,40 +147,52 @@ void *hashmap_set(hashmap_t *map, void *key, void *value)
     if (!x)
     {
         hashmap_entry_t *e = malloc(sizeof(hashmap_entry_t));
+
+        if (!e)
+        {
+            log_error("[HASHMAP] Failed to allocate memory for hashmap");
+            return NULL;
+        }
+
         e->key = map->hash_key_dup(key);
         e->value = value;
         e->next = NULL;
         map->entries[hash] = e;
         return NULL;
     }
-    else
+
+    hashmap_entry_t *p = NULL;
+    do
     {
-        hashmap_entry_t *p = NULL;
-        do
+        if (map->hash_comp(x->key, key))
         {
-            if (map->hash_comp(x->key, key))
-            {
-                void *out = x->value;
-                x->value = value;
-                return out;
-            }
-            else
-            {
-                p = x;
-                x = x->next;
-            }
-        } while (x);
+            void *out = x->value;
+            x->value = value;
+            return out;
+        }
+        else
+        {
+            p = x;
+            x = x->next;
+        }
+    } while (x);
 
-        hashmap_entry_t *e = malloc(sizeof(hashmap_entry_t));
+    hashmap_entry_t *e = malloc(sizeof(hashmap_entry_t));
 
-        e->key = map->hash_key_dup(key);
-        e->value = value;
-        e->next = NULL;
-
-        p->next = e;
-
+    if (!e)
+    {
+        log_error("[HASHMAP] Failed to allocate memory for hashmap");
         return NULL;
     }
+
+    e->key = map->hash_key_dup(key);
+    e->value = value;
+    e->next = NULL;
+
+    p->next = e;
+
+    return NULL;
+
 }
 
 void *hashmap_get(hashmap_t *map, void *key)

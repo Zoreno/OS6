@@ -181,6 +181,12 @@ int usb_hub_init(usb_device_t *dev)
 
         usb_hub_t *hub = malloc(sizeof(usb_hub_t));
 
+        if (!hub)
+        {
+            log_error("[USB_HUB] Failed to allocate memory");
+            return 0;
+        }
+
         hub->dev = dev;
         hub->desc = desc;
 

@@ -1318,11 +1318,14 @@ void Window_set_title(Window *window, char *new_title)
     if (window->title)
     {
         free(window->title);
+        window->title = NULL;
     }
 
     len = strlen(new_title);
 
-    if (!(window->title = (char *)malloc((len + 1) * sizeof(char))))
+    window->title = (char *) malloc((len + 1) * sizeof(char));
+
+    if (!window->title)
     {
         return;
     }
@@ -1350,6 +1353,7 @@ void Window_append_title(Window *window, char *add_c)
     if (!window->title)
     {
         Window_set_title(window, add_c);
+        return;
     }
 
     orig_len = strlen(window->title);

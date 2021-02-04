@@ -61,6 +61,13 @@ void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
     {
         // Allocate head
         device_list = malloc(sizeof(pci_device_list_t));
+
+        if (!device_list)
+        {
+            log_error("[PCI] Failed to allocate memory");
+            return;
+        }
+
         device_list->next = 0; // Since we are not guaranteed empty pages.
 
         // read info into the first node.
@@ -81,6 +88,12 @@ void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
 
         // Allocate a new node
         cur_node->next = malloc(sizeof(pci_device_list_t));
+
+        if (!cur_node->next)
+        {
+            log_error("[PCI] Failed to allocate memory");
+            return;
+        }
 
         cur_node = cur_node->next;
 
