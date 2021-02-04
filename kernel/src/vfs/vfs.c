@@ -335,6 +335,13 @@ fs_node_t *clone_fs(fs_node_t *source)
 
 char *canonicalize_path(char *cwd, char *input)
 {
+    // TODO: this function is riddled with unchecked mallocs.
+    // Out of memory while in this function would be fun...
+    //
+    // This function has a well-defined task and interface, so
+    // it should be moved to another file and split into
+    // multiple functions.
+
     list_t *out = list_create();
 
     if (strlen(input) && input[0] != PATH_SEPARATOR)
