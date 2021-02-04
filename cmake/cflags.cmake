@@ -10,8 +10,11 @@ set(BUILDING_TESTS false)
 
 set(CFLAGS "-m64")
 
+# Enable analyzer
+set(CFLAGS "${CFLAGS} -fanalyzer")
+
 # Set warnings and error conditions
-set(CFLAGS "${CFLAGS} -Wall -Wextra -Werror=implicit-function-declaration -Wno-unused -Wno-sign-compare")
+set(CFLAGS "${CFLAGS} -Wall -Wextra -Wno-unused -Wno-sign-compare -Wno-address-of-packed-member")
 
 # Disable standard library
 set(CFLAGS "${CFLAGS} -ffreestanding")
@@ -23,7 +26,7 @@ set(CFLAGS "${CFLAGS} -fno-builtin -finline-functions -fno-stack-protector -mno-
 set(CPPFLAGS "${CFLAGS} -std=c++11 -static-libgcc")
 
 # Set C standard
-set(CFLAGS "${CFLAGS} -Wno-pointer-sign -std=c11")
+set(CFLAGS "${CFLAGS} -Wno-pointer-sign -std=c11 -Werror=implicit-function-declaration")
 
 set(ASMFLAGS "")
 
