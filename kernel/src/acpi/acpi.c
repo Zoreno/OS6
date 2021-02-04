@@ -108,7 +108,7 @@ acpi_system_state_t S5_state;
 //=============================================================================
 
 #if DEBUG_ACPI == 1
-static void acpi_print_rdsp(rsdp_t *rsdp);
+static void acpi_print_rsdp(rsdp_t *rsdp);
 static void acpi_print_acpi_header(const acpi_header_t *header);
 static const char *acpi_gas_address_space_to_string(uint8_t as);
 static const char *acpi_gas_access_size_to_string(uint8_t access_size);
@@ -131,7 +131,7 @@ static int acpi_enable(void);
 //=============================================================================
 
 #if DEBUG_ACPI == 1
-static void acpi_print_rdsp(rsdp_t *rsdp)
+static void acpi_print_rsdp(rsdp_t *rsdp)
 {
     char sig[9];
     char oem[7];
@@ -251,7 +251,7 @@ static rsdp_t *acpi_check_rsdp(unsigned int *ptr)
     {
 #if DEBUG_ACPI == 1
         log_debug("[ACPI] Found matching signature");
-        acpi_print_rdsp(rsdp);
+        acpi_print_rsdp(rsdp);
 #endif
 
         // If matching signature, check checksum
@@ -284,7 +284,7 @@ static rsdp_t *acpi_get_rsdp(void)
          (long long int)addr < 0x00100000;
          addr += 0x10 / sizeof(addr))
     {
-        rsdp_t *rsdp = acpi_check_rdsp(addr);
+        rsdp_t *rsdp = acpi_check_rsdp(addr);
 
         if (rsdp)
         {
@@ -300,7 +300,7 @@ static rsdp_t *acpi_get_rsdp(void)
          addr += 0x10 / sizeof(addr))
 
     {
-        rsdp_t *rsdp = acpi_check_rdsp(addr);
+        rsdp_t *rsdp = acpi_check_rsdp(addr);
 
         if (rsdp)
         {
