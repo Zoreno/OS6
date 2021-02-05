@@ -24,13 +24,13 @@
 #include <stdint.h>
 #include <stdio.h>
 
-typedef int (*COMPARE)(const void *, const void *);
+typedef int (*compare_func_t)(const void *, const void *);
 
 static void swap(void *mem1, void *mem2, size_t size);
 static size_t partition(void *arr, size_t low, size_t high, size_t item_size,
-                        COMPARE compare);
+                        compare_func_t compare);
 static void quicksort(void *arr, size_t low, size_t high, size_t item_size,
-                      COMPARE compare);
+                      compare_func_t compare);
 
 static void swap(void *mem1, void *mem2, size_t size)
 {
@@ -51,7 +51,7 @@ static void swap(void *mem1, void *mem2, size_t size)
 }
 
 static size_t partition(void *arr, size_t low, size_t high, size_t item_size,
-                        COMPARE compare)
+                        compare_func_t compare)
 {
 
     uint8_t *arr_b = arr;
@@ -73,7 +73,7 @@ static size_t partition(void *arr, size_t low, size_t high, size_t item_size,
 }
 
 static void quicksort(void *arr, size_t low, size_t high, size_t item_size,
-                      COMPARE compare)
+                      compare_func_t compare)
 {
     if (low < high)
     {
@@ -84,7 +84,7 @@ static void quicksort(void *arr, size_t low, size_t high, size_t item_size,
     }
 }
 
-void qsort(void *base, size_t nitems, size_t size, COMPARE compare)
+void qsort(void *base, size_t nitems, size_t size, compare_func_t compare)
 {
     quicksort(base, 0, nitems - 1, size, compare);
 }
