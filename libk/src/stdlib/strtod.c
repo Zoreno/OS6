@@ -179,6 +179,8 @@ done:
     return d;
 }
 
+// TODO: This should not be needed. It was implemented as a way of testing
+// isolated libk functions, but at the moment we could simply use GMock.
 weak_alias(libk_strtod, strtod);
 
 //==============================================================================
