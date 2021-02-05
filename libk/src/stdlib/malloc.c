@@ -25,11 +25,11 @@
 #include <string.h>
 #include <stdio.h>
 
+// Note that this introduces dependency from libk to the kernel. It would be
+// nice to handle this in a more noticable way.
 extern void *kmalloc(size_t size);
 
 __attribute__((malloc)) void *malloc(size_t size)
 {
-    //printf("[Malloc]: %i bytes\n", size);
-
     return kmalloc(size);
 }
