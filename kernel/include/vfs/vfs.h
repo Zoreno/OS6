@@ -24,6 +24,7 @@
 #define VFS_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 /**
  * @brief Maximum symbolic link depth that the VFS will try to interpret.

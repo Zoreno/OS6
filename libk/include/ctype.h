@@ -25,7 +25,7 @@
 
 #include <__libk_common.h>
 
-#include <__locale.h>
+#include <sys/types.h>
 
 int isalnum(char c);
 int isalpha(char c);

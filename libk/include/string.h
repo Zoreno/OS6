@@ -25,8 +25,7 @@
 
 #include <__libk_common.h>
 
-#include <_null.h>
-#include <_size_t.h>
+#include <sys/types.h>
 
 int bcmp(const void *s1, const void *s2, size_t n);  // Done
 void bcopy(const void *src, void *dest, size_t len); // Done

@@ -24,6 +24,7 @@
 #define _MM_BITMAP_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 typedef uint64_t *mm_bitmap_t;
 

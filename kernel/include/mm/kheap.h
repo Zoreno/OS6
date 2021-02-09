@@ -24,6 +24,7 @@
 #define _KHEAP_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 #define KHEAP_ALIGNMENT_MASK 0x00FFFFFFFFFFFFFF
 

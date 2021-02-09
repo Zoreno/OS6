@@ -1,12 +1,12 @@
 /**
- * @file stddef.h
+ * @file types.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2019-04-25
+ * @date 2021-02-09
  * 
- * @brief Defines the standard types
+ * @brief 
  * 
- * @copyright Copyright (C) 2019,
+ * @copyright Copyright (C) 2021,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,14 +20,18 @@
  * 
  */
 
-#ifndef _LIBK_STDDEF_H
-#define _LIBK_STDDEF_H
+#ifndef _LIBK_SYS_TYPES_H
+#define _LIBK_SYS_TYPES_H
 
 #include <__libk_common.h>
 
-#include <sys/types.h>
-
-#define offsetof(type, member) ((size_t)((char *)&(((type *)0)->member) - (char *)0))
+#include <sys/__locale.h>
+#include <sys/_file.h>
+#include <sys/_null.h>
+#include <sys/_ptrdiff_t.h>
+#include <sys/_size_t.h>
+#include <sys/_wchar_t.h>
+#include <sys/_wint_t.h>
 
 #endif
 

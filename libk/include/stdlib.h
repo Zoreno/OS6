@@ -25,8 +25,8 @@
 
 #include <__libk_common.h>
 
-#include <_null.h>
-#include <_size_t.h>
+#include <sys/types.h>
+
 #include <stdint.h>
 
 #define EXIT_SUCCESS (0)

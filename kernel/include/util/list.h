@@ -24,7 +24,7 @@
 #define _LIST_H
 
 #include <stdint.h>
-
+#include <stddef.h>
 typedef struct _list_node
 {
     struct _list_node *next;

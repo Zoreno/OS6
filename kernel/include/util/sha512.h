@@ -25,6 +25,7 @@
 
 #include <stdarg.h>
 #include <stdint.h>
+#include <stddef.h>
 
 #define SHA512_DIGEST_SIZE 64
 

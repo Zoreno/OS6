@@ -24,6 +24,7 @@
 #define _BLOCKDEV_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 typedef uint32_t (*blockdev_read_func_t)(uint32_t, uint32_t, uint32_t, void *);
 typedef uint32_t (*blockdev_write_func_t)(uint32_t, uint32_t, uint32_t, void *);

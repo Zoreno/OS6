@@ -25,9 +25,7 @@
 
 #include <__libk_common.h>
 
-#include <_file.h>
-#include <_null.h>
-#include <_size_t.h>
+#include <sys/types.h>
 
 #include <stdarg.h>
 

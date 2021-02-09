@@ -24,6 +24,7 @@
 #define _LIBSIMD_MM_ALLOC_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 void *_mm_malloc(size_t __size, size_t __align);
 void _mm_free(void *__ptr);

@@ -24,6 +24,7 @@
 #define _HEXDUMP_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 void hexdump(uint8_t *mem, size_t size);
 

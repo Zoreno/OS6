@@ -25,8 +25,7 @@
 
 #include <__libk_common.h>
 
-#include <__locale.h>
-#include <_wint_t.h>
+#include <sys/types.h>
 
 #ifndef WEOF
 #define WEOF ((wint_t)-1)

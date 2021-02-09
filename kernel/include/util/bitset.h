@@ -24,6 +24,7 @@
 #define _BITSET_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 /**
  * @brief Struct representing a set of bits
