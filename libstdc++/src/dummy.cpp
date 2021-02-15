@@ -9,6 +9,7 @@
 
 #include <iterator>
 #include <string>
+#include <memory>
 
 void f()
 {
