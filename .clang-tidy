@@ -1,5 +1,5 @@
 ---
-Checks:          '-*,google-readability-*,modernize-*,readability-identifier-naming'
+Checks:          '-*,google-readability-*,modernize-*,-google-readability-todo'
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
 User:            zoreno

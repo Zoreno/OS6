@@ -273,6 +273,10 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/math/acothf.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/fenv/fegetround.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/fenv/fesetround.c)
 
+# setjmp.h header
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/setjmp/setjmp.asm)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/setjmp/longjmp.asm)
+
 #==============================================================================
 # Tests
 #==============================================================================

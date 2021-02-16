@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _ARCH_H
@@ -33,12 +33,42 @@ typedef uint64_t tick_count_t;
 
 typedef void (*INT_HANDLER)(void);
 
+/**
+ * @brief The system stack as seen from an interrupt handler.
+ *
+ *
+ */
 typedef struct __system_stack
 {
-    uint64_t r15, r14, r13, r12, r11, r10, r9, r8; /* pushed by 'pushall' */
-    uint64_t rdi, rsi, rbp, rbx, rdx, rcx, rax;    /* pushed in registers */
-    uint64_t int_no, err_code;                     /* our 'push byte #' and ecodes do this */
-    uint64_t rip, cs, rflags, userrsp, ss;         /* pushed by the processor automatically */
+    /* pushed by 'pushall' */
+    uint64_t r15;
+    uint64_t r14;
+    uint64_t r13;
+    uint64_t r12;
+    uint64_t r11;
+    uint64_t r10;
+    uint64_t r9;
+    uint64_t r8;
+
+    /* pushed in registers */
+    uint64_t rdi;
+    uint64_t rsi;
+    uint64_t rbp;
+    uint64_t rbx;
+    uint64_t rdx;
+    uint64_t rcx;
+    uint64_t rax;
+
+    /* our 'push byte #' and ecodes do this */
+    uint64_t int_no;
+    uint64_t err_code;
+
+    /* pushed by the processor automatically */
+    uint64_t rip;
+    uint64_t cs;
+    uint64_t rflags;
+    uint64_t userrsp;
+    uint64_t ss;
 
 } system_stack_t;
 
@@ -64,9 +94,7 @@ static inline void udelay(uint64_t n)
         return;
     }
 
-    __asm__ volatile("1: dec %%rax; jne 1b;"
-                     :
-                     : "a"(n * 1000));
+    __asm__ volatile("1: dec %%rax; jne 1b;" : : "a"(n * 1000));
 }
 
 static inline void mdelay(uint32_t n)
@@ -110,13 +138,13 @@ void atomic_dec(volatile long long int *x);
 #define ATOMIC_ADD(P, V) __sync_and_fetch((P), (V))
 #define ATOMIC_SET_BIT(P, B) __sync_or_and_fetch((P), 1 << (V))
 #define ATOMIC_CLEAR_BIT(P, B) __sync_and_and_fetch((P), ~(1 << (V)))
-#define BARRIER __asm__ volatile("" :: \
-                                     : "memory")
+#define BARRIER __asm__ volatile("" ::: "memory")
 static inline void *xchg_64(void *ptr, void *x)
 {
     __asm__ __volatile__("xchgq %0,%1"
                          : "=r"((unsigned long long)x)
-                         : "m"(*(volatile long long *)ptr), "0"((unsigned long long)x)
+                         : "m"(*(volatile long long *)ptr),
+                           "0"((unsigned long long)x)
                          : "memory");
 
     return x;
@@ -145,11 +173,12 @@ static inline unsigned short xchg_16(void *ptr, unsigned short x)
 static inline char atomic_bitsetandtest(void *ptr, int x)
 {
     char out;
-    __asm__ __volatile__("lock; bts %2,%1\n"
-                         "sbb %0,%0\n"
-                         : "=r"(out), "=m"(*(volatile long long *)ptr)
-                         : "Ir"(x)
-                         : "memory");
+    __asm__ __volatile__(
+        "lock; bts %2,%1\n"
+        "sbb %0,%0\n"
+        : "=r"(out), "=m"(*(volatile long long *)ptr)
+        : "Ir"(x)
+        : "memory");
 
     return out;
 }

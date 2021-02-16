@@ -58,4 +58,5 @@
         "hcsparams",
         "mdelay"
     ],
+    "clang-tidy.buildPath": "${workspaceFolder}/build"
 }

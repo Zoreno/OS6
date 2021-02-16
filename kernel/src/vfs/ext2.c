@@ -1055,6 +1055,7 @@ static uint32_t write_inode_buffer(ext2_fs_t *this,
                        this->block_size - (offset % this->block_size));
 
                 inode_write_block(this, inode, inode_number, block_offset, buf);
+
                 if (!b)
                 {
                     refresh_inode(this, inode, inode_number);

@@ -281,6 +281,7 @@ char *simple_cli_read_line(simple_cli_t *cli)
                 {
                     buf_ptr++;
                 }
+                break;
             default:
                 break;
             }

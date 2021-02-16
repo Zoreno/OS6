@@ -34,6 +34,7 @@ void vt_100_get_cursor_location(int *line, int *column)
 
     if (c != 27)
     {
+        printf("Expected escape\n");
         return;
     }
 
@@ -42,6 +43,7 @@ void vt_100_get_cursor_location(int *line, int *column)
 
     if (c != '[')
     {
+        printf("Expected bracket\n");
         return;
     }
 
