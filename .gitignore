@@ -2,6 +2,6 @@
 *.bin
 .vscode/**
 docs/*
-toolchain/OS6_cross_cc/**
-toolchain/src/**
+toolchain/**
+-toolchain/build_toolchain.sh
 root/**

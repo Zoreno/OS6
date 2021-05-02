@@ -12,7 +12,8 @@ wget -nc ftp://ftp.gnu.org/gnu/binutils/binutils-2.32.tar.gz
 wget -nc ftp://ftp.gnu.org/gnu/gcc/gcc-8.3.0/gcc-8.3.0.tar.gz
 
 # Get Installation Requisites
-sudo apt-get install -y texinfo
+export DEBIAN_FRONTEND="noninteractive"
+apt-get install -y texinfo
 
 # Unpack source to src folder
 
@@ -26,7 +27,7 @@ for f in *.tar.*; do tar -xf $f -C src; done
 
 CUR_DIR=$(pwd)
 
-export PREFIX="$CUR_DIR/OS6_cross_cc"
+export PREFIX="/opt/OS6_cross_cc"
 export TARGET=x86_64-elf
 export PATH="$PREFIX/bin:$PATH"
 
