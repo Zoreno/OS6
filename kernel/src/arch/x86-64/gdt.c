@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <arch/x86-64/gdt.h>
@@ -64,17 +64,24 @@ void arch_x86_64_initialize_gdt()
 {
     printf("[ARCH] Initializing GDT...\n");
 
-    _gdtr.limit = (uint16_t)(sizeof(arch_x86_64_gdt_descriptor) * ARCH_X86_64_GDT_MAX_DESCRIPTORS - 1);
+    _gdtr.limit = (uint16_t)(sizeof(arch_x86_64_gdt_descriptor) *
+                                 ARCH_X86_64_GDT_MAX_DESCRIPTORS -
+                             1);
     _gdtr.base = (uint64_t)_gdt;
 
     arch_x86_64_gdt_set_descriptor(0, 0, 0);
-    arch_x86_64_gdt_set_descriptor(1,
-                                   ARCH_X86_64_GDT_DESC_READWRITE | ARCH_X86_64_GDT_DESC_EXEC_CODE | ARCH_X86_64_GDT_DESC_CODEDATA | ARCH_X86_64_GDT_DESC_DPL0 | ARCH_X86_64_GDT_DESC_MEMORY,
-                                   ARCH_X86_64_GDT_GRAN_4K | ARCH_X86_64_GDT_GRAN_LIMITHI);
+    arch_x86_64_gdt_set_descriptor(
+        1,
+        ARCH_X86_64_GDT_DESC_READWRITE | ARCH_X86_64_GDT_DESC_EXEC_CODE |
+            ARCH_X86_64_GDT_DESC_CODEDATA | ARCH_X86_64_GDT_DESC_DPL0 |
+            ARCH_X86_64_GDT_DESC_MEMORY,
+        ARCH_X86_64_GDT_GRAN_4K | ARCH_X86_64_GDT_GRAN_LIMITHI);
 
-    arch_x86_64_gdt_set_descriptor(2,
-                                   ARCH_X86_64_GDT_DESC_READWRITE | ARCH_X86_64_GDT_DESC_CODEDATA | ARCH_X86_64_GDT_DESC_DPL0 | ARCH_X86_64_GDT_DESC_MEMORY,
-                                   ARCH_X86_64_GDT_GRAN_4K | ARCH_X86_64_GDT_GRAN_LIMITHI);
+    arch_x86_64_gdt_set_descriptor(
+        2,
+        ARCH_X86_64_GDT_DESC_READWRITE | ARCH_X86_64_GDT_DESC_CODEDATA |
+            ARCH_X86_64_GDT_DESC_DPL0 | ARCH_X86_64_GDT_DESC_MEMORY,
+        ARCH_X86_64_GDT_GRAN_4K | ARCH_X86_64_GDT_GRAN_LIMITHI);
 
     arch_x86_64_gdt_flush((uint64_t)&_gdtr);
 

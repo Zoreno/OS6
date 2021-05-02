@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-20
- * 
+ *
  * @brief USB UHCI Host Controller Driver
- * 
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <usb/usb_uhci.h>
@@ -311,12 +311,9 @@ static void uhci_init_td(uhci_td_t *td,
         td->cs |= TD_CS_LOW_SPEED;
     }
 
-    td->token =
-        (len << TD_TOK_MAXLEN_SHIFT) |
-        (toggle << TD_TOK_D_SHIFT) |
-        (endp << TD_TOK_ENDP_SHIFT) |
-        (addr << TD_TOK_DEVADDR_SHIFT) |
-        packetType;
+    td->token = (len << TD_TOK_MAXLEN_SHIFT) | (toggle << TD_TOK_D_SHIFT) |
+                (endp << TD_TOK_ENDP_SHIFT) | (addr << TD_TOK_DEVADDR_SHIFT) |
+                packetType;
 
     td->buffer = (uint32_t)(uintptr_t)data;
 }
@@ -349,8 +346,7 @@ static void uhci_process_qh(uhci_controller_t *controller, uhci_qh_t *qh)
         if (td->cs & TD_CS_STALLED)
         {
             log_error("[UHCI] TD is stalled");
-            t->success = 0,
-            t->complete = 1;
+            t->success = 0, t->complete = 1;
         }
 
         if (td->cs & TD_CS_DATABUFFER)
@@ -416,7 +412,8 @@ static uint16_t uhci_reset_port(uhci_controller_t *controller, uint16_t port)
     mdelay(50);
     uhci_port_clr(controller->ioAddr + reg, PORT_RESET);
 
-    uhci_port_set(controller->ioAddr + reg, PORT_ENABLE | PORT_CONNECTION_CHANGE | PORT_ENABLE_CHANGE);
+    uhci_port_set(controller->ioAddr + reg,
+                  PORT_ENABLE | PORT_CONNECTION_CHANGE | PORT_ENABLE_CHANGE);
 
     uint16_t status = 0;
 
@@ -435,7 +432,8 @@ static uint16_t uhci_reset_port(uhci_controller_t *controller, uint16_t port)
         if (status & (PORT_ENABLE_CHANGE | PORT_CONNECTION_CHANGE))
         {
             log_warn("[UHCI] Port change ack %i", port);
-            uhci_port_clr(controller->ioAddr + reg, PORT_ENABLE_CHANGE | PORT_CONNECTION_CHANGE);
+            uhci_port_clr(controller->ioAddr + reg,
+                          PORT_ENABLE_CHANGE | PORT_CONNECTION_CHANGE);
             continue;
         }
 
@@ -478,7 +476,8 @@ static void uhci_dev_control(usb_device_t *dev, usb_transfer_t *t)
     uint32_t packetType = TD_PACKET_SETUP;
     uint32_t packetSize = sizeof(usb_dev_req_t);
 
-    uhci_init_td(td, prev, speed, addr, endp, toggle, packetType, packetSize, req);
+    uhci_init_td(
+        td, prev, speed, addr, endp, toggle, packetType, packetSize, req);
     prev = td;
 
     packetType = type & RT_DEV_TO_HOST ? TD_PACKET_IN : TD_PACKET_OUT;
@@ -503,7 +502,8 @@ static void uhci_dev_control(usb_device_t *dev, usb_transfer_t *t)
             packetSize = maxSize;
         }
 
-        uhci_init_td(td, prev, speed, addr, endp, toggle, packetType, packetSize, it);
+        uhci_init_td(
+            td, prev, speed, addr, endp, toggle, packetType, packetSize, it);
 
         it += packetSize;
         prev = td;
@@ -555,7 +555,8 @@ static void uhci_dev_intr(usb_device_t *dev, usb_transfer_t *t)
     uint32_t packetType = TD_PACKET_IN;
     uint32_t packetSize = t->len;
 
-    uhci_init_td(td, prev, speed, addr, endp, toggle, packetType, packetSize, t->data);
+    uhci_init_td(
+        td, prev, speed, addr, endp, toggle, packetType, packetSize, t->data);
 
     uhci_qh_t *qh = uhci_alloc_qh(controller);
 
@@ -573,7 +574,8 @@ static void uhci_probe(uhci_controller_t *controller)
 
         if (status & PORT_ENABLE)
         {
-            uint32_t speed = (status & PORT_LSDA) ? USB_LOW_SPEED : USB_FULL_SPEED;
+            uint32_t speed =
+                (status & PORT_LSDA) ? USB_LOW_SPEED : USB_FULL_SPEED;
 
             usb_device_t *dev = usb_dev_create();
 
@@ -696,7 +698,10 @@ void usb_uhci_init(uint32_t id, PciDeviceInfo_t *devInfo)
     outportw(hc->ioAddr + REG_LEGSUP, 0x8F00);
     outportw(hc->ioAddr + REG_INTR, 0);
     outportw(hc->ioAddr + REG_FRNUM, 0);
-    outportl(hc->ioAddr + REG_FRBASEADD, (uint32_t)((uint64_t)(virt_mem_get_physical_addr(hc->frame_list, virt_mem_get_current_dir())) & 0xFFFFFFFF));
+    outportl(hc->ioAddr + REG_FRBASEADD,
+             (uint32_t)((uint64_t)(virt_mem_get_physical_addr(
+                            hc->frame_list, virt_mem_get_current_dir())) &
+                        0xFFFFFFFF));
     outportw(hc->ioAddr + REG_SOFMOD, 0x40);
     outportw(hc->ioAddr + REG_STS, 0xFFFF);
     outportw(hc->ioAddr + REG_CMD, CMD_RS | CMD_CF | CMD_MAXP);

@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-12-29
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _ACPI_DSDT_H
@@ -28,23 +28,27 @@
 #include "acpi_header.h"
 
 /**
-* Differentiated System Description Table.
-* 
-* Signature must be "DSDT"
-*/
+ * Differentiated System Description Table.
+ *
+ * Signature must be "DSDT"
+ */
 typedef struct
 {
     /**
-	* ACPI standard header.
-	*/
+     * ACPI standard header.
+     */
     acpi_header_t header;
 
     /**
-	* First byte of definition block.
-	* 
-	* Size can be calculated from length in header.
-	*/
+     * First byte of definition block.
+     *
+     * Size can be calculated from length in header.
+     */
     uint8_t definition_block[1];
 } __attribute__((packed)) dsdt_t;
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

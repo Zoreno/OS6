@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,14 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _ARCH_X86_64_IDT_H
 #define _ARCH_X86_64_IDT_H
 
-#include <stdint.h>
 #include <arch/arch.h>
+#include <stdint.h>
 
 #define ARCH_X86_64_IDT_MAX_INTERRUPTS 256
 
@@ -50,10 +50,17 @@ typedef struct
 
 arch_x86_64_idt_descriptor *arch_x86_64_get_ir(uint32_t i);
 
-void arch_x86_64_install_ir(uint32_t i, uint16_t flags, uint16_t sel, INT_HANDLER int_hander);
+void arch_x86_64_install_ir(uint32_t i,
+                            uint16_t flags,
+                            uint16_t sel,
+                            INT_HANDLER int_hander);
 
 void arch_x86_64_install_irq(int irq, IRQ_HANDLER irq_handler);
 
 void arch_x86_64_initialize_idt(uint16_t code_sel);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

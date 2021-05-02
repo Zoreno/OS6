@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <ctype.h>
@@ -29,36 +29,44 @@
 static int num_tests = 0;
 static int num_cleared = 0;
 
-#define TEST_INT(expr, expected)                               \
-    {                                                          \
-        int eval = (expr);                                     \
-        if (eval == (expected))                                \
-        {                                                      \
-            ++num_cleared;                                     \
-        }                                                      \
-        else                                                   \
-        {                                                      \
-            printf("ERROR: %s:%i:[%s] got: %i expected %i\n",  \
-                   __FILE__, __LINE__, #expr, eval, expected); \
-        }                                                      \
-                                                               \
-        ++num_tests;                                           \
+#define TEST_INT(expr, expected)                              \
+    {                                                         \
+        int eval = (expr);                                    \
+        if (eval == (expected))                               \
+        {                                                     \
+            ++num_cleared;                                    \
+        }                                                     \
+        else                                                  \
+        {                                                     \
+            printf("ERROR: %s:%i:[%s] got: %i expected %i\n", \
+                   __FILE__,                                  \
+                   __LINE__,                                  \
+                   #expr,                                     \
+                   eval,                                      \
+                   expected);                                 \
+        }                                                     \
+                                                              \
+        ++num_tests;                                          \
     }
 
-#define TEST_CHAR(expr, expected)                              \
-    {                                                          \
-        char eval = (expr);                                    \
-        if (eval == (expected))                                \
-        {                                                      \
-            ++num_cleared;                                     \
-        }                                                      \
-        else                                                   \
-        {                                                      \
-            printf("ERROR: %s:%i:[%s] got: %c expected %c\n",  \
-                   __FILE__, __LINE__, #expr, eval, expected); \
-        }                                                      \
-                                                               \
-        ++num_tests;                                           \
+#define TEST_CHAR(expr, expected)                             \
+    {                                                         \
+        char eval = (expr);                                   \
+        if (eval == (expected))                               \
+        {                                                     \
+            ++num_cleared;                                    \
+        }                                                     \
+        else                                                  \
+        {                                                     \
+            printf("ERROR: %s:%i:[%s] got: %c expected %c\n", \
+                   __FILE__,                                  \
+                   __LINE__,                                  \
+                   #expr,                                     \
+                   eval,                                      \
+                   expected);                                 \
+        }                                                     \
+                                                              \
+        ++num_tests;                                          \
     }
 
 #define TEST_STRING(expr, expected)                                   \
@@ -71,7 +79,11 @@ static int num_cleared = 0;
         else                                                          \
         {                                                             \
             printf("ERROR: %s:%i:[%s] got: \"%s\" expected \"%s\"\n", \
-                   __FILE__, __LINE__, #expr, eval, expected);        \
+                   __FILE__,                                          \
+                   __LINE__,                                          \
+                   #expr,                                             \
+                   eval,                                              \
+                   expected);                                         \
         }                                                             \
                                                                       \
         ++num_tests;                                                  \

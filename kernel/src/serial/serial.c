@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <serial/serial.h>
@@ -152,7 +152,11 @@ void serial_init_full()
     scom4_file.eof = 0;
 }
 
-void init_serial(COM_port_t port, serial_baud_rate_t baud_rate, uint8_t data_bits, uint8_t stop_bits, serial_parity_mode_t parity)
+void init_serial(COM_port_t port,
+                 serial_baud_rate_t baud_rate,
+                 uint8_t data_bits,
+                 uint8_t stop_bits,
+                 serial_parity_mode_t parity)
 {
     uint16_t port_base;
 
@@ -216,8 +220,12 @@ void init_serial(COM_port_t port, serial_baud_rate_t baud_rate, uint8_t data_bit
 
     outportb(SERIAL_LINE_CTRL_REG(port_base), line_ctrl_data_byte);
 
-    outportb(SERIAL_INT_ID_FIFO_CTRL_REG(port_base), SERIAL_IIR_FIFO_ENABLED | SERIAL_IIR_LINE_STATUS_INT | SERIAL_IIR_INT_PENDING_MASK);
-    outportb(SERIAL_MODEM_CTRL_REG(port_base), SERIAL_MCR_DATA_TERMINAL_READY_MASK | SERIAL_MCR_REQUEST_TO_SEND_MASK | SERIAL_MCR_INT_ENABLE_MASK);
+    outportb(SERIAL_INT_ID_FIFO_CTRL_REG(port_base),
+             SERIAL_IIR_FIFO_ENABLED | SERIAL_IIR_LINE_STATUS_INT |
+                 SERIAL_IIR_INT_PENDING_MASK);
+    outportb(SERIAL_MODEM_CTRL_REG(port_base),
+             SERIAL_MCR_DATA_TERMINAL_READY_MASK |
+                 SERIAL_MCR_REQUEST_TO_SEND_MASK | SERIAL_MCR_INT_ENABLE_MASK);
 
     switch (port)
     {
@@ -243,13 +251,17 @@ int serial_received(COM_port_t port)
     switch (port)
     {
     case COM1:
-        return (inportb(SERIAL_LINE_STATUS_REG(COM1_BASE)) & SERIAL_LSR_DATA_AVAILABLE_MASK);
+        return (inportb(SERIAL_LINE_STATUS_REG(COM1_BASE)) &
+                SERIAL_LSR_DATA_AVAILABLE_MASK);
     case COM2:
-        return (inportb(SERIAL_LINE_STATUS_REG(COM2_BASE)) & SERIAL_LSR_DATA_AVAILABLE_MASK);
+        return (inportb(SERIAL_LINE_STATUS_REG(COM2_BASE)) &
+                SERIAL_LSR_DATA_AVAILABLE_MASK);
     case COM3:
-        return (inportb(SERIAL_LINE_STATUS_REG(COM3_BASE)) & SERIAL_LSR_DATA_AVAILABLE_MASK);
+        return (inportb(SERIAL_LINE_STATUS_REG(COM3_BASE)) &
+                SERIAL_LSR_DATA_AVAILABLE_MASK);
     case COM4:
-        return (inportb(SERIAL_LINE_STATUS_REG(COM4_BASE)) & SERIAL_LSR_DATA_AVAILABLE_MASK);
+        return (inportb(SERIAL_LINE_STATUS_REG(COM4_BASE)) &
+                SERIAL_LSR_DATA_AVAILABLE_MASK);
     default:
         return -1;
     }
@@ -280,13 +292,17 @@ int serial_is_transmit_ready(COM_port_t port)
     switch (port)
     {
     case COM1:
-        return (inportb(SERIAL_LINE_STATUS_REG(COM1_BASE)) & SERIAL_LSR_TRANSMIT_READY_MASK);
+        return (inportb(SERIAL_LINE_STATUS_REG(COM1_BASE)) &
+                SERIAL_LSR_TRANSMIT_READY_MASK);
     case COM2:
-        return (inportb(SERIAL_LINE_STATUS_REG(COM2_BASE)) & SERIAL_LSR_TRANSMIT_READY_MASK);
+        return (inportb(SERIAL_LINE_STATUS_REG(COM2_BASE)) &
+                SERIAL_LSR_TRANSMIT_READY_MASK);
     case COM3:
-        return (inportb(SERIAL_LINE_STATUS_REG(COM3_BASE)) & SERIAL_LSR_TRANSMIT_READY_MASK);
+        return (inportb(SERIAL_LINE_STATUS_REG(COM3_BASE)) &
+                SERIAL_LSR_TRANSMIT_READY_MASK);
     case COM4:
-        return (inportb(SERIAL_LINE_STATUS_REG(COM4_BASE)) & SERIAL_LSR_TRANSMIT_READY_MASK);
+        return (inportb(SERIAL_LINE_STATUS_REG(COM4_BASE)) &
+                SERIAL_LSR_TRANSMIT_READY_MASK);
     default:
         return -1;
     }

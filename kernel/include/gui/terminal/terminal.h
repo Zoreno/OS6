@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-18
- * 
+ *
  * @brief Terminal for the OS6 operating system
- * 
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,14 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _TERMINAL_H
 #define _TERMINAL_H
 
-#include <gui/terminal/terminal_context.h>
 #include <gui/terminal/terminal_buffer.h>
+#include <gui/terminal/terminal_context.h>
 #include <util/vector.h>
 
 typedef struct _terminal

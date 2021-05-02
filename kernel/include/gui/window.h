@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _WINDOW_H_
@@ -88,7 +88,10 @@
 struct Window_struct;
 
 typedef void (*WindowPaintHandler)(struct Window_struct *);
-typedef void (*WindowMousedownHandler)(struct Window_struct *, int, int, uint8_t);
+typedef void (*WindowMousedownHandler)(struct Window_struct *,
+                                       int,
+                                       int,
+                                       uint8_t);
 typedef void (*WindowKeyHandler)(struct Window_struct *, int, int, int);
 typedef void (*WindowTickHandler)(struct Window_struct *, int);
 
@@ -104,8 +107,8 @@ typedef struct Window_struct
     int16_t y;
     uint16_t width;
     uint16_t height;
-    uint16_t inner_width;  // The width of the inner renderable area.
-    uint16_t inner_height; // The height of the inner renderable area.
+    uint16_t inner_width;   // The width of the inner renderable area.
+    uint16_t inner_height;  // The height of the inner renderable area.
     uint16_t flags;
     Context *context;
     gui_list_t *children;
@@ -116,10 +119,10 @@ typedef struct Window_struct
 
     uint32_t index;
 
-    int16_t last_x;       // For returning from maximized state.
-    int16_t last_y;       // For returning from maximized state.
-    uint16_t last_width;  // For returning from maximized state.
-    uint16_t last_height; // For returning from maximized state.
+    int16_t last_x;        // For returning from maximized state.
+    int16_t last_y;        // For returning from maximized state.
+    uint16_t last_width;   // For returning from maximized state.
+    uint16_t last_height;  // For returning from maximized state.
 
     // Settings
 
@@ -148,141 +151,93 @@ typedef struct Window_struct
 
 } Window;
 
-Window *Window_new(
-    unsigned int x,
-    unsigned int y,
-    unsigned int width,
-    unsigned int height,
-    uint16_t flags,
-    Context *context,
-    uint32_t index);
+Window *Window_new(unsigned int x,
+                   unsigned int y,
+                   unsigned int width,
+                   unsigned int height,
+                   uint16_t flags,
+                   Context *context,
+                   uint32_t index);
 
-int Window_init(
-    Window *window,
-    int16_t x,
-    int16_t y,
-    uint16_t width,
-    uint16_t height,
-    uint16_t flags,
-    Context *context,
-    uint32_t index);
+int Window_init(Window *window,
+                int16_t x,
+                int16_t y,
+                uint16_t width,
+                uint16_t height,
+                uint16_t flags,
+                Context *context,
+                uint32_t index);
 
-void Window_apply_bound_clipping(
-    Window *window,
-    int in_recursion,
-    gui_list_t *dirty_regions);
+void Window_apply_bound_clipping(Window *window,
+                                 int in_recursion,
+                                 gui_list_t *dirty_regions);
 
-void Window_draw_border(
-    Window *window);
+void Window_draw_border(Window *window);
 
-void Window_paint(
-    Window *window,
-    gui_list_t *dirty_regions,
-    uint8_t paint_children);
+void Window_paint(Window *window,
+                  gui_list_t *dirty_regions,
+                  uint8_t paint_children);
 
-void Window_process_mouse(
-    Window *window,
-    uint16_t mouse_x,
-    uint16_t mouse_y,
-    uint8_t mouse_buttons);
+void Window_process_mouse(Window *window,
+                          uint16_t mouse_x,
+                          uint16_t mouse_y,
+                          uint8_t mouse_buttons);
 
-void Window_process_keyboard(
-    Window *window,
-    int key,
-    int mods,
-    int action);
+void Window_process_keyboard(Window *window, int key, int mods, int action);
 
-void Window_process_tick(
-    Window *window,
-    int ticks);
+void Window_process_tick(Window *window, int ticks);
 
-gui_list_t *Window_get_windows_above(
-    Window *parent,
-    Window *child);
+gui_list_t *Window_get_windows_above(Window *parent, Window *child);
 
-gui_list_t *Window_get_windows_below(
-    Window *parent,
-    Window *child);
+gui_list_t *Window_get_windows_below(Window *parent, Window *child);
 
-Window *Window_create_window(
-    Window *parent,
-    int16_t x,
-    int16_t y,
-    uint16_t width,
-    uint16_t height,
-    uint16_t flags);
+Window *Window_create_window(Window *parent,
+                             int16_t x,
+                             int16_t y,
+                             uint16_t width,
+                             uint16_t height,
+                             uint16_t flags);
 
-void Window_insert_child(
-    Window *window,
-    Window *child);
+void Window_insert_child(Window *window, Window *child);
 
-void Window_raise(
-    Window *window,
-    uint8_t do_draw);
+void Window_raise(Window *window, uint8_t do_draw);
 
-void Window_move(
-    Window *window,
-    int new_x,
-    int new_y);
+void Window_move(Window *window, int new_x, int new_y);
 
-void Window_resize(
-    Window *window,
-    int new_width,
-    int new_height);
+void Window_resize(Window *window, int new_width, int new_height);
 
 void Window_invalidate(
-    Window *window,
-    int top,
-    int left,
-    int bottom,
-    int right);
+    Window *window, int top, int left, int bottom, int right);
 
-void Window_set_title(
-    Window *window,
-    char *new_title);
+void Window_set_title(Window *window, char *new_title);
 
-void Window_append_title(
-    Window *window,
-    char *add_c);
+void Window_append_title(Window *window, char *add_c);
 
-void Window_get_title(
-    Window *window,
-    char *buf);
+void Window_get_title(Window *window, char *buf);
 
-void Window_minimize(
-    Window *window);
+void Window_minimize(Window *window);
 
-void Window_restore(
-    Window *window);
+void Window_restore(Window *window);
 
-int Window_minimized(
-    Window *window);
+int Window_minimized(Window *window);
 
-void Window_remove(
-    Window *window);
+void Window_remove(Window *window);
 
-void Window_close(
-    Window *window);
+void Window_close(Window *window);
 
-int Window_should_close(
-    Window *window);
+int Window_should_close(Window *window);
 
-void Window_request_close(
-    Window *window);
+void Window_request_close(Window *window);
 
-int Window_is_focused(
-    Window *window);
+int Window_is_focused(Window *window);
 
-float Window_get_aspect_ratio(
-    Window *window);
+float Window_get_aspect_ratio(Window *window);
 
-void Window_maximize(
-    Window *window);
+void Window_maximize(Window *window);
 
-void Window_unmaximize(
-    Window *window);
+void Window_unmaximize(Window *window);
 
-#endif // _WINDOW_H_
+#endif  // _WINDOW_H_
 
 //=============================================================================
 // End of file

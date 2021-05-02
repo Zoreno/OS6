@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _LINK_H
@@ -42,16 +42,17 @@ int link_is_empty(link_t *x);
 #define link_data(link, T, m) \
     (T *)((char *)(link) - (unsigned long long)(&(((T *)0)->m)))
 
-#define list_for_each(it, list, m, T)       \
-    for (it = link_data((list).next, T, m); \
-         &it->m != &(list);                 \
+#define list_for_each(it, list, m, T)                          \
+    for (it = link_data((list).next, T, m); &it->m != &(list); \
          it = link_data(it->m.next, T, m))
 
-#define list_for_each_safe(it, n, list, m, T) \
-    for (it = link_data((list).next, T, m),   \
-        n = link_data(it->m.next, T, m);      \
-         &it->m != &(list);                   \
-         it = n,                              \
-        n = link_data(n->m.next, T, m))
+#define list_for_each_safe(it, n, list, m, T)                                \
+    for (it = link_data((list).next, T, m), n = link_data(it->m.next, T, m); \
+         &it->m != &(list);                                                  \
+         it = n, n = link_data(n->m.next, T, m))
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

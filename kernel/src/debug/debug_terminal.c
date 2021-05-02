@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <debug/debug_terminal.h>
@@ -104,7 +104,8 @@ void debug_terminal_restore_default()
 
 void debug_terminal_clear()
 {
-    for (uint32_t i = 0; i < (DEBUG_TERMINAL_HEIGHT * DEBUG_TERMINAL_WIDTH); ++i)
+    for (uint32_t i = 0; i < (DEBUG_TERMINAL_HEIGHT * DEBUG_TERMINAL_WIDTH);
+         ++i)
     {
         _VIDMEM[i] = (char_entry_t){' ', _text_color, _back_color};
     }

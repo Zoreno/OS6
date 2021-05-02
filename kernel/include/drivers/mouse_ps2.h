@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _MOUSE_H
@@ -31,28 +31,28 @@
 typedef enum
 {
     /**
-	 * Left mouse button
-	 */
+     * Left mouse button
+     */
     MOUSE_BUTTON_LEFT = 1,
 
     /**
-	 * Middle mouse button
-	 */
+     * Middle mouse button
+     */
     MOUSE_BUTTON_MIDDLE = 2,
 
     /**
-	 * Right mouse button
-	 */
+     * Right mouse button
+     */
     MOUSE_BUTTON_RIGHT = 4,
 
     /**
-	 * Mouse button 4
-	 */
+     * Mouse button 4
+     */
     MOUSE_BUTTON_4 = 8,
 
     /**
-	 * Mouse button 5
-	 */
+     * Mouse button 5
+     */
     MOUSE_BUTTON_5 = 0x10,
 } mouse_button_t;
 
@@ -62,19 +62,19 @@ typedef enum
 typedef enum
 {
     /**
-	 * Normal mouse without wheel.
-	 */
+     * Normal mouse without wheel.
+     */
     MOUSE_NORMAL,
 
     /**
-	 * Mouse with mousewheel
-	 */
+     * Mouse with mousewheel
+     */
     MOUSE_WHEEL,
 
     /**
-	 * Mouse with support for two-dimensional mouse movement
-	 * and 5 buttons.
-	 */
+     * Mouse with support for two-dimensional mouse movement
+     * and 5 buttons.
+     */
     MOUSE_WHEEL_BUTTON
 
 } mouse_type_t;
@@ -138,3 +138,7 @@ typedef void (*mouse_scroll_event_handler)(mouse_scroll_event_t *);
 void register_mouse_scroll_handler(mouse_scroll_event_handler newHandler);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
+ *
  * @brief Virtual memory manager
- * 
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,14 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _VIRT_MEM_H
 #define _VIRT_MEM_H
 
-#include <stdint.h>
 #include <mm/phys_mem.h>
+#include <stdint.h>
 
 #define PAGE_SIZE 4096
 
@@ -41,8 +41,9 @@ enum PTE_FLAGS
     PTE_NOT_CAHCEABLE = 0x10,
     PTE_ACCESS = 0x20,
     PTE_DIRTY = 0x40,
-    PTE_PAT = 0x80, // Page attribute table
-    PTE_ON_CLONE = PTE_PRESENT | PTE_WRITABLE | PTE_USER | PTE_WRITETHROUGH | PTE_NOT_CAHCEABLE,
+    PTE_PAT = 0x80,  // Page attribute table
+    PTE_ON_CLONE = PTE_PRESENT | PTE_WRITABLE | PTE_USER | PTE_WRITETHROUGH |
+                   PTE_NOT_CAHCEABLE,
     PTE_FRAME = 0x7FFFFFFFFFFFF000,
 };
 
@@ -79,7 +80,8 @@ enum PDE_FLAGS
     PDE_CPU_GLOBAL = 0x100,
     PDE_LV4_GLOBAL = 0x200,
 
-    PDE_ON_CLONE = PDE_PRESENT | PDE_WRITABLE | PDE_USER | PDE_PWT | PDE_PCD | PDE_4MB | PDE_CPU_GLOBAL | PDE_LV4_GLOBAL,
+    PDE_ON_CLONE = PDE_PRESENT | PDE_WRITABLE | PDE_USER | PDE_PWT | PDE_PCD |
+                   PDE_4MB | PDE_CPU_GLOBAL | PDE_LV4_GLOBAL,
     PDE_FRAME = 0x7FFFFFFFFFFFF000,
 };
 
@@ -114,7 +116,8 @@ enum PDPE_FLAGS
     PDPE_ACCESSED = 0x20,
     PDPE_1GB = 0x80,
 
-    PDPE_ON_CLONE = PDPE_PRESENT | PDPE_WRITABLE | PDPE_USER | PDPE_PWT | PDPE_PCD | PDPE_1GB,
+    PDPE_ON_CLONE = PDPE_PRESENT | PDPE_WRITABLE | PDPE_USER | PDPE_PWT |
+                    PDPE_PCD | PDPE_1GB,
     PDPE_FRAME = 0x7FFFFFFFFFFFF000
 };
 
@@ -147,7 +150,8 @@ enum PML4E_FLAGS
     PML4E_ACCESSED = 0x20,
     PML4E_DIRTY = 0x40,
 
-    PML4E_ON_CLONE = PML4E_PRESENT | PML4E_WRITABLE | PML4E_USER | PML4E_PWT | PML4E_PCD,
+    PML4E_ON_CLONE =
+        PML4E_PRESENT | PML4E_WRITABLE | PML4E_USER | PML4E_PWT | PML4E_PCD,
     PML4E_FRAME = 0x7FFFFFFFFFFFF000
 };
 
@@ -235,7 +239,8 @@ enum VIRT_MEM_FLAGS
 // TODO: Add flags for cache, remap, shared
 int virt_mem_map_page_p(void *phys, void *virt, uint64_t flags, pml4_t *dir);
 int virt_mem_map_page(void *phys, void *virt, uint64_t flags);
-int virt_mem_map_pages_p(void *phys, void *virt, size_t n_pages, uint64_t flags, pml4_t *dir);
+int virt_mem_map_pages_p(
+    void *phys, void *virt, size_t n_pages, uint64_t flags, pml4_t *dir);
 int virt_mem_map_pages(void *phys, void *virt, size_t n_pages, uint64_t flags);
 int virt_mem_unmap_page(void *virt);
 int virt_mem_unmap_pages(void *virt, size_t n_pages);
@@ -243,3 +248,7 @@ int virt_mem_unmap_pages(void *virt, size_t n_pages);
 pml4_t *virt_mem_clone_address_space(pml4_t *src);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <arch/arch.h>
@@ -51,7 +51,9 @@ void arch_initialize()
     log_info("[ARCH] Initializing PIT");
 
     arch_x86_64_initialize_pit();
-    arch_x86_64_pit_start_counter(TIMER_FREQ, ARCH_X86_64_PIT_OCW_COUNTER_0, ARCH_X86_64_PIT_OCW_MODE_SQUAREWAVEGEN);
+    arch_x86_64_pit_start_counter(TIMER_FREQ,
+                                  ARCH_X86_64_PIT_OCW_COUNTER_0,
+                                  ARCH_X86_64_PIT_OCW_MODE_SQUAREWAVEGEN);
 
     log_info("[ARCH] PIT Done!");
 
@@ -74,9 +76,7 @@ uint8_t inportb(uint16_t port)
 {
     uint8_t ret;
 
-    __asm__ volatile("in %1, %0"
-                     : "=a"(ret)
-                     : "Nd"(port));
+    __asm__ volatile("in %1, %0" : "=a"(ret) : "Nd"(port));
 
     return ret;
 }
@@ -85,9 +85,7 @@ uint16_t inportw(uint16_t port)
 {
     uint16_t ret;
 
-    __asm__ volatile("in %1, %0"
-                     : "=a"(ret)
-                     : "Nd"(port));
+    __asm__ volatile("in %1, %0" : "=a"(ret) : "Nd"(port));
 
     return ret;
 }
@@ -96,32 +94,24 @@ uint32_t inportl(uint16_t port)
 {
     uint32_t ret;
 
-    __asm__ volatile("in %1, %0"
-                     : "=a"(ret)
-                     : "Nd"(port));
+    __asm__ volatile("in %1, %0" : "=a"(ret) : "Nd"(port));
 
     return ret;
 }
 
 void outportb(uint16_t port, uint8_t value)
 {
-    __asm__ volatile("out %0, %1"
-                     :
-                     : "a"(value), "Nd"(port));
+    __asm__ volatile("out %0, %1" : : "a"(value), "Nd"(port));
 }
 
 void outportw(uint16_t port, uint16_t value)
 {
-    __asm__ volatile("out %0, %1"
-                     :
-                     : "a"(value), "Nd"(port));
+    __asm__ volatile("out %0, %1" : : "a"(value), "Nd"(port));
 }
 
 void outportl(uint16_t port, uint32_t value)
 {
-    __asm__ volatile("out %0, %1"
-                     :
-                     : "a"(value), "Nd"(port));
+    __asm__ volatile("out %0, %1" : : "a"(value), "Nd"(port));
 }
 
 static int int_enabled = 0;
@@ -134,15 +124,13 @@ int is_interrupts_enabled()
 void sti()
 {
     int_enabled = 1;
-    __asm__ volatile("sti" ::
-                         : "memory");
+    __asm__ volatile("sti" ::: "memory");
 }
 
 void cli()
 {
     int_enabled = 0;
-    __asm__ volatile("cli" ::
-                         : "memory");
+    __asm__ volatile("cli" ::: "memory");
 }
 
 void interrupt_done(uint32_t intno)
@@ -167,7 +155,11 @@ void set_interrupt_handler(int intno, INT_HANDLER int_handler, int flags)
     // TODO: Define and parse arch-agnostic interrupt flags
     (void)flags;
 
-    arch_x86_64_install_ir(intno, ARCH_X86_64_IDT_DESC_PRESENT | ARCH_X86_64_IDT_DESC_BIT32, 0x08, int_handler);
+    arch_x86_64_install_ir(
+        intno,
+        ARCH_X86_64_IDT_DESC_PRESENT | ARCH_X86_64_IDT_DESC_BIT32,
+        0x08,
+        int_handler);
 }
 
 void set_irq_handler(int irq, IRQ_HANDLER irq_handler)

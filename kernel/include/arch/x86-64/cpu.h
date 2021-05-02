@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-23
- * 
+ *
  * @brief CPU Initialization and feature detection
- * 
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _ARCH_X86_64_CPU_H
@@ -89,60 +89,60 @@
 
 /**
  * @brief Initializes the CPU
- * 
- * 
+ *
+ *
  */
 void arch_x86_64_initialize_cpu();
 
 /**
  * @brief Shuts down the CPU
- * 
- * 
+ *
+ *
  */
 void arch_x86_64_shutdown_cpu();
 
 /**
  * @brief Gets the CPU vendor.
- * 
+ *
  * @return ASCII vendor string.
  */
 const char *arch_x86_64_get_cpu_vendor();
 
 /**
  * @brief Gets the CPU brand.
- * 
+ *
  * @return ASCII brand string.
  */
 const char *arch_x86_64_get_cpu_brand();
 
 /**
  * @brief Gets the number of cache descriptors.
- * 
+ *
  * @return Number of cache descriptors.
  */
 uint32_t arch_x86_64_get_cpu_cache_descriptor_count();
 
 /**
  * @brief Checks if the CPU has been identified.
- * 
+ *
  * @return Non-zero if true.
  */
 int arch_x86_64_cpu_identified();
 
 /**
  * @brief Checks if a feature is present on the CPU
- * 
+ *
  * @param feature Feature number
- * 
+ *
  * @return Non-zero if present
  */
 int arch_x86_64_cpu_query_feature(int feature);
 
 /**
  * @brief Returns the name of the feature represented by the feature number.
- * 
+ *
  * @param feature Feature number
- * 
+ *
  * @return Pointer to statically allocated string.
  */
 const char *arch_x86_64_cpu_get_feature_name(int feature);

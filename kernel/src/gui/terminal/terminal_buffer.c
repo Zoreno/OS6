@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-18
- * 
+ *
  * @brief Terminal buffer
- * 
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <gui/terminal/terminal_buffer.h>
@@ -69,7 +69,8 @@ void terminal_buffer_append_input(terminal_buffer_t *buffer, char c)
     if (buffer->input_line_length + 1 >= buffer->input_line_max_size)
     {
         // TODO: This should be checked for NULL
-        buffer->input_line = realloc(buffer->input_line, buffer->input_line_max_size * 2);
+        buffer->input_line =
+            realloc(buffer->input_line, buffer->input_line_max_size * 2);
         buffer->input_line_max_size *= 2;
         // TODO: Clear the new part
     }
@@ -77,14 +78,16 @@ void terminal_buffer_append_input(terminal_buffer_t *buffer, char c)
     buffer->input_line[buffer->input_line_length++] = c;
 }
 
-void terminal_buffer_append_string(terminal_buffer_t *buffer, const char *string)
+void terminal_buffer_append_string(terminal_buffer_t *buffer,
+                                   const char *string)
 {
     size_t length = strlen(string);
 
     while (buffer->input_line_length + length >= buffer->input_line_max_size)
     {
         // TODO: This should be checked for NULL
-        buffer->input_line = realloc(buffer->input_line, buffer->input_line_max_size * 2);
+        buffer->input_line =
+            realloc(buffer->input_line, buffer->input_line_max_size * 2);
         buffer->input_line_max_size *= 2;
         // TODO: Clear the new part
     }

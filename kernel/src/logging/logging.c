@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-12-30
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <logging/logging.h>
@@ -30,21 +30,11 @@
 //=============================================================================
 
 static const char *level_strings[] = {
-    "TRACE",
-    "DEBUG",
-    "INFO",
-    "WARN",
-    "ERROR",
-    "FATAL"};
+    "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
 
 #ifdef LOG_USE_COLOR
 static const char *level_colors[] = {
-    "\x1b[94m",
-    "\x1b[36m",
-    "\x1b[32m",
-    "\x1b[33m",
-    "\x1b[31m",
-    "\x1b[35m"};
+    "\x1b[94m", "\x1b[36m", "\x1b[32m", "\x1b[33m", "\x1b[31m", "\x1b[35m"};
 #endif
 
 static log_level_t level_threshold;
@@ -69,11 +59,8 @@ static int get_current_time(char *buffer, size_t buffer_size)
 // Interface functions
 //=============================================================================
 
-void log_printf(log_level_t level,
-                const char *file,
-                int line,
-                const char *fmt,
-                ...)
+void log_printf(
+    log_level_t level, const char *file, int line, const char *fmt, ...)
 {
     if (level < level_threshold)
     {
@@ -91,10 +78,13 @@ void log_printf(log_level_t level,
 
 #ifdef LOG_USE_COLOR
     printf("%s %s%-5s\x1b[0m \x1b[90m%s:%d:\x1b[0m ",
-           buf, level_colors[level], level_strings[level], file, line);
+           buf,
+           level_colors[level],
+           level_strings[level],
+           file,
+           line);
 #else
-    printf("%s %-5s %s:%d: ",
-           buf, level_strings[level], file, line);
+    printf("%s %-5s %s:%d: ", buf, level_strings[level], file, line);
 #endif
     va_list ap;
     va_start(ap, fmt);

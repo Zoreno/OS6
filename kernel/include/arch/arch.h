@@ -190,3 +190,7 @@ static inline char atomic_bitsetandtest(void *ptr, int x)
 // TODO: Abstact from the fpu file
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

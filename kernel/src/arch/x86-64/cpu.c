@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <arch/arch.h>
@@ -437,7 +437,7 @@ typedef struct
     /**
      * TLB page size.
      */
-    uint32_t page_size; // In kbytes
+    uint32_t page_size;  // In kbytes
 
     // Only for cache
 
@@ -449,19 +449,19 @@ typedef struct
     /**
      * Cache size
      */
-    uint32_t size; // In kbytes
+    uint32_t size;  // In kbytes
 
     /**
      * Cahce line size
      */
-    uint32_t line_size; // In bytes
+    uint32_t line_size;  // In bytes
 
     // Only for prefetch
 
     /**
      * Prefetch size
      */
-    uint32_t prefetch_size; // In bytes
+    uint32_t prefetch_size;  // In bytes
 
 } tlb_cache_info;
 
@@ -571,7 +571,8 @@ static inline void _cpuid(arch_x86_64_cpuid_regs_t *regs);
  * @param bits Number of bits to fetch
  * @return Isolated bits [offset ... offset + size]
  */
-#define fetch_bits(data, offset, bits) ((((data) >> (offset))) & ((1 << (bits)) - 1))
+#define fetch_bits(data, offset, bits) \
+    ((((data) >> (offset))) & ((1 << (bits)) - 1))
 
 /**
  * @brief Isolates a single bit
@@ -594,7 +595,8 @@ static arch_x86_64_cpu_ident _cpu_ident = {0};
 // CPUID Private Function Definitions
 //==============================================================================
 
-// TODO Fill out from Intel Manual. These are only the ones found on my computer /Joakim
+// TODO Fill out from Intel Manual. These are only the ones found on my computer
+// /Joakim
 static int classify_cache(tlb_cache_info *info, uint8_t descriptor)
 {
     switch (descriptor)
@@ -670,7 +672,8 @@ static void arch_x86_64_run_cpuid()
     _cpu_ident.version_info.extModelID = fetch_bits(regs.eax.reg, 16, 4);
     _cpu_ident.version_info.extFamilyID = fetch_bits(regs.eax.reg, 20, 8);
 
-    // TODO: Calculate Family ID acc. to Intel Manual Vol 2A CPUID Instuction Reference
+    // TODO: Calculate Family ID acc. to Intel Manual Vol 2A CPUID Instuction
+    // Reference
 
     _cpu_ident.brandID = regs.ebx.bytes[0];
     _cpu_ident.CLFLUSH = regs.ebx.bytes[1];
@@ -714,8 +717,9 @@ static void arch_x86_64_run_cpuid()
     {
         for (int i = 1; i < 16; ++i)
         {
-            if (classify_cache(&_cpu_ident.cache_table[_cpu_ident.cache_table_entries],
-                               regs.all_bytes[i]))
+            if (classify_cache(
+                    &_cpu_ident.cache_table[_cpu_ident.cache_table_entries],
+                    regs.all_bytes[i]))
             {
                 ++_cpu_ident.cache_table_entries;
             }
@@ -724,8 +728,7 @@ static void arch_x86_64_run_cpuid()
 
 #if DEBUG_CPUID
 
-    printf("Found %i valid descriptors\n",
-           _cpu_ident.cache_table_entries);
+    printf("Found %i valid descriptors\n", _cpu_ident.cache_table_entries);
 
 #endif
 
@@ -832,12 +835,14 @@ static inline void _cpuid(arch_x86_64_cpuid_regs_t *regs)
 void arch_x86_64_initialize_cpu()
 {
     log_info("[ARCH] Initializing CPU...");
-    //arch_x86_64_initialize_gdt();
+    // arch_x86_64_initialize_gdt();
     arch_x86_64_initialize_idt(0x08);
 
     arch_x86_64_run_cpuid();
 
-    printf("Detected CPU: %s %s\n", arch_x86_64_get_cpu_vendor(), arch_x86_64_get_cpu_brand());
+    printf("Detected CPU: %s %s\n",
+           arch_x86_64_get_cpu_vendor(),
+           arch_x86_64_get_cpu_brand());
 
     printf("Detected features:\n");
 

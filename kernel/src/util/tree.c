@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <util/tree.h>
@@ -56,7 +56,8 @@ int tree_set_root(tree_t *tree, void *value)
 
 void tree_node_destroy(tree_node_t *node)
 {
-    for (list_node_t *lnode = node->children->head; lnode != NULL; lnode = lnode->next)
+    for (list_node_t *lnode = node->children->head; lnode != NULL;
+         lnode = lnode->next)
     {
         tree_node_destroy((tree_node_t *)lnode->payload);
     }
@@ -80,7 +81,8 @@ void tree_node_free(tree_node_t *node)
         return;
     }
 
-    for (list_node_t *lnode = node->children->head; lnode != NULL; lnode = lnode->next)
+    for (list_node_t *lnode = node->children->head; lnode != NULL;
+         lnode = lnode->next)
     {
         tree_node_free((tree_node_t *)lnode->payload);
     }
@@ -116,14 +118,18 @@ tree_node_t *tree_node_create(void *value)
     return out;
 }
 
-void tree_node_insert_child_node(tree_t *tree, tree_node_t *parent, tree_node_t *node)
+void tree_node_insert_child_node(tree_t *tree,
+                                 tree_node_t *parent,
+                                 tree_node_t *node)
 {
     list_insert(parent->children, node);
     node->parent = parent;
     tree->nodes++;
 }
 
-tree_node_t *tree_node_insert_child(tree_t *tree, tree_node_t *parent, void *value)
+tree_node_t *tree_node_insert_child(tree_t *tree,
+                                    tree_node_t *parent,
+                                    void *value)
 {
     tree_node_t *out = tree_node_create(value);
     tree_node_insert_child_node(tree, parent, out);
@@ -135,7 +141,8 @@ tree_node_t *tree_node_find_parent(tree_node_t *haystack, tree_node_t *needle)
 {
     tree_node_t *found = NULL;
 
-    for (list_node_t *lnode = haystack->children->head; lnode != NULL; lnode = lnode->next)
+    for (list_node_t *lnode = haystack->children->head; lnode != NULL;
+         lnode = lnode->next)
     {
         if (lnode->payload == needle)
         {
@@ -167,7 +174,8 @@ size_t tree_count_children(tree_node_t *node)
 
     size_t out = node->children->length;
 
-    for (list_node_t *lnode = node->children->head; lnode != NULL; lnode = lnode->next)
+    for (list_node_t *lnode = node->children->head; lnode != NULL;
+         lnode = lnode->next)
     {
         out += tree_count_children((tree_node_t *)lnode->payload);
     }
@@ -175,7 +183,9 @@ size_t tree_count_children(tree_node_t *node)
     return out;
 }
 
-void tree_node_parent_remove(tree_t *tree, tree_node_t *parent, tree_node_t *node)
+void tree_node_parent_remove(tree_t *tree,
+                             tree_node_t *parent,
+                             tree_node_t *node)
 {
     tree->nodes -= tree_count_children(node) + 1;
     list_delete(parent->children, list_find(parent->children, node));
@@ -210,7 +220,8 @@ void tree_remove(tree_t *tree, tree_node_t *node)
 
     tree->nodes--;
     list_delete(parent->children, list_find(parent->children, node));
-    for (list_node_t *lnode = node->children->head; lnode != NULL; lnode = lnode->next)
+    for (list_node_t *lnode = node->children->head; lnode != NULL;
+         lnode = lnode->next)
     {
         ((tree_node_t *)lnode->payload)->parent = parent;
     }
@@ -231,7 +242,8 @@ void tree_remove_reparent_root(tree_t *tree, tree_node_t *node)
 
     list_delete(parent->children, list_find(parent->children, node));
 
-    for (list_node_t *child = node->children->head; child != NULL; child = child->next)
+    for (list_node_t *child = node->children->head; child != NULL;
+         child = child->next)
     {
         ((tree_node_t *)child->payload)->parent = tree->root;
     }
@@ -255,7 +267,9 @@ void tree_break_off(tree_t *tree, tree_node_t *node)
     list_delete(parent->children, list_find(parent->children, node));
 }
 
-tree_node_t *tree_node_find(tree_node_t *node, void *search, tree_comparator_t comparator)
+tree_node_t *tree_node_find(tree_node_t *node,
+                            void *search,
+                            tree_comparator_t comparator)
 {
     if (comparator(node->value, search))
     {
@@ -264,9 +278,11 @@ tree_node_t *tree_node_find(tree_node_t *node, void *search, tree_comparator_t c
 
     tree_node_t *found;
 
-    for (list_node_t *lnode = node->children->head; lnode != NULL; lnode = lnode->next)
+    for (list_node_t *lnode = node->children->head; lnode != NULL;
+         lnode = lnode->next)
     {
-        found = tree_node_find((tree_node_t *)lnode->payload, search, comparator);
+        found =
+            tree_node_find((tree_node_t *)lnode->payload, search, comparator);
 
         if (!found)
         {

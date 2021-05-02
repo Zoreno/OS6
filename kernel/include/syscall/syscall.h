@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-07-19
- * 
+ *
  * @brief System call interface
- * 
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _SYSCALL_H
@@ -28,16 +28,16 @@
 #include <process/process.h>
 #include <vfs/vfs.h>
 
+#include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <errno.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 /**
  * @brief The system call interrupt number
- * 
- * 
+ *
+ *
  */
 #define SYSCALL_INTNO 0x80
 
@@ -107,41 +107,41 @@
 #define S_IWOTH 0000002 /* write permission, other */
 #define S_IXOTH 0000001 /* execute/search permission, other */
 
-int syscall_debug_print(char *str); // DONE
-int syscall_exit(int retval);       // DONE
-int syscall_yield(int reschedule);  // DONE
-int syscall_sleep(uint64_t ms);     // DONE
+int syscall_debug_print(char *str);  // DONE
+int syscall_exit(int retval);        // DONE
+int syscall_yield(int reschedule);   // DONE
+int syscall_sleep(uint64_t ms);      // DONE
 
 int syscall_fork();
 int syscall_clone();
 int syscall_kill(pid_t process, uint32_t signal);
 
-int syscall_open(const char *file, int flags, int mode);      // DONE
-int syscall_close(int fd);                                    // DONE
-int syscall_read(int fd, char *ptr, uint64_t len);            // DONE
-int syscall_write(int fd, char *ptr, uint64_t len);           // DONE
-int syscall_seek(int fd, int offset, int whence);             // DONE
-int syscall_readdir(int fd, int index, struct dirent *entry); // DONE
-int syscall_access(const char *file, int flags);              // DONE
-int syscall_ioctl(int fd, int request, void *argp);           // DONE
-int syscall_statf(char *file, uintptr_t st);                  // DONE
-int syscall_stat(int fd, uintptr_t st);                       // DONE
-int syscall_mkdir(char *path, int mode);                      // DONE
-int syscall_unlink(const char *file);                         // DONE
-int syscall_symlink(char *target, char *name);                // DONE
-int syscall_readlink(const char *file, char *ptr, int len);   // DONE
-int syscall_lstat(const char *file, uintptr_t st);            // DONE
+int syscall_open(const char *file, int flags, int mode);       // DONE
+int syscall_close(int fd);                                     // DONE
+int syscall_read(int fd, char *ptr, uint64_t len);             // DONE
+int syscall_write(int fd, char *ptr, uint64_t len);            // DONE
+int syscall_seek(int fd, int offset, int whence);              // DONE
+int syscall_readdir(int fd, int index, struct dirent *entry);  // DONE
+int syscall_access(const char *file, int flags);               // DONE
+int syscall_ioctl(int fd, int request, void *argp);            // DONE
+int syscall_statf(char *file, uintptr_t st);                   // DONE
+int syscall_stat(int fd, uintptr_t st);                        // DONE
+int syscall_mkdir(char *path, int mode);                       // DONE
+int syscall_unlink(const char *file);                          // DONE
+int syscall_symlink(char *target, char *name);                 // DONE
+int syscall_readlink(const char *file, char *ptr, int len);    // DONE
+int syscall_lstat(const char *file, uintptr_t st);             // DONE
 
 int syscall_chmod(char *file, int mode);
 int syscall_chown(char *file, int uid, int gid);
 
 int syscall_sbrk(uint64_t size);
 
-int syscall_getpid(); // DONE
-int syscall_gettid(); // DONE
+int syscall_getpid();  // DONE
+int syscall_gettid();  // DONE
 
-int syscall_chdir(char *newdir);            // DONE
-int syscall_getcwd(char *buf, size_t size); // DONE
+int syscall_chdir(char *newdir);             // DONE
+int syscall_getcwd(char *buf, size_t size);  // DONE
 
 void syscall_install();
 
@@ -152,11 +152,17 @@ int64_t do_syscall3(int64_t syscall, int64_t arg1, int64_t arg2, int64_t arg3);
 
 // TODO: Move these to a private header
 
-#define FILE_DESC_IN_RANGE(FILE) ((FILE) < (int)process_get_current()->file_descriptors->length && (FILE) >= 0)
-#define FILE_DESC_ENTRY(FILE) (process_get_current()->file_descriptors->entries[(FILE)])
-#define FILE_DESC_CHECK(FILE) (FILE_DESC_IN_RANGE(FILE) && FILE_DESC_ENTRY(FILE))
-#define FILE_DESC_OFFSET(FILE) (process_get_current()->file_descriptors->offsets[(FILE)])
-#define FILE_DESC_MODE(FILE) (process_get_current()->file_descriptors->modes[(FILE)])
+#define FILE_DESC_IN_RANGE(FILE)                                      \
+    ((FILE) < (int)process_get_current()->file_descriptors->length && \
+     (FILE) >= 0)
+#define FILE_DESC_ENTRY(FILE) \
+    (process_get_current()->file_descriptors->entries[(FILE)])
+#define FILE_DESC_CHECK(FILE) \
+    (FILE_DESC_IN_RANGE(FILE) && FILE_DESC_ENTRY(FILE))
+#define FILE_DESC_OFFSET(FILE) \
+    (process_get_current()->file_descriptors->offsets[(FILE)])
+#define FILE_DESC_MODE(FILE) \
+    (process_get_current()->file_descriptors->modes[(FILE)])
 
 int __stat_node(fs_node_t *node, uintptr_t addr);
 

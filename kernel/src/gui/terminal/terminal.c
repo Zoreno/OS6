@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-18
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,15 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <gui/terminal/terminal.h>
 
 #include <drivers/vbe.h>
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <gui/terminal/terminal_color.h>
@@ -46,9 +46,12 @@ terminal_t *terminal_create()
     uint16_t bpp = vbe_get_bpp();
     uint32_t *framebuffer = (uint32_t *)vbe_get_buffer();
 
-    terminal->context = terminal_context_create(width, height, bpp, framebuffer);
+    terminal->context =
+        terminal_context_create(width, height, bpp, framebuffer);
 
-    printf("Max Cols: %i, Max Lines: %i\n", terminal->context->max_cols, terminal->context->max_lines);
+    printf("Max Cols: %i, Max Lines: %i\n",
+           terminal->context->max_cols,
+           terminal->context->max_lines);
 
     terminal->buffers = malloc(sizeof(vector_t));
 
@@ -119,7 +122,10 @@ void terminal_redraw(terminal_t *terminal)
 
     for (int j = 0; j < terminal_count; ++j)
     {
-        sprintf(str, "%s %s |", str, ((terminal_buffer_t *)vector_get(terminal->buffers, j))->name);
+        sprintf(str,
+                "%s %s |",
+                str,
+                ((terminal_buffer_t *)vector_get(terminal->buffers, j))->name);
     }
 
     vbe_print_string(foreground, 0, 16, str);
@@ -130,13 +136,23 @@ void terminal_redraw(terminal_t *terminal)
 
         for (int lines = 0; lines < lines_count; ++lines)
         {
-            vbe_fill_rect(background, 0, 8 * lines + 16, terminal->context->width, 8);
-            vbe_print_string(foreground, 0, 8 * lines + 16 + 8, vector_get(terminal->current_buffer->lines, lines));
+            vbe_fill_rect(
+                background, 0, 8 * lines + 16, terminal->context->width, 8);
+            vbe_print_string(
+                foreground,
+                0,
+                8 * lines + 16 + 8,
+                vector_get(terminal->current_buffer->lines, lines));
         }
 
-        vbe_fill_rect(background, 0, terminal->context->height - 8, terminal->context->width, 8);
+        vbe_fill_rect(background,
+                      0,
+                      terminal->context->height - 8,
+                      terminal->context->width,
+                      8);
         char str[100];
-        sprintf(str, "%s@%s:%s$",
+        sprintf(str,
+                "%s@%s:%s$",
                 terminal->current_buffer->user,
                 terminal->current_buffer->group,
                 terminal->current_buffer->working_directory);
@@ -144,7 +160,10 @@ void terminal_redraw(terminal_t *terminal)
         size_t string_length = strlen(str);
 
         vbe_print_string(foreground, 0, terminal->context->height, str);
-        vbe_print_string(foreground, 8 * string_length, terminal->context->height, terminal->current_buffer->input_line);
+        vbe_print_string(foreground,
+                         8 * string_length,
+                         terminal->context->height,
+                         terminal->current_buffer->input_line);
     }
 }
 

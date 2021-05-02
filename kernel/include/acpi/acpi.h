@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-12-29
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _ACPI_H
@@ -27,25 +27,29 @@
 
 /**
  * @brief Initiate the ACPI subsystem
- * 
- * 
+ *
+ *
  * @return 0 if successful
  */
 int acpi_init();
 
 /**
  * @brief Shuts down the computer
- * 
- * 
+ *
+ *
  */
 void acpi_power_off();
 
 /**
  * @brief Get the CMOS Century register
- * 
- * 
+ *
+ *
  * @return CMOS address of the century register.
  */
 uint8_t acpi_get_century_register();
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

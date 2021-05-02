@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <drivers/mouse_ps2.h>
@@ -33,85 +33,85 @@
 typedef struct _mouse_packet
 {
     /**
-	 * Status of the left mouse button.
-	 */
+     * Status of the left mouse button.
+     */
     uint8_t left_button : 1;
 
     /**
-	 * Status of the right mouse button.
-	 */
+     * Status of the right mouse button.
+     */
     uint8_t right_button : 1;
 
     /**
-	 * Status of the middle mouse button.
-	 */
+     * Status of the middle mouse button.
+     */
     uint8_t middle_button : 1;
 
     /**
-	 * This bit should always be one.
-	 */
+     * This bit should always be one.
+     */
     uint8_t always_one : 1;
 
     /**
-	 * Sign of the x-movement
-	 */
+     * Sign of the x-movement
+     */
     uint8_t x_sign : 1;
 
     /**
-	 * Sign of the y-movement
-	 */
+     * Sign of the y-movement
+     */
     uint8_t y_sign : 1;
 
     /**
-	 * Indication of that the x movement has exceeded it's maximum value.
-	 */
+     * Indication of that the x movement has exceeded it's maximum value.
+     */
     uint8_t x_overflow : 1;
 
     /**
-	 * Indication of that the y movement has exceeded it's maximum value.
-	 */
+     * Indication of that the y movement has exceeded it's maximum value.
+     */
     uint8_t y_overflow : 1;
 
     /**
-	 * Movement in the x direction since last packet.
-	 */
+     * Movement in the x direction since last packet.
+     */
     int8_t x_movement;
 
     /**
-	 * Movement in the y direction since last packet.
-	 */
+     * Movement in the y direction since last packet.
+     */
     int8_t y_movement;
 
     union {
         /**
-	 	 * Movement in the z direction since last packet.
-		 *
-		 * Valid if mouse is of type MOUSE_WHEEL
-		 */
+         * Movement in the z direction since last packet.
+         *
+         * Valid if mouse is of type MOUSE_WHEEL
+         */
         int8_t z_movement;
 
         struct
         {
             /**
-			 * Indication of scroll movement.
-			 *
-			 * Valid if mouse is of type MOUSE_WHEEL_BUTTON
-			 */
+             * Indication of scroll movement.
+             *
+             * Valid if mouse is of type MOUSE_WHEEL_BUTTON
+             */
             uint8_t z_opt : 4;
 
             /**
-	 		 * Status of the 4th mouse button.
-			 */
+             * Status of the 4th mouse button.
+             */
             uint8_t button4 : 1;
 
             /**
-	 		 * Status of the 5th mouse button.
-	 		 */
+             * Status of the 5th mouse button.
+             */
             uint8_t button5 : 1;
 
             /**
-			 * Reserved.
-			 */
+             * Reserved.
+             */
             uint8_t res : 2;
         };
     };
@@ -255,10 +255,12 @@ void mouse_process_packet(mouse_packet *packet)
 {
     // printf("Starting to process mouse packet...\n");
 
-    //printf("Mouse packet:\n");
-    //printf("X: %i, sign: %i, of: %i\n", (int64_t)packet->x_movement, packet->x_sign, packet->x_overflow);
-    //printf("Y: %i, sign: %i, of: %i\n", (int64_t)packet->y_movement, packet->y_sign, packet->y_overflow);
-    //printf("Buttons: l: %i, m: %i, r: %i\n", packet->left_button, packet->middle_button, packet->right_button);
+    // printf("Mouse packet:\n");
+    // printf("X: %i, sign: %i, of: %i\n", (int64_t)packet->x_movement,
+    // packet->x_sign, packet->x_overflow); printf("Y: %i, sign: %i, of: %i\n",
+    // (int64_t)packet->y_movement, packet->y_sign, packet->y_overflow);
+    // printf("Buttons: l: %i, m: %i, r: %i\n", packet->left_button,
+    // packet->middle_button, packet->right_button);
 
     //=========================================================
     // Check validity of packet
@@ -586,8 +588,9 @@ void mouse_irq_handler(system_stack_t *regs)
     }
 
     // This will print debug info.
-    //printf("Handled mouse packet: x_[%i], y_[%i],z_[%i] buttons[%i]\n",
-    //      (int64_t)mouse_x, (int64_t)mouse_y, mouse_z_vertical, mouse_buttons);
+    // printf("Handled mouse packet: x_[%i], y_[%i],z_[%i] buttons[%i]\n",
+    //      (int64_t)mouse_x, (int64_t)mouse_y, mouse_z_vertical,
+    //      mouse_buttons);
 }
 
 static int mouse_reset()
@@ -673,8 +676,8 @@ void mouse_install()
 
     uint8_t status = mouse_read();
     uint8_t mod_status = status;
-    mod_status |= 0x02;  // Enable IRQ
-    mod_status &= ~0x20; // Disable Mouse clock
+    mod_status |= 0x02;   // Enable IRQ
+    mod_status &= ~0x20;  // Disable Mouse clock
 
     mouse_wait_signal();
     outportb(MOUSE_CONTROL_PORT, MOUSE_COMMAND_SET_COMPAQ_STATUS);

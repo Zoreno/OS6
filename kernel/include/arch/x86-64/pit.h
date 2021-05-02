@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,15 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _ARCH_X86_64_PIT_H
 #define _ARCH_X86_64_PIT_H
 
-#include <stdint.h>
 #include <arch/arch.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #define ARCH_X86_64_PIT_OCW_MASK_BINCOUNT 1
 #define ARCH_X86_64_PIT_OCW_MASK_MODE 0xE
@@ -57,8 +57,14 @@ void arch_x86_64_pit_send_data(uint16_t counter, uint8_t data);
 uint8_t arch_x86_64_pit_read_data(uint16_t counter);
 tick_count_t arch_x86_64_pit_set_tick_count(tick_count_t i);
 tick_count_t arch_x86_64_pit_get_tick_count();
-void arch_x86_64_pit_start_counter(uint32_t freq, uint8_t counter, uint8_t mode);
+void arch_x86_64_pit_start_counter(uint32_t freq,
+                                   uint8_t counter,
+                                   uint8_t mode);
 void arch_x86_64_initialize_pit();
 int arch_X86_64_pit_is_initialzed();
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

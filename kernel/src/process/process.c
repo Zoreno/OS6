@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-12-31
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <process/process.h>
@@ -94,12 +94,31 @@ void wakeup_sleeping_processes();
 
 void debug_print_process(process_t *process)
 {
-    PRINT("---------------------------------------------------------------------------------");
-    PRINT("PID: %d, Name: %s, Description: %s", process->id, process->name, process->description);
+    PRINT(
+        "----------------------------------------------------------------------"
+        "-----------");
+    PRINT("PID: %d, Name: %s, Description: %s",
+          process->id,
+          process->name,
+          process->description);
     PRINT("Cmdline: %s", process->cmdline);
-    PRINT("Image: {.entry = %#016x, .size = %#016x, .stack = %#016x, .start = %#016x}", process->image.entry, process->image.size, process->image.stack, process->image.start);
-    PRINT("Status: %#08x, started: %d, finished: %d, running: %d, suspended: %d", process->status, process->started, process->finished, process->running, process->suspended);
-    PRINT("---------------------------------------------------------------------------------");
+    PRINT(
+        "Image: {.entry = %#016x, .size = %#016x, .stack = %#016x, .start = "
+        "%#016x}",
+        process->image.entry,
+        process->image.size,
+        process->image.stack,
+        process->image.start);
+    PRINT(
+        "Status: %#08x, started: %d, finished: %d, running: %d, suspended: %d",
+        process->status,
+        process->started,
+        process->finished,
+        process->running,
+        process->suspended);
+    PRINT(
+        "----------------------------------------------------------------------"
+        "-----------");
 }
 
 void debug_print_process_tree_node(tree_node_t *node, size_t height)
@@ -130,8 +149,7 @@ void debug_print_process_tree_node(tree_node_t *node, size_t height)
 
     printf("");
 
-    for (list_node_t *child = node->children->head;
-         child != NULL;
+    for (list_node_t *child = node->children->head; child != NULL;
          child = child->next)
     {
         debug_print_process_tree_node(child->payload, height + 1);
@@ -205,11 +223,11 @@ static void kernel_idle(void)
 {
     while (1)
     {
-        //printf("Idle thread");
+        // printf("Idle thread");
         sti();
-        __asm__ volatile("hlt"); // TODO: Make this arch-agnostic
+        __asm__ volatile("hlt");  // TODO: Make this arch-agnostic
 
-        //switch_task(0);
+        // switch_task(0);
     }
 }
 
@@ -270,9 +288,12 @@ process_t *spawn_init()
     init->file_descriptors->refs = 1;
     init->file_descriptors->length = 0;
     init->file_descriptors->capacity = 4;
-    init->file_descriptors->entries = malloc(sizeof(fs_node_t *) * init->file_descriptors->capacity);
-    init->file_descriptors->modes = malloc(sizeof(int) * init->file_descriptors->capacity);
-    init->file_descriptors->offsets = malloc(sizeof(uint64_t) * init->file_descriptors->capacity);
+    init->file_descriptors->entries =
+        malloc(sizeof(fs_node_t *) * init->file_descriptors->capacity);
+    init->file_descriptors->modes =
+        malloc(sizeof(int) * init->file_descriptors->capacity);
+    init->file_descriptors->offsets =
+        malloc(sizeof(uint64_t) * init->file_descriptors->capacity);
 
     init->wd_node = clone_fs(fs_root);
     init->wd_path = strdup("/");
@@ -325,18 +346,23 @@ process_t *spawn_process(process_t *parent)
     proc->cmdline = parent->cmdline;
     proc->argc = parent->argc;
 
-    //proc->thread.fpu_enabled = 0;
-    //memcpy((void *)proc->thread.fp_regs, (void *)parent->thread.fp_regs, 512);
+    // proc->thread.fpu_enabled = 0;
+    // memcpy((void *)proc->thread.fp_regs, (void *)parent->thread.fp_regs,
+    // 512);
 
     uint64_t *stack = (uint64_t *)malloc(sizeof(uint64_t) * KERNEL_STACK_SIZE);
 
     log_debug("Child stack: %#016x-%#016x", stack, stack + KERNEL_STACK_SIZE);
-    log_debug("Parent stack: %#016x-%#016x", parent->image.stack, parent->image.stack + KERNEL_STACK_SIZE * sizeof(uint64_t));
+    log_debug("Parent stack: %#016x-%#016x",
+              parent->image.stack,
+              parent->image.stack + KERNEL_STACK_SIZE * sizeof(uint64_t));
     log_debug("Parent stack: %#016x-%#016x", &stack_bottom, &stack_top);
 
-    memcpy(stack, (void *)parent->image.stack, sizeof(uint64_t) * (KERNEL_STACK_SIZE));
+    memcpy(stack,
+           (void *)parent->image.stack,
+           sizeof(uint64_t) * (KERNEL_STACK_SIZE));
 
-    //hexdump(stack, sizeof(uint64_t) * KERNEL_STACK_SIZE);
+    // hexdump(stack, sizeof(uint64_t) * KERNEL_STACK_SIZE);
 
     proc->image.stack = (uint64_t)(stack);
 
@@ -357,15 +383,20 @@ process_t *spawn_process(process_t *parent)
     proc->file_descriptors->length = parent->file_descriptors->length;
     proc->file_descriptors->capacity = parent->file_descriptors->capacity;
 
-    proc->file_descriptors->entries = malloc(sizeof(fs_node_t *) * proc->file_descriptors->capacity);
-    proc->file_descriptors->modes = malloc(sizeof(int) * proc->file_descriptors->capacity);
-    proc->file_descriptors->offsets = malloc(sizeof(uint64_t) * proc->file_descriptors->capacity);
+    proc->file_descriptors->entries =
+        malloc(sizeof(fs_node_t *) * proc->file_descriptors->capacity);
+    proc->file_descriptors->modes =
+        malloc(sizeof(int) * proc->file_descriptors->capacity);
+    proc->file_descriptors->offsets =
+        malloc(sizeof(uint64_t) * proc->file_descriptors->capacity);
 
     for (uint32_t i = 0; i < parent->file_descriptors->length; ++i)
     {
-        proc->file_descriptors->entries[i] = clone_fs(parent->file_descriptors->entries[i]);
+        proc->file_descriptors->entries[i] =
+            clone_fs(parent->file_descriptors->entries[i]);
         proc->file_descriptors->modes[i] = parent->file_descriptors->modes[i];
-        proc->file_descriptors->offsets[i] = parent->file_descriptors->offsets[i];
+        proc->file_descriptors->offsets[i] =
+            parent->file_descriptors->offsets[i];
     }
 
     proc->wd_node = clone_fs(parent->wd_node);
@@ -410,7 +441,8 @@ pid_t process_fork()
 
     ASSERT(parent);
 
-    pml4_t *new_page_directory = virt_mem_clone_address_space(parent->page_directory);
+    pml4_t *new_page_directory =
+        virt_mem_clone_address_space(parent->page_directory);
 
     parent->thread.rip = return_addr;
 
@@ -422,12 +454,14 @@ pid_t process_fork()
 
     volatile uintptr_t var = (uintptr_t)(get_rsp_val() + 8);
     parent->thread.rsp = (uint64_t *)(get_rsp_val() + 8);
-    volatile uintptr_t diff = parent->image.stack + sizeof(uint64_t) * KERNEL_STACK_SIZE - 1 - (var);
+    volatile uintptr_t diff =
+        parent->image.stack + sizeof(uint64_t) * KERNEL_STACK_SIZE - 1 - (var);
 
     log_debug("Parent thread rsp: %#016x", parent->thread.rsp);
     log_debug("Diff: %#016x", diff);
 
-    new_proc->thread.rsp = (uint64_t *)(((uint64_t)new_proc->thread.rsp) - 8 * ((uint64_t)diff));
+    new_proc->thread.rsp =
+        (uint64_t *)(((uint64_t)new_proc->thread.rsp) - 8 * ((uint64_t)diff));
 
     log_debug("New thread rsp: %#016x", new_proc->thread.rsp);
 
@@ -606,8 +640,8 @@ void switch_next(uintptr_t return_addr)
     current_process->running = 1;
 
     PRINT("Old thread rip: %#016x", old_thread->rip);
-    //LOOKUP_SYMBOL(old_thread->rip);
-    //PRINT("");
+    // LOOKUP_SYMBOL(old_thread->rip);
+    // PRINT("");
 
     virt_mem_switch_dir(current_process->page_directory);
 
@@ -751,9 +785,15 @@ size_t process_append_fd(process_t *proc, fs_node_t *node)
     if (proc->file_descriptors->length == proc->file_descriptors->capacity)
     {
         proc->file_descriptors->capacity *= 2;
-        proc->file_descriptors->entries = realloc(proc->file_descriptors->entries, sizeof(fs_node_t *) * proc->file_descriptors->capacity);
-        proc->file_descriptors->modes = realloc(proc->file_descriptors->modes, sizeof(int) * proc->file_descriptors->capacity);
-        proc->file_descriptors->offsets = realloc(proc->file_descriptors->offsets, sizeof(uint64_t) * proc->file_descriptors->capacity);
+        proc->file_descriptors->entries =
+            realloc(proc->file_descriptors->entries,
+                    sizeof(fs_node_t *) * proc->file_descriptors->capacity);
+        proc->file_descriptors->modes =
+            realloc(proc->file_descriptors->modes,
+                    sizeof(int) * proc->file_descriptors->capacity);
+        proc->file_descriptors->offsets =
+            realloc(proc->file_descriptors->offsets,
+                    sizeof(uint64_t) * proc->file_descriptors->capacity);
     }
 
     proc->file_descriptors->entries[proc->file_descriptors->length] = node;
@@ -765,7 +805,8 @@ size_t process_append_fd(process_t *proc, fs_node_t *node)
 
 size_t process_move_fd(process_t *proc, int src, int dest)
 {
-    if ((size_t)src > proc->file_descriptors->length || (dest != -1 && (size_t)dest > proc->file_descriptors->length))
+    if ((size_t)src > proc->file_descriptors->length ||
+        (dest != -1 && (size_t)dest > proc->file_descriptors->length))
     {
         return -1;
     }
@@ -773,12 +814,16 @@ size_t process_move_fd(process_t *proc, int src, int dest)
     {
         dest = process_append_fd(proc, NULL);
     }
-    if (proc->file_descriptors->entries[dest] != proc->file_descriptors->entries[src])
+    if (proc->file_descriptors->entries[dest] !=
+        proc->file_descriptors->entries[src])
     {
         close_fs(proc->file_descriptors->entries[dest]);
-        proc->file_descriptors->entries[dest] = proc->file_descriptors->entries[src];
-        proc->file_descriptors->modes[dest] = proc->file_descriptors->modes[src];
-        proc->file_descriptors->offsets[dest] = proc->file_descriptors->offsets[src];
+        proc->file_descriptors->entries[dest] =
+            proc->file_descriptors->entries[src];
+        proc->file_descriptors->modes[dest] =
+            proc->file_descriptors->modes[src];
+        proc->file_descriptors->offsets[dest] =
+            proc->file_descriptors->offsets[src];
         open_fs(proc->file_descriptors->entries[dest], 0);
     }
     return dest;
@@ -788,7 +833,10 @@ size_t process_move_fd(process_t *proc, int src, int dest)
 // waitpid
 //=============================================================================
 
-static int wait_candidate(process_t *parent, int pid, int options, process_t *proc)
+static int wait_candidate(process_t *parent,
+                          int pid,
+                          int options,
+                          process_t *proc)
 {
     log_debug("[WAITPID]: Checking wait candidate");
 
@@ -835,8 +883,7 @@ int waitpid(int pid, int *status, int options)
         process_t *candidate = NULL;
         int has_children = 0;
 
-        for (list_node_t *node = proc->tree_entry->children->head;
-             node != NULL;
+        for (list_node_t *node = proc->tree_entry->children->head; node != NULL;
              node = node->next)
         {
             log_debug("[WAITPID]: Child tree node %#016x", node);
@@ -901,7 +948,7 @@ void process_sleep(uint64_t ms)
 {
     uint64_t ticks = ms * TIMER_FREQ / 1000;
 
-    //printf("Task %i entering sleep mode for %d ticks", get_pid(), ticks);
+    // printf("Task %i entering sleep mode for %d ticks", get_pid(), ticks);
 
     // We do not append tasks to the sleep queue that do not sleep for a full
     // timeslice
@@ -916,17 +963,18 @@ void process_sleep(uint64_t ms)
     current_process->sleeping = 1;
 
     spinlock_lock(&process_sleeping_lock);
-    list_append(process_sleeping_list, (list_node_t *)&current_process->sched_node);
+    list_append(process_sleeping_list,
+                (list_node_t *)&current_process->sched_node);
     spinlock_unlock(&process_sleeping_lock);
 
-    //printf("Task %i entered sleep mode for %d ticks", get_pid(), ticks);
+    // printf("Task %i entered sleep mode for %d ticks", get_pid(), ticks);
 
     process_switch_task(0);
 }
 
 void wakeup_sleeping_processes()
 {
-    //printf("Waking up sleeping processes");
+    // printf("Waking up sleeping processes");
 
     cli();
 

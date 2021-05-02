@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-12-29
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <acpi/acpi.h>
@@ -50,36 +50,36 @@
 
 /**
  * @brief Describes a system power state.
- * 
- * 
+ *
+ *
  */
 typedef struct
 {
     /**
      * @brief Non-zero if valid, that is if the values has been initialized.
-     * 
-     * 
+     *
+     *
      */
     int valid;
 
     /**
      * @brief Copy of the signature of the state.
-     * 
-     * 
+     *
+     *
      */
     char signature[5];
 
     /**
      * @brief Value to store in the PM1a_CNT register.
-     * 
-     * 
+     *
+     *
      */
     uint16_t SLP_TYPa;
 
     /**
      * @brief Value to store in the PM1b_CNT register.
-     * 
-     * 
+     *
+     *
      */
     uint16_t SLP_TYPb;
 } acpi_system_state_t;
@@ -175,23 +175,22 @@ static const char *acpi_gas_address_space_to_string(uint8_t as)
 {
     struct
     {
-        uint8_t lower_bound; // Inclusive
-        uint8_t upper_bound; // Inclusive
-        const char *string;  // Pointer to statically allocated string.
-    } values[] =
-        {
-            {0, 0, "System Memory"},
-            {1, 1, "System I/O"},
-            {2, 2, "PCI Configuration Space"},
-            {3, 3, "Embedded Controller"},
-            {4, 4, "SMBus"},
-            {5, 0x09, "Reserved"},
-            {0x0A, 0x0A, "Platform Communications Channel (PCC)"},
-            {0x0B, 0x7E, "Reserved"},
-            {0x7F, 0x7F, "Functional Fixed Hardware"},
-            {0x80, 0xBF, "Reserved"},
-            {0xC0, 0xFF, "OEM Defined"},
-        };
+        uint8_t lower_bound;  // Inclusive
+        uint8_t upper_bound;  // Inclusive
+        const char *string;   // Pointer to statically allocated string.
+    } values[] = {
+        {0, 0, "System Memory"},
+        {1, 1, "System I/O"},
+        {2, 2, "PCI Configuration Space"},
+        {3, 3, "Embedded Controller"},
+        {4, 4, "SMBus"},
+        {5, 0x09, "Reserved"},
+        {0x0A, 0x0A, "Platform Communications Channel (PCC)"},
+        {0x0B, 0x7E, "Reserved"},
+        {0x7F, 0x7F, "Functional Fixed Hardware"},
+        {0x80, 0xBF, "Reserved"},
+        {0xC0, 0xFF, "OEM Defined"},
+    };
 
     int values_size = sizeof(values) / sizeof(values[0]);
 
@@ -229,11 +228,13 @@ static const char *acpi_gas_access_size_to_string(uint8_t access_size)
 
 static void acpi_print_gas(const generic_address_structure_t *gas)
 {
-    printf("Address space: %i (%s)\n", gas->address_space,
+    printf("Address space: %i (%s)\n",
+           gas->address_space,
            acpi_gas_address_space_to_string(gas->address_space));
     printf("Bit width: %i\n", gas->bit_width);
     printf("Bit offset: %i\n", gas->bit_offset);
-    printf("Access size: %i (%s)\n", gas->access_size,
+    printf("Access size: %i (%s)\n",
+           gas->access_size,
            acpi_gas_access_size_to_string(gas->access_size));
     printf("Address: 0x%016x\n", gas->address);
 }
@@ -412,7 +413,9 @@ static int acpi_find_system_state(const char *signature,
 
 #if DEBUG_ACPI == 1
             log_trace("[ACPI] %s SLP_TYPa: %i, SLP_TYPb: %i",
-                      signature, state->SLP_TYPa, state->SLP_TYPb);
+                      signature,
+                      state->SLP_TYPa,
+                      state->SLP_TYPb);
 #endif
         }
         else
@@ -468,7 +471,8 @@ static int acpi_init_xsdt(xsdt_t *xsdt)
     acpi_print_acpi_header(&xsdt->header);
 #endif
 
-    int entries = (xsdt->header.length - sizeof(acpi_header_t)) / sizeof(xsdt->tables[0]);
+    int entries =
+        (xsdt->header.length - sizeof(acpi_header_t)) / sizeof(xsdt->tables[0]);
 
     for (int i = 0; i < entries; ++i)
     {
@@ -505,7 +509,8 @@ static int acpi_init_rsdt(rsdt_t *rsdt)
     acpi_print_acpi_header(&rsdt->header);
 #endif
 
-    int entries = (rsdt->header.length - sizeof(acpi_header_t)) / sizeof(rsdt->tables[0]);
+    int entries =
+        (rsdt->header.length - sizeof(acpi_header_t)) / sizeof(rsdt->tables[0]);
 
     for (int i = 0; i < entries; ++i)
     {

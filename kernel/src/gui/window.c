@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <gui/window.h>
@@ -31,7 +31,10 @@
 #include <gui/desktop.h>
 
 void Window_paint_handler(Window *window);
-void Window_mousedown_handler(Window *window, int x, int y, uint8_t mouse_buttons);
+void Window_mousedown_handler(Window *window,
+                              int x,
+                              int y,
+                              uint8_t mouse_buttons);
 void Window_key_handler(Window *window, int key, int mods, int action);
 void Window_tick_handler(Window *window, int ticks);
 
@@ -44,14 +47,13 @@ uint8_t pseudo_rand_8()
     return (uint8_t)(seed = (12657 * seed + 12345) & 256);
 }
 
-Window *Window_new(
-    unsigned int x,
-    unsigned int y,
-    unsigned int width,
-    unsigned int height,
-    uint16_t flags,
-    Context *context,
-    uint32_t index)
+Window *Window_new(unsigned int x,
+                   unsigned int y,
+                   unsigned int width,
+                   unsigned int height,
+                   uint16_t flags,
+                   Context *context,
+                   uint32_t index)
 {
     Window *window;
 
@@ -73,15 +75,14 @@ Window *Window_new(
     return window;
 }
 
-int Window_init(
-    Window *window,
-    int16_t x,
-    int16_t y,
-    uint16_t width,
-    uint16_t height,
-    uint16_t flags,
-    Context *context,
-    uint32_t index)
+int Window_init(Window *window,
+                int16_t x,
+                int16_t y,
+                uint16_t width,
+                uint16_t height,
+                uint16_t flags,
+                Context *context,
+                uint32_t index)
 {
     // Initialize the list of children and return if it does not work
     if (!(window->children = gui_list_new()))
@@ -141,11 +142,15 @@ int Window_init(
 
     // TODO: Use a MAX/MIN/CLAMP macro
     // Check if state is valid given the settings
-    window->width = window->width > window->min_width ? window->width : window->min_width;
-    window->height = window->height > window->min_height ? window->height : window->min_height;
+    window->width =
+        window->width > window->min_width ? window->width : window->min_width;
+    window->height = window->height > window->min_height ? window->height
+                                                         : window->min_height;
 
-    window->width = window->width < window->max_width ? window->width : window->max_width;
-    window->height = window->height < window->max_height ? window->height : window->max_height;
+    window->width =
+        window->width < window->max_width ? window->width : window->max_width;
+    window->height = window->height < window->max_height ? window->height
+                                                         : window->max_height;
 
     return 1;
 }
@@ -172,7 +177,6 @@ int Window_screen_y(Window *window)
 
 void Window_update_title(Window *window)
 {
-
     // Make sure that we have a context.
     // A redraw may be triggered before we have initialized the context.
     if (!window->context)
@@ -207,96 +211,112 @@ void Window_draw_border(Window *window)
     int screen_y = Window_screen_y(window);
 
     // Draw the 3 pixel border around the window
-    Context_draw_rect(window->context, screen_x, screen_y,
-                      window->width, window->height, WIN_BORDERCOLOR);
-    Context_draw_rect(window->context, screen_x + 1, screen_y + 1,
-                      window->width - 2, window->height - 2, WIN_BORDERCOLOR);
-    Context_draw_rect(window->context, screen_x + 2, screen_y + 2,
-                      window->width - 4, window->height - 4, WIN_BORDERCOLOR);
+    Context_draw_rect(window->context,
+                      screen_x,
+                      screen_y,
+                      window->width,
+                      window->height,
+                      WIN_BORDERCOLOR);
+    Context_draw_rect(window->context,
+                      screen_x + 1,
+                      screen_y + 1,
+                      window->width - 2,
+                      window->height - 2,
+                      WIN_BORDERCOLOR);
+    Context_draw_rect(window->context,
+                      screen_x + 2,
+                      screen_y + 2,
+                      window->width - 4,
+                      window->height - 4,
+                      WIN_BORDERCOLOR);
 
     // Draw the 3 pixel border line under the title bar
-    Context_horizontal_line(window->context, screen_x + 3, screen_y + 28,
-                            window->width - 6, WIN_BORDERCOLOR);
+    Context_horizontal_line(window->context,
+                            screen_x + 3,
+                            screen_y + 28,
+                            window->width - 6,
+                            WIN_BORDERCOLOR);
 
-    Context_horizontal_line(window->context, screen_x + 3, screen_y + 29,
-                            window->width - 6, WIN_BORDERCOLOR);
+    Context_horizontal_line(window->context,
+                            screen_x + 3,
+                            screen_y + 29,
+                            window->width - 6,
+                            WIN_BORDERCOLOR);
 
-    Context_horizontal_line(window->context, screen_x + 3, screen_y + 30,
-                            window->width - 6, WIN_BORDERCOLOR);
+    Context_horizontal_line(window->context,
+                            screen_x + 3,
+                            screen_y + 30,
+                            window->width - 6,
+                            WIN_BORDERCOLOR);
 
     // Fill in the color of the title bar.
-    Context_fill_rect(
-        window->context,
-        screen_x + 3,
-        screen_y + 3,
-        window->width - 6,
-        25,
-        window->parent->active_child == window ? WIN_TITLECOLOR : WIN_TITLECOLOR_INACTIVE);
+    Context_fill_rect(window->context,
+                      screen_x + 3,
+                      screen_y + 3,
+                      window->width - 6,
+                      25,
+                      window->parent->active_child == window
+                          ? WIN_TITLECOLOR
+                          : WIN_TITLECOLOR_INACTIVE);
 
     // Render the window title.
-    Context_draw_text(
-        window->context,
-        window->title,
-        screen_x + 10,
-        screen_y + 10,
-        window->parent->active_child == window ? WIN_TEXTCOLOR : WIN_TEXTCOLOR_INACTIVE);
+    Context_draw_text(window->context,
+                      window->title,
+                      screen_x + 10,
+                      screen_y + 10,
+                      window->parent->active_child == window
+                          ? WIN_TEXTCOLOR
+                          : WIN_TEXTCOLOR_INACTIVE);
 
     // Render the 'close window' button.
-    Context_fill_rect(
-        window->context,
-        screen_x + window->width - 24,
-        screen_y + 8,
-        16,
-        16,
-        0xFFFF0000);
+    Context_fill_rect(window->context,
+                      screen_x + window->width - 24,
+                      screen_y + 8,
+                      16,
+                      16,
+                      0xFFFF0000);
 
     // Render the text on the 'close window' button.
-    Context_draw_text(
-        window->context,
-        "x",
-        screen_x + window->width - 20,
-        screen_y + 8,
-        0xFF000000);
+    Context_draw_text(window->context,
+                      "x",
+                      screen_x + window->width - 20,
+                      screen_y + 8,
+                      0xFF000000);
 
     // Render the 'Maximize' button.
-    Context_fill_rect(
-        window->context,
-        screen_x + window->width - 48,
-        screen_y + 8,
-        16,
-        16,
-        WIN_BGCOLOR);
+    Context_fill_rect(window->context,
+                      screen_x + window->width - 48,
+                      screen_y + 8,
+                      16,
+                      16,
+                      WIN_BGCOLOR);
 
     // Render the text on the 'Minimize' button.
-    Context_draw_text(
-        window->context,
-        window->flags & WIN_MAXIMIZED ? "m" : "M",
-        screen_x + window->width - 44,
-        screen_y + 10,
-        0xFF000000);
+    Context_draw_text(window->context,
+                      window->flags & WIN_MAXIMIZED ? "m" : "M",
+                      screen_x + window->width - 44,
+                      screen_y + 10,
+                      0xFF000000);
 
     // Render the 'Minimize' button.
-    Context_fill_rect(
-        window->context,
-        screen_x + window->width - 72,
-        screen_y + 8,
-        16,
-        16,
-        WIN_BGCOLOR);
+    Context_fill_rect(window->context,
+                      screen_x + window->width - 72,
+                      screen_y + 8,
+                      16,
+                      16,
+                      WIN_BGCOLOR);
 
     // Render the text on the 'Minimize' button.
-    Context_draw_text(
-        window->context,
-        "_",
-        screen_x + window->width - 68,
-        screen_y + 10,
-        0xFF000000);
+    Context_draw_text(window->context,
+                      "_",
+                      screen_x + window->width - 68,
+                      screen_y + 10,
+                      0xFF000000);
 }
 
-void Window_apply_bound_clipping(
-    Window *window,
-    int in_recursion,
-    gui_list_t *dirty_regions)
+void Window_apply_bound_clipping(Window *window,
+                                 int in_recursion,
+                                 gui_list_t *dirty_regions)
 {
     rect_t *temp_rect;
     rect_t *current_dirty_rect;
@@ -329,7 +349,9 @@ void Window_apply_bound_clipping(
     }
     else
     {
-        temp_rect = rect_new(screen_y, screen_x, screen_y + window->height - 1,
+        temp_rect = rect_new(screen_y,
+                             screen_x,
+                             screen_y + window->height - 1,
                              screen_x + window->width - 1);
     }
 
@@ -339,7 +361,8 @@ void Window_apply_bound_clipping(
         {
             for (i = 0; i < dirty_regions->count; ++i)
             {
-                current_dirty_rect = (rect_t *)gui_list_get_at(dirty_regions, i);
+                current_dirty_rect =
+                    (rect_t *)gui_list_get_at(dirty_regions, i);
                 clone_dirty_rect = rect_new(current_dirty_rect->top,
                                             current_dirty_rect->left,
                                             current_dirty_rect->bottom,
@@ -379,11 +402,10 @@ void Window_apply_bound_clipping(
         screen_x = Window_screen_x(clipping_window);
         screen_y = Window_screen_y(clipping_window);
 
-        temp_rect = rect_new(
-            screen_y,
-            screen_x,
-            screen_y + clipping_window->height - 1,
-            screen_x + clipping_window->width - 1);
+        temp_rect = rect_new(screen_y,
+                             screen_x,
+                             screen_y + clipping_window->height - 1,
+                             screen_x + clipping_window->width - 1);
 
         Context_subtract_clip_rect(window->context, temp_rect);
 
@@ -393,10 +415,9 @@ void Window_apply_bound_clipping(
     free(clip_windows);
 }
 
-void Window_paint(
-    Window *window,
-    gui_list_t *dirty_regions,
-    uint8_t paint_children)
+void Window_paint(Window *window,
+                  gui_list_t *dirty_regions,
+                  uint8_t paint_children)
 {
     uint32_t i;
     uint32_t j;
@@ -432,9 +453,11 @@ void Window_paint(
         screen_x += WIN_BORDERWIDTH;
         screen_y += WIN_TITLEHEIGHT;
 
-        temp_rect = rect_new(screen_y, screen_x,
-                             screen_y + window->height - WIN_TITLEHEIGHT - WIN_BORDERWIDTH - 1,
-                             screen_x + window->width - (2 * WIN_BORDERWIDTH) - 1);
+        temp_rect = rect_new(
+            screen_y,
+            screen_x,
+            screen_y + window->height - WIN_TITLEHEIGHT - WIN_BORDERWIDTH - 1,
+            screen_x + window->width - (2 * WIN_BORDERWIDTH) - 1);
 
         Context_intersect_clip_rect(window->context, temp_rect);
     }
@@ -452,11 +475,10 @@ void Window_paint(
         child_screen_x = Window_screen_x(current_child);
         child_screen_y = Window_screen_y(current_child);
 
-        temp_rect = rect_new(
-            child_screen_y,
-            child_screen_x,
-            child_screen_y + current_child->height - 1,
-            child_screen_x + current_child->width - 1);
+        temp_rect = rect_new(child_screen_y,
+                             child_screen_x,
+                             child_screen_y + current_child->height - 1,
+                             child_screen_x + current_child->width - 1);
 
         Context_subtract_clip_rect(window->context, temp_rect);
 
@@ -475,13 +497,11 @@ void Window_paint(
 
     if (!paint_children)
     {
-
         return;
     }
 
     if (!(draw_windows = gui_list_new()))
     {
-
         return;
     }
 
@@ -490,7 +510,8 @@ void Window_paint(
      */
 
     // Construct a new list with all windows in drawing order
-    for (current_index = 0; current_index < window->children->count; ++current_index)
+    for (current_index = 0; current_index < window->children->count;
+         ++current_index)
     {
         for (i = 0; i < window->children->count; ++i)
         {
@@ -514,7 +535,6 @@ void Window_paint(
         {
             for (j = 0; j < dirty_regions->count; ++j)
             {
-
                 temp_rect = (rect_t *)gui_list_get_at(dirty_regions, j);
 
                 screen_x = Window_screen_x(current_child);
@@ -558,10 +578,8 @@ void Window_paint(
 
         if (dirty_regions)
         {
-
             for (j = 0; j < dirty_regions->count; ++j)
             {
-
                 temp_rect = (rect_t *)gui_list_get_at(dirty_regions, j);
 
                 screen_x = Window_screen_x(current_child);
@@ -590,15 +608,9 @@ void Window_paint(
 
 void Window_paint_handler(Window *window)
 {
-
     // Just fill in the background
     Context_fill_rect(
-        window->context,
-        0,
-        0,
-        window->width,
-        window->height,
-        WIN_BGCOLOR);
+        window->context, 0, 0, window->width, window->height, WIN_BGCOLOR);
 }
 
 gui_list_t *Window_get_windows_above(Window *parent, Window *child)
@@ -624,7 +636,8 @@ gui_list_t *Window_get_windows_above(Window *parent, Window *child)
             continue;
         }
 
-        if (current_window->index >= child->index && !(current_window->flags & WIN_FLOATING))
+        if (current_window->index >= child->index &&
+            !(current_window->flags & WIN_FLOATING))
         {
             continue;
         }
@@ -669,7 +682,8 @@ gui_list_t *Window_get_windows_below(Window *parent, Window *child)
             continue;
         }
 
-        if (current_window->index <= child->index || current_window->flags & WIN_FLOATING)
+        if (current_window->index <= child->index ||
+            current_window->flags & WIN_FLOATING)
         {
             continue;
         }
@@ -686,11 +700,10 @@ gui_list_t *Window_get_windows_below(Window *parent, Window *child)
     return return_list;
 }
 
-void Window_process_mouse(
-    Window *window,
-    uint16_t mouse_x,
-    uint16_t mouse_y,
-    uint8_t mouse_buttons)
+void Window_process_mouse(Window *window,
+                          uint16_t mouse_x,
+                          uint16_t mouse_y,
+                          uint8_t mouse_buttons)
 {
     uint32_t i;
     uint32_t current_index;
@@ -725,14 +738,13 @@ void Window_process_mouse(
         {
             Window_raise(child, 1);
 
-            if (!(child->flags & WIN_NODECORATION) &&
-                mouse_y >= child->y && mouse_y < (child->y + 31))
+            if (!(child->flags & WIN_NODECORATION) && mouse_y >= child->y &&
+                mouse_y < (child->y + 31))
             {
                 // 'Close window' button
                 if (mouse_x >= child->x + child->width - 24 &&
                     mouse_x < child->x + child->width - 8 &&
-                    mouse_y >= child->y + 8 &&
-                    mouse_y < child->y + 24)
+                    mouse_y >= child->y + 8 && mouse_y < child->y + 24)
                 {
                     Window_request_close(child);
 
@@ -741,8 +753,7 @@ void Window_process_mouse(
                 // 'Maximize window' button
                 else if (mouse_x >= child->x + child->width - 48 &&
                          mouse_x < child->x + child->width - 32 &&
-                         mouse_y >= child->y + 8 &&
-                         mouse_y < child->y + 24)
+                         mouse_y >= child->y + 8 && mouse_y < child->y + 24)
                 {
                     if (child->flags & WIN_MAXIMIZED)
                     {
@@ -758,8 +769,7 @@ void Window_process_mouse(
                 // 'Minimize window' button
                 if (mouse_x >= child->x + child->width - 72 &&
                     mouse_x < child->x + child->width - 56 &&
-                    mouse_y >= child->y + 8 &&
-                    mouse_y < child->y + 24)
+                    mouse_y >= child->y + 8 && mouse_y < child->y + 24)
                 {
                     Window_minimize(child);
 
@@ -797,7 +807,8 @@ void Window_process_mouse(
             }
         }
 
-        Window_process_mouse(child, mouse_x - child->x, mouse_y - child->y, mouse_buttons);
+        Window_process_mouse(
+            child, mouse_x - child->x, mouse_y - child->y, mouse_buttons);
         window_hit = 1;
         break;
     }
@@ -809,9 +820,9 @@ void Window_process_mouse(
 
     if (!window_hit)
     {
-
         // Construct a new list with all windows in drawing order
-        for (current_index = 0; current_index < window->children->count; ++current_index)
+        for (current_index = 0; current_index < window->children->count;
+             ++current_index)
         {
             for (i = 0; i < window->children->count; ++i)
             {
@@ -844,22 +855,20 @@ void Window_process_mouse(
             {
                 Window_raise(child, 1);
 
-                if (!(child->flags & WIN_NODECORATION) &&
-                    mouse_y >= child->y && mouse_y < (child->y + 31))
+                if (!(child->flags & WIN_NODECORATION) && mouse_y >= child->y &&
+                    mouse_y < (child->y + 31))
                 {
                     // 'Close window' button
                     if (mouse_x >= child->x + child->width - 24 &&
                         mouse_x < child->x + child->width - 8 &&
-                        mouse_y >= child->y + 8 &&
-                        mouse_y < child->y + 24)
+                        mouse_y >= child->y + 8 && mouse_y < child->y + 24)
                     {
                         Window_request_close(child);
                     }
                     // 'Maximize window' button
                     else if (mouse_x >= child->x + child->width - 48 &&
                              mouse_x < child->x + child->width - 32 &&
-                             mouse_y >= child->y + 8 &&
-                             mouse_y < child->y + 24)
+                             mouse_y >= child->y + 8 && mouse_y < child->y + 24)
                     {
                         if (child->flags & WIN_MAXIMIZED)
                         {
@@ -875,8 +884,7 @@ void Window_process_mouse(
                     // 'Minimize window' button
                     if (mouse_x >= child->x + child->width - 72 &&
                         mouse_x < child->x + child->width - 56 &&
-                        mouse_y >= child->y + 8 &&
-                        mouse_y < child->y + 24)
+                        mouse_y >= child->y + 8 && mouse_y < child->y + 24)
                     {
                         Window_minimize(child);
 
@@ -910,7 +918,8 @@ void Window_process_mouse(
                 }
             }
 
-            Window_process_mouse(child, mouse_x - child->x, mouse_y - child->y, mouse_buttons);
+            Window_process_mouse(
+                child, mouse_x - child->x, mouse_y - child->y, mouse_buttons);
             break;
         }
     }
@@ -924,21 +933,20 @@ void Window_process_mouse(
 
     if (window->drag_child && window->dragging)
     {
-        Window_move(
-            window->drag_child,
-            mouse_x - window->drag_off_x,
-            mouse_y - window->drag_off_y);
+        Window_move(window->drag_child,
+                    mouse_x - window->drag_off_x,
+                    mouse_y - window->drag_off_y);
     }
 
     if (window->drag_child && window->resizing)
     {
-        Window_resize(
-            window->drag_child,
-            mouse_x - window->drag_off_x,
-            mouse_y - window->drag_off_y);
+        Window_resize(window->drag_child,
+                      mouse_x - window->drag_off_x,
+                      mouse_y - window->drag_off_y);
     }
 
-    if (window->mousedown_function && mouse_buttons && !window->last_button_state)
+    if (window->mousedown_function && mouse_buttons &&
+        !window->last_button_state)
     {
         window->mousedown_function(window, mouse_x, mouse_y, mouse_buttons);
     }
@@ -953,11 +961,7 @@ void Window_process_mouse(
     free(processing_windows);
 }
 
-void Window_process_keyboard(
-    Window *window,
-    int key,
-    int mods,
-    int action)
+void Window_process_keyboard(Window *window, int key, int mods, int action)
 {
     if (window->active_child)
     {
@@ -988,7 +992,10 @@ void Window_process_tick(Window *window, int ticks)
     }
 }
 
-void Window_mousedown_handler(Window *window, int x, int y, uint8_t mouse_buttons)
+void Window_mousedown_handler(Window *window,
+                              int x,
+                              int y,
+                              uint8_t mouse_buttons)
 {
     return;
 }
@@ -997,7 +1004,8 @@ void Window_key_handler(Window *window, int key, int mods, int action)
 {
     if (window->title)
     {
-        //printf("Window (%s) got keypress(%d:%#x:%d)\n", window->title, key, mods, action);
+        // printf("Window (%s) got keypress(%d:%#x:%d)\n", window->title, key,
+        // mods, action);
     }
 
     return;
@@ -1011,7 +1019,8 @@ void Window_update_context(Window *window, Context *context)
 
     for (i = 0; i < window->children->count; ++i)
     {
-        Window_update_context((Window *)gui_list_get_at(window->children, i), context);
+        Window_update_context((Window *)gui_list_get_at(window->children, i),
+                              context);
     }
 }
 
@@ -1024,14 +1033,19 @@ void Window_insert_child(Window *window, Window *child)
     Window_update_context(child, window->context);
 }
 
-Window *Window_create_window(Window *parent, int16_t x, int16_t y,
-                             uint16_t width, uint16_t height, uint16_t flags)
+Window *Window_create_window(Window *parent,
+                             int16_t x,
+                             int16_t y,
+                             uint16_t width,
+                             uint16_t height,
+                             uint16_t flags)
 {
     Window *new_window;
 
     uint32_t new_index = parent->children->count;
 
-    if (!(new_window = Window_new(x, y, width, height, flags, parent->context, new_index)))
+    if (!(new_window = Window_new(
+              x, y, width, height, flags, parent->context, new_index)))
     {
         return new_window;
     }
@@ -1109,7 +1123,7 @@ void Window_raise(Window *window, uint8_t do_draw)
 
     Desktop_invalidate_start_bar(parent);
 
-    //Window_paint(parent, (List *)0, 1);
+    // Window_paint(parent, (List *)0, 1);
 }
 
 void Window_move(Window *window, int new_x, int new_y)
@@ -1160,7 +1174,8 @@ void Window_move(Window *window, int new_x, int new_y)
 
     while (dirty_windows->count)
     {
-        Window_paint((Window *)gui_list_remove_at(dirty_windows, 0), dirty_list, 1);
+        Window_paint(
+            (Window *)gui_list_remove_at(dirty_windows, 0), dirty_list, 1);
     }
 
     Window_paint(window->parent, dirty_list, 0);
@@ -1251,12 +1266,14 @@ void Window_resize(Window *window, int new_width, int new_height)
     else
     {
         window->inner_width = new_width - 2 * WIN_BORDERWIDTH;
-        window->inner_height = new_height - WIN_TITLEHEIGHT - 2 * WIN_BORDERWIDTH;
+        window->inner_height =
+            new_height - WIN_TITLEHEIGHT - 2 * WIN_BORDERWIDTH;
     }
 
     while (dirty_windows->count)
     {
-        Window_paint((Window *)gui_list_remove_at(dirty_windows, 0), dirty_list, 1);
+        Window_paint(
+            (Window *)gui_list_remove_at(dirty_windows, 0), dirty_list, 1);
     }
 
     Window_paint(window, (gui_list_t *)0, 1);
@@ -1397,12 +1414,11 @@ void Window_minimize(Window *window)
 {
     window->flags |= (WIN_MINIMIZED);
 
-    Window_invalidate(
-        window->parent,
-        window->y,
-        window->x,
-        window->y + window->height - 1,
-        window->x + window->width - 1);
+    Window_invalidate(window->parent,
+                      window->y,
+                      window->x,
+                      window->y + window->height - 1,
+                      window->x + window->width - 1);
 
     // TODO: Find another window to raise by picking random or create
     // a list of newly used windows.
@@ -1415,12 +1431,11 @@ void Window_restore(Window *window)
 {
     window->flags &= ~(WIN_MINIMIZED);
 
-    Window_invalidate(
-        window->parent,
-        window->y,
-        window->x,
-        window->y + window->height - 1,
-        window->x + window->width - 1);
+    Window_invalidate(window->parent,
+                      window->y,
+                      window->x,
+                      window->y + window->height - 1,
+                      window->x + window->width - 1);
 
     Window_raise(window, 1);
 }
@@ -1465,13 +1480,11 @@ void Window_remove(Window *window)
         parent->drag_child = (Window *)0;
     }
 
-    Window_invalidate(
-        parent,
-        window->y,
-        window->x,
-        window->y +
-            window->height - 1,
-        window->x + window->width - 1);
+    Window_invalidate(parent,
+                      window->y,
+                      window->x,
+                      window->y + window->height - 1,
+                      window->x + window->width - 1);
 
     free(window->title);
 
@@ -1601,7 +1614,8 @@ void Window_debug_print(Window *window, int print_depth)
         printf("Dumping window information...\n\n");
     }
 
-    sprintf(flag_string, "%s%s%s%s%s%s%s",
+    sprintf(flag_string,
+            "%s%s%s%s%s%s%s",
             window->flags & WIN_NODECORATION ? "nodeco " : "",
             window->flags & WIN_MINIMIZED ? "minimized " : "",
             window->flags & WIN_SHOULD_CLOSE ? "close " : "",
@@ -1610,36 +1624,39 @@ void Window_debug_print(Window *window, int print_depth)
             window->flags & WIN_FLOATING ? "floating " : "",
             window->flags & WIN_MAXIMIZED ? "maximized " : "");
 
-    printf("%sWindow title %s\n",
-           ws, window->title ? window->title : "");
+    printf("%sWindow title %s\n", ws, window->title ? window->title : "");
     printf("%sWindow Parent Address: %#p\n",
-           ws, window->parent ? window->parent : NULL);
-    printf("%sWindow Position (%d, %d)\n",
-           ws, window->x, window->y);
-    printf("%sWindow Dimension (%d, %d)\n",
-           ws, window->width, window->height);
+           ws,
+           window->parent ? window->parent : NULL);
+    printf("%sWindow Position (%d, %d)\n", ws, window->x, window->y);
+    printf("%sWindow Dimension (%d, %d)\n", ws, window->width, window->height);
     printf("%sWindow Inner Dimension (%d, %d)\n",
-           ws, window->inner_width, window->inner_height);
-    printf("%sWindow Flags: %s\n",
-           ws, flag_string);
-    printf("%sWindow Context Address: %#p\n",
-           ws, window->context);
+           ws,
+           window->inner_width,
+           window->inner_height);
+    printf("%sWindow Flags: %s\n", ws, flag_string);
+    printf("%sWindow Context Address: %#p\n", ws, window->context);
     printf("%sWindow Last Position (%d, %d)\n",
-           ws, window->last_x, window->last_y);
+           ws,
+           window->last_x,
+           window->last_y);
     printf("%sWindow Last Dimension (%d, %d)\n",
-           ws, window->last_width, window->last_height);
-    printf("%sNumber of children: %d\n",
-           ws, window->children->count);
+           ws,
+           window->last_width,
+           window->last_height);
+    printf("%sNumber of children: %d\n", ws, window->children->count);
     printf("%sWindow Drag Child Address: %#p\n",
-           ws, window->drag_child ? window->drag_child : NULL);
+           ws,
+           window->drag_child ? window->drag_child : NULL);
     printf("%sWindow Active Child Address: %#p\n",
-           ws, window->active_child ? window->active_child : NULL);
-    printf("%sDragging: %d\n",
-           ws, window->dragging);
-    printf("%sResizing: %d\n",
-           ws, window->resizing);
+           ws,
+           window->active_child ? window->active_child : NULL);
+    printf("%sDragging: %d\n", ws, window->dragging);
+    printf("%sResizing: %d\n", ws, window->resizing);
     printf("%sWindow Drag Offset (%d, %d)\n",
-           ws, window->drag_off_x, window->drag_off_y);
+           ws,
+           window->drag_off_x,
+           window->drag_off_y);
 
     // TODO: Print handler addresses and such
     // TODO: Print min/max width/height

@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-07-30
- * 
+ *
  * @brief ELF 32-bit binary format types and definitons
- * 
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _ELF32_H
@@ -29,11 +29,11 @@
 // Primitive types
 //=============================================================================
 
-typedef uint16_t Elf32_Half; // Unsigned half int
-typedef uint32_t Elf32_Off;  // Unsigned offset
-typedef uint32_t Elf32_Addr; // Unsigned address
-typedef uint32_t Elf32_Word; // Unsigned int
-typedef int32_t Elf32_Sword; // Signed int
+typedef uint16_t Elf32_Half;  // Unsigned half int
+typedef uint32_t Elf32_Off;   // Unsigned offset
+typedef uint32_t Elf32_Addr;  // Unsigned address
+typedef uint32_t Elf32_Word;  // Unsigned int
+typedef int32_t Elf32_Sword;  // Signed int
 
 //=============================================================================
 // Program header
@@ -59,13 +59,13 @@ typedef struct
     Elf32_Half e_shstrndx;
 } Elf32_Ehdr_t;
 
-#define ELFMAG0 0x7F // e_ident[EI_MAG0]
-#define ELFMAG1 'E'  // e_ident[EI_MAG1]
-#define ELFMAG2 'L'  // e_ident[EI_MAG2]
-#define ELFMAG3 'F'  // e_ident[EI_MAG3]
+#define ELFMAG0 0x7F  // e_ident[EI_MAG0]
+#define ELFMAG1 'E'   // e_ident[EI_MAG1]
+#define ELFMAG2 'L'   // e_ident[EI_MAG2]
+#define ELFMAG3 'F'   // e_ident[EI_MAG3]
 
-#define ELFDATA2LSB (1) // Little Endian
-#define ELFCLASS32 (1)  // 32-bit Architecture
+#define ELFDATA2LSB (1)  // Little Endian
+#define ELFCLASS32 (1)   // 32-bit Architecture
 #define EI_MAG0 0
 #define EI_MAG1 1
 #define EI_MAG2 2
@@ -201,9 +201,9 @@ typedef struct
 
 enum RtT_Types
 {
-    R_386_NONE = 0, // No relocation
-    R_386_32 = 1,   // Symbol + Offset
-    R_386_PC32 = 2  // Symbol + Offset - Section Offset
+    R_386_NONE = 0,  // No relocation
+    R_386_32 = 1,    // Symbol + Offset
+    R_386_PC32 = 2   // Symbol + Offset - Section Offset
 };
 
 //=============================================================================
@@ -223,3 +223,7 @@ typedef struct
 } Elf32_Phdr_t;
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================
