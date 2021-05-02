@@ -20,12 +20,11 @@
  *
  */
 
+#include <arch/arch.h>
 #include <drivers/mouse_ps2.h>
+#include <logging/logging.h>
 
 #include <stdio.h>
-
-#include <arch/arch.h>
-#include <logging/logging.h>
 
 /**
  * Mouse packet from mouse IRQ

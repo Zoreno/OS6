@@ -21,10 +21,9 @@
  */
 
 #include <simple_cli/commands.h>
+#include <syscall/syscall.h>
 
 #include <stdio.h>
-
-#include <syscall/syscall.h>
 
 static int rm_command_remove_item(int recursive, const char *path);
 static int rm_command_remove_directory(int recursive, const char *dir);

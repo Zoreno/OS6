@@ -20,14 +20,13 @@
  *
  */
 
+#include <arch/arch.h>
+#include <logging/logging.h>
 #include <usb/usb_hub.h>
+#include <usb/usb_registry.h>
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <arch/arch.h>
-#include <logging/logging.h>
-#include <usb/usb_registry.h>
 
 #define PORT_CONNECTION (1 << 0)    // Current Connect Status
 #define PORT_ENABLE (1 << 1)        // Port Enabled

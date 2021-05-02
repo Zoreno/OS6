@@ -20,9 +20,8 @@
  *
  */
 
-#include <pci/pci_io.h>
-
 #include <arch/arch.h>
+#include <pci/pci_io.h>
 
 #define MAKE_ADDR(id, reg) (0x80000000 | id | (reg & 0xFC))
 

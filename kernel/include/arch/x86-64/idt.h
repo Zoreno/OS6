@@ -24,6 +24,7 @@
 #define _ARCH_X86_64_IDT_H
 
 #include <arch/arch.h>
+
 #include <stdint.h>
 
 #define ARCH_X86_64_IDT_MAX_INTERRUPTS 256

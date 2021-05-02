@@ -20,13 +20,12 @@
  *
  */
 
+#include <arch/arch.h>
 #include <gui/context.h>
 #include <gui/font.h>
 
 #include <stdint.h>
 #include <string.h>
-
-#include <arch/arch.h>
 
 Context *Context_new(uint16_t width, uint16_t height, uint32_t *buffer)
 {

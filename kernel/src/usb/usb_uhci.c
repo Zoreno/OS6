@@ -20,13 +20,6 @@
  *
  */
 
-#include <usb/usb_uhci.h>
-
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <arch/arch.h>
 #include <debug/backtrace.h>
 #include <logging/logging.h>
@@ -36,7 +29,13 @@
 #include <pci/pci_io.h>
 #include <usb/usb_controller.h>
 #include <usb/usb_device.h>
+#include <usb/usb_uhci.h>
 #include <util/link.h>
+
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 //=============================================================================
 // Limits

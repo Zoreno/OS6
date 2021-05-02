@@ -20,13 +20,12 @@
  *
  */
 
-#include <cmos/cmos_rtc.h>
-
-#include <stdio.h>
-
 #include <arch/arch.h>
+#include <cmos/cmos_rtc.h>
 #include <logging/logging.h>
 #include <process/process.h>
+
+#include <stdio.h>
 
 //=============================================================================
 // Variables

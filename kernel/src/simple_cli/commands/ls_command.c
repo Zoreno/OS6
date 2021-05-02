@@ -22,7 +22,6 @@
 
 #include <simple_cli/commands.h>
 #include <simple_cli/simple_cli.h>
-
 #include <syscall/syscall.h>
 
 #include <stdio.h>

@@ -20,17 +20,16 @@
  *
  */
 
+#include <arch/arch.h>
+#include <debug/backtrace.h>
 #include <drivers/blockdev.h>
+#include <logging/logging.h>
+#include <util/list.h>
+#include <vfs/vfs.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <arch/arch.h>
-#include <debug/backtrace.h>
-#include <logging/logging.h>
-#include <util/list.h>
-#include <vfs/vfs.h>
 
 #define MAX_DESCRIPTION_LENGTH 256
 

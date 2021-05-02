@@ -21,11 +21,6 @@
  */
 
 #include <acpi/acpi.h>
-
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-
 #include <acpi/acpi_header.h>
 #include <acpi/dsdt.h>
 #include <acpi/fadt.h>
@@ -35,6 +30,10 @@
 #include <arch/arch.h>
 #include <logging/logging.h>
 #include <util/hexdump.h>
+
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 //=============================================================================
 // Macros

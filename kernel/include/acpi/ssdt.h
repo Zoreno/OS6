@@ -23,9 +23,9 @@
 #ifndef _ACPI_SSDT_H
 #define _ACPI_SSDT_H
 
-#include <stdint.h>
-
 #include "acpi_header.h"
+
+#include <stdint.h>
 
 /**
  * Secondary System Description Table.

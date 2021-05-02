@@ -24,6 +24,7 @@
 #define _ARCH_X86_64_PIT_H
 
 #include <arch/arch.h>
+
 #include <stddef.h>
 #include <stdint.h>
 

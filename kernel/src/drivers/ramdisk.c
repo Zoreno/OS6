@@ -21,7 +21,6 @@
  */
 
 #include <drivers/ramdisk.h>
-
 #include <vfs/vfs.h>
 
 #include <stdio.h>

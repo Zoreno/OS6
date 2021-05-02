@@ -21,7 +21,6 @@
  */
 
 #include <usb/usb.h>
-
 #include <usb/usb_controller.h>
 #include <usb/usb_device.h>
 

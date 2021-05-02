@@ -24,6 +24,7 @@
 #define _PHYS_MEM_H
 
 #include <mm/memory_info.h>
+
 #include <stdint.h>
 
 typedef uint64_t phys_addr;

@@ -23,9 +23,9 @@
 #ifndef _ACPI_DSDT_H
 #define _ACPI_DSDT_H
 
-#include <stdint.h>
-
 #include "acpi_header.h"
+
+#include <stdint.h>
 
 /**
  * Differentiated System Description Table.

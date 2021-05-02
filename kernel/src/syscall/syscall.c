@@ -20,9 +20,8 @@
  *
  */
 
-#include <syscall/syscall.h>
-
 #include <logging/logging.h>
+#include <syscall/syscall.h>
 
 int syscall_fork();
 int syscall_clone();

@@ -20,15 +20,14 @@
  *
  */
 
+#include <gui/context.h>
+#include <gui/desktop.h>
 #include <gui/window.h>
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <gui/context.h>
-#include <gui/desktop.h>
 
 void Window_paint_handler(Window *window);
 void Window_mousedown_handler(Window *window,

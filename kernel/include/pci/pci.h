@@ -23,9 +23,9 @@
 #ifndef _PCI_H
 #define _PCI_H
 
-#include <stdint.h>
-
 #include <pci/pci_device.h>
+
+#include <stdint.h>
 
 extern pci_device_list_t *device_list;
 

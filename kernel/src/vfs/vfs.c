@@ -20,12 +20,6 @@
  *
  */
 
-#include <vfs/vfs.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <arch/arch.h>
 #include <debug/backtrace.h>
 #include <logging/logging.h>
@@ -34,7 +28,12 @@
 #include <util/list.h>
 #include <util/tree.h>
 #include <vfs/nulldev.h>
+#include <vfs/vfs.h>
 #include <vfs/zerodev.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 fs_node_t *fs_root = 0;
 tree_t *fs_tree = 0;

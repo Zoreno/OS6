@@ -22,16 +22,15 @@
 
 #include <exec/elf32.h>
 #include <exec/elf64.h>
+#include <logging/logging.h>
+#include <mm/virt_mem.h>
+#include <process/process.h>
+#include <vfs/vfs.h>
 
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <logging/logging.h>
-#include <mm/virt_mem.h>
-#include <process/process.h>
-#include <vfs/vfs.h>
 
 /**
  * @brief Type describing an entry point "main" function.

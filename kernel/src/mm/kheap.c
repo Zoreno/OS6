@@ -20,15 +20,14 @@
  *
  */
 
+#include <arch/arch.h>
+#include <logging/logging.h>
 #include <mm/kheap.h>
 #include <mm/phys_mem.h>
 #include <mm/virt_mem.h>
 
 #include <stdio.h>
 #include <string.h>
-
-#include <arch/arch.h>
-#include <logging/logging.h>
 
 //==============================================================================
 // Definitions

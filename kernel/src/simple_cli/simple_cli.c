@@ -20,15 +20,14 @@
  *
  */
 
+#include <process/process.h>
+#include <simple_cli/commands.h>
 #include <simple_cli/simple_cli.h>
+#include <simple_cli/vt_100.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <process/process.h>
-#include <simple_cli/commands.h>
-#include <simple_cli/vt_100.h>
 
 //=============================================================================
 // Definitions

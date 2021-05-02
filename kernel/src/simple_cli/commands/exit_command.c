@@ -20,9 +20,8 @@
  *
  */
 
-#include <simple_cli/commands.h>
-
 #include <acpi/acpi.h>
+#include <simple_cli/commands.h>
 
 int exit_command(int argc, const char **argv)
 {

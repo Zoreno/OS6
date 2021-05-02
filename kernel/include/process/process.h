@@ -23,14 +23,14 @@
 #ifndef _PROCESS_H
 #define _PROCESS_H
 
-#include <stdint.h>
-
 #include <arch/arch.h>
 #include <mm/virt_mem.h>
 #include <sync/spinlock.h>
 #include <util/list.h>
 #include <util/tree.h>
 #include <vfs/vfs.h>
+
+#include <stdint.h>
 
 #define MAX_PIDS 256
 

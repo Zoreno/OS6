@@ -20,14 +20,13 @@
  *
  */
 
+#include <logging/logging.h>
 #include <vfs/nulldev.h>
+#include <vfs/vfs.h>
 
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <logging/logging.h>
-#include <vfs/vfs.h>
 
 //=============================================================================
 // Private functions

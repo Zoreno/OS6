@@ -20,11 +20,9 @@
  *
  */
 
-#include <sync/spinlock.h>
-
 #include <arch/arch.h>
-
 #include <process/process.h>
+#include <sync/spinlock.h>
 
 void spinlock_lock(spinlock_t *lock)
 {

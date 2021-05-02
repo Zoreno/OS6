@@ -20,9 +20,8 @@
  *
  */
 
-#include <drivers/keyboard_ps2.h>
-
 #include <arch/arch.h>
+#include <drivers/keyboard_ps2.h>
 #include <logging/logging.h>
 
 #include <ctype.h>

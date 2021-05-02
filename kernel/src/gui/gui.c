@@ -20,14 +20,13 @@
  *
  */
 
-#include <gui/gui.h>
-
 #include <arch/arch.h>
 #include <drivers/keyboard_ps2.h>
 #include <drivers/mouse_ps2.h>
 #include <drivers/vbe.h>
 #include <gui/context.h>
 #include <gui/desktop.h>
+#include <gui/gui.h>
 #include <gui/window.h>
 
 Desktop *desktop;

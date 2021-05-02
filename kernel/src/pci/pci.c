@@ -20,17 +20,16 @@
  *
  */
 
+#include <arch/arch.h>
+#include <logging/logging.h>
 #include <pci/pci.h>
+#include <pci/pci_io.h>
+#include <usb/usb_ehci.h>
+#include <usb/usb_uhci.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <arch/arch.h>
-#include <logging/logging.h>
-#include <pci/pci_io.h>
-#include <usb/usb_ehci.h>
-#include <usb/usb_uhci.h>
 
 pci_device_list_t *device_list = 0;
 

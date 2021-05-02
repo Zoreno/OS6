@@ -20,9 +20,8 @@
  *
  */
 
-#include <util/vector.h>
-
 #include <debug/backtrace.h>
+#include <util/vector.h>
 
 #include <stdint.h>
 #include <stdio.h>

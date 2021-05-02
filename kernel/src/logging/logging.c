@@ -20,10 +20,9 @@
  *
  */
 
-#include <logging/logging.h>
-
 #include <arch/arch.h>
 #include <cmos/cmos_rtc.h>
+#include <logging/logging.h>
 
 //=============================================================================
 // Local variables

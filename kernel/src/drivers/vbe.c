@@ -20,18 +20,14 @@
  *
  */
 
-#include <drivers/vbe.h>
-
-#include <pci/pci.h>
-
 #include <arch/arch.h>
-
+#include <debug/backtrace.h>
+#include <drivers/vbe.h>
 #include <mm/virt_mem.h>
+#include <pci/pci.h>
 
 #include <stdio.h>
 #include <string.h>
-
-#include <debug/backtrace.h>
 
 //=============================================================================
 // Definitions

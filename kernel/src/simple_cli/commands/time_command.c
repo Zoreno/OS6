@@ -20,11 +20,10 @@
  *
  */
 
+#include <cmos/cmos_rtc.h>
 #include <simple_cli/commands.h>
 
 #include <stdio.h>
-
-#include <cmos/cmos_rtc.h>
 
 int time_command(int argc, const char **argv)
 {

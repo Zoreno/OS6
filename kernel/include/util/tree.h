@@ -23,8 +23,9 @@
 #ifndef _TREE_H
 #define _TREE_H
 
-#include <stdint.h>
 #include <util/list.h>
+
+#include <stdint.h>
 
 typedef struct tree_node
 {

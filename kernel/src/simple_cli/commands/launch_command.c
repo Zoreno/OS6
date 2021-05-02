@@ -20,11 +20,10 @@
  *
  */
 
+#include <process/launch_program.h>
 #include <simple_cli/commands.h>
 
 #include <stdio.h>
-
-#include <process/launch_program.h>
 
 int launch_command(int argc, const char **argv)
 {

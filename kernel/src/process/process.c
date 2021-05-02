@@ -20,22 +20,21 @@
  *
  */
 
+#include <arch/arch.h>
+#include <arch/x86-64/fpu.h>
+#include <debug/backtrace.h>
+#include <exec/elf64.h>
+#include <logging/logging.h>
 #include <process/process.h>
+#include <sync/spinlock.h>
+#include <util/bitset.h>
+#include <util/hexdump.h>
 
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <arch/arch.h>
-#include <arch/x86-64/fpu.h>
-#include <debug/backtrace.h>
-#include <exec/elf64.h>
-#include <logging/logging.h>
-#include <sync/spinlock.h>
-#include <util/bitset.h>
-#include <util/hexdump.h>
 
 #define DEBUG_SCHED 0
 

@@ -20,17 +20,16 @@
  *
  */
 
+#include <arch/arch.h>
+#include <debug/backtrace.h>
+#include <drivers/blockdev.h>
 #include <drivers/ide.h>
+#include <logging/logging.h>
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <arch/arch.h>
-#include <debug/backtrace.h>
-#include <drivers/blockdev.h>
-#include <logging/logging.h>
 
 #define NUM_IDE_CONTROLLERS 2
 #define NUM_DEVICES_PER_CONTROLLER 2

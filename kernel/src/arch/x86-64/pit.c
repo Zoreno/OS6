@@ -20,12 +20,11 @@
  *
  */
 
+#include <arch/x86-64/pic.h>
 #include <arch/x86-64/pit.h>
+#include <process/process.h>
 
 #include <stdio.h>
-
-#include <arch/x86-64/pic.h>
-#include <process/process.h>
 
 #define ARCH_X86_64_PIT_REG_COUNTER0 0x40
 #define ARCH_X86_64_PIT_REG_COUNTER1 0x41

@@ -20,14 +20,12 @@
  *
  */
 
-#include <mm/phys_mem.h>
-
+#include <logging/logging.h>
 #include <mm/mm_bitmap.h>
+#include <mm/phys_mem.h>
 
 #include <stdio.h>
 #include <string.h>
-
-#include <logging/logging.h>
 
 #define PHYS_MEM_BLOCKS_PER_BYTE 8
 #define PHYS_MEM_BLOCK_SIZE 4096

@@ -23,11 +23,11 @@
 #ifndef _WINDOW_H_
 #define _WINDOW_H_
 
-#include <stdint.h>
-
 #include <gui/context.h>
 #include <gui/gui_list.h>
 #include <gui/rect.h>
+
+#include <stdint.h>
 
 #define COLOR_SET 0
 

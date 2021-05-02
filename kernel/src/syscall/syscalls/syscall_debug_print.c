@@ -20,11 +20,10 @@
  *
  */
 
+#include <logging/logging.h>
 #include <syscall/syscall.h>
 
 #include <string.h>
-
-#include <logging/logging.h>
 
 int syscall_debug_print(char *str)
 {

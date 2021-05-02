@@ -20,17 +20,14 @@
  *
  */
 
-#include <gui/terminal/terminal.h>
-
+#include <cmos/cmos_rtc.h>
 #include <drivers/vbe.h>
+#include <gui/terminal/terminal.h>
+#include <gui/terminal/terminal_color.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <gui/terminal/terminal_color.h>
-
-#include <cmos/cmos_rtc.h>
 
 terminal_t *terminal_create()
 {

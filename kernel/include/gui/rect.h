@@ -24,6 +24,7 @@
 #define _RECT_H_
 
 #include <gui/gui_list.h>
+
 #include <stdlib.h>
 
 typedef struct _rect_t

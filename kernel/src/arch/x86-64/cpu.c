@@ -21,13 +21,12 @@
  */
 
 #include <arch/arch.h>
-
-#include <stdio.h>
-
 #include <arch/x86-64/cpu.h>
 #include <arch/x86-64/gdt.h>
 #include <arch/x86-64/idt.h>
 #include <logging/logging.h>
+
+#include <stdio.h>
 
 #define DEBUG_CPUID 0
 

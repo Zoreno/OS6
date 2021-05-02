@@ -21,10 +21,9 @@
  */
 
 #include <simple_cli/simple_cli.h>
+#include <syscall/syscall.h>
 
 #include <stdio.h>
-
-#include <syscall/syscall.h>
 
 int mkdir_command(int argc, const char **argv)
 {

@@ -20,13 +20,6 @@
  *
  */
 
-#include <usb/usb_ehci.h>
-
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <arch/arch.h>
 #include <debug/backtrace.h>
 #include <logging/logging.h>
@@ -38,7 +31,13 @@
 #include <pci/pci_io.h>
 #include <usb/usb_controller.h>
 #include <usb/usb_device.h>
+#include <usb/usb_ehci.h>
 #include <util/link.h>
+
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 //==============================================================================
 // Definitions

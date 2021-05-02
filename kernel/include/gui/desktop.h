@@ -23,11 +23,11 @@
 #ifndef _DESKTOP_H_
 #define _DESKTOP_H_
 
-#include <stdint.h>
-
 #include <gui/context.h>
 #include <gui/gui_list.h>
 #include <gui/window.h>
+
+#include <stdint.h>
 
 #define MOUSE_WIDTH 11
 #define MOUSE_HEIGHT 18

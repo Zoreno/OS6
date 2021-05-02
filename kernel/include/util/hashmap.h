@@ -23,11 +23,11 @@
 #ifndef _HASHMAP_H
 #define _HASHMAP_H
 
+#include <util/list.h>
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <util/list.h>
 
 typedef unsigned long long int (*hashmap_hash_t)(void *key);
 typedef long long int (*hashmap_comp_t)(void *a, void *b);

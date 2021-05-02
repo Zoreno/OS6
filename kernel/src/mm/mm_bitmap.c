@@ -20,9 +20,8 @@
  *
  */
 
-#include <mm/mm_bitmap.h>
-
 #include <logging/logging.h>
+#include <mm/mm_bitmap.h>
 
 #define BITS_PER_ENTRY 64
 

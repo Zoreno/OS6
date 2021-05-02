@@ -20,13 +20,6 @@
  *
  */
 
-#include <assert.h>
-#include <ctype.h>
-#include <immintrin.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <acpi/acpi.h>
 #include <arch/arch.h>
 #include <boot/multiboot2.h>
@@ -59,6 +52,13 @@
 #include <util/tree.h>
 #include <vfs/ext2.h>
 #include <vfs/vfs.h>
+
+#include <assert.h>
+#include <ctype.h>
+#include <immintrin.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
 

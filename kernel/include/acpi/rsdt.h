@@ -23,9 +23,9 @@
 #ifndef _ACPI_RDST_H
 #define _ACPI_RSDT_H
 
-#include <stdint.h>
-
 #include "acpi_header.h"
+
+#include <stdint.h>
 
 /**
  * Root System Description Table

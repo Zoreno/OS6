@@ -23,10 +23,10 @@
 #ifndef _ACPI_FADT_H
 #define _ACPI_FADT_H
 
-#include <stdint.h>
-
 #include "acpi_header.h"
 #include "gas.h"
+
+#include <stdint.h>
 
 /**
  * Fixed System Description Table

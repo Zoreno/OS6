@@ -20,9 +20,9 @@
  *
  */
 
+#include <arch/arch.h>
 #include <serial/serial.h>
 
-#include <arch/arch.h>
 #include <stdarg.h>
 #include <string.h>
 

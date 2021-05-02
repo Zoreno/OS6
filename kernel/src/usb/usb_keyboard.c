@@ -20,16 +20,15 @@
  *
  */
 
-#include <usb/usb_keyboard.h>
-
-#include <stdint.h>
-#include <string.h>
-
 #include <logging/logging.h>
 #include <mm/phys_mem.h>
 #include <mm/virt_mem.h>
 #include <usb/usb_device.h>
+#include <usb/usb_keyboard.h>
 #include <usb/usb_registry.h>
+
+#include <stdint.h>
+#include <string.h>
 
 //=============================================================================
 // Definitions

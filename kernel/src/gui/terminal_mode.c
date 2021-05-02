@@ -20,15 +20,14 @@
  *
  */
 
+#include <arch/arch.h>
+#include <drivers/vbe.h>
+#include <gui/terminal/terminal.h>
 #include <gui/terminal_mode.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <arch/arch.h>
-#include <drivers/vbe.h>
-#include <gui/terminal/terminal.h>
 
 //=============================================================================
 // Local variables

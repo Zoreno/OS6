@@ -20,14 +20,13 @@
  *
  */
 
-#include <process/launch_program.h>
-
-#include <stdio.h>
-
 #include <exec/elf64.h>
 #include <logging/logging.h>
+#include <process/launch_program.h>
 #include <process/process.h>
 #include <syscall/syscall.h>
+
+#include <stdio.h>
 
 int launch_program(char *path)
 {

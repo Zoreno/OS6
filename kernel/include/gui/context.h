@@ -23,11 +23,11 @@
 #ifndef _CONTEXT_H_
 #define _CONTEXT_H_
 
-#include <stdint.h>
-#include <stdio.h>
-
 #include <gui/gui_list.h>
 #include <gui/rect.h>
+
+#include <stdint.h>
+#include <stdio.h>
 
 typedef struct Context_struct
 {

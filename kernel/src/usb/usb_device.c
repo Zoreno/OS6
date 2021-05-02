@@ -20,15 +20,14 @@
  *
  */
 
-#include <usb/usb_device.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <arch/arch.h>
 #include <debug/backtrace.h>
 #include <logging/logging.h>
+#include <usb/usb_device.h>
 #include <usb/usb_driver.h>
+
+#include <stdio.h>
+#include <stdlib.h>
 
 //=============================================================================
 // Local variables

@@ -21,13 +21,12 @@
  */
 
 #include <exec/elf64.h>
+#include <logging/logging.h>
 
 #include <limits.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-
-#include <logging/logging.h>
 
 static size_t read_sleb128(const unsigned char *buf,
                            const unsigned char *buf_end,
@@ -623,7 +622,8 @@ void dwarf_parse_debug_line_section(Elf64_Addr_t section_start,
         // printf("Minimum instruction length: %i\n",
         // header->min_instruction_length); printf("Line base: %i\n",
         // (int64_t)header->line_base); printf("Line range: %i\n",
-        // header->line_range); printf("Opcode base: %i\n", header->opcode_base);
+        // header->line_range); printf("Opcode base: %i\n",
+        // header->opcode_base);
 
         uint8_t *end_of_header = (uint8_t *)header + header->header_length;
 
