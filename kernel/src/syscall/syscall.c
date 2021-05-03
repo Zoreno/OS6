@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-07-19
- * 
+ *
  * @brief System call interface
- * 
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,11 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
-#include <syscall/syscall.h>
-
 #include <logging/logging.h>
+#include <syscall/syscall.h>
 
 int syscall_fork();
 int syscall_clone();
@@ -34,7 +33,7 @@ typedef int (*syscall_func_t)(uint64_t, ...);
 
 syscall_func_t _syscalls[128] = {0};
 
-void syscall_handler(system_stack_t* stack)
+void syscall_handler(system_stack_t *stack)
 {
     syscall_func_t syscall_func = _syscalls[stack->rax];
 
@@ -51,7 +50,8 @@ void syscall_handler(system_stack_t* stack)
     stack->rax = retval;
 }
 
-#define DECLARE_SYSCALL(NAME, FUNC) _syscalls[SYSCALL_##NAME] = (syscall_func_t)syscall_##FUNC
+#define DECLARE_SYSCALL(NAME, FUNC) \
+    _syscalls[SYSCALL_##NAME] = (syscall_func_t)syscall_##FUNC
 
 void syscall_install()
 {

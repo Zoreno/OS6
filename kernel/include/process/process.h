@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-12-31
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,11 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _PROCESS_H
 #define _PROCESS_H
-
-#include <stdint.h>
 
 #include <arch/arch.h>
 #include <mm/virt_mem.h>
@@ -31,6 +29,8 @@
 #include <util/list.h>
 #include <util/tree.h>
 #include <vfs/vfs.h>
+
+#include <stdint.h>
 
 #define MAX_PIDS 256
 

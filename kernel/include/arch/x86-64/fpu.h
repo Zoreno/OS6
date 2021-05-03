@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-26
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _ARCH_X86_64_FPU_H
@@ -58,3 +58,7 @@ void arch_x64_64_restore_fpu(void *buffer);
 void arch_x64_64_save_fpu(void *buffer);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

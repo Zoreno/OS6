@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,17 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _DESKTOP_H_
 #define _DESKTOP_H_
 
-#include <stdint.h>
-
 #include <gui/context.h>
 #include <gui/gui_list.h>
 #include <gui/window.h>
+
+#include <stdint.h>
 
 #define MOUSE_WIDTH 11
 #define MOUSE_HEIGHT 18
@@ -47,32 +47,26 @@ typedef struct Desktop_struct
 
 Desktop *Desktop_new(Context *context);
 
-void Desktop_process_mouse(
-    Desktop *desktop,
-    uint16_t x,
-    uint16_t y,
-    uint8_t mouse_button);
+void Desktop_process_mouse(Desktop *desktop,
+                           uint16_t x,
+                           uint16_t y,
+                           uint8_t mouse_button);
 
-void Desktop_paint_handler(
-    Window *desktop_window);
+void Desktop_paint_handler(Window *desktop_window);
 
-void Desktop_invalidate_start_bar(
-    Window *desktop_window);
+void Desktop_invalidate_start_bar(Window *desktop_window);
 
-Window *Desktop_create_window(
-    Window *desktop_window,
-    int16_t x,
-    int16_t y,
-    uint16_t width,
-    uint16_t height,
-    uint16_t flags,
-    char *title);
+Window *Desktop_create_window(Window *desktop_window,
+                              int16_t x,
+                              int16_t y,
+                              uint16_t width,
+                              uint16_t height,
+                              uint16_t flags,
+                              char *title);
 
-void Desktop_remove_window(
-    Window *desktop_window,
-    Window *window);
+void Desktop_remove_window(Window *desktop_window, Window *window);
 
-#endif // _DESKTOP_H_
+#endif  // _DESKTOP_H_
 
 //=============================================================================
 // End of file

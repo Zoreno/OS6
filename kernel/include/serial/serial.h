@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _SERIAL_H
@@ -67,10 +67,18 @@ typedef enum
 } serial_parity_mode_t;
 
 void serial_init_full();
-void init_serial(COM_port_t port, serial_baud_rate_t baud_rate, uint8_t data_bits, uint8_t stop_bits, serial_parity_mode_t parity);
+void init_serial(COM_port_t port,
+                 serial_baud_rate_t baud_rate,
+                 uint8_t data_bits,
+                 uint8_t stop_bits,
+                 serial_parity_mode_t parity);
 int serial_received(COM_port_t port);
 char serial_receive_data(COM_port_t port);
 int serial_is_transmit_ready(COM_port_t port);
 void serial_send_data(COM_port_t port, char data);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================

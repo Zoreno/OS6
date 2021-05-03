@@ -20,12 +20,11 @@
  *
  */
 
+#include <logging/logging.h>
 #include <mm/virt_mem.h>
 
 #include <stdio.h>
 #include <string.h>
-
-#include <logging/logging.h>
 
 // TODO: Most of this file is arch-dependent, so move those parts to kernel/arch
 

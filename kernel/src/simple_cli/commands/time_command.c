@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-12-30
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,15 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
+#include <cmos/cmos_rtc.h>
 #include <simple_cli/commands.h>
 
 #include <stdio.h>
 
-#include <cmos/cmos_rtc.h>
-
-int time_command(int argc, const char** argv)
+int time_command(int argc, const char **argv)
 {
     ktime_t time;
     char buffer[256];

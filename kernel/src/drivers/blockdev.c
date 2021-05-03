@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
+ *
  * @brief Block device driver
- * 
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,19 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
+#include <arch/arch.h>
+#include <debug/backtrace.h>
 #include <drivers/blockdev.h>
+#include <logging/logging.h>
+#include <util/list.h>
+#include <vfs/vfs.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
-#include <stddef.h>
-
-#include <arch/arch.h>
-#include <debug/backtrace.h>
-#include <logging/logging.h>
-#include <util/list.h>
-#include <vfs/vfs.h>
 
 #define MAX_DESCRIPTION_LENGTH 256
 
@@ -66,9 +63,11 @@ typedef struct _blockdev_instance
 
 static blockdev_class_t *blockdev_classes[NUM_BLOCKDEV_CLASSES] = {NULL};
 
-static blockdev_instance_t *get_blockdev_instance(blockdev_class_t *class, uint32_t minor)
+static blockdev_instance_t *get_blockdev_instance(blockdev_class_t *class,
+                                                  uint32_t minor)
 {
-    for (list_node_t *lnode = class->instance_list->head; lnode != NULL; lnode = lnode->next)
+    for (list_node_t *lnode = class->instance_list->head; lnode != NULL;
+         lnode = lnode->next)
     {
         blockdev_instance_t *instance = lnode->payload;
 
@@ -88,9 +87,11 @@ static void release_blockdev_instance(blockdev_instance_t *instance)
     instance->ref_count--;
 }
 
-int reg_blockdev_class(uint64_t major, const char *desc, blockdev_read_func_t read, blockdev_write_func_t write)
+int reg_blockdev_class(uint64_t major,
+                       const char *desc,
+                       blockdev_read_func_t read,
+                       blockdev_write_func_t write)
 {
-
     blockdev_class_t *class;
     if (major > NUM_BLOCKDEV_CLASSES)
     {
@@ -127,7 +128,10 @@ int reg_blockdev_class(uint64_t major, const char *desc, blockdev_read_func_t re
     return 0;
 }
 
-static uint32_t read_blockdev_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
+static uint32_t read_blockdev_fs(fs_node_t *node,
+                                 uint64_t offset,
+                                 uint32_t size,
+                                 uint8_t *buffer)
 {
     blockdev_instance_t *instance = (blockdev_instance_t *)node->device;
     blockdev_class_t *class = instance->class;
@@ -135,7 +139,10 @@ static uint32_t read_blockdev_fs(fs_node_t *node, uint64_t offset, uint32_t size
     return blockdev_read(class->major, instance->minor, offset, size, buffer);
 }
 
-static uint32_t write_blockdev_fs(fs_node_t *node, uint64_t offset, uint32_t size, uint8_t *buffer)
+static uint32_t write_blockdev_fs(fs_node_t *node,
+                                  uint64_t offset,
+                                  uint32_t size,
+                                  uint8_t *buffer)
 {
     (void)node;
 
@@ -148,7 +155,11 @@ static void open_blockdev_fs(fs_node_t *node, uint32_t flags)
     blockdev_class_t *class = instance->class;
 }
 
-int reg_blockdev_instance(uint32_t major, uint32_t minor, const char *desc, size_t block_size, size_t capacity)
+int reg_blockdev_instance(uint32_t major,
+                          uint32_t minor,
+                          const char *desc,
+                          size_t block_size,
+                          size_t capacity)
 {
     blockdev_class_t *class;
     blockdev_instance_t *instance;
@@ -273,7 +284,11 @@ int unreg_blockdev_instance(uint32_t major, uint32_t minor)
     return 0;
 }
 
-uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, size_t len, void *buffer)
+uint32_t blockdev_read(unsigned int major,
+                       unsigned int minor,
+                       uint32_t offset,
+                       size_t len,
+                       void *buffer)
 {
     blockdev_class_t *class;
     blockdev_instance_t *instance;
@@ -391,7 +406,11 @@ uint32_t blockdev_read(unsigned int major, unsigned int minor, uint32_t offset, 
     return 0;
 }
 
-uint32_t blockdev_write(unsigned int major, unsigned int minor, uint32_t offset, size_t len, void *buffer)
+uint32_t blockdev_write(unsigned int major,
+                        unsigned int minor,
+                        uint32_t offset,
+                        size_t len,
+                        void *buffer)
 {
     blockdev_class_t *class;
     blockdev_instance_t *instance;

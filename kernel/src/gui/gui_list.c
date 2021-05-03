@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <gui/gui_list.h>
@@ -75,7 +75,9 @@ void *gui_list_get_at(gui_list_t *list, unsigned int index)
 
     gui_list_node_t *current_node = list->root_node;
 
-    for (unsigned int current_index = 0; (current_index < index && current_node); ++current_index)
+    for (unsigned int current_index = 0;
+         (current_index < index && current_node);
+         ++current_index)
     {
         current_node = current_node->next;
     }
@@ -94,7 +96,9 @@ void *gui_list_remove_at(gui_list_t *list, unsigned int index)
 
     gui_list_node_t *current_node = list->root_node;
 
-    for (unsigned int current_index = 0; (current_index < index) && current_node; current_index++)
+    for (unsigned int current_index = 0;
+         (current_index < index) && current_node;
+         current_index++)
     {
         current_node = current_node->next;
     }
@@ -127,3 +131,7 @@ void *gui_list_remove_at(gui_list_t *list, unsigned int index)
 
     return payload;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

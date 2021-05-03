@@ -1,4 +1,4 @@
-set(TOOLCHAIN_DIR "${CMAKE_SOURCE_DIR}/toolchain")
+set(TOOLCHAIN_DIR "/opt")
 
 if(NOT EXISTS "${TOOLCHAIN_DIR}/OS6_cross_cc")
 message(FATAL_ERROR "Did not find cross-compiler directory. Did you run ./build_toolchain.sh from the ${TOOLCHAIN_DIR} directory?")

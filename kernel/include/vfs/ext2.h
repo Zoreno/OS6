@@ -23,9 +23,10 @@
 #ifndef _EXT2_H
 #define _EXT2_H
 
-#include <stdint.h>
 #include <sync/spinlock.h>
 #include <vfs/vfs.h>
+
+#include <stdint.h>
 
 #define EXT2_SUPER_MAGIC 0xEF53
 #define EXT2_DIRECT_BLOCKS 12

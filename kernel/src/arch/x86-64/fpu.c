@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <arch/x86-64/fpu.h>
@@ -31,8 +31,7 @@ void arch_x64_64_set_fpu_cw(const uint16_t cw)
 
 void arch_x64_64_get_fpu_cw(uint16_t *cw)
 {
-    __asm__ volatile("fstcw %0"
-                     : "=m"(*cw));
+    __asm__ volatile("fstcw %0" : "=m"(*cw));
 }
 
 void arch_x86_64_set_rounding_mode(uint16_t mode)
@@ -72,16 +71,14 @@ void arch_x64_64_enable_fpu()
 
     size_t t;
 
-    __asm__ volatile("mov %%cr0, %0"
-                     : "=r"(t));
+    __asm__ volatile("mov %%cr0, %0" : "=r"(t));
 
     t &= ~(1 << 2);
     t |= (1 << 1);
 
     __asm__ volatile("mov %0, %%cr0" ::"r"(t));
 
-    __asm__ volatile("mov %%cr4, %0"
-                     : "=r"(t));
+    __asm__ volatile("mov %%cr4, %0" : "=r"(t));
 
     t |= 3 << 9;
 
@@ -92,8 +89,7 @@ void arch_x64_64_disable_fpu()
 {
     size_t t;
 
-    __asm__ volatile("mov %%cr0, %0"
-                     : "=r"(t));
+    __asm__ volatile("mov %%cr0, %0" : "=r"(t));
 
     t |= (1 << 3);
 

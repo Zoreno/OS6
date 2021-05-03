@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,17 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
-
-#include <usb/usb_device.h>
-
-#include <stdio.h>
-#include <stdlib.h>
 
 #include <arch/arch.h>
 #include <debug/backtrace.h>
 #include <logging/logging.h>
+#include <usb/usb_device.h>
 #include <usb/usb_driver.h>
+
+#include <stdio.h>
+#include <stdlib.h>
 
 //=============================================================================
 // Local variables
@@ -163,7 +162,8 @@ int usb_dev_init(usb_device_t *dev)
 
     log_debug("[USB_DEVICE] conf_count: %i", dev_desc.conf_count);
 
-    for (uint32_t conf_index = 0; conf_index < dev_desc.conf_count; ++conf_index)
+    for (uint32_t conf_index = 0; conf_index < dev_desc.conf_count;
+         ++conf_index)
     {
         if (!usb_dev_request(dev,
                              RT_DEV_TO_HOST | RT_STANDARD | RT_DEV,
@@ -181,9 +181,11 @@ int usb_dev_init(usb_device_t *dev)
 
         if (conf_desc->total_len > sizeof(conf_buf))
         {
-            log_warn("[USB_DEVICE] Configuration buffer length %i greater than %d bytes",
-                     conf_desc->total_len,
-                     sizeof(conf_buf));
+            log_warn(
+                "[USB_DEVICE] Configuration buffer length %i greater than %d "
+                "bytes",
+                conf_desc->total_len,
+                sizeof(conf_buf));
 
             continue;
         }
@@ -357,7 +359,10 @@ int usb_dev_get_langs(usb_device_t *dev, uint16_t *langs)
     return 1;
 }
 
-int usb_dev_get_string(usb_device_t *dev, char *str, uint32_t langId, uint32_t str_index)
+int usb_dev_get_string(usb_device_t *dev,
+                       char *str,
+                       uint32_t langId,
+                       uint32_t str_index)
 {
     str[0] = '\0';
     if (!str_index)

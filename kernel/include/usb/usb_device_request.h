@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-20
- * 
+ *
  * @brief Usb device request struct
- * 
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _USB_DEVICE_REQUEST_H
@@ -84,30 +84,30 @@
 // USB Standard feature selectors
 //=============================================================================
 
-#define F_DEVICE_REMOTE_WAKEUP 1 // Device
-#define F_ENDPOINT_HALT 2        // Endpoint
-#define F_TEST_MODE 3            // Device
+#define F_DEVICE_REMOTE_WAKEUP 1  // Device
+#define F_ENDPOINT_HALT 2         // Endpoint
+#define F_TEST_MODE 3             // Device
 
 //=============================================================================
 // USB HUB Feature Selectors
 //=============================================================================
 
-#define F_C_HUB_LOCAL_POWER 0    // Hub
-#define F_C_HUB_OVER_CURRENT 1   // Hub
-#define F_PORT_CONNECTION 0      // Port
-#define F_PORT_ENABLE 1          // Port
-#define F_PORT_SUSPEND 2         // Port
-#define F_PORT_OVER_CURRENT 3    // Port
-#define F_PORT_RESET 4           // Port
-#define F_PORT_POWER 8           // Port
-#define F_PORT_LOW_SPEED 9       // Port
-#define F_C_PORT_CONNECTION 16   // Port
-#define F_C_PORT_ENABLE 17       // Port
-#define F_C_PORT_SUSPEND 18      // Port
-#define F_C_PORT_OVER_CURRENT 19 // Port
-#define F_C_PORT_RESET 20        // Port
-#define F_PORT_TEST 21           // Port
-#define F_PORT_INDICATOR 22      // Port
+#define F_C_HUB_LOCAL_POWER 0     // Hub
+#define F_C_HUB_OVER_CURRENT 1    // Hub
+#define F_PORT_CONNECTION 0       // Port
+#define F_PORT_ENABLE 1           // Port
+#define F_PORT_SUSPEND 2          // Port
+#define F_PORT_OVER_CURRENT 3     // Port
+#define F_PORT_RESET 4            // Port
+#define F_PORT_POWER 8            // Port
+#define F_PORT_LOW_SPEED 9        // Port
+#define F_C_PORT_CONNECTION 16    // Port
+#define F_C_PORT_ENABLE 17        // Port
+#define F_C_PORT_SUSPEND 18       // Port
+#define F_C_PORT_OVER_CURRENT 19  // Port
+#define F_C_PORT_RESET 20         // Port
+#define F_PORT_TEST 21            // Port
+#define F_PORT_INDICATOR 22       // Port
 
 //=============================================================================
 // USB Device request

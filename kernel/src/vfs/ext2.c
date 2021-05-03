@@ -20,16 +20,15 @@
  *
  */
 
+#include <cmos/cmos_rtc.h>
+#include <debug/backtrace.h>
+#include <logging/logging.h>
 #include <vfs/ext2.h>
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <cmos/cmos_rtc.h>
-#include <debug/backtrace.h>
-#include <logging/logging.h>
 
 #define DEBUG_EXT2 1
 

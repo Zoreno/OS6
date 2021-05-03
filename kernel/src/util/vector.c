@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-21
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,20 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
+#include <debug/backtrace.h>
 #include <util/vector.h>
 
-#include <debug/backtrace.h>
-
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
 void vector_init(vector_t *v)
 {
-    v->data = NULL,
-    v->size = 0;
+    v->data = NULL, v->size = 0;
     v->count = 0;
 }
 
@@ -75,7 +73,10 @@ void vector_add(vector_t *v, void *element)
         }
     }
 
-    printf("v->data: %#016x, v->size: %i, v->count: %i\n", v->data, v->size, v->count);
+    printf("v->data: %#016x, v->size: %i, v->count: %i\n",
+           v->data,
+           v->size,
+           v->count);
 
     v->data[v->count] = element;
     ++v->count;

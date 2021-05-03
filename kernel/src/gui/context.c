@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,15 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
+#include <arch/arch.h>
 #include <gui/context.h>
 #include <gui/font.h>
 
 #include <stdint.h>
 #include <string.h>
-
-#include <arch/arch.h>
 
 Context *Context_new(uint16_t width, uint16_t height, uint32_t *buffer)
 {
@@ -54,14 +53,13 @@ Context *Context_new(uint16_t width, uint16_t height, uint32_t *buffer)
     return context;
 }
 
-void Context_clipped_rect(
-    Context *context,
-    int x,
-    int y,
-    unsigned int width,
-    unsigned int height,
-    rect_t *clip_area,
-    uint32_t color)
+void Context_clipped_rect(Context *context,
+                          int x,
+                          int y,
+                          unsigned int width,
+                          unsigned int height,
+                          rect_t *clip_area,
+                          uint32_t color)
 {
     int cur_x;
     int max_x = x + width;
@@ -94,13 +92,12 @@ void Context_clipped_rect(
     }
 }
 
-void Context_fill_rect(
-    Context *context,
-    int x,
-    int y,
-    unsigned int width,
-    unsigned int height,
-    uint32_t color)
+void Context_fill_rect(Context *context,
+                       int x,
+                       int y,
+                       unsigned int width,
+                       unsigned int height,
+                       uint32_t color)
 {
     int max_x = x + width;
     int max_y = y + height;
@@ -117,13 +114,7 @@ void Context_fill_rect(
             clip_area = (rect_t *)gui_list_get_at(context->clip_rects, i);
 
             Context_clipped_rect(
-                context,
-                x,
-                y,
-                width,
-                height,
-                clip_area,
-                color);
+                context, x, y, width, height, clip_area, color);
         }
     }
     else
@@ -136,27 +127,20 @@ void Context_fill_rect(
             screen_area.right = context->width - 1;
 
             Context_clipped_rect(
-                context,
-                x,
-                y,
-                width,
-                height,
-                &screen_area,
-                color);
+                context, x, y, width, height, &screen_area, color);
         }
     }
 }
 
-void Context_clipped_bitmap(
-    Context *context,
-    int source_x,
-    int source_y,
-    int dest_x,
-    int dest_y,
-    unsigned int width,
-    unsigned int height,
-    rect_t *clip_area,
-    unsigned int *source)
+void Context_clipped_bitmap(Context *context,
+                            int source_x,
+                            int source_y,
+                            int dest_x,
+                            int dest_y,
+                            unsigned int width,
+                            unsigned int height,
+                            rect_t *clip_area,
+                            unsigned int *source)
 {
     int cur_dest_x;
     int cur_source_x;
@@ -171,7 +155,8 @@ void Context_clipped_bitmap(
 
     if (dest_x < clip_area->left)
     {
-        source_x += clip_area->left - dest_x; // Don't forget to update source aswell :)
+        source_x += clip_area->left -
+                    dest_x;  // Don't forget to update source aswell :)
         dest_x = clip_area->left;
     }
 
@@ -195,8 +180,7 @@ void Context_clipped_bitmap(
 
     for (; dest_y < max_y; ++dest_y, ++source_y)
     {
-        for (cur_dest_x = dest_x, cur_source_x = source_x;
-             cur_source_x < max_x;
+        for (cur_dest_x = dest_x, cur_source_x = source_x; cur_source_x < max_x;
              ++cur_dest_x, ++cur_source_x)
         {
             context->buffer[dest_y * context->width + cur_dest_x] =
@@ -208,15 +192,14 @@ void Context_clipped_bitmap(
 // TODO: Implement scaling with different source and dest width/height
 // TODO: Implement different texture formats for the bitmaps source and
 // dest bitmaps
-void Context_fill_bitmap(
-    Context *context,
-    int source_x,
-    int source_y,
-    int dest_x,
-    int dest_y,
-    unsigned int width,
-    unsigned int height,
-    unsigned int *source)
+void Context_fill_bitmap(Context *context,
+                         int source_x,
+                         int source_y,
+                         int dest_x,
+                         int dest_y,
+                         unsigned int width,
+                         unsigned int height,
+                         unsigned int *source)
 {
     int i;
 
@@ -228,8 +211,15 @@ void Context_fill_bitmap(
         for (i = 0; i < context->clip_rects->count; ++i)
         {
             clip_area = (rect_t *)gui_list_get_at(context->clip_rects, i);
-            Context_clipped_bitmap(context, source_x, source_y, dest_x,
-                                   dest_y, width, height, clip_area, source);
+            Context_clipped_bitmap(context,
+                                   source_x,
+                                   source_y,
+                                   dest_x,
+                                   dest_y,
+                                   width,
+                                   height,
+                                   clip_area,
+                                   source);
         }
     }
     else
@@ -240,39 +230,37 @@ void Context_fill_bitmap(
             screen_area.left = 0;
             screen_area.bottom = context->height - 1;
             screen_area.right = context->width - 1;
-            Context_clipped_bitmap(context, source_x, source_y, dest_x,
-                                   dest_y, width, height, &screen_area, source);
+            Context_clipped_bitmap(context,
+                                   source_x,
+                                   source_y,
+                                   dest_x,
+                                   dest_y,
+                                   width,
+                                   height,
+                                   &screen_area,
+                                   source);
         }
     }
 }
 
 void Context_horizontal_line(
-    Context *context,
-    int x,
-    int y,
-    unsigned int length,
-    uint32_t color)
+    Context *context, int x, int y, unsigned int length, uint32_t color)
 {
     Context_fill_rect(context, x, y, length, 1, color);
 }
 
 void Context_vertical_line(
-    Context *context,
-    int x,
-    int y,
-    unsigned int length,
-    uint32_t color)
+    Context *context, int x, int y, unsigned int length, uint32_t color)
 {
     Context_fill_rect(context, x, y, 1, length, color);
 }
 
-void Context_draw_rect(
-    Context *context,
-    int x,
-    int y,
-    unsigned int width,
-    unsigned int height,
-    uint32_t color)
+void Context_draw_rect(Context *context,
+                       int x,
+                       int y,
+                       unsigned int width,
+                       unsigned int height,
+                       uint32_t color)
 {
     Context_horizontal_line(context, x, y, width, color);
     Context_vertical_line(context, x, y + 1, height - 2, color);
@@ -317,9 +305,7 @@ void Context_intersect_clip_rect(Context *context, rect_t *rect)
     free(rect);
 }
 
-void Context_subtract_clip_rect(
-    Context *context,
-    rect_t *subtracted_rect)
+void Context_subtract_clip_rect(Context *context, rect_t *subtracted_rect)
 {
     int i, j;
 
@@ -377,7 +363,8 @@ void Context_clear_clip_rects(Context *context)
     }
 }
 
-void Context_draw_char_clipped(Context *context, char c, int x, int y, uint32_t color, rect_t *bound_rect)
+void Context_draw_char_clipped(
+    Context *context, char c, int x, int y, uint32_t color, rect_t *bound_rect)
 {
     int font_x;
     int font_y;
@@ -392,10 +379,8 @@ void Context_draw_char_clipped(Context *context, char c, int x, int y, uint32_t 
 
     c &= 0x7F;
 
-    if (x > bound_rect->right ||
-        (x + 8) <= bound_rect->left ||
-        y > bound_rect->bottom ||
-        (y + 12) <= bound_rect->top)
+    if (x > bound_rect->right || (x + 8) <= bound_rect->left ||
+        y > bound_rect->bottom || (y + 12) <= bound_rect->top)
     {
         return;
     }
@@ -431,7 +416,8 @@ void Context_draw_char_clipped(Context *context, char c, int x, int y, uint32_t 
         {
             if (shift_line & 0x80)
             {
-                context->buffer[(font_y + y) * context->width + (font_x + x)] = color;
+                context->buffer[(font_y + y) * context->width + (font_x + x)] =
+                    color;
             }
 
             shift_line <<= 1;
@@ -466,9 +452,9 @@ void Context_draw_char(Context *context, char c, int x, int y, uint32_t color)
     }
 }
 
-void Context_draw_text(Context *context, char *string, int x, int y, uint32_t color)
+void Context_draw_text(
+    Context *context, char *string, int x, int y, uint32_t color)
 {
-
     if (!string)
     {
         return;

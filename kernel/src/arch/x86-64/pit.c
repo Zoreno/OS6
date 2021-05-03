@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,14 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
+#include <arch/x86-64/pic.h>
 #include <arch/x86-64/pit.h>
+#include <process/process.h>
 
 #include <stdio.h>
-
-#include <arch/x86-64/pic.h>
-#include <process/process.h>
 
 #define ARCH_X86_64_PIT_REG_COUNTER0 0x40
 #define ARCH_X86_64_PIT_REG_COUNTER1 0x41
@@ -48,7 +47,7 @@ void arch_x86_64_pit_irq(system_stack_t *regs)
 
     ++_pit_ticks;
 
-    //printf("[PIC] PIT tick: %8i\n", _pit_ticks);
+    // printf("[PIC] PIT tick: %8i\n", _pit_ticks);
 
     if (_on_tick_handler)
     {

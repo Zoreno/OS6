@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,15 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
-#include <mm/phys_mem.h>
-
+#include <logging/logging.h>
 #include <mm/mm_bitmap.h>
+#include <mm/phys_mem.h>
 
 #include <stdio.h>
 #include <string.h>
-
-#include <logging/logging.h>
 
 #define PHYS_MEM_BLOCKS_PER_BYTE 8
 #define PHYS_MEM_BLOCK_SIZE 4096
@@ -86,11 +84,15 @@ static uint64_t get_addr(uint64_t frame)
 void phys_mem_init(memory_info_t *mem_info)
 {
     _phys_mem.memory_size = mem_info->memory_size;
-    _phys_mem.bitmap = (mm_bitmap_t)(align_up(mem_info->kernel_end, PHYS_MEM_BLOCK_SIZE));
-    _phys_mem.max_blocks = align_up(mem_info->memory_size, PHYS_MEM_BLOCK_SIZE) / PHYS_MEM_BLOCK_SIZE;
+    _phys_mem.bitmap =
+        (mm_bitmap_t)(align_up(mem_info->kernel_end, PHYS_MEM_BLOCK_SIZE));
+    _phys_mem.max_blocks =
+        align_up(mem_info->memory_size, PHYS_MEM_BLOCK_SIZE) /
+        PHYS_MEM_BLOCK_SIZE;
     _phys_mem.used_blocks = _phys_mem.max_blocks;
 
-    log_debug("[PMM] Bitmap size: %i", phys_mem_get_block_count() / PHYS_MEM_BLOCKS_PER_BYTE);
+    log_debug("[PMM] Bitmap size: %i",
+              phys_mem_get_block_count() / PHYS_MEM_BLOCKS_PER_BYTE);
 
     int entries = (phys_mem_get_block_count() + 63) / 64;
 
@@ -103,7 +105,8 @@ void phys_mem_init(memory_info_t *mem_info)
     {
         if (mem_info->regions[i].addr != 0)
         {
-            phys_mem_init_region(mem_info->regions[i].addr, mem_info->regions[i].len);
+            phys_mem_init_region(mem_info->regions[i].addr,
+                                 mem_info->regions[i].len);
         }
     }
 
@@ -111,9 +114,13 @@ void phys_mem_init(memory_info_t *mem_info)
     phys_mem_deinit_region(mem_info->kernel_load_addr, mem_info->kernel_size);
 
     // Deinit memory used for the bitmap
-    phys_mem_deinit_region((phys_addr)_phys_mem.bitmap, phys_mem_get_block_count() / PHYS_MEM_BLOCKS_PER_BYTE);
+    phys_mem_deinit_region(
+        (phys_addr)_phys_mem.bitmap,
+        phys_mem_get_block_count() / PHYS_MEM_BLOCKS_PER_BYTE);
 
-    log_info("[PMM] Initialized! Bitmap address: %#016x, (Entries: %i)", _phys_mem.bitmap, entries);
+    log_info("[PMM] Initialized! Bitmap address: %#016x, (Entries: %i)",
+             _phys_mem.bitmap,
+             entries);
 }
 
 void phys_mem_init_region(phys_addr base, size_t size)
@@ -121,7 +128,11 @@ void phys_mem_init_region(phys_addr base, size_t size)
     uint64_t align = base / PHYS_MEM_BLOCK_ALIGN;
     uint64_t blocks = align_up(size, PHYS_MEM_BLOCK_SIZE) / PHYS_MEM_BLOCK_SIZE;
 
-    log_debug("[PMM] Initing region: %#016x, (%i bytes)(Frame: %i count: %i)", base, size, align, blocks);
+    log_debug("[PMM] Initing region: %#016x, (%i bytes)(Frame: %i count: %i)",
+              base,
+              size,
+              align,
+              blocks);
 
     for (uint64_t i = 0; i < blocks; ++i)
     {
@@ -137,7 +148,11 @@ void phys_mem_deinit_region(phys_addr base, size_t size)
     uint64_t align = base / PHYS_MEM_BLOCK_ALIGN;
     uint64_t blocks = align_up(size, PHYS_MEM_BLOCK_SIZE) / PHYS_MEM_BLOCK_SIZE;
 
-    log_debug("[PMM] Deiniting region: %#016x, (%i bytes)(Frame: %i count: %i)", base, size, align, blocks);
+    log_debug("[PMM] Deiniting region: %#016x, (%i bytes)(Frame: %i count: %i)",
+              base,
+              size,
+              align,
+              blocks);
 
     for (uint64_t i = 0; i < blocks; ++i)
     {
@@ -154,7 +169,8 @@ void *phys_mem_alloc_block()
         return 0;
     }
 
-    uint64_t frame = mm_bitmap_first_free(_phys_mem.bitmap, _phys_mem.max_blocks);
+    uint64_t frame =
+        mm_bitmap_first_free(_phys_mem.bitmap, _phys_mem.max_blocks);
 
     if ((int)frame == -1)
     {
@@ -196,7 +212,8 @@ void *phys_mem_alloc_blocks(size_t blocks)
         return 0;
     }
 
-    uint64_t frame = mm_bitmap_first_free_s(_phys_mem.bitmap, _phys_mem.max_blocks, blocks);
+    uint64_t frame =
+        mm_bitmap_first_free_s(_phys_mem.bitmap, _phys_mem.max_blocks, blocks);
 
     if ((int)frame == -1)
     {

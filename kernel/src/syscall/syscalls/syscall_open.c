@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-08-08
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <syscall/syscall.h>
@@ -147,7 +147,7 @@ int syscall_open(const char *file, int flags, int mode)
         FILE_DESC_OFFSET(fd) = 0;
     }
 
-    //printf("[OPEN] Process %i opened file", process_get_pid());
+    // printf("[OPEN] Process %i opened file", process_get_pid());
 
     return fd;
 }

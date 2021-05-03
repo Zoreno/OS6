@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-12-29
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,35 +17,35 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _ACPI_RDST_H
 #define _ACPI_RSDT_H
 
-#include <stdint.h>
-
 #include "acpi_header.h"
 
+#include <stdint.h>
+
 /**
-* Extended System Description Table
-*
-* Contains pointers to other system description tables.
-*
-* Header signature must be "XSDT"
-*/
+ * Extended System Description Table
+ *
+ * Contains pointers to other system description tables.
+ *
+ * Header signature must be "XSDT"
+ */
 typedef struct
 {
     /**
-	* Standard ACPI header.
-	*/
+     * Standard ACPI header.
+     */
     acpi_header_t header;
 
     /**
-	* First table entry.
-	*
-	* Number of entries is determined by size of table.
-	*/
+     * First table entry.
+     *
+     * Number of entries is determined by size of table.
+     */
     uint64_t tables[1];
 } __attribute__((packed)) xsdt_t;
 

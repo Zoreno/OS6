@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _LIST_H_
@@ -36,4 +36,8 @@ int gui_list_add(gui_list_t *list, void *payload);
 void *gui_list_get_at(gui_list_t *list, unsigned int index);
 void *gui_list_remove_at(gui_list_t *list, unsigned int index);
 
-#endif // _LIST_H_
+#endif  // _LIST_H_
+
+//=============================================================================
+// End of file
+//=============================================================================

@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2020-08-09
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,19 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <simple_cli/commands.h>
 #include <simple_cli/simple_cli.h>
-
 #include <syscall/syscall.h>
 
 #include <stdio.h>
 
-static void ls_command_format_permissions(uint32_t permissions, char* buffer)
+static void ls_command_format_permissions(uint32_t permissions, char *buffer)
 {
-    sprintf(buffer, "%c%c%c%c%c%c%c%c%c",
+    sprintf(buffer,
+            "%c%c%c%c%c%c%c%c%c",
             permissions & S_IRUSR ? 'r' : '-',
             permissions & S_IWUSR ? 'w' : '-',
             permissions & S_IXUSR ? 'x' : '-',
@@ -43,7 +43,9 @@ static void ls_command_format_permissions(uint32_t permissions, char* buffer)
             permissions & S_IXOTH ? 'x' : '-');
 }
 
-static void ls_command_format_size(int human_readable, size_t size, char* buffer)
+static void ls_command_format_size(int human_readable,
+                                   size_t size,
+                                   char *buffer)
 {
     if (human_readable)
     {
@@ -66,9 +68,10 @@ static void ls_command_format_size(int human_readable, size_t size, char* buffer
     sprintf(buffer, "%d", (int)size);
 }
 
-int ls_command(int argc, const char** argv)
+int ls_command(int argc, const char **argv)
 {
-    int fd = syscall_open(simple_cli_get_working_directory(), O_DIRECTORY, O_RDONLY);
+    int fd =
+        syscall_open(simple_cli_get_working_directory(), O_DIRECTORY, O_RDONLY);
 
     if (fd < 0)
     {

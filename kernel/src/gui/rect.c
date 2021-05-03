@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <gui/rect.h>
@@ -59,11 +59,10 @@ gui_list_t *rect_split(rect_t *subject_rect, rect_t *cutting_rect)
     if (cutting_rect->left > subject_copy.left &&
         cutting_rect->left <= subject_copy.right)
     {
-        if (!(temp_rect = rect_new(
-                  subject_copy.top,
-                  subject_copy.left,
-                  subject_copy.bottom,
-                  cutting_rect->left - 1)))
+        if (!(temp_rect = rect_new(subject_copy.top,
+                                   subject_copy.left,
+                                   subject_copy.bottom,
+                                   cutting_rect->left - 1)))
         {
             free(output_rects);
 
@@ -78,11 +77,10 @@ gui_list_t *rect_split(rect_t *subject_rect, rect_t *cutting_rect)
     if (cutting_rect->top > subject_copy.top &&
         cutting_rect->top <= subject_copy.bottom)
     {
-        if (!(temp_rect = rect_new(
-                  subject_copy.top,
-                  subject_copy.left,
-                  cutting_rect->top - 1,
-                  subject_copy.right)))
+        if (!(temp_rect = rect_new(subject_copy.top,
+                                   subject_copy.left,
+                                   cutting_rect->top - 1,
+                                   subject_copy.right)))
         {
             while (output_rects->count)
             {
@@ -104,11 +102,10 @@ gui_list_t *rect_split(rect_t *subject_rect, rect_t *cutting_rect)
     if (cutting_rect->right >= subject_copy.left &&
         cutting_rect->right < subject_copy.right)
     {
-        if (!(temp_rect = rect_new(
-                  subject_copy.top,
-                  cutting_rect->right + 1,
-                  subject_copy.bottom,
-                  subject_copy.right)))
+        if (!(temp_rect = rect_new(subject_copy.top,
+                                   cutting_rect->right + 1,
+                                   subject_copy.bottom,
+                                   subject_copy.right)))
         {
             while (output_rects->count)
             {
@@ -129,11 +126,10 @@ gui_list_t *rect_split(rect_t *subject_rect, rect_t *cutting_rect)
     if (cutting_rect->bottom >= subject_copy.top &&
         cutting_rect->bottom < subject_copy.bottom)
     {
-        if (!(temp_rect = rect_new(
-                  cutting_rect->bottom + 1,
-                  subject_copy.left,
-                  subject_copy.bottom,
-                  subject_copy.right)))
+        if (!(temp_rect = rect_new(cutting_rect->bottom + 1,
+                                   subject_copy.left,
+                                   subject_copy.bottom,
+                                   subject_copy.right)))
         {
             while (output_rects->count)
             {
@@ -158,31 +154,24 @@ rect_t *rect_intersect(rect_t *rect_a, rect_t *rect_b)
 {
     rect_t *result_rect;
 
-    if (!(rect_a->left <= rect_b->right &&
-          rect_a->right >= rect_b->left &&
-          rect_a->top <= rect_b->bottom &&
-          rect_a->bottom >= rect_b->top))
+    if (!(rect_a->left <= rect_b->right && rect_a->right >= rect_b->left &&
+          rect_a->top <= rect_b->bottom && rect_a->bottom >= rect_b->top))
     {
         return (rect_t *)0;
     }
 
     if (!(result_rect = rect_new(
-              rect_a->top,
-              rect_a->left,
-              rect_a->bottom,
-              rect_a->right)))
+              rect_a->top, rect_a->left, rect_a->bottom, rect_a->right)))
     {
         return (rect_t *)0;
     }
 
-    if (rect_b->left >= result_rect->left &&
-        rect_b->left <= result_rect->right)
+    if (rect_b->left >= result_rect->left && rect_b->left <= result_rect->right)
     {
         result_rect->left = rect_b->left;
     }
 
-    if (rect_b->top >= result_rect->top &&
-        rect_b->top <= result_rect->bottom)
+    if (rect_b->top >= result_rect->top && rect_b->top <= result_rect->bottom)
     {
         result_rect->top = rect_b->top;
     }
@@ -201,3 +190,7 @@ rect_t *rect_intersect(rect_t *rect_a, rect_t *rect_b)
 
     return result_rect;
 }
+
+//=============================================================================
+// End of file
+//=============================================================================

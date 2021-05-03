@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,8 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
-
-#include <gui/gui.h>
 
 #include <arch/arch.h>
 #include <drivers/keyboard_ps2.h>
@@ -28,6 +26,7 @@
 #include <drivers/vbe.h>
 #include <gui/context.h>
 #include <gui/desktop.h>
+#include <gui/gui.h>
 #include <gui/window.h>
 
 Desktop *desktop;
@@ -93,23 +92,9 @@ void gui_init()
     desktop = Desktop_new(context);
 
     cli();
-    Desktop_create_window(
-        (Window *)desktop,
-        10,
-        10,
-        300,
-        200,
-        0,
-        "Window 1");
+    Desktop_create_window((Window *)desktop, 10, 10, 300, 200, 0, "Window 1");
 
-    Desktop_create_window(
-        (Window *)desktop,
-        400,
-        10,
-        300,
-        200,
-        0,
-        "Window 2");
+    Desktop_create_window((Window *)desktop, 400, 10, 300, 200, 0, "Window 2");
 
     sti();
 
@@ -122,7 +107,7 @@ void gui_init()
         {
             timer_updated = 0;
             cli();
-            //Window_paint((Window *)desktop, NULL, 1);
+            // Window_paint((Window *)desktop, NULL, 1);
             Desktop_invalidate_start_bar((Window *)desktop);
             sti();
         }

@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-20
- * 
+ *
  * @brief PCI bus enumeration and device driver initialization
- * 
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,26 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
+#include <arch/arch.h>
+#include <logging/logging.h>
 #include <pci/pci.h>
+#include <pci/pci_io.h>
+#include <usb/usb_ehci.h>
+#include <usb/usb_uhci.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <arch/arch.h>
-#include <logging/logging.h>
-#include <pci/pci_io.h>
-#include <usb/usb_ehci.h>
-#include <usb/usb_uhci.h>
-
 pci_device_list_t *device_list = 0;
 
 #define SERIAL_PCI_OUTPUT 0
 
-#define PCI_MAKE_ID(bus, dev, func) (((bus) << 16) | ((dev) << 11) | ((func) << 8))
+#define PCI_MAKE_ID(bus, dev, func) \
+    (((bus) << 16) | ((dev) << 11) | ((func) << 8))
 
 // PCI Configuration Registers
 #define PCI_CONFIG_VENDOR_ID 0x00
@@ -110,12 +110,11 @@ void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
         return;
     }
 
-    const PciDriver_t _pci_driver_table[] =
-        {
-            {usb_uhci_init},
-            {usb_ehci_init},
-            {0},
-        };
+    const PciDriver_t _pci_driver_table[] = {
+        {usb_uhci_init},
+        {usb_ehci_init},
+        {0},
+    };
 
     const PciDriver_t *driver = _pci_driver_table;
 
@@ -184,16 +183,17 @@ void pciInit()
 
     while (cur_node != 0)
     {
-
         PciDeviceInfo_t *dev = &cur_node->dev_info;
 
-        printf("Device Name: %s\n", pci_device_name(dev->vendorID, dev->deviceID));
-        printf("Class Name: %s\n", pci_class_name(dev->classCode, dev->subClass, dev->progIntf));
+        printf("Device Name: %s\n",
+               pci_device_name(dev->vendorID, dev->deviceID));
+        printf("Class Name: %s\n",
+               pci_class_name(dev->classCode, dev->subClass, dev->progIntf));
 
         printf("Vendor ID: %#x\n", dev->vendorID);
         printf("Device ID: %#x\n", dev->deviceID);
-        printf("Command: %#x\n", dev->command_w); // TODO Print bit for bit
-        printf("Status: %#x\n", dev->status_w);   // TODO Print bit for bit
+        printf("Command: %#x\n", dev->command_w);  // TODO Print bit for bit
+        printf("Status: %#x\n", dev->status_w);    // TODO Print bit for bit
         printf("Revision ID: %#x\n", dev->revisionID);
         printf("Prog IF: %#x\n", dev->progIntf);
         printf("Subclass: %#x\n", dev->subClass);
@@ -233,7 +233,7 @@ void pciInit()
 
         printf("\n==========================================\n\n");
 
-        cur_node = cur_node->next; // Advance
+        cur_node = cur_node->next;  // Advance
     }
 
 #endif

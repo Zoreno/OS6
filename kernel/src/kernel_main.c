@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
+ *
  * @brief Kernel C entry point
- * 
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,8 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
-
-#include <assert.h>
-#include <ctype.h>
-#include <immintrin.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include <acpi/acpi.h>
 #include <arch/arch.h>
@@ -59,6 +52,13 @@
 #include <util/tree.h>
 #include <vfs/ext2.h>
 #include <vfs/vfs.h>
+
+#include <assert.h>
+#include <ctype.h>
+#include <immintrin.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
 
@@ -133,7 +133,8 @@ VFS
  - Fix proper listing of mounted paths
  - Pipes
  - Serial device
- - RAMdevice (May not be needed as the VFS is initialized early. Still nice for completion)
+ - RAMdevice (May not be needed as the VFS is initialized early. Still nice for
+completion)
 
 Sound
  - Sound card driver
@@ -157,7 +158,8 @@ GUI
    - Progress bar
    - Slider
    - Dropdown
- - Application ownership (add window to process resource table, unique window handle, inter-process communication)
+ - Application ownership (add window to process resource table, unique window
+handle, inter-process communication)
  - Input queue
  - Scroll
  - Change theme
@@ -222,7 +224,8 @@ extern void *__kernel_end;
 // TODO: Move to separate file
 void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
 {
-    struct multiboot_start_tag *start_tag = (struct multiboot_start_tag *)mb_ptr;
+    struct multiboot_start_tag *start_tag =
+        (struct multiboot_start_tag *)mb_ptr;
 
     uint32_t mb_size = start_tag->total_size;
 
@@ -240,14 +243,16 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
         {
         case MULTIBOOT_TAG_TYPE_CMDLINE:
         {
-            struct multiboot_tag_string *cmdline = (struct multiboot_tag_string *)tag;
+            struct multiboot_tag_string *cmdline =
+                (struct multiboot_tag_string *)tag;
             log_info("[MULTIBOOT] Command line \"%s\"", cmdline->string);
         }
         break;
 
         case MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME:
         {
-            struct multiboot_tag_string *boot_loader = (struct multiboot_tag_string *)tag;
+            struct multiboot_tag_string *boot_loader =
+                (struct multiboot_tag_string *)tag;
             log_info("[MULTIBOOT] Bootloader name \"%s\"", boot_loader->string);
         }
         break;
@@ -255,17 +260,22 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
         {
             struct multiboot_tag_basic_meminfo *basic_mem =
                 (struct multiboot_tag_basic_meminfo *)tag;
-            log_info("[MULTIBOOT] Basic memory: lower: %i upper: %i", basic_mem->mem_lower, basic_mem->mem_upper);
+            log_info("[MULTIBOOT] Basic memory: lower: %i upper: %i",
+                     basic_mem->mem_lower,
+                     basic_mem->mem_upper);
         }
         break;
         case MULTIBOOT_TAG_TYPE_BOOTDEV:
         {
-            struct multiboot_tag_bootdev *bootdev = (struct multiboot_tag_bootdev *)tag;
+            struct multiboot_tag_bootdev *bootdev =
+                (struct multiboot_tag_bootdev *)tag;
 
-            log_info("[MULTIBOOT] Boot device: biosdev: %i, partition: %i, sub_partition: %i",
-                     bootdev->biosdev,
-                     bootdev->slice,
-                     bootdev->part);
+            log_info(
+                "[MULTIBOOT] Boot device: biosdev: %i, partition: %i, "
+                "sub_partition: %i",
+                bootdev->biosdev,
+                bootdev->slice,
+                bootdev->part);
         }
         break;
         case MULTIBOOT_TAG_TYPE_MMAP:
@@ -274,7 +284,9 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
 
             int count = mmap->size / mmap->entry_size;
 
-            log_info("[MULTIBOOT] mmap: entry_size: %i, count: %i", mmap->entry_size, count);
+            log_info("[MULTIBOOT] mmap: entry_size: %i, count: %i",
+                     mmap->entry_size,
+                     count);
 
             int j = 0;
 
@@ -299,7 +311,8 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
         break;
         case MULTIBOOT_TAG_TYPE_LOAD_BASE_ADDR:
         {
-            struct multiboot_tag_load_base_addr *lba = (struct multiboot_tag_load_base_addr *)tag;
+            struct multiboot_tag_load_base_addr *lba =
+                (struct multiboot_tag_load_base_addr *)tag;
 
             log_info("[MULTIBOOT] Load base addr: %#08x", lba->load_base_addr);
         }
@@ -311,7 +324,8 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
         break;
         case MULTIBOOT_TAG_TYPE_ELF_SECTIONS:
         {
-            struct multiboot_tag_elf_sections *elf_sections = (struct multiboot_tag_elf_sections *)tag;
+            struct multiboot_tag_elf_sections *elf_sections =
+                (struct multiboot_tag_elf_sections *)tag;
 
             init_kernel_symbol_context(elf_sections, mem_info);
         }
@@ -348,7 +362,7 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
     mem_info->memory_size = largest_mem;
 
     mem_info->kernel_load_addr = (uint64_t)&__kernel_start;
-    //mem_info->kernel_end = (uint64_t)&__kernel_end;
+    // mem_info->kernel_end = (uint64_t)&__kernel_end;
     mem_info->kernel_size = mem_info->kernel_end - mem_info->kernel_load_addr;
 }
 
@@ -356,7 +370,10 @@ void mouse_moved_handler(mouse_moved_event_t *event)
 {
     static int i = 0;
 
-    printf("Mouse moved [%i]: %i, %i\n", i++, (int64_t)event->x, (int64_t)event->y);
+    printf("Mouse moved [%i]: %i, %i\n",
+           i++,
+           (int64_t)event->x,
+           (int64_t)event->y);
 }
 
 spinlock_t print_lock;
@@ -371,7 +388,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     set_stdout(scom1_fd);
 
-    log_init(LOG_DEBUG);
+    log_init(LOG_INFO);
 
     log_info("[KERNEL] Initializing kernel...");
 
@@ -418,7 +435,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     tasking_install();
 
-    //exec_elf("bin/hello_world", 0, NULL, NULL, 0);
+    // exec_elf("bin/hello_world", 0, NULL, NULL, 0);
 
     // printf("My pid: %d\n", pid);
 
@@ -428,7 +445,7 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     spinlock_init(&print_lock);
 
-    //printf("After switch\n");
+    // printf("After switch\n");
 
     /*
 
@@ -487,13 +504,19 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     log_info("[KERNEL] Kernel initailization done!\n");
 
-    printf("================================================================================\n");
-    printf("|| Launching GUI...                                                           ||\n");
-    printf("================================================================================\n");
+    printf(
+        "======================================================================"
+        "==========\n");
+    printf(
+        "|| Launching GUI...                                                   "
+        "        ||\n");
+    printf(
+        "======================================================================"
+        "==========\n");
 
-    //gui_init();
+    // gui_init();
 
-    //terminal_init();
+    // terminal_init();
 
     time_t curr_time = time(NULL);
 

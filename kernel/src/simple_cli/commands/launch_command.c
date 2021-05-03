@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2021-01-06
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2021,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,13 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
+#include <process/launch_program.h>
 #include <simple_cli/commands.h>
 
 #include <stdio.h>
-
-#include <process/launch_program.h>
 
 int launch_command(int argc, const char **argv)
 {
@@ -33,6 +32,7 @@ int launch_command(int argc, const char **argv)
         return -1;
     }
 
+    // TODO: Why is launch_program() taking non-const arg?
     launch_program((char *)argv[1]);
 
     return 0;

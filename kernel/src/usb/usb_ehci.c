@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-22
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,8 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
-
-#include <usb/usb_ehci.h>
-
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include <arch/arch.h>
 #include <debug/backtrace.h>
@@ -38,7 +31,13 @@
 #include <pci/pci_io.h>
 #include <usb/usb_controller.h>
 #include <usb/usb_device.h>
+#include <usb/usb_ehci.h>
 #include <util/link.h>
+
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 //==============================================================================
 // Definitions
@@ -57,8 +56,8 @@
 
 /**
  * @brief The EHCI Controller Capability registers
- * 
- * 
+ *
+ *
  */
 typedef struct _ehci_cap_regs_t
 {
@@ -72,8 +71,8 @@ typedef struct _ehci_cap_regs_t
 
     /**
      * @brief Reserved
-     * 
-     * 
+     *
+     *
      */
     uint8_t reserved;
 
@@ -87,15 +86,15 @@ typedef struct _ehci_cap_regs_t
 
     /**
      * @brief Structural parameters of the controller.
-     * 
-     * 
+     *
+     *
      */
     uint32_t hcs_params;
 
     /**
      * @brief Capability parameters of the controller.
-     * 
-     * 
+     *
+     *
      */
     uint32_t hcc_params;
 
@@ -113,7 +112,8 @@ typedef struct _ehci_cap_regs_t
 #define HCSPARAMS_N_PORTS_MASK (15 << 0)  // Number of Ports
 #define HCSPARAMS_PPC (1 << 4)            // Port Power Control
 #define HCSPARAMS_PORT_ROUTE (1 << 7)     // Port Routing Rules
-#define HCSPARAMS_N_PCC_MASK (15 << 8)    // Number of Ports per Companion Controller
+#define HCSPARAMS_N_PCC_MASK \
+    (15 << 8)  // Number of Ports per Companion Controller
 #define HCSPARAMS_N_PCC_SHIFT 8
 #define HCSPARAMS_N_CC_MASK (15 << 12)  // Number of Companion Controllers
 #define HCSPARAMS_N_CC_SHIFT 12
@@ -146,7 +146,7 @@ typedef struct _ehci_op_regs_t
      * The status resulting from a transaction on the serial bus is not
      * indicated in this register. Software sets a bit to 0 in this register by
      * writing a 1 to it.
-     * 
+     *
      */
     volatile uint32_t usb_status;
 
@@ -183,30 +183,30 @@ typedef struct _ehci_op_regs_t
 
     /**
      * @brief Periodic Frame List Base Address Register.
-     * 
+     *
      * This register contains the beginning address of the periodic frame list.
-     * 
+     *
      */
     volatile uint32_t periodic_list_base;
 
     /**
      * @brief Current Asynchronous List Address Register.
-     * 
+     *
      * This register contains the address of the next asynchronous queue head to
      * be executed.
-     * 
+     *
      */
     volatile uint32_t async_list_addr;
 
     /**
      * @brief Reserved
-     * 
-     * 
+     *
+     *
      */
     volatile uint32_t reserved[9];
 
     /**
-     * @brief Configure Flag Register. 
+     * @brief Configure Flag Register.
      *
      * This register is in the auxiliary power well. It is only reset by
      * hardware when the auxiliary power is initially applied or in response to
@@ -285,23 +285,24 @@ typedef struct _ehci_op_regs_t
 #define PORT_WKCNNT_E (1 << 20)    // Wake on Connect Enable
 #define PORT_WKDSCNNT_E (1 << 21)  // Wake on Disconnect Enable
 #define PORT_WKOC_E (1 << 22)      // Wake on Over-current Enable
-#define PORT_RWC (PORT_CONNECTION_CHANGE | PORT_ENABLE_CHANGE | PORT_OVER_CURRENT_CHANGE)
+#define PORT_RWC \
+    (PORT_CONNECTION_CHANGE | PORT_ENABLE_CHANGE | PORT_OVER_CURRENT_CHANGE)
 
 /**
  * @brief Isochronous High Speed Transfer Descriptor
- * 
+ *
  * This format is only used for high-speed isochronous endpoints.
- * 
+ *
  * @note Must be aligned on a 32 byte boundary.
- * 
+ *
  */
 typedef struct _ehci_itd_t
 {
     /**
      * @brief Next Link Pointer.
-     * 
+     *
      * Pointer to the next schedule data structure.
-     * 
+     *
      */
     uint32_t next_link;
 
@@ -317,43 +318,43 @@ typedef struct _ehci_itd_t
 
     /**
      * @brief iTD Buffer Page Pointer List.
-     * 
+     *
      * Page-pointers to the data buffer for this transfer descriptor.
      */
     uint32_t buffer[7];
 
     /**
      * @brief Extra iTD Buffer Page Pointer List.
-     * 
+     *
      * Page-pointers to the data buffer for this transfer descriptor.
      */
     uint32_t ext_buffer[7];
 
     /**
      * @brief Physical address of this transfer descriptor.
-     * 
-     * 
+     *
+     *
      */
     uint32_t this;
 
     /**
      * @brief Pointer to the next transfer descriptor.
-     * 
-     * 
+     *
+     *
      */
     uint32_t next;
 
     /**
      * @brief Pointer to the previous transfer descriptor.
-     * 
-     * 
+     *
+     *
      */
     uint32_t prev;
 
     /**
      * @brief Last token of the transfer.
-     * 
-     * 
+     *
+     *
      */
     uint32_t last_token;
 
@@ -391,31 +392,31 @@ typedef struct _ehci_itd_t
  * All full-speed isochronous transfer through Transaction Translators are
  * managed using the siTD data structure. The data structure satisfies the
  * operational requirements for managing the split transaction protocol.
- * 
+ *
  */
 typedef struct _ehci_sitd_t
 {
     /**
      * @brief Next Link Pointer.
-     * 
+     *
      * Pointer to the next schedule data structure.
-     * 
+     *
      */
     uint32_t next_link;
 
     /**
      * @brief Port number.
-     * 
+     *
      * Port number of the recipient transaction translator.
-     * 
+     *
      */
     uint8_t port_number;
 
     /**
      * @brief Hub address.
-     * 
+     *
      * Device address of the transaction translation's hub.
-     * 
+     *
      */
     uint8_t hub_address;
 
@@ -424,21 +425,21 @@ typedef struct _ehci_sitd_t
      *
      * Selects the particular endpoint number on the device serving as the
      * data source or sink.
-     * 
+     *
      */
     uint8_t endpoint;
 
     /**
      * @brief Device address.
-     * 
+     *
      * Selects the specific device serving as the data source or sink.
      */
     uint8_t device_address;
 
     /**
      * @brief Reserved.
-     * 
-     * 
+     *
+     *
      */
     uint16_t reserved1;
 
@@ -456,15 +457,15 @@ typedef struct _ehci_sitd_t
      *
      * This field is used to determine during which micro-frames the host
      * controller should execute start-split transactions.
-     * 
+     *
      */
     uint8_t s_mask;
 
     /**
      * @brief Transfer length.
-     * 
+     *
      * The number of bytes expected in this transfer.
-     * 
+     *
      */
     uint16_t transfer_length;
 
@@ -488,59 +489,59 @@ typedef struct _ehci_sitd_t
 
     /**
      * @brief Buffer Pointer List.
-     * 
+     *
      * Page-aligned buffer pointers.
-     * 
+     *
      */
     uint32_t buffer[2];
 
     /**
      * @brief Back Link Pointer.
-     * 
+     *
      * Physical memory of an ehci_sitd_t;
      */
     uint32_t back;
 
     /**
      * @brief Extra Buffer Pointer List.
-     * 
+     *
      * Page-aligned buffer pointers.
-     * 
+     *
      */
     uint32_t ext_buffer;
 
     /**
      * @brief Physical memory of this structure.
-     * 
-     * 
+     *
+     *
      */
     uint32_t this;
 
     /**
      * @brief Pointer to the next transfer descriptor
-     * 
-     * 
+     *
+     *
      */
     uint32_t next;
 
     /**
      * @brief Pointer to the previous transfer descriptor.
-     * 
-     * 
+     *
+     *
      */
     uint32_t prev;
 
     /**
      * @brief Size of the buffer.
-     * 
-     * 
+     *
+     *
      */
     size_t buffer_size;
 
     /**
      * @brief Buffer log.
-     * 
-     * 
+     *
+     *
      */
     void *buffer_log;
 
@@ -556,7 +557,7 @@ typedef struct _ehci_sitd_t
  * buffer pointers.
  *
  * @note Must be aligned on a 32 byte boundary.
- * 
+ *
  */
 typedef struct _ehci_td_t
 {
@@ -573,7 +574,7 @@ typedef struct _ehci_td_t
 
     /**
      * @brief Alternative pointer to the next transfer descriptor.
-     * 
+     *
      * Used for hardware advancement of the data stream to the next
      * client buffer on short packet.
      *
@@ -583,21 +584,22 @@ typedef struct _ehci_td_t
 
     /**
      * @brief Queue Transfer Descriptor State.
-     * 
-     * Contains most of the information needed for the USB host controller to execute the USB transaction.
+     *
+     * Contains most of the information needed for the USB host controller to
+     * execute the USB transaction.
      */
     volatile uint32_t token;
 
     /**
      * @brief Buffer Page Pointer List.
-     * 
+     *
      * Array of physical memory address pointers.
      */
     volatile uint32_t buffer[5];
 
     /**
      * @brief Extended Buffer Page Pointer List.
-     * 
+     *
      * Array of physical memory address pointers.
      */
     volatile uint32_t ext_buffer[5];
@@ -606,22 +608,22 @@ typedef struct _ehci_td_t
 
     /**
      * @brief Index of the next transfer descriptor.
-     * 
-     * 
+     *
+     *
      */
     uint32_t td_next;
 
     /**
      * @brief Non-zero if the TD is currently active.
-     * 
-     * 
+     *
+     *
      */
     uint32_t active;
 
     /**
      * @brief Padding to ensure the alignment of the field
-     * 
-     * 
+     *
+     *
      */
     uint8_t pad[4];
 
@@ -669,7 +671,7 @@ typedef struct _ehci_qh_t
      * Contains a link pointer to the next data object to be processed after any
      * required processing in the queue has been completed, as well as some
      * control bits.
-     * 
+     *
      */
     volatile uint32_t qhlp;
 
@@ -691,8 +693,8 @@ typedef struct _ehci_qh_t
 
     /**
      * @brief Current Transfer Descriptor Link Pointer.
-     * 
-     * 
+     *
+     *
      */
     volatile uint32_t cur_link;
 
@@ -707,36 +709,36 @@ typedef struct _ehci_qh_t
 
     /**
      * @brief USB Transfer descriptor pointer.
-     * 
-     * 
+     *
+     *
      */
     usb_transfer_t *transfer;
 
     /**
      * @brief Link node for this Queue Head.
-     * 
-     * 
+     *
+     *
      */
     link_t qh_link;
 
     /**
      * @brief Transfer Descriptor Head Pointer.
-     * 
-     * 
+     *
+     *
      */
     uint32_t td_head;
 
     /**
      * @brief Non-zero if the Queue Head is active at the moment.
-     * 
-     * 
+     *
+     *
      */
     uint32_t active;
 
     /**
      * @brief Padding to ensure that the data structure is 32-byte aligned.
-     * 
-     * 
+     *
+     *
      */
     uint8_t pad[28];
 } __attribute__((packed)) ehci_qh_t;
@@ -841,27 +843,38 @@ static ehci_controller_t *ehci_init_hc(uint32_t id, uint64_t port_addr);
 
 static void ehci_print_queue_head(ehci_qh_t *qh)
 {
-    printf("=========================================================================\n");
+    printf(
+        "======================================================================"
+        "===\n");
     printf("[EHCI] Queue Head %#08x\n\n", qh);
 
     printf("Queue Head Horizontal pointer: %#08x\n", qh->qhlp & ~0xF);
     printf("Type: %i\n", (qh->qhlp & 0b110) >> 1);
     printf("Terminate: %i\n\n", qh->qhlp & 0b1);
 
-    printf("NAK Count reload: %i\n", (qh->ch & QH_CH_NAK_RL_MASK) >> QH_CH_NAK_RL_SHIFT);
+    printf("NAK Count reload: %i\n",
+           (qh->ch & QH_CH_NAK_RL_MASK) >> QH_CH_NAK_RL_SHIFT);
     printf("Control endpoint: %i\n", (qh->ch & QH_CH_CONTROL) > 0 ? 1 : 0);
-    printf("Max packet length: %i\n", (qh->ch & QH_CH_MPL_MASK) >> QH_CH_MPL_SHIFT);
+    printf("Max packet length: %i\n",
+           (qh->ch & QH_CH_MPL_MASK) >> QH_CH_MPL_SHIFT);
     printf("Head of reclamation list: %i\n", (qh->ch & QH_CH_H) > 0 ? 1 : 0);
     printf("Data toggle control: %i\n", (qh->ch & QH_CH_DTC) > 0 ? 1 : 0);
-    printf("Endpoint speed: %i\n", (qh->ch & QH_CH_ENDP_MASK) >> QH_CH_ENDP_SHIFT);
-    printf("Inactive on next transaction: %i\n", (qh->ch & QH_CH_INACTIVE) > 0 ? 1 : 0);
+    printf("Endpoint speed: %i\n",
+           (qh->ch & QH_CH_ENDP_MASK) >> QH_CH_ENDP_SHIFT);
+    printf("Inactive on next transaction: %i\n",
+           (qh->ch & QH_CH_INACTIVE) > 0 ? 1 : 0);
     printf("Device address: %i\n\n", (qh->ch & QH_CH_DEVADDR_MASK));
 
-    printf("High BW Multiplier: %i\n", (qh->ch & QH_CAP_MULT_MASK) >> QH_CAP_MULT_SHIFT);
-    printf("Port number: %i\n", (qh->ch & QH_CAP_PORT_MASK) >> QH_CAP_PORT_SHIFT);
-    printf("Hub addr: %i\n", (qh->ch & QH_CAP_HUB_ADDR_MASK) >> QH_CAP_HUB_ADDR_SHIFT);
-    printf("Split completion: %i\n", (qh->ch & QH_CAP_SPLIT_C_MASK) >> QH_CAP_SPLIT_C_SHIFT);
-    printf("Interrupt schedule mask: %i\n\n", (qh->ch & QH_CAP_INT_SCHED_MASK) >> QH_CAP_INT_SCHED_SHIFT);
+    printf("High BW Multiplier: %i\n",
+           (qh->ch & QH_CAP_MULT_MASK) >> QH_CAP_MULT_SHIFT);
+    printf("Port number: %i\n",
+           (qh->ch & QH_CAP_PORT_MASK) >> QH_CAP_PORT_SHIFT);
+    printf("Hub addr: %i\n",
+           (qh->ch & QH_CAP_HUB_ADDR_MASK) >> QH_CAP_HUB_ADDR_SHIFT);
+    printf("Split completion: %i\n",
+           (qh->ch & QH_CAP_SPLIT_C_MASK) >> QH_CAP_SPLIT_C_SHIFT);
+    printf("Interrupt schedule mask: %i\n\n",
+           (qh->ch & QH_CAP_INT_SCHED_MASK) >> QH_CAP_INT_SCHED_SHIFT);
 
     printf("Ping: %i\n", (qh->token & TD_TOK_PING) > 0 ? 1 : 0);
     printf("STS: %i\n", (qh->token & TD_TOK_STS) > 0 ? 1 : 0);
@@ -874,7 +887,9 @@ static void ehci_print_queue_head(ehci_qh_t *qh)
     printf("PID: %i\n", (qh->token & TD_TOK_PID_MASK) >> TD_TOK_PID_SHIFT);
     printf("Cerr: %i\n", (qh->token & TD_TOK_CERR_MASK) >> TD_TOK_CERR_SHIFT);
     printf("Len: %i\n", (qh->token & TD_TOK_LEN_MASK) >> TD_TOK_LEN_SHIFT);
-    printf("=========================================================================\n");
+    printf(
+        "======================================================================"
+        "===\n");
 }
 
 static uint32_t ehci_qh_is_active(ehci_qh_t *qh)
@@ -1013,10 +1028,8 @@ static void ehci_init_td(ehci_td_t *td,
     td->alt_link = PTR_TERMINATE;
     td->td_next = 0;
 
-    td->token = (toggle << TD_TOK_D_SHIFT) |
-                (len << TD_TOK_LEN_SHIFT) |
-                (3 << TD_TOK_CERR_SHIFT) |
-                (packet_type << TD_TOK_PID_SHIFT) |
+    td->token = (toggle << TD_TOK_D_SHIFT) | (len << TD_TOK_LEN_SHIFT) |
+                (3 << TD_TOK_CERR_SHIFT) | (packet_type << TD_TOK_PID_SHIFT) |
                 TD_TOK_ACTIVE;
 
     uintptr_t p = (uintptr_t)data;
@@ -1047,15 +1060,11 @@ static void ehci_init_qh(ehci_qh_t *qh,
 
     qh->transfer = t;
 
-    uint32_t ch =
-        (max_size << QH_CH_MPL_SHIFT) |
-        QH_CH_DTC |
-        (speed << QH_CH_EPS_SHIFT) |
-        (endp << QH_CH_ENDP_SHIFT) |
-        addr;
+    uint32_t ch = (max_size << QH_CH_MPL_SHIFT) | QH_CH_DTC |
+                  (speed << QH_CH_EPS_SHIFT) | (endp << QH_CH_ENDP_SHIFT) |
+                  addr;
 
-    uint32_t caps =
-        (1 << QH_CAP_MULT_SHIFT);
+    uint32_t caps = (1 << QH_CAP_MULT_SHIFT);
 
     if (!interrupt)
     {
@@ -1073,9 +1082,8 @@ static void ehci_init_qh(ehci_qh_t *qh,
             ch |= QH_CH_CONTROL;
         }
 
-        caps |=
-            (parent->port << QH_CAP_PORT_SHIFT) |
-            (parent->addr << QH_CAP_HUB_ADDR_SHIFT);
+        caps |= (parent->port << QH_CAP_PORT_SHIFT) |
+                (parent->addr << QH_CAP_HUB_ADDR_SHIFT);
     }
 
     if (interrupt)
@@ -1365,7 +1373,8 @@ static void ehci_probe(ehci_controller_t *hc)
 
                 if (!usb_dev_init(dev))
                 {
-                    log_warn("[EHCI] USB device failed to initiate for %i", port);
+                    log_warn("[EHCI] USB device failed to initiate for %i",
+                             port);
                 }
             }
         }
@@ -1510,7 +1519,8 @@ static void ehci_disable_legacy_support(uint32_t id, ehci_controller_t *hc)
 {
     log_debug("[EHCI] Disabling legacy support");
 
-    uint32_t eecp = (hc->cap_regs->hcc_params & HCCPARAMS_EECP_MASK) >> HCCPARAMS_EECP_SHIFT;
+    uint32_t eecp = (hc->cap_regs->hcc_params & HCCPARAMS_EECP_MASK) >>
+                    HCCPARAMS_EECP_SHIFT;
 
     if (eecp >= 0x40)
     {
@@ -1597,7 +1607,8 @@ static ehci_controller_t *ehci_init_hc(uint32_t id, uint64_t port_addr)
     log_debug("[EHCI] TD block: %#016x", tdBlock);
 
     hc->cap_regs = (ehci_cap_regs_t *)(uintptr_t)port_addr;
-    hc->op_regs = (ehci_op_regs_t *)(uintptr_t)(port_addr + hc->cap_regs->cap_length);
+    hc->op_regs =
+        (ehci_op_regs_t *)(uintptr_t)(port_addr + hc->cap_regs->cap_length);
     hc->frame_list = (uint32_t *)frameListBlock;
     hc->qh_pool = (ehci_qh_t *)qhBlock;
     hc->td_pool = (ehci_td_t *)tdBlock;
@@ -1642,7 +1653,8 @@ static ehci_controller_t *ehci_init_hc(uint32_t id, uint64_t port_addr)
 
 void usb_ehci_init(uint32_t id, PciDeviceInfo_t *dev_info)
 {
-    if (!((((dev_info->classCode << 8) | dev_info->subClass) == PCI_SERIAL_USB) &&
+    if (!((((dev_info->classCode << 8) | dev_info->subClass) ==
+           PCI_SERIAL_USB) &&
           (dev_info->progIntf == PCI_SERIAL_USB_EHCI)))
     {
         return;
@@ -1669,7 +1681,8 @@ void usb_ehci_init(uint32_t id, PciDeviceInfo_t *dev_info)
 
     log_debug("[EHCI] Allocating controller");
 
-    usb_controller_t *controller = (usb_controller_t *)malloc(sizeof(usb_controller_t));
+    usb_controller_t *controller =
+        (usb_controller_t *)malloc(sizeof(usb_controller_t));
 
     if (!controller)
     {

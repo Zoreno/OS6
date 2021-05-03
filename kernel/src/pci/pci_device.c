@@ -21,7 +21,6 @@
  */
 
 #include <pci/pci_device.h>
-
 #include <pci/pci_io.h>
 
 void pci_read_device_info(uint32_t id, PciDeviceInfo_t *info)

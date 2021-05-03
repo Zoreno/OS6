@@ -20,17 +20,16 @@
  *
  */
 
-#include <arch/x86-64/idt.h>
-
-#include <stdio.h>
-#include <string.h>
-
 #include <acpi/acpi.h>
+#include <arch/x86-64/idt.h>
 #include <debug/backtrace.h>
 #include <debug/debug_terminal.h>
 #include <exec/elf64.h>
 #include <logging/logging.h>
 #include <process/process.h>
+
+#include <stdio.h>
+#include <string.h>
 
 extern void arch_x86_64_idt_flush(uint64_t idtr_ptr);
 

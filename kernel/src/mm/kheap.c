@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-06-17
- * 
+ *
  * @brief Kernel heap implementation
- * 
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,17 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
+#include <arch/arch.h>
+#include <logging/logging.h>
 #include <mm/kheap.h>
 #include <mm/phys_mem.h>
 #include <mm/virt_mem.h>
 
 #include <stdio.h>
 #include <string.h>
-
-#include <arch/arch.h>
-#include <logging/logging.h>
 
 //==============================================================================
 // Definitions
@@ -106,7 +105,8 @@ static void *pmalloc(size_t size, uint64_t alignment)
 
     size = align_up(size, 8);
 
-    uint8_t *currPlacement = (uint8_t *)align_up((uint64_t)nextPlacement, alignment);
+    uint8_t *currPlacement =
+        (uint8_t *)align_up((uint64_t)nextPlacement, alignment);
 
     if (((uint64_t)currPlacement + size) > PLACEMENT_END)
     {
@@ -120,7 +120,8 @@ static int heap_grow(size_t size, uint8_t *heap_end, int cont)
 {
     (void)cont;
 
-    if ((region_count > 0) && regions[region_count - 1].res && (region_count >= region_max_count))
+    if ((region_count > 0) && regions[region_count - 1].res &&
+        (region_count >= region_max_count))
     {
         return 0;
     }
@@ -203,10 +204,13 @@ static void *kmalloc_imp(size_t size, uint64_t alignment)
             first_free_addr = region_address;
         }
 
-        uint8_t *aligned_address = (uint8_t *)align_up((uintptr_t)region_address, alignment);
-        uintptr_t additional_size = (uintptr_t)aligned_address - (uintptr_t)region_address;
+        uint8_t *aligned_address =
+            (uint8_t *)align_up((uintptr_t)region_address, alignment);
+        uintptr_t additional_size =
+            (uintptr_t)aligned_address - (uintptr_t)region_address;
 
-        if (!regions[i].res && (regions[i].size >= size + additional_size) && (within - (uintptr_t)region_address % within >= additional_size))
+        if (!regions[i].res && (regions[i].size >= size + additional_size) &&
+            (within - (uintptr_t)region_address % within >= additional_size))
         {
             if (aligned_address != region_address)
             {
@@ -215,7 +219,9 @@ static void *kmalloc_imp(size_t size, uint64_t alignment)
                     return 0;
                 }
 
-                memmove(regions + i + 1, regions + i, (region_count - i) * sizeof(kheap_region_t));
+                memmove(regions + i + 1,
+                        regions + i,
+                        (region_count - i) * sizeof(kheap_region_t));
 
                 ++region_count;
                 regions[i].size = aligned_address - region_address;
@@ -233,7 +239,9 @@ static void *kmalloc_imp(size_t size, uint64_t alignment)
                     return 0;
                 }
 
-                memmove(regions + i + 2, regions + i + 1, (region_count - i - 1) * sizeof(kheap_region_t));
+                memmove(regions + i + 2,
+                        regions + i + 1,
+                        (region_count - i - 1) * sizeof(kheap_region_t));
 
                 ++region_count;
 
@@ -253,9 +261,11 @@ static void *kmalloc_imp(size_t size, uint64_t alignment)
         region_address += regions[i].size;
     }
 
-    uint64_t size_to_grow = max(HEAP_MIN_GROWTH, align_up(size * 3 / 2, PAGE_SIZE));
+    uint64_t size_to_grow =
+        max(HEAP_MIN_GROWTH, align_up(size * 3 / 2, PAGE_SIZE));
 
-    if (!heap_grow(size_to_grow, (uint8_t *)((uintptr_t)HEAP_START + heap_size), cont))
+    if (!heap_grow(
+            size_to_grow, (uint8_t *)((uintptr_t)HEAP_START + heap_size), cont))
     {
         return 0;
     }
@@ -283,7 +293,9 @@ static void kfree_imp(void *addr)
             {
                 regions[i].size += regions[i + 1].size;
 
-                memmove(regions + i + 1, regions + i + 2, (region_count - 2) * sizeof(kheap_region_t));
+                memmove(regions + i + 1,
+                        regions + i + 2,
+                        (region_count - 2) * sizeof(kheap_region_t));
 
                 --region_count;
             }
@@ -292,7 +304,9 @@ static void kfree_imp(void *addr)
             {
                 regions[i - 1].size += regions[i].size;
 
-                memmove(regions + i, regions + i + 1, (region_count - 1 - i) * sizeof(kheap_region_t));
+                memmove(regions + i,
+                        regions + i + 1,
+                        (region_count - 1 - i) * sizeof(kheap_region_t));
 
                 --region_count;
 
@@ -392,13 +406,14 @@ void kheap_init()
 
         virt_mem_map_page(paddr, (void *)i, VIRT_MEM_WRITABLE);
 
-        //log_debug("Mapping %#016x to %#016x", paddr, i);
+        // log_debug("Mapping %#016x to %#016x", paddr, i);
     }
 
     regions = (kheap_region_t *)pmalloc(0, 0);
 
     region_count = 0;
-    region_max_count = (PLACEMENT_END - (uint64_t)regions) / sizeof(kheap_region_t);
+    region_max_count =
+        (PLACEMENT_END - (uint64_t)regions) / sizeof(kheap_region_t);
 
     sti();
     log_info("[KHEAP] Done!");

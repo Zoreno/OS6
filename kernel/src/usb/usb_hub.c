@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-04-20
- * 
+ *
  * @brief USB hub initialization and probing
- * 
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,16 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
-
-#include <usb/usb_hub.h>
-
-#include <stdio.h>
-#include <stdlib.h>
 
 #include <arch/arch.h>
 #include <logging/logging.h>
+#include <usb/usb_hub.h>
 #include <usb/usb_registry.h>
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #define PORT_CONNECTION (1 << 0)    // Current Connect Status
 #define PORT_ENABLE (1 << 1)        // Port Enabled
