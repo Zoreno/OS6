@@ -85,6 +85,9 @@ void syscall_install()
 
     DECLARE_SYSCALL(CHDIR, chdir);
     DECLARE_SYSCALL(GETCWD, getcwd);
+
+    DECLARE_SYSCALL(GETTIMEOFDAY, gettimeofday);
+    DECLARE_SYSCALL(SETTIMEOFDAY, settimeofday);
 #pragma GCC diagnostic pop
 
     set_irq_handler(SYSCALL_INTNO, syscall_handler);

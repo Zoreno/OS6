@@ -1,10 +1,10 @@
 /**
- * @file _time.h
+ * @file time.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2021-02-09
+ * @date 2021-02-16
  * 
- * @brief Defines common time types for the kernel library.
+ * @brief 
  * 
  * @copyright Copyright (C) 2021,
  * This program is free software: you can redistribute it and/or modify
@@ -20,58 +20,30 @@
  * 
  */
 
-#ifndef _LIBK__TIME_H
-#define _LIBK__TIME_H
+#ifndef _LIBK_TIME_H
+#define _LIBK_TIME_H
 
 #include <__libk_common.h>
 
-typedef long time_t;
-typedef unsigned long clock_t;
-typedef unsigned long timer_t;
-typedef long susecond_t;
-typedef unsigned long usecond_t;
-struct tm
-{
-    int tm_sec;
-    int tm_min;
-    int tm_hour;
-    int tm_mday;
-    int tm_mon;
-    int tm_year;
-    int tm_wday;
-    int tm_yday;
-    int tm_isdst;
-};
+#include <sys/_time.h>
 
-struct timespec
-{
-    time_t tv_sec;
-    long tv_nsec;
-};
+#include <stddef.h>
 
-struct timeval 
-{
-    time_t tv_sec;
-    susecond_t tv_usec;
-};
+clock_t clock();
+double difftime(time_t time1, time_t time2);
+time_t mktime(struct tm *tp);
+time_t time(time_t *time);
 
-struct timezone
-{
-    int tz_min;
-    int tz_dsttime;
-};
+char *asctime(const struct tm *tp);
+char *ctime(const time_t *time);
+struct tm *gmtime(const time_t *time);
+struct tm *localtime(const time_t *time);
 
-struct itimerspec
-{
-    struct timespec it_interval;
-    struct timespec it_value;
-};
+size_t strftime(char *dst, size_t max_size, const char *format, const struct tm *time);
+size_t strftime_l(char *dst, size_t max_size, const char *format, const struct tm *time, locale_t *locale);
 
-struct itimerval
-{
-    struct timeval it_interval;
-    struct timeval it_value;
-};
+char *strptime(const char *s, const char *format, struct tm *time);
+char *strptime_l(const char *s, const char *format, struct tm *time, locale_t *locale);
 
 #endif
 

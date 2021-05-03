@@ -495,6 +495,10 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     //terminal_init();
 
+    time_t curr_time = time(NULL);
+
+    log_info("Time: %i", curr_time);
+
     simple_cli_init();
 
     while (1)

@@ -1,12 +1,12 @@
 /**
- * @file _time.h
+ * @file syscall_settimeofday.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2021-02-09
+ * @date 2020-08-08
  * 
- * @brief Defines common time types for the kernel library.
+ * @brief 
  * 
- * @copyright Copyright (C) 2021,
+ * @copyright Copyright (C) 2020,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,60 +20,19 @@
  * 
  */
 
-#ifndef _LIBK__TIME_H
-#define _LIBK__TIME_H
+#include <syscall/syscall.h>
 
-#include <__libk_common.h>
+#include <logging/logging.h>
 
-typedef long time_t;
-typedef unsigned long clock_t;
-typedef unsigned long timer_t;
-typedef long susecond_t;
-typedef unsigned long usecond_t;
-struct tm
+int syscall_settimeofday(const struct timeval *tv, const struct timezone *tz)
 {
-    int tm_sec;
-    int tm_min;
-    int tm_hour;
-    int tm_mday;
-    int tm_mon;
-    int tm_year;
-    int tm_wday;
-    int tm_yday;
-    int tm_isdst;
-};
+    (void)tv;
+    (void)tz;
 
-struct timespec
-{
-    time_t tv_sec;
-    long tv_nsec;
-};
+    log_warn("syscall settimeofday not supported yet");
 
-struct timeval 
-{
-    time_t tv_sec;
-    susecond_t tv_usec;
-};
-
-struct timezone
-{
-    int tz_min;
-    int tz_dsttime;
-};
-
-struct itimerspec
-{
-    struct timespec it_interval;
-    struct timespec it_value;
-};
-
-struct itimerval
-{
-    struct timeval it_interval;
-    struct timeval it_value;
-};
-
-#endif
+    return 0;
+}
 
 //=============================================================================
 // End of file

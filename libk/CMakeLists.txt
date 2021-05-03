@@ -277,6 +277,15 @@ target_sources(${LIBK} PRIVATE ${LIBK_SRC}/fenv/fesetround.c)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/setjmp/setjmp.asm)
 target_sources(${LIBK} PRIVATE ${LIBK_SRC}/setjmp/longjmp.asm)
 
+# sys/syscall.h header
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/sys/syscall/_gettimeofday.c)
+
+# time.h header
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/time/asctime.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/time/difftime.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/time/mktime.c)
+target_sources(${LIBK} PRIVATE ${LIBK_SRC}/time/time.c)
+
 #==============================================================================
 # Tests
 #==============================================================================

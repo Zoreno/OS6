@@ -22,6 +22,9 @@
 
 #include <syscall/syscall.h>
 
+// TODO: This contains inline assembly, which is hardware dependent. Move the
+// implementation to arch and let this file be an interface.
+
 int64_t do_syscall0(int64_t syscall)
 {
     int64_t ret;

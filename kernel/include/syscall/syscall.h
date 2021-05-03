@@ -33,6 +33,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 /**
  * @brief The system call interrupt number
@@ -76,6 +77,9 @@
 
 #define SYSCALL_CHDIR 27
 #define SYSCALL_GETCWD 28
+
+#define SYSCALL_GETTIMEOFDAY 29
+#define SYSCALL_SETTIMEOFDAY 30
 
 #define _IFMT 0170000 /* type of file */
 #define S_ISBLK(m) (((m)&_IFMT) == _IFBLK)
@@ -142,6 +146,9 @@ int syscall_gettid(); // DONE
 
 int syscall_chdir(char *newdir);            // DONE
 int syscall_getcwd(char *buf, size_t size); // DONE
+
+int syscall_gettimeofday(struct timeval *tv, struct timezone *tz);
+int syscall_settimeofday(const struct timeval *tv, const struct timezone *tz);
 
 void syscall_install();
 
