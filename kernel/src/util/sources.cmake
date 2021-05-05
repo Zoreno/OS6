@@ -1,4 +1,5 @@
 kernel_source(bitset.c)
+kernel_source(endian.c)
 kernel_source(hashmap.c)
 kernel_source(hexdump.c)
 kernel_source(huffman.c)
