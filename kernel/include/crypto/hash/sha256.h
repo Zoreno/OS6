@@ -1,8 +1,8 @@
 /**
- * @file crypto.h
+ * @file sha256.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2021-05-05
+ * @date 2021-05-06
  *
  * @brief
  *
@@ -20,13 +20,32 @@
  *
  */
 
-#ifndef _CRYPTO_H
-#define _CRYPTO_H
+#ifndef _CRYPTO_HASH_SHA256_H
+#define _CRYPTO_HASH_SHA256_H
 
-#include <crypto/crypto_cipher.h>
-#include <crypto/crypto_hash.h>
-#include <crypto/crypto_util.h>
-#include <util/endian.h>
+#include <crypto/crypto.h>
+
+#define SHA256_BLOCK_SIZE 64
+#define SHA256_DIGEST_SIZE 32
+#define SHA256_MIN_PAD_SIZE 9
+
+typedef struct
+{
+    uint32_t h[8];
+    uint32_t w[16];
+    uint32_t digest[32];
+    uint32_t buffer[64];
+
+    size_t size;
+    uint64_t total_size;
+} sha256_context_t;
+
+error_t sha256_compute(const void *data, size_t length, uint8_t *digest);
+void sha256_init(sha256_context_t *context);
+void sha256_update(sha256_context_t *context, const void *data, size_t length);
+void sha256_finalize(sha256_context_t *context, uint8_t *digest);
+void sha256_finalize_raw(sha256_context_t *context, uint8_t *digest);
+void sha256_process_block(sha256_context_t *context);
 
 #endif
 
