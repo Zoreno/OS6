@@ -181,7 +181,7 @@ static const uint32_t rcon[11] = {0x00000000,
                                   0x0000001B,
                                   0x00000036};
 
-static const cipher_algo_t aes_algo = {
+static const crypto_cipher_algo_t aes_algo = {
     "AES",
     sizeof(aes_context_t),
     CIPHER_TYPE_BLOCK,
@@ -296,7 +296,7 @@ static void gen_dec_key_schedule(aes_context_t *context,
 // Interface functions
 //=============================================================================
 
-const cipher_algo_t *aes_get_algo()
+const crypto_cipher_algo_t *aes_get_algo()
 {
     return &aes_algo;
 }

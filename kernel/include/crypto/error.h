@@ -1,8 +1,8 @@
 /**
- * @file aes.h
+ * @file error.h
  * @author Joakim Bertils
  * @version 0.1
- * @date 2021-05-05
+ * @date 2021-05-06
  *
  * @brief
  *
@@ -20,28 +20,10 @@
  *
  */
 
-#ifndef _CRYPTO_AES_H
-#define _CRYPTO_AES_H
+#ifndef _CRYPTO_ERROR_H
+#define _CRYPTO_ERROR_H
 
-#include <crypto/crypto.h>
-
-#define AES_BLOCK_SIZE 16
-
-typedef struct
-{
-    uint32_t nr;
-    uint32_t ek[60];
-    uint32_t dk[60];
-} aes_context_t;
-
-const crypto_cipher_algo_t *aes_get_algo();
-error_t aes_init(aes_context_t *context, const uint8_t *key, size_t key_len);
-void aes_encrypt_block(aes_context_t *context,
-                       const uint8_t *input,
-                       uint8_t *output);
-void aes_decrypt_block(aes_context_t *context,
-                       const uint8_t *input,
-                       uint8_t *output);
+typedef int error_t;
 
 #endif
 

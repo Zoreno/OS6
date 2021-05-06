@@ -23,51 +23,9 @@
 #ifndef _CRYPTO_H
 #define _CRYPTO_H
 
+#include <crypto/crypto_cipher.h>
 #include <crypto/crypto_util.h>
 #include <util/endian.h>
-
-#include <stddef.h>
-#include <stdint.h>
-
-typedef enum
-{
-    CIPHER_TYPE_STREAM,
-    CIPHER_TYPE_BLOCK
-} cipher_algo_type_t;
-
-typedef int error_t;
-
-typedef error_t (*cipher_algo_init_func_t)(void *context,
-                                           const uint8_t *key,
-                                           size_t key_len);
-
-typedef void (*cipher_algo_encrypt_stream_func_t)(void *context,
-                                                  const uint8_t *input,
-                                                  uint8_t *output,
-                                                  size_t length);
-typedef void (*cipher_algo_decrypt_stream_func_t)(void *context,
-                                                  const uint8_t *input,
-                                                  uint8_t *output,
-                                                  size_t length);
-typedef void (*cipher_algo_encrypt_block_func_t)(void *context,
-                                                 const uint8_t *input,
-                                                 uint8_t *output);
-typedef void (*cipher_algo_decrypt_block_func_t)(void *context,
-                                                 const uint8_t *input,
-                                                 uint8_t *output);
-
-typedef struct
-{
-    const char *name;
-    size_t context_size;
-    cipher_algo_type_t type;
-    size_t block_size;
-    cipher_algo_init_func_t init_func;
-    cipher_algo_encrypt_stream_func_t encrypt_stream_func;
-    cipher_algo_decrypt_stream_func_t decrypt_stream_func;
-    cipher_algo_encrypt_block_func_t encrypt_block_func;
-    cipher_algo_decrypt_block_func_t decrypt_block_func;
-} cipher_algo_t;
 
 #endif
 
