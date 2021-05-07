@@ -119,6 +119,11 @@ static inline uint32_t sigma4(uint32_t x)
 // Interface functions
 //=============================================================================
 
+const crypto_hash_algo_t *sha256_get_algo()
+{
+    return &sha256_hash_algo;
+}
+
 error_t sha256_compute(const void *data, size_t length, uint8_t *digest)
 {
     sha256_context_t *context;

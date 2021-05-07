@@ -40,6 +40,8 @@ typedef struct
     uint64_t total_size;
 } sha256_context_t;
 
+const crypto_hash_algo_t *sha256_get_algo();
+
 error_t sha256_compute(const void *data, size_t length, uint8_t *digest);
 void sha256_init(sha256_context_t *context);
 void sha256_update(sha256_context_t *context, const void *data, size_t length);
