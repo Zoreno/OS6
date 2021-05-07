@@ -190,7 +190,9 @@ static const crypto_cipher_algo_t aes_algo = {
     NULL,
     NULL,
     (cipher_algo_encrypt_block_func_t)aes_encrypt_block,
-    (cipher_algo_decrypt_block_func_t)aes_decrypt_block};
+    (cipher_algo_decrypt_block_func_t)aes_decrypt_block
+
+};
 
 //=============================================================================
 // Private function forward declarations
