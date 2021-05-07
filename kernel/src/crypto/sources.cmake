@@ -5,3 +5,4 @@ kernel_source(crypto_zeroize.c)
 
 kernel_subdirectory(cipher)
 kernel_subdirectory(hash)
+kernel_subdirectory(mpint)
