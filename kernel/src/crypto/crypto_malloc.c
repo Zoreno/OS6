@@ -1,8 +1,8 @@
 /**
- * @file crypto.h
+ * @file crypto_malloc.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2021-05-05
+ * @date 2021-05-07
  *
  * @brief
  *
@@ -20,18 +20,14 @@
  *
  */
 
-#ifndef _CRYPTO_H
-#define _CRYPTO_H
+#include <crypto/crypto.h>
 
-#include <crypto/crypto_cipher.h>
-#include <crypto/crypto_hash.h>
-#include <crypto/crypto_util.h>
-#include <util/endian.h>
+#include <stdlib.h>
 
-void *crypto_malloc(size_t size);
-void crypto_free(void *p);
-
-#endif
+void *crypto_malloc(size_t size)
+{
+    return malloc(size);
+}
 
 //=============================================================================
 // End of file
