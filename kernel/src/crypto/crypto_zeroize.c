@@ -1,8 +1,8 @@
 /**
- * @file crypto.h
+ * @file crypto_zeroize.c
  * @author Joakim Bertils
  * @version 0.1
- * @date 2021-05-05
+ * @date 2021-05-08
  *
  * @brief
  *
@@ -20,32 +20,19 @@
  *
  */
 
-#ifndef _CRYPTO_H
-#define _CRYPTO_H
+#include <crypto/crypto.h>
 
-#include <crypto/crypto_cipher.h>
-#include <crypto/crypto_hash.h>
-#include <crypto/crypto_util.h>
-#include <util/endian.h>
+void *crypto_zeroize(void *p, size_t size)
+{
+    volatile unsigned char *ptr = p;
 
-void *crypto_malloc(size_t size);
-void crypto_free(void *p);
+    while (size--)
+    {
+        *ptr++ = 0;
+    }
 
-/**
- * @brief Zeroizes a chunk of memory.
- *
- * The function is written in such a way that there is no risk of this function
- * being optimized away. It is important to use this function instead of memset
- * when clearing memory in the crypto module.
- *
- * @param p Pointer to start of memory to clear.
- * @param size Size of the memory chunk.
- *
- * @return Pointer to the zeroized memory chunk.
- */
-void *crypto_zeroize(void *p, size_t size);
-
-#endif
+    return p;
+}
 
 //=============================================================================
 // End of file
