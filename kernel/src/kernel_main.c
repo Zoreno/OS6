@@ -24,6 +24,7 @@
 #include <arch/arch.h>
 #include <boot/multiboot2.h>
 #include <cmos/cmos_rtc.h>
+#include <crypto/mpint/mpint.h>
 #include <debug/backtrace.h>
 #include <debug/debug_terminal.h>
 #include <drivers/blockdev.h>
@@ -215,6 +216,7 @@ Applications
 */
 
 extern void run_unit_tests();
+extern void test_crypto();
 
 // https://www.gnu.org/software/grub/manual/multiboot2/html_node/kernel_002ec.html
 
@@ -521,6 +523,8 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     time_t curr_time = time(NULL);
 
     log_info("Time: %i", curr_time);
+
+    test_crypto();
 
     simple_cli_init();
 
