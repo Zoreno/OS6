@@ -27,27 +27,20 @@
 
 #include <stdint.h>
 
-/**
- * @brief The underlying type for the mpint data type.
- *
- *
- */
-#define MPINT_IMPL_TYPE uint32_t
+typedef struct
+{
+    int sign;
+    size_t size;
+    uint32_t *data;
+
+} mpint_t;
 
 /**
  * @brief The size of the underlying type
  *
  *
  */
-#define MPINT_INT_SIZE sizeof(MPINT_IMPL_TYPE)
-
-typedef struct
-{
-    int sign;
-    size_t size;
-    MPINT_IMPL_TYPE *data;
-
-} mpint_t;
+#define MPINT_INT_SIZE sizeof(*((mpint_t *)0)->data)
 
 /**
  * @brief Initialize the integer data type.

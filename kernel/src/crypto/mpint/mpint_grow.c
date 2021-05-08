@@ -26,7 +26,7 @@
 
 int mpint_grow(mpint_t *i, size_t new_size)
 {
-    MPINT_IMPL_TYPE *data;
+    uint32_t *data;
 
     if (new_size < 1)
     {
