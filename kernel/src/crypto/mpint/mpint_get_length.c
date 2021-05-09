@@ -24,9 +24,9 @@
 
 size_t mpint_get_length(const mpint_t *a)
 {
-    ssize_t i;
+    ssize_t i = 0;
 
-    if (a->size == 0)
+    if (a->size == 0 || a->data == NULL)
     {
         return 0;
     }
