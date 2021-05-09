@@ -46,7 +46,7 @@ int mpint_copy(mpint_t *dest, const mpint_t *src)
 
     memset(dest->data, 0, dest->size * MPINT_INT_SIZE);
     memcpy(dest->data, src->data, dest->size * MPINT_INT_SIZE);
-    dest->size = src->sign;
+    dest->sign = src->sign;
 
     return 0;
 }
