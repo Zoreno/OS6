@@ -30,6 +30,7 @@ void mpint_free(mpint_t *i)
         crypto_free(i->data);
     }
 
+    i->sign = 1;
     i->size = 0;
     i->data = NULL;
 }
