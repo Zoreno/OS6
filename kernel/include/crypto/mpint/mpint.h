@@ -24,7 +24,9 @@
 #define _CRYPTO_MPINT_H
 
 #include <crypto/crypto.h>
+#ifdef CRYPTO_LOG
 #include <logging/logging.h>
+#endif
 
 #include <stdint.h>
 
@@ -33,6 +35,7 @@
  *
  *
  */
+#ifdef CRYPTO_LOG
 #define MPINT_GOTO_ON_ERROR(expr, label)                     \
     error = (expr);                                          \
     if (error != 0)                                          \
@@ -40,6 +43,14 @@
         log_error("Error evaluating expression: %s", #expr); \
         goto label;                                          \
     }
+#else
+#define MPINT_GOTO_ON_ERROR(expr, label) \
+    error = (expr);                      \
+    if (error != 0)                      \
+    {                                    \
+        goto label;                      \
+    }
+#endif
 
 #define MPINT_NODISCARD __attribute__((warn_unused_result))
 
