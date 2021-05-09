@@ -28,7 +28,7 @@ int mpint_add_int(mpint_t *r, const mpint_t *a, int b)
     mpint_t t;
 
     value = _abs(b);
-    t.size = _sign(b);
+    t.sign = _sign(b);
     t.size = 1;
     t.data = &value;
 
