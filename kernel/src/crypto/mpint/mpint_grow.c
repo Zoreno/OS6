@@ -46,7 +46,7 @@ int mpint_grow(mpint_t *i, size_t new_size)
         return -1;
     }
 
-    crypto_zeroize(data, i->size * MPINT_INT_SIZE);
+    crypto_zeroize(data, new_size * MPINT_INT_SIZE);
 
     if (i->size > 0)
     {
