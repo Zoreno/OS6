@@ -38,7 +38,7 @@ int mpint_grow(mpint_t *i, size_t new_size)
         return 0;
     }
 
-    data = crypto_malloc(new_size * MPINT_INT_SIZE);
+    data = (uint32_t *)crypto_malloc(new_size * MPINT_INT_SIZE);
 
     if (data == NULL)
     {

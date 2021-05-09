@@ -24,7 +24,7 @@
 
 void *crypto_zeroize(void *p, size_t size)
 {
-    volatile unsigned char *ptr = p;
+    volatile unsigned char *ptr = (unsigned char *)p;
 
     while (size--)
     {
