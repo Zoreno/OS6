@@ -38,8 +38,8 @@ int mpint_mod(mpint_t *r, const mpint_t *a, const mpint_t *p)
 
     sign = a->sign;
 
-    size_t m = mpint_get_length(a);
-    size_t n = mpint_get_length(p);
+    size_t m = mpint_get_bit_length(a);
+    size_t n = mpint_get_bit_length(p);
 
     MPINT_GOTO_ON_ERROR(mpint_copy(r, a), end);
 

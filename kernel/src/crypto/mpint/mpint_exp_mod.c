@@ -135,7 +135,7 @@ int mpint_exp_mod(mpint_t *r,
         MPINT_GOTO_ON_ERROR(mpint_copy(r, &c2), end);
         MPINT_GOTO_ON_ERROR(mpint_montgomery_red(r, r, k, p, &t), end);
 
-        i = mpint_get_length(e) - 1;
+        i = mpint_get_bit_length(e) - 1;
 
         while (i >= 0)
         {
