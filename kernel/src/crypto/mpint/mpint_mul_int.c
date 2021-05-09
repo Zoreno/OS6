@@ -22,16 +22,6 @@
 
 #include <crypto/mpint/mpint.h>
 
-static int _abs(int val)
-{
-    return val >= 0 ? val : -val;
-}
-
-static int _sign(int val)
-{
-    return val >= 0 ? 1 : -1;
-}
-
 int mpint_mul_int(mpint_t *r, const mpint_t *a, int b)
 {
     uint32_t value;

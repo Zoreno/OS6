@@ -45,6 +45,9 @@ uint16_t shr16(uint16_t a, uint8_t n);
 uint32_t shr32(uint32_t a, uint8_t n);
 uint64_t shr64(uint64_t a, uint8_t n);
 
+int _abs(int val);
+int _sign(int val);
+
 #endif
 
 //=============================================================================
