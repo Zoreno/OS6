@@ -6,7 +6,7 @@
 set(DEBUG_BUILD true)
 
 # Should build the unit tests?
-set(BUILDING_TESTS false)
+set(BUILDING_TESTS ON)
 
 set(CFLAGS "-m64")
 

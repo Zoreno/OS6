@@ -9,7 +9,7 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 macro(declare_test name source)
 add_executable(${name} ${source})
-target_link_libraries(${name} ${GTEST_LIBRARIES} pthread)
+target_link_libraries(${name} ${GTEST_LIBRARIES} pthread -lgmock)
 add_test(${name} ./${name})
 endmacro()
 
