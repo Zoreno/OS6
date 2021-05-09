@@ -26,7 +26,14 @@
 
 void *crypto_malloc(size_t size)
 {
-    return malloc(size);
+    void *p = malloc(size);
+
+    if (p)
+    {
+        crypto_zeroize(p, size);
+    }
+
+    return p;
 }
 
 //=============================================================================
