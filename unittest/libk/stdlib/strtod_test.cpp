@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-12-30
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,12 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
-extern "C" 
+extern "C"
 {
 #include "../../../libk/src/stdlib/strtod.c"
 }
@@ -36,8 +35,8 @@ extern "C"
 // Tests
 //==============================================================================
 
-TEST(Strtod, Strtod_SimpleNumber) 
-{ 
+TEST(Strtod, Strtod_SimpleNumber)
+{
     const char *str = "10";
 
     double d = libk_strtod(str, NULL);
@@ -45,8 +44,8 @@ TEST(Strtod, Strtod_SimpleNumber)
     ASSERT_EQ(d, 10.0);
 }
 
-TEST(Strtod, Strtod_SimpleNumberSetsEndpointer) 
-{ 
+TEST(Strtod, Strtod_SimpleNumberSetsEndpointer)
+{
     const char *str = "10";
     char *end;
 
@@ -56,8 +55,8 @@ TEST(Strtod, Strtod_SimpleNumberSetsEndpointer)
     ASSERT_EQ(end, str + strlen(str));
 }
 
-TEST(Strtod, Strtod_InitialWhitespace) 
-{ 
+TEST(Strtod, Strtod_InitialWhitespace)
+{
     const char *str = "   10";
 
     double d = libk_strtod(str, NULL);
@@ -65,8 +64,8 @@ TEST(Strtod, Strtod_InitialWhitespace)
     ASSERT_EQ(d, 10.0);
 }
 
-TEST(Strtod, Strtod_PlusSign) 
-{ 
+TEST(Strtod, Strtod_PlusSign)
+{
     const char *str = "+10";
 
     double d = libk_strtod(str, NULL);
@@ -74,8 +73,8 @@ TEST(Strtod, Strtod_PlusSign)
     ASSERT_EQ(d, 10.0);
 }
 
-TEST(Strtod, Strtod_MinusSign) 
-{ 
+TEST(Strtod, Strtod_MinusSign)
+{
     const char *str = "-10";
 
     double d = libk_strtod(str, NULL);
@@ -83,8 +82,8 @@ TEST(Strtod, Strtod_MinusSign)
     ASSERT_EQ(d, -10.0);
 }
 
-TEST(Strtod, Strtod_EndingOnNonDigitCharacter) 
-{ 
+TEST(Strtod, Strtod_EndingOnNonDigitCharacter)
+{
     const char *str = "10!";
 
     double d = libk_strtod(str, NULL);
@@ -92,10 +91,10 @@ TEST(Strtod, Strtod_EndingOnNonDigitCharacter)
     ASSERT_EQ(d, 10.0);
 }
 
-TEST(Strtod, Strtod_NotANumber) 
-{ 
+TEST(Strtod, Strtod_NotANumber)
+{
     const char *str = "asdf";
-    char *end;  
+    char *end;
 
     double d = libk_strtod(str, &end);
 
@@ -103,10 +102,10 @@ TEST(Strtod, Strtod_NotANumber)
     ASSERT_EQ(end, str);
 }
 
-TEST(Strtod, Strtod_FractionalPart) 
-{ 
+TEST(Strtod, Strtod_FractionalPart)
+{
     const char *str = "10.23";
-    char *end;  
+    char *end;
 
     double d = libk_strtod(str, &end);
 
@@ -114,10 +113,10 @@ TEST(Strtod, Strtod_FractionalPart)
     ASSERT_EQ(end, str + strlen(str));
 }
 
-TEST(Strtod, Strtod_ExponentialPart) 
-{ 
+TEST(Strtod, Strtod_ExponentialPart)
+{
     const char *str = "1e2";
-    char *end;  
+    char *end;
 
     double d = libk_strtod(str, &end);
 
@@ -125,10 +124,10 @@ TEST(Strtod, Strtod_ExponentialPart)
     ASSERT_EQ(end, str + strlen(str));
 }
 
-TEST(Strtod, Strtod_ExponentialPartWithPlus) 
-{ 
+TEST(Strtod, Strtod_ExponentialPartWithPlus)
+{
     const char *str = "1e+2";
-    char *end;  
+    char *end;
 
     double d = libk_strtod(str, &end);
 
@@ -136,10 +135,10 @@ TEST(Strtod, Strtod_ExponentialPartWithPlus)
     ASSERT_EQ(end, str + strlen(str));
 }
 
-TEST(Strtod, Strtod_ExponentialPartWithMinus) 
-{ 
+TEST(Strtod, Strtod_ExponentialPartWithMinus)
+{
     const char *str = "1e-1";
-    char *end;  
+    char *end;
 
     double d = libk_strtod(str, &end);
 
@@ -147,10 +146,10 @@ TEST(Strtod, Strtod_ExponentialPartWithMinus)
     ASSERT_EQ(end, str + strlen(str));
 }
 
-TEST(Strtod, Strtod_ExponentialPartWithLeadingZeros) 
-{ 
+TEST(Strtod, Strtod_ExponentialPartWithLeadingZeros)
+{
     const char *str = "1e01";
-    char *end;  
+    char *end;
 
     double d = libk_strtod(str, &end);
 
@@ -158,10 +157,10 @@ TEST(Strtod, Strtod_ExponentialPartWithLeadingZeros)
     ASSERT_EQ(end, str + strlen(str));
 }
 
-TEST(Strtod, Strtod_ExponentialPartWithMultipleDigits) 
-{ 
+TEST(Strtod, Strtod_ExponentialPartWithMultipleDigits)
+{
     const char *str = "1e10";
-    char *end;  
+    char *end;
 
     double d = libk_strtod(str, &end);
 
@@ -169,10 +168,10 @@ TEST(Strtod, Strtod_ExponentialPartWithMultipleDigits)
     ASSERT_EQ(end, str + strlen(str));
 }
 
-TEST(Strtod, Strtod_LowNumberShouldEqualZero) 
-{ 
+TEST(Strtod, Strtod_LowNumberShouldEqualZero)
+{
     const char *str = "2.2250738585072011e-308";
-    char *end;  
+    char *end;
 
     double d = libk_strtod(str, &end);
 
@@ -180,10 +179,10 @@ TEST(Strtod, Strtod_LowNumberShouldEqualZero)
     ASSERT_EQ(end, str + strlen(str));
 }
 
-TEST(Strtod, Strtod_ExponentialPartMissing) 
-{ 
+TEST(Strtod, Strtod_ExponentialPartMissing)
+{
     const char *str = "1e";
-    char *end;  
+    char *end;
 
     double d = libk_strtod(str, &end);
 
@@ -195,7 +194,7 @@ TEST(Strtod, Strtod_ExponentialPartMissing)
 // Main file
 //==============================================================================
 
-int main(int argc, char **argv) 
+int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 

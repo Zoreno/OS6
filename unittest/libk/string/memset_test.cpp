@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2019-12-30
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-extern "C" 
+extern "C"
 {
 #include "../../../libk/src/string/memset.c"
 }
@@ -36,8 +36,8 @@ extern "C"
 // Tests
 //==============================================================================
 
-TEST(Memset, Memset_SetsAllElements) 
-{ 
+TEST(Memset, Memset_SetsAllElements)
+{
     char array[3];
 
     void *ret = libk_memset(array, 2, sizeof(array));
@@ -46,9 +46,9 @@ TEST(Memset, Memset_SetsAllElements)
     ASSERT_EQ(array, ret);
 }
 
-TEST(Memset, Memset_OnlySetsElementsInRange) 
-{ 
-    char array[3] = {0,0,0};
+TEST(Memset, Memset_OnlySetsElementsInRange)
+{
+    char array[3] = {0, 0, 0};
 
     void *ret = libk_memset(array, 2, sizeof(array) - 1);
 
@@ -60,7 +60,7 @@ TEST(Memset, Memset_OnlySetsElementsInRange)
 // Main file
 //==============================================================================
 
-int main(int argc, char **argv) 
+int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
