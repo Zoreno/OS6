@@ -37,15 +37,17 @@ int mpint_sub_abs(mpint_t *r, const mpint_t *a, const mpint_t *b)
     size_t a_len = mpint_get_length(a);
     size_t b_len = mpint_get_length(b);
     size_t i;
+    uint32_t carry;
+    uint32_t temp_data;
 
     MPINT_GOTO_ON_ERROR(mpint_grow(r, a_len), end);
 
     r->sign = 1;
-    uint32_t carry = 0;
+    carry = 0;
 
     for (i = 0; i < b_len; ++i)
     {
-        uint32_t temp_data = a->data[i];
+        temp_data = a->data[i];
 
         if (carry != 0)
         {

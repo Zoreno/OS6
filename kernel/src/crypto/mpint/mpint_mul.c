@@ -31,6 +31,9 @@ int mpint_mul(mpint_t *r, const mpint_t *a, const mpint_t *b)
     mpint_t temp_a;
     mpint_t temp_b;
 
+    size_t a_len;
+    size_t b_len;
+
     mpint_init(&temp_a);
     mpint_init(&temp_b);
 
@@ -48,8 +51,8 @@ int mpint_mul(mpint_t *r, const mpint_t *a, const mpint_t *b)
         b = &temp_b;
     }
 
-    size_t a_len = mpint_get_length(a);
-    size_t b_len = mpint_get_length(b);
+    a_len = mpint_get_length(a);
+    b_len = mpint_get_length(b);
 
     MPINT_GOTO_ON_ERROR(mpint_grow(r, a_len + b_len), end);
 

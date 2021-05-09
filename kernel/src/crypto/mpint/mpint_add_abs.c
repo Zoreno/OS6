@@ -25,6 +25,8 @@
 int mpint_add_abs(mpint_t *r, const mpint_t *a, const mpint_t *b)
 {
     int error;
+    size_t b_len;
+    uint32_t carry;
 
     if (r == b)
     {
@@ -37,12 +39,12 @@ int mpint_add_abs(mpint_t *r, const mpint_t *a, const mpint_t *b)
         MPINT_GOTO_ON_ERROR(mpint_copy(r, a), end);
     }
 
-    size_t b_len = mpint_get_length(b);
+    b_len = mpint_get_length(b);
 
     MPINT_GOTO_ON_ERROR(mpint_grow(r, b_len), end);
 
     r->sign = 1;
-    uint32_t carry = 0;
+    carry = 0;
 
     for (size_t i = 0; i < b_len; ++i)
     {

@@ -30,6 +30,9 @@ int mpint_div(mpint_t *q, mpint_t *r, const mpint_t *a, const mpint_t *b)
     mpint_t d;
     mpint_t e;
 
+    size_t m;
+    size_t n;
+
     if (mpint_comp_int(b, 0) == 0)
     {
         // Divide by zero.
@@ -44,8 +47,8 @@ int mpint_div(mpint_t *q, mpint_t *r, const mpint_t *a, const mpint_t *b)
     MPINT_GOTO_ON_ERROR(mpint_copy(&d, b), end);
     MPINT_GOTO_ON_ERROR(mpint_set_value(&e, 0), end);
 
-    size_t m = mpint_get_bit_length(&c);
-    size_t n = mpint_get_bit_length(&d);
+    m = mpint_get_bit_length(&c);
+    n = mpint_get_bit_length(&d);
 
     if (m > n)
     {
