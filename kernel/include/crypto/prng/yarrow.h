@@ -73,3 +73,7 @@ int yarrow_add_entropy(yarrow_context_t *context,
 int yarrow_read(yarrow_context_t *context, uint8_t *output, size_t length);
 
 #endif
+
+//=============================================================================
+// End of file
+//=============================================================================
