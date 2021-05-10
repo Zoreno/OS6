@@ -25,6 +25,7 @@
 
 #include <crypto/crypto_cipher.h>
 #include <crypto/crypto_hash.h>
+#include <crypto/crypto_prng.h>
 #include <crypto/crypto_util.h>
 #include <util/endian.h>
 
