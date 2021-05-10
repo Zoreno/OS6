@@ -369,7 +369,7 @@ TEST_F(MpintTest, Mod2)
     ExpectValue(&r, {5});
 }
 
-TEST_F(MpintTest, ExpMod)
+TEST_F(MpintTest, ExpMod1)
 {
     SetValue(&a, {2});  // Base
     SetValue(&b, {3});  // Exponent
@@ -378,13 +378,40 @@ TEST_F(MpintTest, ExpMod)
     ExpectValue(&r, {1});
 }
 
-TEST_F(MpintTest, ExpModHuge)
+TEST_F(MpintTest, ExpMod2)
 {
     SetValue(&a, {102});  // Base
     SetValue(&b, {103});  // Exponent
     SetValue(&c, {82});   // Modulus
     ExpMod(&r, &a, &b, &c);
     ExpectValue(&r, {46});
+}
+
+TEST_F(MpintTest, ExpMod3)
+{
+    SetValue(&a, {102});  // Base
+    SetValue(&b, {103});  // Exponent
+    SetValue(&c, {81});   // Modulus
+    ExpMod(&r, &a, &b, &c);
+    ExpectValue(&r, {0});
+}
+
+TEST_F(MpintTest, ExpMod4)
+{
+    SetValue(&a, {98237});  // Base
+    SetValue(&b, {98233});  // Exponent
+    SetValue(&c, {83923});  // Modulus
+    ExpMod(&r, &a, &b, &c);
+    ExpectValue(&r, {26949});
+}
+
+TEST_F(MpintTest, ExpMod5)
+{
+    SetValue(&a, uvec32{0x78398237U, 0x78398237U});  // Base
+    SetValue(&b, uvec32{0x83398233U, 0x83398233U});  // Exponent
+    SetValue(&c, uvec32{0x38783923U, 0x38783923U});  // Modulus
+    ExpMod(&r, &a, &b, &c);
+    ExpectValue(&r, uvec32{0x136206f4U, 0x136206f4U});
 }
 
 //==============================================================================
