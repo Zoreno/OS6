@@ -29,7 +29,23 @@
 #include <crypto/crypto_util.h>
 #include <util/endian.h>
 
+/**
+ * @brief Allocates a chunk of memory for use in crypto operations.
+ *
+ * @param size Size of the requested memory.
+ *
+ * @return Pointer to allocated memory or NULL.
+ */
 void *crypto_malloc(size_t size);
+
+/**
+ * @brief Frees a chunk of memory allocated from the crypto_malloc function.
+ *
+ * The allocated memory has to be manually zeroized for security.
+ *
+ * @param p Pointer to memory to free.
+ *
+ */
 void crypto_free(void *p);
 
 /**
