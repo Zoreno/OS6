@@ -128,9 +128,7 @@ error_t sha256_compute(const void *data, size_t length, uint8_t *digest)
 {
     sha256_context_t *context;
 
-    // TODO: This should use a specialized malloc/free pair that always zeroizes
-    // the memory and ideally allocates from a separate pool of memory.
-    context = malloc(sizeof(sha256_context_t));
+    context = crypto_malloc(sizeof(sha256_context_t));
 
     if (context == NULL)
     {
@@ -141,7 +139,7 @@ error_t sha256_compute(const void *data, size_t length, uint8_t *digest)
     sha256_update(context, data, length);
     sha256_finalize(context, digest);
 
-    free(context);
+    crypto_free(context);
 
     return 0;
 }
