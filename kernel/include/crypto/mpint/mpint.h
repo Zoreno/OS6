@@ -62,6 +62,12 @@ typedef struct
 
 } mpint_t;
 
+typedef enum
+{
+    MPINT_FORMAT_BIG_ENDIAN,
+    MPINT_FORMAT_LITTLE_ENDIAN,
+} mpint_format_t;
+
 /**
  * @brief The size of the underlying type
  *
@@ -514,6 +520,52 @@ int mpint_check_probable_prime(const mpint_t *a);
  *
  */
 void mpint_swap(const mpint_t *a, const mpint_t *b);
+
+/**
+ * @brief Generates a random number using the given PRNG.
+ *
+ * @param r Pointer to the interger to fill.
+ * @param length Number of words to generate.
+ * @param prng_algo PRNG algo to use.
+ * @param prng_context Context for the PRNG algo.
+ *
+ * @return Non-zero on error.
+ *
+ */
+int mpint_rand(mpint_t *r,
+               size_t length,
+               const crypto_prng_algo_t *prng_algo,
+               void *prng_context);
+
+/**
+ * @brief Imports an integer from packed data.
+ *
+ * @param r Mpint to import to.
+ * @param data Pointer to data.
+ * @param length Size of the data.
+ * @param format If the data is big or little endian.
+ *
+ * @return Non-zero on error.
+ */
+int mpint_import(mpint_t *r,
+                 const uint8_t *data,
+                 size_t length,
+                 mpint_format_t format);
+
+/**
+ * @brief Export an integer to packed data.
+ *
+ * @param a Mpint to export.
+ * @param data Pointer to data.
+ * @param length Max size of the data.
+ * @param format If the data is big or little endian.
+ *
+ * @return Non-zero on error.
+ */
+int mpint_export(const mpint_t *a,
+                 uint8_t *data,
+                 size_t length,
+                 mpint_format_t format);
 
 #endif
 
