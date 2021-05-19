@@ -29,6 +29,15 @@
 #define MIN(a, b) (((a) > (b)) ? (b) : (a))
 
 //=============================================================================
+// Private function forward declarations
+//=============================================================================
+
+static int mpint_export_le(const mpint_t *a, uint8_t *data, size_t length);
+static int mpint_export_be(const mpint_t *a, uint8_t *data, size_t length);
+static int mpint_import_le(mpint_t *r, const uint8_t *data, size_t length);
+static int mpint_import_be(mpint_t *r, const uint8_t *data, size_t length);
+
+//=============================================================================
 // Private functions
 //=============================================================================
 
