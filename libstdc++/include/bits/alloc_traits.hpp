@@ -20,8 +20,8 @@
  * 
  */
 
-#ifndef _STL_CONSTRUCT_HPP
-#define _STL_CONSTRUCT_HPP
+#ifndef _STL_ALLOC_TRAITS_HPP
+#define _STL_ALLOC_TRAITS_HPP
 
 #pragma GCC system_header
 
