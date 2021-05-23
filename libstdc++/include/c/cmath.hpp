@@ -84,7 +84,7 @@ template <typename _T, typename _Ret = int>
 using __is_arith = typename __enable_if<__is_arithmetic<_T>::__value, _Ret>::__type;
 
 template <typename _T, typename _U, typename _Ret = double>
-using __is_int3 = typename __enable_if<__is_integer<_T>::__value && __is_integer<_T>::__value, _Ret>::__type;
+using __is_int3 = typename __enable_if<__is_integer<_T>::__value && __is_integer<_U>::__value, _Ret>::__type;
 
 template <typename _T, typename _Ret = double>
 using __is_int2 = typename __enable_if<__is_integer<_T>::__value, _Ret>::__type;
