@@ -4,6 +4,7 @@ kernel_source(crypto_util.c)
 kernel_source(crypto_zeroize.c)
 
 kernel_subdirectory(cipher)
+kernel_subdirectory(encoding)
 kernel_subdirectory(hash)
 kernel_subdirectory(mac)
 kernel_subdirectory(mpint)
