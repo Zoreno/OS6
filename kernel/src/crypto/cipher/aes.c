@@ -285,11 +285,11 @@ static void gen_dec_key_schedule(aes_context_t *context,
 
             context->dk[i] = td[sbox[context->ek[i] & 0xFF]];
             temp = td[sbox[(context->ek[i] >> 8) & 0xFF]];
-            context->dk[i] ^= rol32(temp, 8);
+            context->dk[i] ^= rotate_left32(temp, 8);
             temp = td[sbox[(context->ek[i] >> 16) & 0xFF]];
-            context->dk[i] ^= rol32(temp, 16);
+            context->dk[i] ^= rotate_left32(temp, 16);
             temp = td[sbox[(context->ek[i] >> 24) & 0xFF]];
-            context->dk[i] ^= rol32(temp, 24);
+            context->dk[i] ^= rotate_left32(temp, 24);
         }
     }
 }
@@ -359,35 +359,35 @@ void aes_encrypt_block(aes_context_t *context,
         // Apply round function
         t0 = te[s0 & 0xFF];
         temp = te[(s1 >> 8) & 0xFF];
-        t0 ^= rol32(temp, 8);
+        t0 ^= rotate_left32(temp, 8);
         temp = te[(s2 >> 16) & 0xFF];
-        t0 ^= rol32(temp, 16);
+        t0 ^= rotate_left32(temp, 16);
         temp = te[(s3 >> 24) & 0xFF];
-        t0 ^= rol32(temp, 24);
+        t0 ^= rotate_left32(temp, 24);
 
         t1 = te[s1 & 0xFF];
         temp = te[(s2 >> 8) & 0xFF];
-        t1 ^= rol32(temp, 8);
+        t1 ^= rotate_left32(temp, 8);
         temp = te[(s3 >> 16) & 0xFF];
-        t1 ^= rol32(temp, 16);
+        t1 ^= rotate_left32(temp, 16);
         temp = te[(s0 >> 24) & 0xFF];
-        t1 ^= rol32(temp, 24);
+        t1 ^= rotate_left32(temp, 24);
 
         t2 = te[s2 & 0xFF];
         temp = te[(s3 >> 8) & 0xFF];
-        t2 ^= rol32(temp, 8);
+        t2 ^= rotate_left32(temp, 8);
         temp = te[(s0 >> 16) & 0xFF];
-        t2 ^= rol32(temp, 16);
+        t2 ^= rotate_left32(temp, 16);
         temp = te[(s1 >> 24) & 0xFF];
-        t2 ^= rol32(temp, 24);
+        t2 ^= rotate_left32(temp, 24);
 
         t3 = te[s3 & 0xFF];
         temp = te[(s0 >> 8) & 0xFF];
-        t3 ^= rol32(temp, 8);
+        t3 ^= rotate_left32(temp, 8);
         temp = te[(s1 >> 16) & 0xFF];
-        t3 ^= rol32(temp, 16);
+        t3 ^= rotate_left32(temp, 16);
         temp = te[(s2 >> 24) & 0xFF];
-        t3 ^= rol32(temp, 24);
+        t3 ^= rotate_left32(temp, 24);
 
         // Round key addition
         s0 = t0 ^ context->ek[i * 4];
@@ -463,35 +463,35 @@ void aes_decrypt_block(aes_context_t *context,
         // Apply round function
         t0 = td[s0 & 0xFF];
         temp = td[(s3 >> 8) & 0xFF];
-        t0 ^= rol32(temp, 8);
+        t0 ^= rotate_left32(temp, 8);
         temp = td[(s2 >> 16) & 0xFF];
-        t0 ^= rol32(temp, 16);
+        t0 ^= rotate_left32(temp, 16);
         temp = td[(s1 >> 24) & 0xFF];
-        t0 ^= rol32(temp, 24);
+        t0 ^= rotate_left32(temp, 24);
 
         t1 = td[s1 & 0xFF];
         temp = td[(s0 >> 8) & 0xFF];
-        t1 ^= rol32(temp, 8);
+        t1 ^= rotate_left32(temp, 8);
         temp = td[(s3 >> 16) & 0xFF];
-        t1 ^= rol32(temp, 16);
+        t1 ^= rotate_left32(temp, 16);
         temp = td[(s2 >> 24) & 0xFF];
-        t1 ^= rol32(temp, 24);
+        t1 ^= rotate_left32(temp, 24);
 
         t2 = td[s2 & 0xFF];
         temp = td[(s1 >> 8) & 0xFF];
-        t2 ^= rol32(temp, 8);
+        t2 ^= rotate_left32(temp, 8);
         temp = td[(s0 >> 16) & 0xFF];
-        t2 ^= rol32(temp, 16);
+        t2 ^= rotate_left32(temp, 16);
         temp = td[(s3 >> 24) & 0xFF];
-        t2 ^= rol32(temp, 24);
+        t2 ^= rotate_left32(temp, 24);
 
         t3 = td[s3 & 0xFF];
         temp = td[(s2 >> 8) & 0xFF];
-        t3 ^= rol32(temp, 8);
+        t3 ^= rotate_left32(temp, 8);
         temp = td[(s1 >> 16) & 0xFF];
-        t3 ^= rol32(temp, 16);
+        t3 ^= rotate_left32(temp, 16);
         temp = td[(s0 >> 24) & 0xFF];
-        t3 ^= rol32(temp, 24);
+        t3 ^= rotate_left32(temp, 24);
 
         // Round key addition
         s0 = t0 ^ context->dk[i * 4];

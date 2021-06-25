@@ -97,22 +97,22 @@ static inline uint32_t maj(uint32_t x, uint32_t y, uint32_t z)
 
 static inline uint32_t sigma1(uint32_t x)
 {
-    return ror32(x, 2) ^ ror32(x, 13) ^ ror32(x, 22);
+    return rotate_right32(x, 2) ^ rotate_right32(x, 13) ^ rotate_right32(x, 22);
 }
 
 static inline uint32_t sigma2(uint32_t x)
 {
-    return ror32(x, 6) ^ ror32(x, 11) ^ ror32(x, 25);
+    return rotate_right32(x, 6) ^ rotate_right32(x, 11) ^ rotate_right32(x, 25);
 }
 
 static inline uint32_t sigma3(uint32_t x)
 {
-    return ror32(x, 7) ^ ror32(x, 18) ^ shr32(x, 3);
+    return rotate_right32(x, 7) ^ rotate_right32(x, 18) ^ shift_right32(x, 3);
 }
 
 static inline uint32_t sigma4(uint32_t x)
 {
-    return ror32(x, 17) ^ ror32(x, 19) ^ shr32(x, 10);
+    return rotate_right32(x, 17) ^ rotate_right32(x, 19) ^ shift_right32(x, 10);
 }
 
 //=============================================================================

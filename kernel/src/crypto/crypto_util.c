@@ -22,82 +22,82 @@
 
 #include <crypto/crypto_util.h>
 
-uint8_t rol8(uint8_t a, uint8_t n)
+uint8_t rotate_left8(uint8_t a, uint8_t n)
 {
     return (a << n) | (a >> (8 - n));
 }
 
-uint16_t rol16(uint16_t a, uint8_t n)
+uint16_t rotate_left16(uint16_t a, uint8_t n)
 {
     return (a << n) | (a >> (16 - n));
 }
 
-uint32_t rol32(uint32_t a, uint8_t n)
+uint32_t rotate_left32(uint32_t a, uint8_t n)
 {
     return (a << n) | (a >> (32 - n));
 }
 
-uint64_t rol64(uint64_t a, uint8_t n)
+uint64_t rotate_left64(uint64_t a, uint8_t n)
 {
     return (a << n) | (a >> (64 - n));
 }
 
-uint8_t ror8(uint8_t a, uint8_t n)
+uint8_t rotate_right8(uint8_t a, uint8_t n)
 {
     return (a >> n) | (a << (8 - n));
 }
 
-uint16_t ror16(uint16_t a, uint8_t n)
+uint16_t rotate_right16(uint16_t a, uint8_t n)
 {
     return (a >> n) | (a << (16 - n));
 }
 
-uint32_t ror32(uint32_t a, uint8_t n)
+uint32_t rotate_right32(uint32_t a, uint8_t n)
 {
     return (a >> n) | (a << (32 - n));
 }
 
-uint64_t ror64(uint64_t a, uint8_t n)
+uint64_t rotate_right64(uint64_t a, uint8_t n)
 {
     return (a >> n) | (a << (64 - n));
 }
 
-uint8_t shl8(uint8_t a, uint8_t n)
+uint8_t shift_left8(uint8_t a, uint8_t n)
 {
     return a << n;
 }
 
-uint16_t shl16(uint16_t a, uint8_t n)
+uint16_t shift_left16(uint16_t a, uint8_t n)
 {
     return a << n;
 }
 
-uint32_t shl32(uint32_t a, uint8_t n)
+uint32_t shift_left32(uint32_t a, uint8_t n)
 {
     return a << n;
 }
 
-uint64_t shl64(uint64_t a, uint8_t n)
+uint64_t shift_left64(uint64_t a, uint8_t n)
 {
     return a << n;
 }
 
-uint8_t shr8(uint8_t a, uint8_t n)
+uint8_t shift_right8(uint8_t a, uint8_t n)
 {
     return a >> n;
 }
 
-uint16_t shr16(uint16_t a, uint8_t n)
+uint16_t shift_right16(uint16_t a, uint8_t n)
 {
     return a >> n;
 }
 
-uint32_t shr32(uint32_t a, uint8_t n)
+uint32_t shift_right32(uint32_t a, uint8_t n)
 {
     return a >> n;
 }
 
-uint64_t shr64(uint64_t a, uint8_t n)
+uint64_t shift_right64(uint64_t a, uint8_t n)
 {
     return a >> n;
 }
