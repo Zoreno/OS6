@@ -400,6 +400,9 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     run_unit_tests();
 #endif
 
+    acpi_init();
+    acpi_enable();
+
     arch_initialize();
 
     memory_info_t mem_info;
@@ -409,8 +412,6 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
     parse_multiboot((unsigned char *)rbx, &mem_info);
 
     log_debug("Kernel end: %#016x", mem_info.kernel_end);
-
-    acpi_init();
 
     phys_mem_init(&mem_info);
 
