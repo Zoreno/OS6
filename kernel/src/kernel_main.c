@@ -417,6 +417,8 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     virt_mem_initialize();
 
+    arch_switch_to_lapic();
+
     sti();
 
     keyboard_install();

@@ -6,7 +6,10 @@ kernel_source(gdt_flush.asm)
 kernel_source(idt_flush.asm)
 kernel_source(default_irq_handler.asm)
 kernel_source(pic.c)
+kernel_source(apic.c)
 kernel_source(pit.c)
 kernel_source(atomic.c)
 kernel_source(fpu.c)
 kernel_source(read_cr2.asm)
+
+# TODO: Reorganize the files in this file.

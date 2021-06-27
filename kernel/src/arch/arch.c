@@ -21,12 +21,12 @@
  */
 
 #include <arch/arch.h>
+#include <logging/logging.h>
 
 #include <stdio.h>
 
-#include <logging/logging.h>
-
 #ifdef ARCH_X86_64
+#include <arch/x86-64/apic.h>
 #include <arch/x86-64/atomic.h>
 #include <arch/x86-64/cpu.h>
 #include <arch/x86-64/fpu.h>
@@ -67,9 +67,17 @@ void arch_initialize()
 #endif
 }
 
-void arch_shutdown(){
+void arch_shutdown()
+{
 #ifdef ARCH_X86_64
 #endif
+}
+
+void arch_switch_to_lapic()
+{
+    log_info("[ARCH] Switching to LAPIC");
+
+    apic_initialize();
 }
 
 uint8_t inportb(uint16_t port)

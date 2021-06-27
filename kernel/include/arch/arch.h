@@ -79,6 +79,8 @@ typedef void (*on_tick_handler_func)(void);
 void arch_initialize();
 void arch_shutdown();
 
+void arch_switch_to_lapic();
+
 uint8_t inportb(uint16_t port);
 uint16_t inportw(uint16_t port);
 uint32_t inportl(uint16_t port);
