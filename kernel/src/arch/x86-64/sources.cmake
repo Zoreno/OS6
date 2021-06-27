@@ -1,6 +1,7 @@
 kernel_source(cpu.c)
 kernel_source(gdt.c)
 kernel_source(idt.c)
+kernel_source(msr.c)
 kernel_source(gdt_flush.asm)
 kernel_source(idt_flush.asm)
 kernel_source(default_irq_handler.asm)
