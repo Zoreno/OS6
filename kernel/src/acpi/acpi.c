@@ -102,6 +102,8 @@ acpi_system_state_t S3_state;
 acpi_system_state_t S4_state;
 acpi_system_state_t S5_state;
 
+static madt_t *madt;
+
 //=============================================================================
 // Forward declarations
 //=============================================================================
@@ -617,7 +619,14 @@ static int acpi_init_rsdt(rsdt_t *rsdt)
 
         if (acpi_check_signature(header, "APIC") == 0)
         {
-            acpi_parse_madt((madt_t *)header);
+            int ret = acpi_parse_madt((madt_t *)header);
+
+            if (!ret)
+            {
+                // The table parsed successfully, and can now be used by other
+                // systems.
+                madt = (madt_t *)header;
+            }
         }
     }
 
@@ -765,6 +774,11 @@ void acpi_power_off()
 uint8_t acpi_get_century_register()
 {
     return century_register;
+}
+
+madt_t *acpi_get_madt()
+{
+    return madt;
 }
 
 //=============================================================================

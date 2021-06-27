@@ -3,9 +3,9 @@
  * @author Joakim Bertils
  * @version 0.1
  * @date 2021-02-01
- * 
- * @brief 
- * 
+ *
+ * @brief
+ *
  * @copyright Copyright (C) 2021,
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,17 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https: //www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef _ACPI_MADT_H
 #define _ACPI_MADT_H
 
-#include <stdint.h>
-
 #include "acpi_header.h"
 
-typedef struct 
+#include <stdint.h>
+
+typedef struct
 {
     acpi_header_t header;
     uint32_t local_apic_addr;
@@ -86,8 +86,10 @@ typedef struct
     uint64_t addr;
 } __attribute__((packed)) madt_entry_lapic_addr_override_t;
 
+uint32_t madt_get_apic_addr(madt_t *madt);
+
 #endif
 
 //=============================================================================
 // End of file
-//============================================================================= 
+//=============================================================================
