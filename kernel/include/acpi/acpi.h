@@ -34,6 +34,21 @@
 int acpi_init();
 
 /**
+ * @brief Check if ACPI is currently enabled.
+ *
+ *
+ * @return Non-zero if enabled.
+ */
+int acpi_is_enabled();
+
+/**
+ * @brief Enables ACPI power management.
+ *
+ *
+ */
+int acpi_enable();
+
+/**
  * @brief Shuts down the computer
  *
  *

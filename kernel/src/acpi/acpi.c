@@ -123,8 +123,6 @@ static int acpi_parse_dsdt(dsdt_t *dsdt);
 static int acpi_check_header(acpi_header_t *header, char *signature);
 static uint8_t acpi_calculate_checksum(acpi_header_t *header);
 
-static int acpi_enable(void);
-
 //=============================================================================
 // Private functions
 //=============================================================================
@@ -626,11 +624,6 @@ static int acpi_init_rsdt(rsdt_t *rsdt)
     return 0;
 }
 
-static int acpi_is_enabled()
-{
-    return (inportw((uint64_t)PM1a_CNT) & SCI_EN) != 0;
-}
-
 static void acpi_set_enabled(int enabled)
 {
     uint8_t command = enabled ? ACPI_ENABLE : ACPI_DISABLE;
@@ -640,40 +633,6 @@ static void acpi_set_enabled(int enabled)
 static void acpi_sleep(int ms)
 {
     mdelay(ms);
-}
-
-static int acpi_enable(void)
-{
-    int tries = 300;
-
-    if (!acpi_is_enabled())
-    {
-        if (SMI_CMD == 0 || SCI_EN == 0)
-        {
-            log_warn("[ACPI] No known way to enable ACPI");
-            return 1;
-        }
-
-        acpi_set_enabled(1);
-
-        for (int i = 0; i < tries; ++i)
-        {
-            if (acpi_is_enabled())
-            {
-                log_info("[ACPI] ACPI enabled!");
-                return 0;
-            }
-
-            acpi_sleep(10);
-        }
-
-        log_error("[ACPI] ACPI could not be enabled");
-        return 1;
-    }
-
-    log_info("[ACPI] ACPI already enabled");
-
-    return 0;
 }
 
 static void acpi_set_state(acpi_system_state_t *state)
@@ -740,6 +699,45 @@ done:
     return 0;
 }
 
+int acpi_is_enabled()
+{
+    return (inportw((uint64_t)PM1a_CNT) & SCI_EN) != 0;
+}
+
+int acpi_enable()
+{
+    int tries = 300;
+
+    if (!acpi_is_enabled())
+    {
+        if (SMI_CMD == 0 || SCI_EN == 0)
+        {
+            log_warn("[ACPI] No known way to enable ACPI");
+            return 1;
+        }
+
+        acpi_set_enabled(1);
+
+        for (int i = 0; i < tries; ++i)
+        {
+            if (acpi_is_enabled())
+            {
+                log_info("[ACPI] ACPI enabled!");
+                return 0;
+            }
+
+            acpi_sleep(10);
+        }
+
+        log_error("[ACPI] ACPI could not be enabled");
+        return 1;
+    }
+
+    log_info("[ACPI] ACPI already enabled");
+
+    return 0;
+}
+
 void acpi_power_off()
 {
     if (SCI_EN == 0)
@@ -747,12 +745,16 @@ void acpi_power_off()
         return;
     }
 
-    acpi_enable();
+    if (!acpi_is_enabled())
+    {
+        acpi_enable();
+    }
 
     arch_shutdown();
 
     // S5 is the closest we can get to a complete shutdown without pulling
-    // pulling the power cord.
+    // pulling the power cord. If the OS is running in a VM, the VM will shut
+    // down.
     acpi_set_state(&S5_state);
 
     mdelay(3000);
