@@ -468,8 +468,8 @@ static int acpi_parse_madt(madt_t *madt)
     log_debug("[ACPI] Found valid MADT");
 #endif
 
-    log_debug("[ACPI] Local ACPI addr: %#08x", madt->local_apic_addr);
-    log_debug("[ACPI] Flags: %#08x", madt->flags);
+    log_info("[ACPI] Local ACPI addr: %#08x", madt->local_apic_addr);
+    log_info("[ACPI] Flags: %#08x", madt->flags);
 
     uint8_t *p = (uint8_t *)madt;
     p += sizeof(madt_t);
@@ -478,17 +478,58 @@ static int acpi_parse_madt(madt_t *madt)
 
     while (p < p_end)
     {
-        madt_entry_header_t* entry = (madt_entry_header_t *)p;
-        switch(entry->entry_type)
+        madt_entry_header_t *entry = (madt_entry_header_t *)p;
+        switch (entry->entry_type)
         {
-            case APIC_TYPE_LOCAL_APIC:
-            {
-                madt_entry_lapic_t* lapic = (madt_entry_lapic_t *)p;
-                log_info("LAPIC processor ID: %i", lapic->acpi_processor_id);
-                log_info("LAPIC APIC ID: %i", lapic->apic_id);
-                log_info("LAPIC flags: %#08x", lapic->flags);
-            }
-            break;
+        case APIC_TYPE_LOCAL_APIC:
+        {
+            madt_entry_lapic_t *lapic = (madt_entry_lapic_t *)p;
+            log_info("LAPIC processor ID: %i", lapic->acpi_processor_id);
+            log_info("LAPIC APIC ID: %i", lapic->apic_id);
+            log_info("LAPIC flags: %#08x", lapic->flags);
+        }
+        break;
+        case APIC_TYPE_IO_APIC:
+        {
+            madt_entry_io_apic_t *ioapic = (madt_entry_io_apic_t *)p;
+
+            log_info("I/O APIC ID: %i", ioapic->io_apic_id);
+            log_info("I/O APIC Addr %#08x", ioapic->io_apic_addr);
+            log_info("I/O APIC Global system interrupt base %#08x",
+                     ioapic->global_system_interrupt_base);
+        }
+        break;
+        case APIC_TYPE_LAPIC_ADDR_OVERRIDE:
+        {
+            madt_entry_lapic_addr_override_t *addr_override =
+                (madt_entry_lapic_addr_override_t *)p;
+
+            log_info("LAPIC Address Override %#016x", addr_override->addr);
+        }
+        break;
+        case APIC_TYPE_NMI:
+        {
+            madt_entry_nmi_t *nmi = (madt_entry_nmi_t *)p;
+
+            log_info("NMI Processor ID %i", nmi->acpi_processor_id);
+            log_info("NMI flags: %08x", nmi->flags);
+            log_info("NMI Lint: %i", nmi->lint);
+        }
+        break;
+        case APIC_TYPE_INTERRUPT_OVERRIDE:
+        {
+            madt_entry_interrupt_override_t *int_override =
+                (madt_entry_interrupt_override_t *)p;
+
+            log_info("Interrupt Override: Global system interrupt %i",
+                     int_override->global_system_interrupt);
+            log_info("Interrupt Override: IRQ source %i",
+                     int_override->irq_source);
+            log_info("Interrupt Override: Flags: %08x", int_override->flags);
+            log_info("Interrupt Override: Bus source: %08x",
+                     int_override->bus_source);
+        }
+        break;
         default:
             log_warn("[ACPI] Invalid madt entry type");
             break;
