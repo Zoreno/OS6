@@ -41,10 +41,15 @@ cd src
 mkdir -p build-binutils
 cd build-binutils
 
-../binutils-$BINUTILS_VERSION/configure --target=$TARGET --prefix="$PREFIX" --with-sysroot --disable-nls --disable-werror
+../binutils-$BINUTILS_VERSION/configure \
+    --target=$TARGET \
+    --prefix="$PREFIX" \
+    --with-sysroot \
+    --disable-nls \
+    --disable-werror
 
-make -j8
-make -j8 install
+make -j4
+make -j4 install
 
 cd ..
 
@@ -68,13 +73,14 @@ cd build-gcc
     --disable-libstdc++-v3 \
     --disable-shared \
     --without-headers \
-    --with-newlib
+    --with-newlib \
+    --with-sysroot
 
-make -j8 all-gcc
-make -j8 install-gcc
+make -j4 all-gcc
+make -j4 install-gcc
 
-make -j8 all-target-libgcc
-make -j8 install-target-libgcc
+make -j4 all-target-libgcc
+make -j4 install-target-libgcc
 
 cd ../..
 
