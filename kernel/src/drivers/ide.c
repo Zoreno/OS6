@@ -120,17 +120,51 @@ enum ata_error_register_t
     ATA_ERROR_END_OF_MEDIA = 0x02,
 };
 
+/**
+ * @brief Internal error codes for the IDE operations.
+ *
+ *
+ */
 typedef enum
 {
+    /**
+     * @brief The operation finished successfully.
+     *
+     *
+     */
     IDE_SUCCESS = 0,
+
+    /**
+     * @brief The operation finished with a general error.
+     *
+     *
+     */
     IDE_ERROR = 1,
+
+    /**
+     * @brief The operation did not finish within the given time.
+     *
+     *
+     */
     IDE_TIMEOUT = 2,
+
+    /**
+     * @brief Device was already selected during selection and force was not
+     * specified.
+     *
+     *
+     */
     IDE_ALREADY_SELECTED = 3,
 } ide_error_t;
 
 #define ATA_CTL_SRST 0x04
 #define ATA_CTL_nIEN 0x02
 
+/**
+ * @brief Default timeout in microseconds for wait operations
+ *
+ *
+ */
 #define ATA_TIMEOUT 30000000
 
 #define IO_READ 0
@@ -460,6 +494,17 @@ static ide_error_t flush_cache(ide_controller_t *controller)
     return IDE_SUCCESS;
 }
 
+/**
+ * @brief Prints the number @a size with one decimal after shifting it @a bits
+ * bits to the right.
+ *
+ * @param size Number ot shift.
+ * @param buffer Buffer to print the number to.
+ * @param bits Number of bits to shift.
+ * @param unit String containing the unit to append to the buffer.
+ *
+ * @return Number of bytes emitted to @a buffer.
+ */
 static size_t format_size_shift_and_print(size_t size,
                                           char *buffer,
                                           size_t bits,
@@ -492,7 +537,7 @@ static size_t format_size_shift_and_print(size_t size,
  * @param size Size to format
  * @param buffer Buffer to print the result to.
  *
- * @return Number of characters written to buffer.
+ * @return Number of characters emitted to @a buffer.
  */
 static size_t format_size_to_human_readable(size_t size, char *buffer)
 {
@@ -522,6 +567,14 @@ static size_t format_size_to_human_readable(size_t size, char *buffer)
     return 0;
 }
 
+/**
+ * @brief Formats the device info into a human-readable string.
+ *
+ * @param device Device to print the info for.
+ * @param buffer Buffer to write the index to.
+ * @param controller_index Index of the controller the device is connected to.
+ *
+ */
 static void format_device_info(ide_device_t *device,
                                char *buffer,
                                size_t controller_index)
@@ -548,6 +601,13 @@ static void format_device_info(ide_device_t *device,
             device->dma ? "YES" : "NO");
 }
 
+/**
+ * @brief Converts an ATA string to an ASCII string.
+ *
+ * @param s String to convert.
+ * @param len Size of the buffer containing the string.
+ *
+ */
 static void fix_ide_string(char *s, int len)
 {
     char c;
@@ -582,6 +642,18 @@ static void fix_ide_string(char *s, int len)
     }
 }
 
+/**
+ * @brief Waits for the controller to set the given bits.
+ *
+ * The condition is fulfilled if status & @a mask == @a value.
+ *
+ * @param controller Controller to wait for.
+ * @param mask Mask with the interesting bits.
+ * @param value Value to wait for.
+ * @param timeout Timeout until the operation is considered failed.
+ *
+ * @return Error code representing the result of the operation.
+ */
 static ide_error_t wait_for_controller(ide_controller_t *controller,
                                        uint8_t mask,
                                        uint8_t value,
@@ -605,6 +677,13 @@ static ide_error_t wait_for_controller(ide_controller_t *controller,
     return IDE_SUCCESS;
 }
 
+/**
+ * @brief Try to reset the controller by writing to the control register.
+ *
+ * @param controller Controller to reset.
+ *
+ * @return Error code representing the result of the operation.
+ */
 static ide_error_t reset_controller(ide_controller_t *controller)
 {
     uint32_t iobase = controller->iobase;
@@ -640,6 +719,13 @@ static void delay400ns(ide_device_t *device)
     }
 }
 
+/**
+ * @brief Read from the drive head register.
+ *
+ * @param controller Controller to read from.
+ *
+ * @return Value of the register.
+ */
 static uint8_t read_drive_head_register(ide_controller_t *controller)
 {
     uint32_t iobase = get_iobase(controller);
@@ -647,6 +733,13 @@ static uint8_t read_drive_head_register(ide_controller_t *controller)
     return inportb(iobase + ATA_REGISTER_DRV_HEAD);
 }
 
+/**
+ * @brief Write to the drive head register.
+ *
+ * @param controller Controller to write to.
+ * @param value Value to write to the register.
+ *
+ */
 static void write_drive_head_register(ide_controller_t *controller,
                                       uint8_t value)
 {
@@ -655,6 +748,13 @@ static void write_drive_head_register(ide_controller_t *controller,
     outportb(iobase + ATA_REGISTER_DRV_HEAD, value);
 }
 
+/**
+ * @brief Check whether the device is the currently selected device.
+ *
+ * @param device Device to check.
+ *
+ * @return Non-zero if selected.
+ */
 static int is_device_selected(ide_device_t *device)
 {
     uint8_t tmp = read_drive_head_register(device->controller);
@@ -735,7 +835,7 @@ static ide_error_t select_device(ide_device_t *device, int force)
 
     uint8_t status;
 
-    if (wait_until_ready(controller, num_retries) != 0)
+    if (wait_until_ready(controller, num_retries) != IDE_SUCCESS)
     {
         log_warn("[IDE] Devce not ready after selecting");
 
@@ -750,6 +850,14 @@ static ide_error_t select_device(ide_device_t *device, int force)
     return IDE_SUCCESS;
 }
 
+/**
+ * @brief Try to identify the device.
+ *
+ * Will populate the @a device struct with information found.
+ *
+ * @param device Pointer to device struct.
+ *
+ */
 static void identify_ide_device(ide_device_t *device)
 {
     int i;
@@ -853,6 +961,13 @@ static void identify_ide_device(ide_device_t *device)
     fix_ide_string(device->firmware, 8);
 }
 
+/**
+ * @brief Get the ide device from the minor number.
+ *
+ * @param minor Minor number describing the device. Valid values are [0-3].
+ *
+ * @return Pointer to IDE device object.
+ */
 static ide_device_t *get_ide_device(unsigned int minor)
 {
     ide_controller_t *controller;
@@ -1003,6 +1118,16 @@ static uint32_t ide_read_write_blocks(uint32_t minor,
     return nblocks;
 }
 
+/**
+ * @brief Writes a number of blocks to the IDE device.
+ *
+ * @param minor Minor number for the device.
+ * @param block Starting block to write to.
+ * @param nblocks Number of blocks to write.
+ * @param buffer Buffer to write from.
+ *
+ * @return Number of blocks written.
+ */
 static uint32_t ide_write_blocks(uint32_t minor,
                                  uint32_t block,
                                  uint32_t nblocks,
@@ -1011,6 +1136,16 @@ static uint32_t ide_write_blocks(uint32_t minor,
     return ide_read_write_blocks(minor, block, nblocks, buffer, IO_WRITE);
 }
 
+/**
+ * @brief Reads a number of blocks from the IDE device.
+ *
+ * @param minor Minor number for the device.
+ * @param block Starting block to read from.
+ * @param nblocks Number of blocks to read.
+ * @param buffer Buffer to read to.
+ *
+ * @return Number of blocks read.
+ */
 static uint32_t ide_read_blocks(uint32_t minor,
                                 uint32_t block,
                                 uint32_t nblocks,
@@ -1019,6 +1154,12 @@ static uint32_t ide_read_blocks(uint32_t minor,
     return ide_read_write_blocks(minor, block, nblocks, buffer, IO_READ);
 }
 
+/**
+ * @brief Handles an interrupt for the given controller.
+ *
+ * @param controller Controller raising the interrupt.
+ *
+ */
 static void ide_handle_interrupt(ide_controller_t *controller)
 {
     // We must read the status register each irq
@@ -1027,6 +1168,12 @@ static void ide_handle_interrupt(ide_controller_t *controller)
     controller->irq = 1;
 }
 
+/**
+ * @brief Interrupt handler for the IRQ of the primary IDE controller.
+ *
+ * @param regs Registers at the time of the interrupt.
+ *
+ */
 static void ide_primary_irq(system_stack_t *regs)
 {
     (void)regs;
@@ -1034,6 +1181,12 @@ static void ide_primary_irq(system_stack_t *regs)
     ide_handle_interrupt(&controllers[PRIMARY_IDE_CONTROLLER]);
 }
 
+/**
+ * @brief Interrupt handler for the IRQ of the secondary IDE controller.
+ *
+ * @param regs Registers at the time of the interrupt.
+ *
+ */
 static void ide_secondary_irq(system_stack_t *regs)
 {
     (void)regs;
