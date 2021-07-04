@@ -25,6 +25,8 @@
  *  - Power management
  *  - Spawn a thread that handles all disk I/O. Other threads may send IPC
  *    to this thread to read from disk.
+ *  - Keep track of statistics for blocks read and written, errors, etc.
+ *  - All registers should be read and written with functions.
  *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
@@ -45,6 +47,7 @@
 #include <drivers/blockdev.h>
 #include <drivers/ide.h>
 #include <logging/logging.h>
+#include <pci/pci.h>
 
 #include <stdint.h>
 #include <stdio.h>
@@ -897,9 +900,9 @@ static void identify_ide_device(ide_device_t *device)
 
     device->present = 0;
 
-    outportb(iobase + ATA_REGISTER_NSECTOR, 0xab);
+    write_count_register(controller, 0xAB);
 
-    if (inportb(iobase + ATA_REGISTER_NSECTOR) != 0xab)
+    if (read_count_register(controller) != 0xAB)
     {
         return;
     }
@@ -919,10 +922,10 @@ static void identify_ide_device(ide_device_t *device)
         return;
     }
 
-    uint8_t res1 = inportb(iobase + ATA_REGISTER_NSECTOR);
-    uint8_t res2 = inportb(iobase + ATA_REGISTER_SECTOR);
+    uint8_t count = read_count_register(controller);
+    uint8_t lba = inportb(iobase + ATA_REGISTER_SECTOR);
 
-    if (res1 == 0x01 && res2 == 0x01)
+    if (count == 0x01 && lba == 0x01)
     {
         cl = inportb(iobase + ATA_REGISTER_LCYL);
         ch = inportb(iobase + ATA_REGISTER_HCYL);
