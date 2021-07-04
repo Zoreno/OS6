@@ -92,6 +92,7 @@ typedef enum
     ATA_COMMAND_ATAPI_IDENTIFY = 0xA1,
     ATA_COMMAND_READ_MULTIPLE = 0xC4,
     ATA_COMMAND_WRITE_MULTIPLE = 0xC5,
+    ATA_COMMAND_CHECK_POWER_MODE = 0xE5,
     ATA_COMMAND_FLUSH_CACHE = 0xE7,
     ATA_COMMAND_IDENTIFY = 0xEC,
     ATA_COMMAND_MEDIA_EJECT = 0xED,
@@ -285,6 +286,9 @@ static uint32_t ide_read_blocks(uint32_t minor,
                                 void *buffer);
 static void ide_primary_irq(system_stack_t *regs);
 static void ide_secondary_irq(system_stack_t *regs);
+static uint8_t read_count_register(ide_controller_t *controller);
+static void write_count_register(ide_controller_t *controller, uint8_t value);
+static ide_error_t check_power_mode(ide_controller_t *controller);
 
 //=============================================================================
 // Private functions
@@ -1202,6 +1206,88 @@ static void ide_secondary_irq(system_stack_t *regs)
     ide_handle_interrupt(&controllers[SECONDARY_IDE_CONTROLLER]);
 }
 
+/**
+ * @brief Read from the count register.
+ *
+ * @param controller Controller to read from.
+ *
+ * @return Value of the count register.
+ */
+static uint8_t read_count_register(ide_controller_t *controller)
+{
+    uint32_t iobase = get_iobase(controller);
+
+    return inportb(iobase + ATA_REGISTER_NSECTOR);
+}
+
+/**
+ * @brief Write tot the count register.
+ *
+ * @param controller Controller to write to.
+ * @param value Value to write.
+ *
+ */
+static void write_count_register(ide_controller_t *controller, uint8_t value)
+{
+    uint32_t iobase = get_iobase(controller);
+
+    outportb(iobase + ATA_REGISTER_NSECTOR, value);
+}
+
+/**
+ * @brief Checks the current power mode of the controller.
+ *
+ * @param controller Controller to check.
+ *
+ * @return Error code indicating the result of the operation.
+ */
+static ide_error_t check_power_mode(ide_controller_t *controller)
+{
+    if (!controller)
+    {
+        return IDE_ERROR;
+    }
+
+    write_command(controller, ATA_COMMAND_CHECK_POWER_MODE);
+
+    wait_until_ready(controller, ATA_TIMEOUT);
+
+    if (read_status_register(controller) &
+        (ATA_STATUS_ERROR | ATA_STATUS_DEVICE_FAULT))
+    {
+        log_error("[IDE] Failed to run command CHECK_POWER_MODE");
+
+        return IDE_ERROR;
+    }
+
+    uint8_t mode = read_count_register(controller);
+
+    switch (mode)
+    {
+    case 0x00:
+    case 0x01:
+        log_info("[IDE] Device is in standby mode");
+        break;
+    case 0x80:
+    case 0x81:
+    case 0x82:
+    case 0x83:
+        log_info("[IDE] Device is in idle mode");
+        break;
+    case 0xFF:
+        log_info("[IDE] Device is active or idle");
+        break;
+    default:
+        log_error("[IDE] Device is in an indeterminate state");
+        return IDE_ERROR;
+    }
+
+    // TODO: Check LOW_POWER_STANDBY_SUPPORTED and query LBA register too.
+    // TODO: Return the power state from this function somehow...
+
+    return IDE_SUCCESS;
+}
+
 //=============================================================================
 // Interface functions
 //=============================================================================
@@ -1263,6 +1349,7 @@ void init_ide_devices()
                                   device->capacity);
 
             log_info("[IDE] %s", msg);
+            check_power_mode(device->controller);
 
             if (i == 0 && j == 0)
             {
