@@ -5,13 +5,26 @@
  * @date 2019-06-22
  *
  * @brief This module implements a subset of the ATA command set for handling
- * HDDs.
+ * HDDs through the IDE controller.
  *
  * Currently, two controllers with two devices each are supported. The module
  * will check the controllers for any conntected devices and setup a device for
  * each found deivce.
  *
  * @note ATAPI devices are not yet fully supported.
+ *
+ * Roadmap for this module:
+ *
+ *  - Implement support for ATAPI.
+ *  - Support for DMA transfers.
+ *  - Support LBA48 PIO mode.
+ *  - IDENTIFY_DEVICE block as struct.
+ *  - Read IOBASE from PCI instead of hard-coded values.
+ *  - Parse more data from PCI.
+ *  - Parse the feature sets present in the IDE controller.
+ *  - Power management
+ *  - Spawn a thread that handles all disk I/O. Other threads may send IPC
+ *    to this thread to read from disk.
  *
  * @copyright Copyright (C) 2019,
  * This program is free software: you can redistribute it and/or modify
