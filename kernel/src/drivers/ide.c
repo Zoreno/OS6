@@ -74,20 +74,28 @@ enum ata_register_t
     ATA_REGISTER_DEV_CTL = 0x206,
 };
 
-#define ATA_COMMAND_READ_SECTOR 0x20
-#define ATA_COMMAND_READ_SECTOR_NORETRY 0x21
-#define ATA_READ_LONG 0x22
-#define ATA_READ_LONG_NORETRY 0x23
-#define ATA_COMMAND_WRITE_SECTOR 0x30
-#define ATA_COMMAND_WRITE_SECTOR_NORETRY 0x31
-#define ATA_WRITE_LONG 0x32
-#define ATA_WRITE_LONG_NORETRY 0x33
-#define ATAPI_IDENTIFY 0xA1
-#define ATA_READ_MULTIPLE 0xC4
-#define ATA_WRITE_MULTIPLE 0xC5
-#define ATA_FLUSH_CACHE 0xE7
-#define ATA_IDENTIFY 0xEC
-#define ATA_MEDIA_EJECT 0xED
+/**
+ * @brief Ata commands from the ATA command specification.
+ *
+ *
+ */
+typedef enum
+{
+    ATA_COMMAND_READ_SECTOR = 0x20,
+    ATA_COMMAND_READ_SECTOR_NORETRY = 0x21,
+    ATA_COMMAND_READ_LONG = 0x22,
+    ATA_COMMAND_READ_LONG_NORETRY = 0x23,
+    ATA_COMMAND_WRITE_SECTOR = 0x30,
+    ATA_COMMAND_WRITE_SECTOR_NORETRY = 0x31,
+    ATA_COMMAND_WRITE_LONG = 0x32,
+    ATA_COMMAND_WRITE_LONG_NORETRY = 0x33,
+    ATA_COMMAND_ATAPI_IDENTIFY = 0xA1,
+    ATA_COMMAND_READ_MULTIPLE = 0xC4,
+    ATA_COMMAND_WRITE_MULTIPLE = 0xC5,
+    ATA_COMMAND_FLUSH_CACHE = 0xE7,
+    ATA_COMMAND_IDENTIFY = 0xEC,
+    ATA_COMMAND_MEDIA_EJECT = 0xED,
+} ata_command_t;
 
 /**
  * @brief Bitfield for the ATA status register
@@ -230,7 +238,7 @@ static uint8_t read_status_register(ide_controller_t *controller);
 static uint8_t read_error_register(ide_controller_t *controller);
 static void clear_error_register(ide_controller_t *controller);
 static void write_control_register(ide_controller_t *controller, uint8_t value);
-static void write_command(ide_controller_t *controller, uint8_t cmd);
+static void write_command(ide_controller_t *controller, ata_command_t cmd);
 static void write_data(ide_controller_t *controller, uint16_t data);
 static uint16_t read_data(ide_controller_t *controller);
 static void wait_for_irq(ide_controller_t *controller);
@@ -356,7 +364,7 @@ static void write_control_register(ide_controller_t *controller, uint8_t value)
  * @param cmd Command to write.
  *
  */
-static void write_command(ide_controller_t *controller, uint8_t cmd)
+static void write_command(ide_controller_t *controller, ata_command_t cmd)
 {
     uint32_t iobase = get_iobase(controller);
 
@@ -481,7 +489,7 @@ static void read_block_no_irq(ide_controller_t *controller, void *buffer)
  */
 static ide_error_t flush_cache(ide_controller_t *controller)
 {
-    write_command(controller, ATA_FLUSH_CACHE);
+    write_command(controller, ATA_COMMAND_FLUSH_CACHE);
 
     if (!wait_for_controller(controller, ATA_STATUS_BUSY, 0, ATA_TIMEOUT))
     {
@@ -867,7 +875,7 @@ static void identify_ide_device(ide_device_t *device)
     uint8_t status;
     uint8_t cl;
     uint8_t ch;
-    uint8_t cmd;
+    ata_command_t cmd;
     uint16_t info[256];
 
     device->present = 0;
@@ -920,7 +928,7 @@ static void identify_ide_device(ide_device_t *device)
         return;
     }
 
-    cmd = device->atapi ? ATAPI_IDENTIFY : ATA_IDENTIFY;
+    cmd = device->atapi ? ATA_COMMAND_ATAPI_IDENTIFY : ATA_COMMAND_IDENTIFY;
 
     write_command(controller, cmd);
 
@@ -993,7 +1001,7 @@ static uint32_t ide_read_write_blocks(uint32_t minor,
     uint8_t cl;
     uint8_t ch;
     uint8_t hd;
-    uint8_t cmd;
+    ata_command_t cmd;
 
     uint32_t iobase;
     uint32_t i;
