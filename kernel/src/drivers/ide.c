@@ -218,6 +218,7 @@ typedef struct _ide_device
     uint8_t atapi : 1;
     uint8_t lba : 1;
     uint8_t dma : 1;
+    uint8_t lba48 : 1;
 
     char model[40];
     char serial[20];
@@ -615,7 +616,7 @@ static void format_device_info(ide_device_t *device,
 
     sprintf(buffer,
             "%s [%i-%i]: %s (%i/%i/%i - %i sectors (%s)) LBA:%s "
-            "- DMA:%s",
+            "- DMA:%s - LBA48:%s",
             device->atapi ? "CD-ROM" : "Hard Disk",
             controller_index,
             device->position,
@@ -626,7 +627,8 @@ static void format_device_info(ide_device_t *device,
             device->capacity,
             size_buffer,
             device->lba ? "YES" : "NO",
-            device->dma ? "YES" : "NO");
+            device->dma ? "YES" : "NO",
+            device->lba48 ? "YES" : "NO");
 }
 
 /**
@@ -966,6 +968,7 @@ static void identify_ide_device(ide_device_t *device)
 
     device->lba = (info[49] >> 9) & 1;
     device->dma = (info[49] >> 8) & 1;
+    device->lba48 = (info[83] >> 10) & 1;
 
     device->cylinders = (uint32_t)info[1];
     device->heads = (uint32_t)info[3];
