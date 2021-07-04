@@ -1308,9 +1308,16 @@ static ide_error_t check_power_mode(ide_controller_t *controller)
 // Interface functions
 //=============================================================================
 
-void init_ide_devices()
+void ide_init(uint32_t id, PciDeviceInfo_t *deviceInfo)
 {
-    log_info("[IDE] Initializing");
+    // TODO: See OS6-33 for ways to improve this detection method.
+    if (!(((deviceInfo->classCode << 8) | deviceInfo->subClass) ==
+          PCI_STORAGE_IDE))
+    {
+        return;
+    }
+
+    log_info("[IDE] Found IDE controller");
 
     int i;
     int j;
