@@ -208,6 +208,17 @@ typedef enum
 #define MAX_NBLOCKS 256
 
 struct _ide_controller;
+struct _ide_device;
+
+typedef uint32_t (*ide_read_function_t)(struct _ide_device *device,
+                                        uint64_t block,
+                                        uint64_t nblocks,
+                                        void *buffer);
+
+typedef uint32_t (*ide_write_function_t)(struct _ide_device *device,
+                                         uint64_t block,
+                                         uint64_t nblocks,
+                                         void *buffer);
 
 typedef struct _ide_device
 {
@@ -228,6 +239,12 @@ typedef struct _ide_device
     uint32_t heads;
     uint32_t sectors;
     uint32_t capacity;
+
+    struct
+    {
+        ide_read_function_t read;
+        ide_write_function_t write;
+    };
 
 } ide_device_t;
 
@@ -288,11 +305,27 @@ static ide_error_t wait_until_ready(ide_controller_t *controller,
 static ide_error_t select_device(ide_device_t *device, int force);
 static void identify_ide_device(ide_device_t *device);
 static ide_device_t *get_ide_device(unsigned int minor);
-static uint32_t ide_read_write_blocks(uint32_t minor,
-                                      uint32_t block,
-                                      uint32_t nblocks,
-                                      void *buffer,
-                                      int direction);
+static uint32_t ide_read_write_blocks_old(uint32_t minor,
+                                          uint32_t block,
+                                          uint32_t nblocks,
+                                          void *buffer,
+                                          int direction);
+static uint32_t ide_read_blocks_LBA28(ide_device_t *device,
+                                      uint64_t block,
+                                      uint64_t nblocks,
+                                      void *buffer);
+static uint32_t ide_read_blocks_CHS(ide_device_t *device,
+                                    uint64_t block,
+                                    uint64_t nblocks,
+                                    void *buffer);
+static uint32_t ide_write_blocks_LBA28(ide_device_t *device,
+                                       uint64_t block,
+                                       uint64_t nblocks,
+                                       void *buffer);
+static uint32_t ide_write_blocks_CHS(ide_device_t *device,
+                                     uint64_t block,
+                                     uint64_t nblocks,
+                                     void *buffer);
 static uint32_t ide_write_blocks(uint32_t minor,
                                  uint32_t block,
                                  uint32_t nblocks,
@@ -1010,11 +1043,22 @@ static ide_device_t *get_ide_device(unsigned int minor)
     return device;
 }
 
-static uint32_t ide_read_write_blocks(uint32_t minor,
-                                      uint32_t block,
-                                      uint32_t nblocks,
-                                      void *buffer,
-                                      int direction)
+/**
+ * @brief Old method of reading and writing to the disk.
+ *
+ * @param minor
+ * @param block
+ * @param nblocks
+ * @param buffer
+ * @param direction
+ *
+ * @return uint32_t
+ */
+static uint32_t ide_read_write_blocks_old(uint32_t minor,
+                                          uint32_t block,
+                                          uint32_t nblocks,
+                                          void *buffer,
+                                          int direction)
 {
     ide_device_t *device;
     ide_controller_t *controller;
@@ -1092,7 +1136,7 @@ static uint32_t ide_read_write_blocks(uint32_t minor,
     controller->irq = 0;
 
     write_drive_head_register(
-        controller, 0xE0 | (device->lba << 6) | (device->position << 4) | hd);
+        controller, 0xA0 | (device->lba << 6) | (device->position << 4) | hd);
     clear_error_register(controller);
 
     outportb(iobase + ATA_REGISTER_NSECTOR, nblocks);
@@ -1150,6 +1194,467 @@ static uint32_t ide_read_write_blocks(uint32_t minor,
 }
 
 /**
+ * @brief Read from the IDE device using LBA28 PIO addressing mode.
+ *
+ * Uses the READ_SECTORS command.
+ *
+ * @param device Device to read from.
+ * @param block Starting block.
+ * @param nblocks Number of blocks to read.
+ * @param buffer Buffer to store the read data.
+ *
+ * @return Number of blocks read.
+ */
+static uint32_t ide_read_blocks_LBA28(ide_device_t *device,
+                                      uint64_t block,
+                                      uint64_t nblocks,
+                                      void *buffer)
+{
+    if (!device)
+    {
+        log_error("[IDE] Device was NULL");
+        return 0;
+    }
+
+    ide_controller_t *controller = device->controller;
+    uint32_t iobase = controller->iobase;
+    uint8_t *buf = (uint8_t *)buffer;
+
+    uint32_t lba = block;
+
+    if (!device->present)
+    {
+        log_error("[IDE] Device not present");
+        return 0;
+    }
+
+    if (!device->lba)
+    {
+        log_error("[IDE] Read using LBA28 requested but not supported");
+        return 0;
+    }
+
+    if (!nblocks)
+    {
+        log_warn("[IDE] Zero blocks requested");
+        return 0;
+    }
+
+    if (nblocks >= MAX_NBLOCKS)
+    {
+        nblocks = MAX_NBLOCKS;
+    }
+
+    if (block + nblocks > device->capacity)
+    {
+        log_error("[IDE] Request outside capacity");
+        log_debug("[IDE] block+nblocks: %i, device->capacity: %i",
+                  block + nblocks,
+                  device->capacity);
+        return 0;
+    }
+
+    if (nblocks > 256)
+    {
+        log_warn("[IDE] Requested read of more than 256 sectors at the time");
+        nblocks = 256;
+    }
+
+    if (select_device(device, 1) != IDE_SUCCESS)
+    {
+        log_error("[IDE] Could not select device");
+        return 0;
+    }
+
+    controller->irq = 0;
+
+    // LBA bit has to be set here.
+    // 0xE0 = 0xA0 | (device->lba << 6)
+    write_drive_head_register(
+        controller, 0xE0 | (device->position << 4) | ((lba >> 24) & 0xF));
+    clear_error_register(controller);
+
+    write_count_register(controller, nblocks == 256 ? 0 : nblocks);
+
+    // TODO: Do not use outportb directly
+    outportb(iobase + ATA_REGISTER_SECTOR, lba & 0xFF);
+    outportb(iobase + ATA_REGISTER_LCYL, (lba >> 8) & 0xFF);
+    outportb(iobase + ATA_REGISTER_HCYL, (lba >> 16) & 0xFF);
+
+    write_command(controller, ATA_COMMAND_READ_SECTOR);
+
+    delay400ns(device);
+
+    if (read_status_register(controller) & ATA_STATUS_ERROR)
+    {
+        log_error("[IDE] Device reported error");
+        return 0;
+    }
+
+    for (int block = 0; block < nblocks; ++block)
+    {
+        read_block(controller, buf);
+
+        buf += BLOCK_SIZE;
+    }
+
+    if (read_status_register(controller) & ATA_STATUS_ERROR)
+    {
+        log_error("[IDE] Device reported error");
+        return 0;
+    }
+
+    return nblocks;
+}
+
+/**
+ * @brief Read from the IDE device using the deprecated CHS PIO addressing mode.
+ *
+ * * Uses the READ_SECTORS command.
+ *
+ * @param device Device to read from.
+ * @param block Starting block.
+ * @param nblocks Number of blocks to read.
+ * @param buffer Buffer to store the read data.
+ *
+ * @return Number of blocks read.
+ */
+static uint32_t ide_read_blocks_CHS(ide_device_t *device,
+                                    uint64_t block,
+                                    uint64_t nblocks,
+                                    void *buffer)
+{
+    if (!device)
+    {
+        log_error("[IDE] Device was NULL");
+        return 0;
+    }
+
+    ide_controller_t *controller = device->controller;
+    uint32_t iobase = controller->iobase;
+    uint8_t *buf = (uint8_t *)buffer;
+
+    uint8_t sc;
+    uint8_t cl;
+    uint8_t ch;
+    uint8_t hd;
+
+    if (!device->present)
+    {
+        log_error("[IDE] Device not present");
+        return 0;
+    }
+
+    if (!nblocks)
+    {
+        log_warn("[IDE] Zero blocks requested");
+        return 0;
+    }
+
+    if (nblocks >= MAX_NBLOCKS)
+    {
+        nblocks = MAX_NBLOCKS;
+    }
+
+    if (block + nblocks > device->capacity)
+    {
+        log_error("[IDE] Request outside capacity");
+        log_debug("[IDE] block+nblocks: %i, device->capacity: %i",
+                  block + nblocks,
+                  device->capacity);
+        return 0;
+    }
+
+    if (select_device(device, 1) != IDE_SUCCESS)
+    {
+        log_error("[IDE] Could not select device");
+        return 0;
+    }
+
+    int cyl = block / (device->heads * device->sectors);
+    int tmp = block % (device->heads * device->sectors);
+
+    sc = tmp % device->sectors + 1;
+    cl = cyl & 0xFF;
+    ch = (cyl >> 8) & 0xFF;
+    hd = tmp / device->sectors;
+
+    controller->irq = 0;
+
+    write_drive_head_register(controller, 0xA0 | (device->position << 4) | hd);
+    clear_error_register(controller);
+
+    write_count_register(controller, nblocks);
+
+    // TODO: Do not use outportb directly
+    outportb(iobase + ATA_REGISTER_SECTOR, sc);
+    outportb(iobase + ATA_REGISTER_LCYL, cl);
+    outportb(iobase + ATA_REGISTER_HCYL, ch);
+
+    write_command(controller, ATA_COMMAND_READ_SECTOR);
+
+    delay400ns(device);
+
+    if (read_status_register(controller) & ATA_STATUS_ERROR)
+    {
+        log_error("[IDE] Device reported error");
+        return 0;
+    }
+
+    for (int block = 0; block < nblocks; ++block)
+    {
+        read_block(controller, buf);
+
+        buf += BLOCK_SIZE;
+    }
+
+    if (read_status_register(controller) & ATA_STATUS_ERROR)
+    {
+        log_error("[IDE] Device reported error");
+        return 0;
+    }
+
+    return nblocks;
+}
+
+/**
+ * @brief Write to the IDE device using LBA28 PIO addressing mode.
+ *
+ * Uses the WRITE_SECTORS command.
+ *
+ * @param device Device to write to.
+ * @param block Starting block.
+ * @param nblocks Number of blocks to write.
+ * @param buffer Buffer to write.
+ *
+ * @return Number of blocks written.
+ */
+static uint32_t ide_write_blocks_LBA28(ide_device_t *device,
+                                       uint64_t block,
+                                       uint64_t nblocks,
+                                       void *buffer)
+{
+    if (!device)
+    {
+        log_error("[IDE] Device was NULL");
+        return 0;
+    }
+
+    ide_controller_t *controller = device->controller;
+    uint32_t iobase = controller->iobase;
+    uint8_t *buf = (uint8_t *)buffer;
+    uint32_t lba = block;
+
+    if (!device->present)
+    {
+        log_error("[IDE] Device not present");
+        return 0;
+    }
+
+    if (!device->lba)
+    {
+        log_error("[IDE] Write using LBA28 requested but not supported");
+        return 0;
+    }
+
+    if (!nblocks)
+    {
+        log_warn("[IDE] Zero blocks requested");
+        return 0;
+    }
+
+    if (nblocks >= MAX_NBLOCKS)
+    {
+        nblocks = MAX_NBLOCKS;
+    }
+
+    if (block + nblocks > device->capacity)
+    {
+        log_error("[IDE] Request outside capacity");
+        log_debug("[IDE] block+nblocks: %i, device->capacity: %i",
+                  block + nblocks,
+                  device->capacity);
+        return 0;
+    }
+
+    if (nblocks > 256)
+    {
+        log_warn("[IDE] Requested write of more than 256 sectors at the time");
+        nblocks = 256;
+    }
+
+    if (select_device(device, 1) != IDE_SUCCESS)
+    {
+        log_error("[IDE] Could not select device");
+        return 0;
+    }
+
+    controller->irq = 0;
+
+    // LBA bit has to be set here.
+    // 0xE0 = 0xA0 | (device->lba << 6)
+    write_drive_head_register(
+        controller, 0xE0 | (device->position << 4) | ((lba >> 24) & 0xF));
+    clear_error_register(controller);
+
+    write_count_register(controller, nblocks == 256 ? 0 : nblocks);
+
+    // TODO: Do not use outportb directly
+    outportb(iobase + ATA_REGISTER_SECTOR, lba & 0xFF);
+    outportb(iobase + ATA_REGISTER_LCYL, (lba >> 8) & 0xFF);
+    outportb(iobase + ATA_REGISTER_HCYL, (lba >> 16) & 0xFF);
+
+    write_command(controller, ATA_COMMAND_WRITE_SECTOR);
+
+    delay400ns(device);
+
+    if (read_status_register(controller) & ATA_STATUS_ERROR)
+    {
+        log_error("[IDE] Device reported error");
+        return 0;
+    }
+
+    for (int block = 0; block < nblocks; ++block)
+    {
+        write_block(controller, buf);
+
+        buf += BLOCK_SIZE;
+    }
+
+    if (read_status_register(controller) & ATA_STATUS_ERROR)
+    {
+        log_error("[IDE] Device reported error");
+        return 0;
+    }
+
+    if (flush_cache(controller) != IDE_SUCCESS)
+    {
+        // We failed to flush the cache, so the the write did not go as
+        // planned.
+        return 0;
+    }
+
+    return nblocks;
+}
+
+/**
+ * @brief Write to the IDE device using the deprecated CHS PIO addressing mode.
+ *
+ * Uses the WRITE_SECTORS command.
+ *
+ * @param device Device to write to.
+ * @param block Starting block.
+ * @param nblocks Number of blocks to write.
+ * @param buffer Buffer to write.
+ *
+ * @return Number of blocks written.
+ */
+static uint32_t ide_write_blocks_CHS(ide_device_t *device,
+                                     uint64_t block,
+                                     uint64_t nblocks,
+                                     void *buffer)
+{
+    if (!device)
+    {
+        log_error("[IDE] Device was NULL");
+        return 0;
+    }
+
+    ide_controller_t *controller = device->controller;
+    uint32_t iobase = controller->iobase;
+    uint8_t *buf = (uint8_t *)buffer;
+
+    uint8_t sc;
+    uint8_t cl;
+    uint8_t ch;
+    uint8_t hd;
+
+    if (!device->present)
+    {
+        log_error("[IDE] Device not present");
+        return 0;
+    }
+
+    if (!nblocks)
+    {
+        log_warn("[IDE] Zero blocks requested");
+        return 0;
+    }
+
+    if (nblocks >= MAX_NBLOCKS)
+    {
+        nblocks = MAX_NBLOCKS;
+    }
+
+    if (block + nblocks > device->capacity)
+    {
+        log_error("[IDE] Request outside capacity");
+        log_debug("[IDE] block+nblocks: %i, device->capacity: %i",
+                  block + nblocks,
+                  device->capacity);
+        return 0;
+    }
+
+    if (select_device(device, 1) != IDE_SUCCESS)
+    {
+        log_error("[IDE] Could not select device");
+        return 0;
+    }
+
+    int cyl = block / (device->heads * device->sectors);
+    int tmp = block % (device->heads * device->sectors);
+
+    sc = tmp % device->sectors + 1;
+    cl = cyl & 0xFF;
+    ch = (cyl >> 8) & 0xFF;
+    hd = tmp / device->sectors;
+
+    controller->irq = 0;
+
+    write_drive_head_register(controller, 0xA0 | (device->position << 4) | hd);
+    clear_error_register(controller);
+
+    write_count_register(controller, nblocks);
+
+    // TODO: Do not use outportb directly
+    outportb(iobase + ATA_REGISTER_SECTOR, sc);
+    outportb(iobase + ATA_REGISTER_LCYL, cl);
+    outportb(iobase + ATA_REGISTER_HCYL, ch);
+
+    write_command(controller, ATA_COMMAND_WRITE_SECTOR);
+
+    delay400ns(device);
+
+    if (read_status_register(controller) & ATA_STATUS_ERROR)
+    {
+        log_error("[IDE] Device reported error");
+        return 0;
+    }
+
+    for (int block = 0; block < nblocks; ++block)
+    {
+        write_block(controller, buf);
+
+        buf += BLOCK_SIZE;
+    }
+
+    if (read_status_register(controller) & ATA_STATUS_ERROR)
+    {
+        log_error("[IDE] Device reported error");
+        return 0;
+    }
+
+    if (flush_cache(controller) != IDE_SUCCESS)
+    {
+        // We failed to flush the cache, so the the write did not go as
+        // planned.
+        return 0;
+    }
+
+    return nblocks;
+}
+
+/**
  * @brief Writes a number of blocks to the IDE device.
  *
  * @param minor Minor number for the device.
@@ -1164,7 +1669,15 @@ static uint32_t ide_write_blocks(uint32_t minor,
                                  uint32_t nblocks,
                                  void *buffer)
 {
-    return ide_read_write_blocks(minor, block, nblocks, buffer, IO_WRITE);
+    ide_device_t *device = get_ide_device(minor);
+
+    if (!device->write)
+    {
+        log_error("[IDE] No write function defined for device");
+        return 0;
+    }
+
+    return device->write(device, block, nblocks, buffer);
 }
 
 /**
@@ -1182,7 +1695,15 @@ static uint32_t ide_read_blocks(uint32_t minor,
                                 uint32_t nblocks,
                                 void *buffer)
 {
-    return ide_read_write_blocks(minor, block, nblocks, buffer, IO_READ);
+    ide_device_t *device = get_ide_device(minor);
+
+    if (!device->read)
+    {
+        log_error("[IDE] No read function defined for device");
+        return 0;
+    }
+
+    return device->read(device, block, nblocks, buffer);
 }
 
 /**
@@ -1364,6 +1885,17 @@ void ide_init(uint32_t id, PciDeviceInfo_t *deviceInfo)
                     "[IDE] ATAPI device found but currently not supported");
 
                 continue;
+            }
+
+            if (device->lba)
+            {
+                device->read = ide_read_blocks_LBA28;
+                device->write = ide_read_blocks_LBA28;
+            }
+            else
+            {
+                device->read = ide_read_blocks_CHS;
+                device->write = ide_write_blocks_CHS;
             }
 
             format_device_info(device, msg, i);
