@@ -27,9 +27,11 @@ include(cmake/coverage.cmake)
 #==============================================================================
 
 declare_test(kernel_crypto_mpint_test kernel/crypto/mpint/test_mpint.cpp)
+#declare_test(kernel_drivers_ide_test kernel/drivers/test_ide.cpp)
 
 # TODO: Make declare_kernel_test and place this line in that macro.
 target_include_directories(kernel_crypto_mpint_test PRIVATE ../kernel/include)
+#target_include_directories(kernel_drivers_ide_test PRIVATE ../kernel/include)
 
 declare_test(libk_strtod_test libk/stdlib/strtod_test.cpp)
 

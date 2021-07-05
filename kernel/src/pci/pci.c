@@ -21,6 +21,7 @@
  */
 
 #include <arch/arch.h>
+#include <drivers/ide.h>
 #include <logging/logging.h>
 #include <pci/pci.h>
 #include <pci/pci_io.h>
@@ -33,7 +34,7 @@
 
 pci_device_list_t *device_list = 0;
 
-#define SERIAL_PCI_OUTPUT 0
+#define SERIAL_PCI_OUTPUT 1
 
 #define PCI_MAKE_ID(bus, dev, func) \
     (((bus) << 16) | ((dev) << 11) | ((func) << 8))
@@ -68,7 +69,7 @@ void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
             return;
         }
 
-        device_list->next = 0; // Since we are not guaranteed empty pages.
+        device_list->next = 0;  // Since we are not guaranteed empty pages.
 
         // read info into the first node.
         pci_read_device_info(id, &device_list->dev_info);
@@ -113,6 +114,7 @@ void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
     const PciDriver_t _pci_driver_table[] = {
         {usb_uhci_init},
         {usb_ehci_init},
+        {ide_init},
         {0},
     };
 

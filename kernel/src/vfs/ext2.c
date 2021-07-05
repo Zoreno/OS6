@@ -1996,7 +1996,6 @@ static uint32_t ext2_root(ext2_fs_t *this,
         return -1;
     }
 
-
     fnode->device = (void *)this;
     fnode->inode = 2;
     fnode->name[0] = '/';
@@ -2175,6 +2174,7 @@ static fs_node_t *mount_ext2(fs_node_t *block_device, int flags)
     if (ext2_root(this, root_inode, RN))
     {
         log_error("[EXT2] mount_ext2: ext2_root returned non-zero");
+        free(RN);
         return NULL;
     }
 
@@ -2189,7 +2189,10 @@ int ext2_initialize()
 {
     log_info("[EXT2] Initializing ext2 driver...");
 
-    fs_node_t *dev = kopen("/dev/hda", 0);
+    const char *devicePath = "/dev/hda";
+    const char *mountPath = "/";
+
+    fs_node_t *dev = kopen(devicePath, 0);
 
     if (!dev)
     {
@@ -2202,6 +2205,8 @@ int ext2_initialize()
     }
 
     int flags = EXT2_FLAG_NOCACHE;
+
+    log_info("[EXT2] Mounting \"%s\" at \"%s\"", devicePath, mountPath);
 
     fs_node_t *fs = mount_ext2(dev, flags);
 

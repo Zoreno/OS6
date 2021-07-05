@@ -23,7 +23,9 @@
 #ifndef _IDE_H
 #define _IDE_H
 
-void init_ide_devices(void);
+#include <pci/pci.h>
+
+void ide_init(uint32_t id, PciDeviceInfo_t *deviceInfo);
 
 #endif
 

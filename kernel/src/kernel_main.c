@@ -428,11 +428,9 @@ int kernel_main(unsigned long long rbx, unsigned long long rax)
 
     vfs_install();
 
-    init_ide_devices();
+    pciInit();
 
     ext2_initialize();
-
-    pciInit();
 
     vbe_bochs_set_gfx(800, 600, 4);
 
