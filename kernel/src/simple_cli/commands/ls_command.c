@@ -70,8 +70,17 @@ static void ls_command_format_size(int human_readable,
 
 int ls_command(int argc, const char **argv)
 {
-    int fd =
-        syscall_open(simple_cli_get_working_directory(), O_DIRECTORY, O_RDONLY);
+    int fd;
+
+    if (argc == 2)
+    {
+        fd = syscall_open(argv[1], O_DIRECTORY, O_RDONLY);
+    }
+    else
+    {
+        fd = syscall_open(
+            simple_cli_get_working_directory(), O_DIRECTORY, O_RDONLY);
+    }
 
     if (fd < 0)
     {
