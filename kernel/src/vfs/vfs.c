@@ -411,8 +411,16 @@ char *canonicalize_path(char *cwd, char *input)
     if (size == 0)
     {
         output = malloc(2 * sizeof(char));
-        output[0] = PATH_SEPARATOR;
-        output[1] = '\0';
+
+        if (output)
+        {
+            output[0] = PATH_SEPARATOR;
+            output[1] = '\0';
+        }
+        else
+        {
+            log_error("[VFS] Out of memory");
+        }
     }
     else
     {
@@ -746,7 +754,21 @@ void vfs_install(void)
 
     vfs_entry_t *root = malloc(sizeof(vfs_entry_t));
 
+    if (!root)
+    {
+        log_error("[VFS] Out of memory");
+        return;
+    }
+
     root->name = strdup("[root]");
+
+    if (!root->name)
+    {
+        log_error("[VFS] Out of memory");
+        free(root);
+        return;
+    }
+
     root->file = NULL;
     root->fs_type = NULL;
     root->device = NULL;
@@ -973,6 +995,7 @@ static fs_node_t *kopen_recur(char *filename,
     if (!node_ptr)
     {
         log_error("[VFS] kopen_recur: Could not get mount point");
+        free(path);
         return NULL;
     }
 
@@ -1066,6 +1089,7 @@ static fs_node_t *kopen_recur(char *filename,
             if (!node_ptr)
             {
                 free((void *)path);
+                return NULL;
             }
         }
 
@@ -1101,6 +1125,8 @@ static fs_node_t *kopen_recur(char *filename,
         path_offset += strlen(path_offset) + 1;
         ++depth;
     } while (depth < path_depth + 1);
+
+    free(node_ptr);
 
     free((void *)path);
 
