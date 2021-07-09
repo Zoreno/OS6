@@ -214,7 +214,8 @@ typedef struct _PciDeviceInfo
      * Provides control over a device's ability to generate and respond to PCI
      * cycles.
      */
-    union {
+    union
+    {
         uint16_t command_w;
         PciCommand_t command;
     };
@@ -222,7 +223,8 @@ typedef struct _PciDeviceInfo
     /**
      * A register used to record status information for PCI bus related events.
      */
-    union {
+    union
+    {
         uint16_t status_w;
         PciStatus_t status;
     };
@@ -272,7 +274,8 @@ typedef struct _PciDeviceInfo
      */
     uint8_t BIST;
 
-    union {
+    union
+    {
         /**
          * These fields are applicable if headerType is 0x00.
          */
@@ -430,6 +433,13 @@ typedef struct _PciDeviceInfo
             uint8_t Diagnostic;
         } type2;
     };
+
+    /**
+     * @brief PCI bus address encoded as ID.
+     *
+     *
+     */
+    uint32_t id;
 
 } PciDeviceInfo_t;
 

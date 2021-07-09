@@ -83,6 +83,8 @@ void pci_read_device_info(uint32_t id, PciDeviceInfo_t *info)
     default:  // Invalid PCI device
         break;
     }
+
+    info->id = id;
 }
 
 const char *pci_device_name(uint32_t vendorID, uint32_t deviceID)

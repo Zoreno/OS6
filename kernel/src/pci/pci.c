@@ -43,16 +43,20 @@ pci_device_list_t *device_list = 0;
 #define PCI_CONFIG_VENDOR_ID 0x00
 #define PCI_CONFIG_HEADER_TYPE 0x0e
 
-void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func);
+static PciDeviceInfo_t *pciCheckDevice(uint32_t bus,
+                                       uint32_t dev,
+                                       uint32_t func);
 
-void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
+static PciDeviceInfo_t *pciCheckDevice(uint32_t bus,
+                                       uint32_t dev,
+                                       uint32_t func)
 {
     uint32_t id = PCI_MAKE_ID(bus, dev, func);
 
     // No existing device
     if (pci_read_w(id, PCI_CONFIG_VENDOR_ID) == 0xFFFF)
     {
-        return;
+        return NULL;
     }
 
     PciDeviceInfo_t *devInfo = NULL;
@@ -66,7 +70,7 @@ void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
         if (!device_list)
         {
             log_error("[PCI] Failed to allocate memory");
-            return;
+            return NULL;
         }
 
         device_list->next = 0;  // Since we are not guaranteed empty pages.
@@ -93,7 +97,7 @@ void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
         if (!cur_node->next)
         {
             log_error("[PCI] Failed to allocate memory");
-            return;
+            return NULL;
         }
 
         cur_node = cur_node->next;
@@ -108,23 +112,38 @@ void pciCheckDevice(uint32_t bus, uint32_t dev, uint32_t func)
 
     if (!devInfo)
     {
-        return;
+        return NULL;
     }
 
-    const PciDriver_t _pci_driver_table[] = {
-        {usb_uhci_init},
-        {usb_ehci_init},
-        {ide_init},
-        {0},
+    return devInfo;
+}
+
+static int find_suitable_driver(PciDeviceInfo_t *devInfo)
+{
+    static const PciDriver_t _pci_driver_table[] = {
+        {PCI_SERIAL_USB, PCI_SERIAL_USB_UHCI, usb_uhci_init},
+        {PCI_SERIAL_USB, PCI_SERIAL_USB_EHCI, usb_ehci_init},
+        {PCI_STORAGE_IDE, PCI_DONT_CARE, ide_init},
+        {0, 0, NULL},
     };
 
     const PciDriver_t *driver = _pci_driver_table;
 
+    uint16_t class = (devInfo->classCode << 8) | devInfo->subClass;
+
     while (*driver->init)
     {
-        driver->init(id, devInfo);
+        if (driver->class == class && (driver->progIntf == PCI_DONT_CARE ||
+                                       driver->progIntf == devInfo->progIntf))
+        {
+            log_info("[PCI] Found suitable driver for device");
+            driver->init(devInfo->id, devInfo);
+            return 1;
+        }
         ++driver;
     }
+
+    return 0;
 }
 
 uint32_t pci_get_vga_lfb()
@@ -157,6 +176,8 @@ void pciInit()
 {
     log_info("[PCI] Initializing...");
 
+    log_info("[PCI] Starting PCI scan...");
+
     for (uint32_t bus = 0; bus < 256; ++bus)
     {
         for (uint32_t dev = 0; dev < 32; ++dev)
@@ -169,10 +190,25 @@ void pciInit()
 
             for (uint8_t func = 0; func < funcCount; ++func)
             {
-                pciCheckDevice(bus, dev, func);
+                PciDeviceInfo_t *devInfo = pciCheckDevice(bus, dev, func);
+
+                if (devInfo)
+                {
+                    log_info("[PCI] Found device at %i-%i:%i: %s",
+                             bus,
+                             dev,
+                             func,
+                             pci_class_name(devInfo->classCode,
+                                            devInfo->subClass,
+                                            devInfo->progIntf));
+
+                    find_suitable_driver(devInfo);
+                }
             }
         }
     }
+
+    log_info("[PCI] PCI scan done!");
 
     // Send out all read info to serial output for reference
 

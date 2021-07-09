@@ -31,7 +31,8 @@ extern pci_device_list_t *device_list;
 
 typedef struct _PciBAR
 {
-    union {
+    union
+    {
         void *address;
         uint16_t port;
     };
@@ -40,8 +41,13 @@ typedef struct _PciBAR
     uint32_t flags;
 } PciBAR_t;
 
+#define PCI_DONT_CARE 0xFF
+
 typedef struct _PciDriver_t
 {
+    uint16_t class;
+    uint8_t progIntf;
+
     void (*init)(uint32_t id, PciDeviceInfo_t *deviceInfo);
 } PciDriver_t;
 
