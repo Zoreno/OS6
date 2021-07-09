@@ -445,7 +445,20 @@ static int acpi_parse_dsdt(dsdt_t *dsdt)
     hexdump(dsdt_block, dsdt_length);
 #endif
 
-    acpi_find_system_state("_S5_", dsdt_block, dsdt_length, &S5_state);
+    if (!acpi_find_system_state("_S3_", dsdt_block, dsdt_length, &S3_state))
+    {
+        log_info("[ACPI] Found valid _S3_ state");
+    }
+
+    if (!acpi_find_system_state("_S4_", dsdt_block, dsdt_length, &S4_state))
+    {
+        log_info("[ACPI] Found valid _S4_ state");
+    }
+
+    if (!acpi_find_system_state("_S5_", dsdt_block, dsdt_length, &S5_state))
+    {
+        log_info("[ACPI] Found valid _S5_ state");
+    }
 
     return 0;
 }

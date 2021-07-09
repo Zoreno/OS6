@@ -1892,7 +1892,7 @@ void ide_init(uint32_t id, PciDeviceInfo_t *deviceInfo)
             if (device->lba)
             {
                 device->read = ide_read_blocks_LBA28;
-                device->write = ide_read_blocks_LBA28;
+                device->write = ide_write_blocks_LBA28;
             }
             else
             {
