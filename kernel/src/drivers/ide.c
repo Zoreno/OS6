@@ -769,7 +769,7 @@ static ide_error_t reset_controller(ide_controller_t *controller)
 /**
  * @brief Delay 400ns by reading from the status register.
  *
- * Each read takes ~100ns, so 4 reads is needed.
+ * Each read takes ~100ns, so 4 reads are needed.
  *
  * @param device Device to read from.
  *
@@ -958,6 +958,8 @@ static void identify_ide_device(ide_device_t *device)
     }
 
     uint8_t count = read_count_register(controller);
+
+    // TODO: Read using function instead of using inportb.
     uint8_t lba = inportb(iobase + ATA_REGISTER_SECTOR);
 
     if (count == 0x01 && lba == 0x01)
