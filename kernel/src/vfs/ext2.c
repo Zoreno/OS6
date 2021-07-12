@@ -2192,7 +2192,7 @@ int ext2_initialize()
     const char *devicePath = "/dev/hda";
     const char *mountPath = "/";
 
-    fs_node_t *dev = kopen(devicePath, 0);
+    fs_node_t *dev = kopen((char *)devicePath, 0);
 
     if (!dev)
     {
