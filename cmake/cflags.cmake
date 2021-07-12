@@ -10,8 +10,12 @@ set(BUILDING_TESTS ON)
 
 set(CFLAGS "-m64")
 
+set(USE_ANALYZER OFF)
+
+if(${USE_ANALYZER})
 # Enable analyzer
 set(CFLAGS "${CFLAGS} -fanalyzer")
+endif()
 
 # Set warnings and error conditions
 set(CFLAGS "${CFLAGS} -Wall -Wextra -Wno-unused -Wno-sign-compare -Wno-address-of-packed-member")
