@@ -366,6 +366,32 @@ void parse_multiboot(unsigned char *mb_ptr, memory_info_t *mem_info)
     mem_info->kernel_load_addr = (uint64_t)&__kernel_start;
     // mem_info->kernel_end = (uint64_t)&__kernel_end;
     mem_info->kernel_size = mem_info->kernel_end - mem_info->kernel_load_addr;
+
+    log_info("Kernel start: %#016x", &__kernel_start);
+
+    // TODO: Write to_human_readable() in utils.
+
+    int unit = 0;
+    size_t val = mem_info->kernel_size;
+
+    // Units differ with factor 2^10
+    while (val > (1ULL << 10))
+    {
+        val >>= 10ULL;
+        unit += 1;
+    }
+
+    const char *units[] = {"B", "KB", "MB"};
+
+    log_info("Kernel size: %i%s (%i bytes)",
+             val,
+             units[unit],
+             mem_info->kernel_size);
+
+    if (mem_info->kernel_size >= (4 * (1 << 20)))
+    {
+        log_error("Kernel larger than currently mapped initial region");
+    }
 }
 
 void mouse_moved_handler(mouse_moved_event_t *event)
