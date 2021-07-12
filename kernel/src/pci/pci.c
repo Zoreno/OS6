@@ -202,7 +202,13 @@ void pciInit()
                                             devInfo->subClass,
                                             devInfo->progIntf));
 
-                    find_suitable_driver(devInfo);
+                    int found = find_suitable_driver(devInfo);
+
+                    if (!found)
+                    {
+                        log_warn(
+                            "[PCI] Could not find suitable driver for device");
+                    }
                 }
             }
         }
