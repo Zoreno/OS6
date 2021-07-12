@@ -33,10 +33,10 @@ set(QEMU_FLAGS ${QEMU_FLAGS} -serial stdio)
 set(QEMU_FLAGS ${QEMU_FLAGS} -vga std)
 
 # Set audio settings
-set(QEMU_FLAGS ${QEMU_FLAGS} -device ich9-intel-hda,addr=1f.1 -audiodev pa,id=snd0 -device hda-output,audiodev=snd0)
+#set(QEMU_FLAGS ${QEMU_FLAGS} -device ich9-intel-hda,addr=1f.1 -audiodev pa,id=snd0 -device hda-output,audiodev=snd0)
 
 # RNG device (not used)
-set(QEMU_FLAGS ${QEMU_FLAGS} -object rng-random,id=rng0,filename=/dev/urandom -device virtio-rng-pci,rng=rng0)
+#set(QEMU_FLAGS ${QEMU_FLAGS} -object rng-random,id=rng0,filename=/dev/urandom -device virtio-rng-pci,rng=rng0)
 
 # Set ACPI flags
 #set(QEMU_FLAGS ${QEMU_FLAGS} -no-acpi)
