@@ -21,6 +21,7 @@
  */
 
 #include <arch/arch.h>
+#include <drivers/e1000.h>
 #include <drivers/ide.h>
 #include <logging/logging.h>
 #include <pci/pci.h>
@@ -124,6 +125,7 @@ static int find_suitable_driver(PciDeviceInfo_t *devInfo)
         {PCI_SERIAL_USB, PCI_SERIAL_USB_UHCI, usb_uhci_init},
         {PCI_SERIAL_USB, PCI_SERIAL_USB_EHCI, usb_ehci_init},
         {PCI_STORAGE_IDE, PCI_DONT_CARE, ide_init},
+        {PCI_NETWORK_ETHERNET, PCI_DONT_CARE, e1000_init},
         {0, 0, NULL},
     };
 
