@@ -172,6 +172,7 @@ void set_interrupt_handler(int intno, INT_HANDLER int_handler, int flags)
 
 void set_irq_handler(int irq, IRQ_HANDLER irq_handler)
 {
+    log_info("[ARCH] Installing IRQ handler for irq%i", irq);
     arch_x86_64_install_irq(irq, irq_handler);
 }
 

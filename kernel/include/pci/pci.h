@@ -25,6 +25,7 @@
 
 #include <pci/pci_device.h>
 
+#include <stddef.h>
 #include <stdint.h>
 
 extern pci_device_list_t *device_list;
@@ -52,6 +53,9 @@ typedef struct _PciDriver_t
 } PciDriver_t;
 
 void pciInit();
+
+void pciWriteConfigField(uint32_t id, int field, size_t size, uint32_t value);
+uint32_t pciReadConfigField(uint32_t id, int field, size_t size);
 
 uint32_t pci_get_vga_lfb();
 

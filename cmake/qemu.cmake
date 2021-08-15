@@ -21,6 +21,15 @@ set(QEMU_FLAGS ${QEMU_FLAGS} -rtc base=localtime)
 # Set boot deivce
 set(QEMU_FLAGS ${QEMU_FLAGS} -boot d)
 
+set(QEMU_FLAGS ${QEMU_FLAGS} -net user)
+#set(QEMU_FLAGS ${QEMU_FLAGS} -netdev hubport,id=u1,hubid=0)
+set(QEMU_FLAGS ${QEMU_FLAGS} -netdev tap,id=u1)
+#set(QEMU_FLAGS ${QEMU_FLAGS} -netdev user,id=u1,net=192.168.1.0/24,dhcpstart=192.168.1.9)
+set(QEMU_FLAGS ${QEMU_FLAGS} -device e1000,netdev=u1)
+set(QEMU_FLAGS ${QEMU_FLAGS} -object filter-dump,id=f1,netdev=u1,file=qemu-e1000e.pcap)
+
+set(QEMU_FLAGS ${QEMU_FLAGS} -enable-kvm)
+
 # Set USB devices
 set(QEMU_FLAGS ${QEMU_FLAGS} -usb -device usb-ehci,id=ehci)
 set(QEMU_FLAGS ${QEMU_FLAGS} -device usb-tablet,bus=ehci.0,port=1)

@@ -26,6 +26,7 @@
 #include <logging/logging.h>
 #include <pci/pci.h>
 #include <pci/pci_io.h>
+#include <process/process.h>
 #include <usb/usb_ehci.h>
 #include <usb/usb_uhci.h>
 
@@ -33,7 +34,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+// TODO: Fix naming convention in this file.
+
+//=============================================================================
+// Local data
+//=============================================================================
+
 pci_device_list_t *device_list = 0;
+
+//=============================================================================
+// Definitions
+//=============================================================================
 
 #define SERIAL_PCI_OUTPUT 1
 
@@ -44,9 +55,50 @@ pci_device_list_t *device_list = 0;
 #define PCI_CONFIG_VENDOR_ID 0x00
 #define PCI_CONFIG_HEADER_TYPE 0x0e
 
+#define PCI_VENDOR_ID 0x00    // 2
+#define PCI_DEVICE_ID 0x02    // 2
+#define PCI_COMMAND 0x04      // 2
+#define PCI_STATUS 0x06       // 2
+#define PCI_REVISION_ID 0x08  // 1
+
+#define PCI_PROG_IF 0x09          // 1
+#define PCI_SUBCLASS 0x0a         // 1
+#define PCI_CLASS 0x0b            // 1
+#define PCI_CACHE_LINE_SIZE 0x0c  // 1
+#define PCI_LATENCY_TIMER 0x0d    // 1
+#define PCI_HEADER_TYPE 0x0e      // 1
+#define PCI_BIST 0x0f             // 1
+#define PCI_BAR0 0x10             // 4
+#define PCI_BAR1 0x14             // 4
+#define PCI_BAR2 0x18             // 4
+#define PCI_BAR3 0x1C             // 4
+#define PCI_BAR4 0x20             // 4
+#define PCI_BAR5 0x24             // 4
+
+#define PCI_INTERRUPT_LINE 0x3C  // 1
+
+#define PCI_SECONDARY_BUS 0x19  // 1
+
+#define PCI_ADDRESS_PORT 0xCF8
+#define PCI_VALUE_PORT 0xCFC
+
+//=============================================================================
+// Private function forward declarations
+//=============================================================================
+
+static uint32_t pciGetAddress(uint32_t id, int field);
 static PciDeviceInfo_t *pciCheckDevice(uint32_t bus,
                                        uint32_t dev,
                                        uint32_t func);
+
+//=============================================================================
+// Private functions
+//=============================================================================
+
+static uint32_t pciGetAddress(uint32_t id, int field)
+{
+    return 0x80000000 | id | (field & 0xFC);
+}
 
 static PciDeviceInfo_t *pciCheckDevice(uint32_t bus,
                                        uint32_t dev,
@@ -147,6 +199,10 @@ static int find_suitable_driver(PciDeviceInfo_t *devInfo)
 
     return 0;
 }
+
+//=============================================================================
+// Interface functions
+//=============================================================================
 
 uint32_t pci_get_vga_lfb()
 {
@@ -285,6 +341,35 @@ void pciInit()
 #endif
 
     log_info("[PCI] Done!");
+}
+
+uint32_t pciReadConfigField(uint32_t id, int field, size_t size)
+{
+    uint32_t address = pciGetAddress(id, field);
+
+    outportl(PCI_ADDRESS_PORT, address);
+
+    switch (size)
+    {
+    case 4:
+        return inportl(PCI_VALUE_PORT);
+    case 2:
+        return inportw(PCI_VALUE_PORT + (field & 2));
+    case 1:
+        return inportb(PCI_VALUE_PORT + (field & 3));
+    default:
+        break;
+    }
+
+    return 0xFFFF;
+}
+
+void pciWriteConfigField(uint32_t id, int field, size_t size, uint32_t value)
+{
+    (void)size;
+    uint32_t address = pciGetAddress(id, field);
+    outportl(PCI_ADDRESS_PORT, address);
+    outportl(PCI_VALUE_PORT, value);
 }
 
 //=============================================================================
